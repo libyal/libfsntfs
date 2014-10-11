@@ -28,7 +28,7 @@ BEGIN
       VALUE "OriginalFilename",		"libfsntfs.dll\0"
       VALUE "ProductName",		"libfsntfs\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"
-      VALUE "Comments",			"For more information visit http://code.google.com/p/libfsntfs/\0"
+      VALUE "Comments",			"For more information visit https://github.com/libyal/libfsntfs/\0"
     END
   END
   BLOCK "VarFileInfo"
