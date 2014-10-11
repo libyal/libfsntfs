@@ -1,0 +1,36 @@
+Source: libfsntfs
+Section: unknown
+Priority: extra
+Maintainer: Joachim Metz <joachim.metz@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev, python-dev
+Standards-Version: 3.8.3
+Homepage: http://code.google.com/p/libfsntfs/
+
+Package: libfsntfs
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Library to access the Windows NT File System (NTFS) format
+ libfsntfs is a library to access the Windows NT File System (NTFS) format.
+
+Package: libfsntfs-dev
+Section: libdevel
+Architecture: any
+Depends: libfsntfs (= ${Source-Version})
+Description: Header files and libraries for developing applications for libfsntfs
+ Header files and libraries for developing applications for libfsntfs.
+
+Package: libfsntfs-tools
+Section: utils
+Architecture: any
+Depends: libfsntfs (= ${Source-Version}), ${shlibs:Depends}
+Description: Several tools for reading Windows NT File System (NTFS) volumes
+ Several tools for reading Windows NT File System (NTFS) volumes
+
+Package: libfsntfs-python
+Section: python
+Architecture: any
+Depends: libfsntfs (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Description: Python bindings for libfsntfs
+ Python bindings for libfsntfs.
+

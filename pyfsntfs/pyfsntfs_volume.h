@@ -1,0 +1,106 @@
+/*
+ * Python object definition of the libfsntfs volume
+ *
+ * Copyright (c) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined( _PYFSNTFS_VOLUME_H )
+#define _PYFSNTFS_VOLUME_H
+
+#include <common.h>
+#include <types.h>
+
+#include "pyfsntfs_libfsntfs.h"
+#include "pyfsntfs_libbfio.h"
+#include "pyfsntfs_python.h"
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+typedef struct pyfsntfs_volume pyfsntfs_volume_t;
+
+struct pyfsntfs_volume
+{
+	/* Python object initialization
+	 */
+	PyObject_HEAD
+
+	/* The libfsntfs volume
+	 */
+	libfsntfs_volume_t *volume;
+
+	/* The libbfio file IO handle
+	 */
+	libbfio_handle_t *file_io_handle;
+};
+
+extern PyMethodDef pyfsntfs_volume_object_methods[];
+extern PyTypeObject pyfsntfs_volume_type_object;
+
+PyObject *pyfsntfs_volume_new(
+           void );
+
+PyObject *pyfsntfs_volume_new_open(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyfsntfs_volume_new_open_file_object(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+int pyfsntfs_volume_init(
+     pyfsntfs_volume_t *pyfsntfs_volume );
+
+void pyfsntfs_volume_free(
+      pyfsntfs_volume_t *pyfsntfs_volume );
+
+PyObject *pyfsntfs_volume_signal_abort(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_open(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyfsntfs_volume_open_file_object(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyfsntfs_volume_close(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_name(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_root_directory(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif
+

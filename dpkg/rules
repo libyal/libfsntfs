@@ -1,0 +1,88 @@
+#!/usr/bin/make -f
+# debian/rules that uses debhelper >= 7.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+PYTHON_PACKAGE_DIR=$(shell python -c "import distutils.sysconfig;print distutils.sysconfig.get_python_lib(True) ")
+
+
+%:
+	dh  $@
+
+install_libfsntfs:
+	# Set up libfsntfs package directories and files
+	mkdir -p debian/libfsntfs/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so.*.*.* debian/libfsntfs/usr/lib
+
+install_libfsntfs_dev:
+	# Set up libfsntfs-dev package directories and files
+	mkdir -p debian/libfsntfs-dev/usr/include
+	mkdir -p debian/libfsntfs-dev/usr/include/libfsntfs
+	mkdir -p debian/libfsntfs-dev/usr/lib
+	mkdir -p debian/libfsntfs-dev/usr/lib/pkgconfig
+	mkdir -p debian/libfsntfs-dev/usr/share/man/man3
+	install -p -m755 debian/tmp/usr/include/*.h debian/libfsntfs-dev/usr/include
+	install -p -m755 debian/tmp/usr/include/libfsntfs/*.h debian/libfsntfs-dev/usr/include/libfsntfs
+	install -p -m755 debian/tmp/usr/lib/*.la debian/libfsntfs-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.a debian/libfsntfs-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/lib*.so debian/libfsntfs-dev/usr/lib
+	install -p -m755 debian/tmp/usr/lib/pkgconfig/* debian/libfsntfs-dev/usr/lib/pkgconfig
+	install -p -m755 debian/tmp/usr/share/man/man3/* debian/libfsntfs-dev/usr/share/man/man3
+
+install_libfsntfs_tools:
+	# Set up libfsntfs-tools package directories and files
+	mkdir -p debian/libfsntfs-tools/usr/bin
+	mkdir -p debian/libfsntfs-tools/usr/share/man/man1
+	install -p -m755 debian/tmp/usr/bin/* debian/libfsntfs-tools/usr/bin
+	install -p -m755 debian/tmp/usr/share/man/man1/* debian/libfsntfs-tools/usr/share/man/man1
+
+install_libfsntfs_python:
+	# Set up libfsntfs-python package directories and files
+	mkdir -p debian/libfsntfs-python/$(PYTHON_PACKAGE_DIR)
+	install -p -m775 debian/tmp$(PYTHON_PACKAGE_DIR)/pyfsntfs.* debian/libfsntfs-python$(PYTHON_PACKAGE_DIR)
+
+override_dh_auto_configure:
+	dh_auto_configure -- --enable-python
+
+override_dh_auto_test:
+
+override_dh_installinit: install_libfsntfs install_libfsntfs_dev install_libfsntfs_tools
+
+override_dh_installmenu:
+
+override_dh_installmime:
+
+override_dh_installmodules:
+
+override_dh_installlogcheck:
+
+override_dh_installlogrotate:
+
+override_dh_installpam:
+
+override_dh_installppp:
+
+override_dh_installudev:
+
+override_dh_installwm:
+
+override_dh_installxfonts:
+
+override_dh_gconf:
+
+override_dh_icons:
+
+override_dh_perl:
+
+override_dh_pysupport:
+
+override_dh_shlibdeps:
+	dh_shlibdeps -Llibfsntfs -l${PWD}/debian/tmp/usr/lib
+
+override_dh_makeshlibs:
+	dh_makeshlibs -Xlibfsntfs-dev
+

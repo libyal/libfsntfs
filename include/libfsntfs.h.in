@@ -1,0 +1,1009 @@
+/*
+ * Library to access the Windows NT File System (NTFS) format
+ *
+ * Copyright (C) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined( _LIBFSNTFS_H )
+#define _LIBFSNTFS_H
+
+#include <libfsntfs/codepage.h>
+#include <libfsntfs/definitions.h>
+#include <libfsntfs/error.h>
+#include <libfsntfs/extern.h>
+#include <libfsntfs/features.h>
+#include <libfsntfs/types.h>
+
+#include <stdio.h>
+
+#if defined( LIBFSNTFS_HAVE_BFIO )
+#include <libbfio.h>
+#endif
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+/* -------------------------------------------------------------------------
+ * Support functions
+ * ------------------------------------------------------------------------- */
+
+/* Returns the library version
+ */
+LIBFSNTFS_EXTERN \
+const char *libfsntfs_get_version(
+             void );
+
+/* Determines if an volume containt the NTFS file system (check for the NTFS signature)
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_volume_signature(
+     const char *filename,
+     libfsntfs_error_t **error );
+
+#if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
+/* Determines if an volume containt the NTFS file system (check for the NTFS signature)
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_volume_signature_wide(
+     const wchar_t *filename,
+     libfsntfs_error_t **error );
+#endif
+
+#if defined( LIBFSNTFS_HAVE_BFIO )
+/* Determines if an volume containt the NTFS file system (check for the NTFS signature) using a Basic File IO (bfio) handle
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_volume_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_error_t **error );
+#endif
+
+/* -------------------------------------------------------------------------
+ * Notify functions
+ * ------------------------------------------------------------------------- */
+
+/* Sets the verbose notification
+ */
+LIBFSNTFS_EXTERN \
+void libfsntfs_notify_set_verbose(
+      int verbose );
+
+/* Sets the notification stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_notify_set_stream(
+     FILE *stream,
+     libfsntfs_error_t **error );
+
+/* Opens the notification stream using a filename
+ * The stream is opened in append mode
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_notify_stream_open(
+     const char *filename,
+     libfsntfs_error_t **error );
+
+/* Closes the notification stream if opened using a filename
+ * Returns 0 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_notify_stream_close(
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Error functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an error
+ */
+LIBFSNTFS_EXTERN \
+void libfsntfs_error_free(
+      libfsntfs_error_t **error );
+
+/* Prints a descriptive string of the error to the stream
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_error_fprint(
+     libfsntfs_error_t *error,
+     FILE *stream );
+
+/* Prints a descriptive string of the error to the string
+ * The end-of-string character is not included in the return value
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_error_sprint(
+     libfsntfs_error_t *error,
+     char *string,
+     size_t size );
+
+/* Prints a backtrace of the error to the stream
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_error_backtrace_fprint(
+     libfsntfs_error_t *error,
+     FILE *stream );
+
+/* Prints a backtrace of the error to the string
+ * The end-of-string character is not included in the return value
+ * Returns the number of printed characters if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_error_backtrace_sprint(
+     libfsntfs_error_t *error,
+     char *string,
+     size_t size );
+
+/* -------------------------------------------------------------------------
+ * Volume functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a volume
+ * Make sure the value volume is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_initialize(
+     libfsntfs_volume_t **volume,
+     libfsntfs_error_t **error );
+
+/* Frees a volume
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_free(
+     libfsntfs_volume_t **volume,
+     libfsntfs_error_t **error );
+
+/* Signals the volume to abort its current activity
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_signal_abort(
+     libfsntfs_volume_t *volume,
+     libfsntfs_error_t **error );
+
+/* Opens a volume
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_open(
+     libfsntfs_volume_t *volume,
+     const char *filename,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+#if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
+/* Opens a volume
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_open_wide(
+     libfsntfs_volume_t *volume,
+     const wchar_t *filename,
+     int access_flags,
+     libfsntfs_error_t **error );
+#endif
+
+#if defined( LIBFSNTFS_HAVE_BFIO )
+/* Opens a volume using a Basic File IO (bfio) handle
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_open_file_io_handle(
+     libfsntfs_volume_t *volume,
+     libbfio_handle_t *file_io_handle,
+     int access_flags,
+     libfsntfs_error_t **error );
+#endif
+
+/* Closes a volume
+ * Returns 0 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_close(
+     libfsntfs_volume_t *volume,
+     libfsntfs_error_t **error );
+
+/* Retrieves the cluster block size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_cluster_block_size(
+     libfsntfs_volume_t *volume,
+     size_t *cluster_block_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_utf8_name_size(
+     libfsntfs_volume_t *volume,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_utf8_name(
+     libfsntfs_volume_t *volume,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_utf16_name_size(
+     libfsntfs_volume_t *volume,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_utf16_name(
+     libfsntfs_volume_t *volume,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the version
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_version(
+     libfsntfs_volume_t *volume,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file entry of a specific MFT entry index
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_file_entry_by_index(
+     libfsntfs_volume_t *volume,
+     uint64_t mft_entry_index,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the root directory file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file entry for an UTF-8 encoded path
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_file_entry_by_utf8_path(
+     libfsntfs_volume_t *volume,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file entry for an UTF-16 encoded path
+ * Returns 1 if successful, 0 if no such file entry or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_file_entry_by_utf16_path(
+     libfsntfs_volume_t *volume,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * File entry functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_free(
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the creation date and time
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_creation_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *creation_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the modification date and time
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the access date and time
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_access_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *access_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the entry modification date and time
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_entry_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *entry_modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file attribute flags
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_file_attribute_flags(
+     libfsntfs_file_entry_t *file_entry,
+     uint32_t *file_attribute_flags,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * This value is retrieved from the $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the number of attributes
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_number_of_attributes(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_attributes,
+     libfsntfs_error_t **error );
+
+/* Retrieves the attribute for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_attribute_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     libfsntfs_attribute_t **attribute,
+     libfsntfs_error_t **error );
+
+/* Determines if the file entry has the default data stream
+ * Defined by the default (nameless) $DATA attribute
+ * Returns 1 if the default data stream, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the number of alternate data streams
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_number_of_alternate_data_streams(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_alternate_data_streams,
+     libfsntfs_error_t **error );
+
+/* Retrieves the alternate data stream for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_alternate_data_stream_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int alternate_data_stream_index,
+     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_error_t **error );
+
+/* Retrieves the alternate data stream for an UTF-8 encoded name
+ * Returns 1 if successful, 0 if the file entry does not contain such value or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_error_t **error );
+
+/* Retrieves the alternate data stream for an UTF-16 encoded name
+ * Returns 1 if successful, 0 if the file entry does not contain such value or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_error_t **error );
+
+/* Retrieves the number of sub file entries
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_number_of_sub_file_entries(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_sub_file_entries,
+     libfsntfs_error_t **error );
+
+/* Retrieves the sub file entry for the specific index
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_sub_file_entry_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int sub_file_entry_index,
+     libfsntfs_file_entry_t **sub_file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the sub file entry for an UTF-8 encoded name
+ * Returns 1 if successful, 0 if the file entry does not contain such value or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_file_entry_t **sub_file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the sub file entry for an UTF-16 encoded name
+ * Returns 1 if successful, 0 if the file entry does not contain such value or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_file_entry_t **sub_file_entry,
+     libfsntfs_error_t **error );
+
+/* Reads data at the current offset
+ * Returns the number of bytes read or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_file_entry_read_buffer(
+         libfsntfs_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         libfsntfs_error_t **error );
+
+/* Reads data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_file_entry_read_buffer_at_offset(
+         libfsntfs_file_entry_t *file_entry,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libfsntfs_error_t **error );
+
+/* Seeks a certain offset of the data
+ * Returns the offset if seek is successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+off64_t libfsntfs_file_entry_seek_offset(
+         libfsntfs_file_entry_t *file_entry,
+         off64_t offset,
+         int whence,
+         libfsntfs_error_t **error );
+
+/* Retrieves the current offset of the data
+ * Returns the offset if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_offset(
+     libfsntfs_file_entry_t *file_entry,
+     off64_t *offset,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_size(
+     libfsntfs_file_entry_t *file_entry,
+     size64_t *size,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_free(
+     libfsntfs_attribute_t **attribute,
+     libfsntfs_error_t **error );
+
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_type(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *type,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_utf8_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_utf8_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_utf16_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_utf16_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * $FILE_NAME attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the creation date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_creation_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *creation_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_modification_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the access date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_access_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *access_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the entry modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_entry_modification_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *entry_modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file attribute flags
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_file_attribute_flags(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *file_attribute_flags,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * $OBJECT_ID attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the droid file identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_object_identifier_attribute_get_droid_file_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *guid,
+     size_t size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the birth droid volume identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *guid,
+     size_t size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the birth droid file identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *guid,
+     size_t size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the birth droid domain identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *guid,
+     size_t size,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * $STANDARD_INFORMATION attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the creation date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_creation_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *creation_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_modification_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the access date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_access_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *access_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the entry modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_entry_modification_time(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *entry_modification_time,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file attribute flags
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_file_attribute_flags(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *file_attribute_flags,
+     libfsntfs_error_t **error );
+
+/* Retrieves the owner identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_owner_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *owner_identifier,
+     libfsntfs_error_t **error );
+
+/* Retrieves the security identifier
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_security_identifier(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *security_identifier,
+     libfsntfs_error_t **error );
+
+/* Retrieves the update sequence number (USN)
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_update_sequence_number(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *update_sequence_number,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * $VOLUME_INFORMATION attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the version
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_information_attribute_get_version(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libfsntfs_error_t **error );
+
+/* Retrieves the flags
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_information_attribute_get_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *flags,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * $VOLUME_NAME attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_name_attribute_get_utf8_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_name_attribute_get_utf8_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_name_attribute_get_utf16_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_name_attribute_get_utf16_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Alternate data stream functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an alternate data stream
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_free(
+     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_utf8_name_size(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_utf8_name(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_utf16_name_size(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_utf16_name(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Reads data at the current offset
+ * Returns the number of bytes read or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_alternate_data_stream_read_buffer(
+         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+         void *buffer,
+         size_t buffer_size,
+         libfsntfs_error_t **error );
+
+/* Reads data at a specific offset
+ * Returns the number of bytes read or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_alternate_data_stream_read_buffer_at_offset(
+         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+         void *buffer,
+         size_t buffer_size,
+         off64_t offset,
+         libfsntfs_error_t **error );
+
+/* Seeks a certain offset of the data
+ * Returns the offset if seek is successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+off64_t libfsntfs_alternate_data_stream_seek_offset(
+         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+         off64_t offset,
+         int whence,
+         libfsntfs_error_t **error );
+
+/* Retrieves the current offset of the data
+ * Returns the offset if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_offset(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     off64_t *offset,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_alternate_data_stream_get_size(
+     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+     size64_t *size,
+     libfsntfs_error_t **error );
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif
+
