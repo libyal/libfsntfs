@@ -1,6 +1,6 @@
 dnl Functions for libcsystem
 dnl
-dnl Version: 20130106
+dnl Version: 20141018
 
 dnl Function to detect if libcsystem is available
 dnl ac_libcsystem_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBCSYSTEM_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libcsystem],
-    [libcsystem >= 20120425],
+    [libcsystem >= 20141018],
     [ac_cv_libcsystem=yes],
     [ac_cv_libcsystem=no])
    ])
@@ -35,21 +35,38 @@ AC_DEFUN([AX_LIBCSYSTEM_CHECK_LIB],
    ac_cv_libcsystem_LIBADD="$pkg_cv_libcsystem_LIBS"],
    [dnl Check for headers
    AC_CHECK_HEADERS([libcsystem.h])
-  
+
    AS_IF(
     [test "x$ac_cv_header_libcsystem_h" = xno],
     [ac_cv_libcsystem=no],
     [dnl Check for the individual functions
     ac_cv_libcsystem=yes
- 
+
     AC_CHECK_LIB(
      csystem,
      libcsystem_get_version,
      [ac_cv_libcsystem_dummy=yes],
      [ac_cv_libcsystem=no])
-   
-    dnl TODO add functions
- 
+
+    dnl Support functions
+    AC_CHECK_LIB(
+     csystem,
+     libcsystem_initialize,
+     [ac_cv_libcsystem_dummy=yes],
+     [ac_cv_libcsystem=no])
+
+    dnl Signal functions
+    AC_CHECK_LIB(
+     csystem,
+     libcsystem_signal_attach,
+     [ac_cv_libcsystem_dummy=yes],
+     [ac_cv_libcsystem=no])
+    AC_CHECK_LIB(
+     csystem,
+     libcsystem_signal_detach,
+     [ac_cv_libcsystem_dummy=yes],
+     [ac_cv_libcsystem=no])
+
     ac_cv_libcsystem_LIBADD="-lcsystem"
     ])
    ])
@@ -103,49 +120,49 @@ AC_DEFUN([AX_LIBCSYSTEM_CHECK_LOCAL],
    [Missing function: close],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_fstat" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: fstat],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_ftruncate" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: ftruncate],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_lseek" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: lseek],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_open" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: open],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_read" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: read],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_stat" != xyes],
   [AC_MSG_FAILURE(
    [Missing function: stat],
    [1])
   ])
- 
+
  AS_IF(
   [test "x$ac_cv_func_write" != xyes],
   [AC_MSG_FAILURE(
@@ -155,17 +172,12 @@ AC_DEFUN([AX_LIBCSYSTEM_CHECK_LOCAL],
 
  dnl Commandline argument/option parsing functions in libcsystem/libcsystem_getopt.h
  AC_CHECK_FUNCS([getopt])
- 
+
  dnl Check for IO buffering functions in libcsystem/libcsystem_support.c
  AC_CHECK_FUNCS([setvbuf])
 
  dnl Check for internationalization functions in libcsystem/libcsystem_support.c
  AC_CHECK_FUNCS([bindtextdomain textdomain])
-
- ac_cv_libcsystem_CPPFLAGS="-I../libcsystem";
- ac_cv_libcsystem_LIBADD="../libcsystem/libcsystem.la";
-
- ac_cv_libcsystem=local
  ])
 
 dnl Function to detect how to enable libcsystem
@@ -180,10 +192,16 @@ AC_DEFUN([AX_LIBCSYSTEM_CHECK_ENABLE],
  dnl Check for a shared library version
  AX_LIBCSYSTEM_CHECK_LIB
 
+ dnl Always check the dependencies
+ AX_LIBCSYSTEM_CHECK_LOCAL
+
  dnl Check if the dependencies for the local library version
  AS_IF(
   [test "x$ac_cv_libcsystem" != xyes],
-  [AX_LIBCSYSTEM_CHECK_LOCAL
+  [ac_cv_libcsystem_CPPFLAGS="-I../libcsystem";
+   ac_cv_libcsystem_LIBADD="../libcsystem/libcsystem.la";
+
+   ac_cv_libcsystem=local
 
   AC_DEFINE(
    [HAVE_LOCAL_LIBCSYSTEM],

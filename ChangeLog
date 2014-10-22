@@ -136,6 +136,9 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20141022
+* changes for deployment
+
 20141011
 * updated dependencies
 * changes for project site move

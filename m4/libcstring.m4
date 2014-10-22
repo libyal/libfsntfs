@@ -1,6 +1,6 @@
 dnl Functions for libcstring
 dnl
-dnl Version: 20130406
+dnl Version: 20141014
 
 dnl Function to detect if libcstring is available
 dnl ac_libcstring_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -52,8 +52,6 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LIB],
      [ac_cv_libcstring_dummy=yes],
      [ac_cv_libcstring=no])
 
-    dnl TODO add functions
-
     ac_cv_libcstring_LIBADD="-lcstring"
     ])
    ])
@@ -87,7 +85,7 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
  AC_CHECK_HEADERS([wchar.h wctype.h])
 
  dnl Narrow character string functions used in libcstring/libcstring_narrow_string.h
- AC_CHECK_FUNCS([fgets memchr memcmp memcpy memrchr snprintf sscanf strcasecmp strchr strlen strncasecmp strncmp strncpy strrchr strstr vsnprintf])
+ AC_CHECK_FUNCS([fgets memchr memcmp memcpy memrchr snprintf sscanf strcasecmp strchr strlen strncasecmp strncmp strncpy strnicmp strrchr strstr vsnprintf])
 
  AS_IF(
   [test "x$ac_cv_func_fgets" != xyes],
@@ -155,9 +153,9 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
   ])
 
  AS_IF(
-  [test "x$ac_cv_func_strcasecmp" != xyes && test "x$ac_cv_func_strncasecmp" != xyes],
+  [test "x$ac_cv_func_strcasecmp" != xyes && test "x$ac_cv_func_strncasecmp" != xyes && test "x$ac_cv_func_strnicmp" != xyes],
   [AC_MSG_FAILURE(
-   [Missing functions: strncasecmp and strcasecmp],
+   [Missing functions: strncasecmp, strcasecmp and strnicmp],
    [1])
   ])
 
@@ -178,7 +176,7 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
  dnl Wide character string functions used in libcstring/libcstring_wide_string.h
  AS_IF(
   [test "x$ac_cv_enable_wide_character_type" != xno],
-  [AC_CHECK_FUNCS([swprintf towlower wcscasecmp wcschr wcslen wcsncasecmp wcsncmp wcsncpy wcsrchr wcsstr wmemchr wmemcmp wmemcpy wmemrchr])
+  [AC_CHECK_FUNCS([swprintf towlower wcscasecmp wcschr wcslen wcsncasecmp wcsncmp wcsncpy wcsnicmp wcsrchr wcsstr wmemchr wmemcmp wmemcpy wmemrchr])
 
   AS_IF(
    [test "x$ac_cv_func_swprintf" != xyes],
@@ -223,9 +221,9 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
    ])
 
   AS_IF(
-   [test "x$ac_cv_func_wcsncasecmp" != xyes && test "x$ac_cv_func_wcscasecmp" != xyes && test "x$ac_cv_func_towlower" != xyes],
+   [test "x$ac_cv_func_wcsncasecmp" != xyes && test "x$ac_cv_func_wcscasecmp" != xyes && test "x$ac_cv_func_wcsnicmp" != xyes && test "x$ac_cv_func_towlower" != xyes],
    [AC_MSG_FAILURE(
-    [Missing functions: wcsncasecmp, wcscasecmp and towlower],
+    [Missing functions: wcsncasecmp, wcscasecmp, wcsnicmp and towlower],
     [1])
    ])
 
@@ -236,11 +234,6 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_LOCAL],
     [1])
    ])
   ])
-
- ac_cv_libcstring_CPPFLAGS="-I../libcstring";
- ac_cv_libcstring_LIBADD="../libcstring/libcstring.la";
-
- ac_cv_libcstring=local
  ])
 
 dnl Function to detect how to enable libcstring
@@ -255,10 +248,16 @@ AC_DEFUN([AX_LIBCSTRING_CHECK_ENABLE],
  dnl Check for a shared library version
  AX_LIBCSTRING_CHECK_LIB
 
+ dnl Always check the dependencies
+ AX_LIBCSTRING_CHECK_LOCAL
+
  dnl Check if the dependencies for the local library version
  AS_IF(
   [test "x$ac_cv_libcstring" != xyes],
-  [AX_LIBCSTRING_CHECK_LOCAL
+  [ac_cv_libcstring_CPPFLAGS="-I../libcstring";
+  ac_cv_libcstring_LIBADD="../libcstring/libcstring.la";
+
+  ac_cv_libcstring=local
 
   AC_DEFINE(
    [HAVE_LOCAL_LIBCSTRING],
