@@ -1498,7 +1498,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_sub_file_entry(
+	result = libfsntfs_file_entry_get_sub_file_entry_by_index(
 	          pyfsntfs_file_entry->file_entry,
 	          sub_file_entry_index,
 	          &sub_file_entry,
