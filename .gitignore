@@ -104,6 +104,7 @@ stamp-h1
 /include/libfsntfs/types.h
 /libfsntfs/libfsntfs.rc
 /libfsntfs/libfsntfs_definitions.h
+/fsntfstools/fsntfsinfo
 /pyfsntfs/setup.py
 /tests/input
 /tests/tmp
