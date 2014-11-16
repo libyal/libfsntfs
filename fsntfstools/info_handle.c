@@ -1781,7 +1781,7 @@ int info_handle_standard_information_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tOwner identifier\t\t\t: %" PRIu32 "\n",
+		 "\tOwner identifier\t\t: %" PRIu32 "\n",
 		 value_32bit );
 	}
 	result = libfsntfs_standard_information_attribute_get_security_identifier(
@@ -1804,7 +1804,7 @@ int info_handle_standard_information_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tSecurity identifier\t\t\t: %" PRIu32 "\n",
+		 "\tSecurity identifier\t\t: %" PRIu32 "\n",
 		 value_32bit );
 	}
 	result = libfsntfs_standard_information_attribute_get_update_sequence_number(
