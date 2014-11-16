@@ -242,7 +242,7 @@ int libfsntfs_file_name_values_read(
 		 ( (fsntfs_file_name_t *) data )->parent_file_reference,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: parent file reference\t\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: parent file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
 		 value_64bit & 0xffffffffffffUL,
 		 value_64bit >> 48 );
@@ -303,7 +303,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: creation time\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: creation time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -350,7 +350,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: modification time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: modification time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -397,7 +397,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: entry modification time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: entry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -444,7 +444,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: access time\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: access time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -452,7 +452,7 @@ int libfsntfs_file_name_values_read(
 		 ( (fsntfs_file_name_t *) data )->allocated_file_size,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: allocated file size\t\t\t\t: %" PRIu64 "\n",
+		 "%s: allocated file size\t\t\t: %" PRIu64 "\n",
 		 function,
 		 value_64bit );
 
@@ -460,12 +460,12 @@ int libfsntfs_file_name_values_read(
 		 ( (fsntfs_file_name_t *) data )->file_size,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: file size\t\t\t\t\t: %" PRIu64 "\n",
+		 "%s: file size\t\t\t\t: %" PRIu64 "\n",
 		 function,
 		 value_64bit );
 
 		libcnotify_printf(
-		 "%s: file attribute flags\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: file attribute flags\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 file_name_values->file_attribute_flags );
 		libfsntfs_debug_print_file_attribute_flags(
@@ -477,12 +477,12 @@ int libfsntfs_file_name_values_read(
 		 ( (fsntfs_file_name_t *) data )->extended_data,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: extended data\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: extended data\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: name size\t\t\t\t\t: %" PRIu16 "\n",
+		 "%s: name size\t\t\t\t: %" PRIu16 "\n",
 		 function,
 		 file_name_values->name_size );
 
@@ -614,7 +614,7 @@ int libfsntfs_file_name_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: name\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
 			 function,
 			 value_string );
 

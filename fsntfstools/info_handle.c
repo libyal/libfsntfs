@@ -3192,8 +3192,10 @@ int info_handle_user_journal_fprint(
 		{
 			break;
 		}
-		data_offset += read_count;
+		data_offset  += read_count;
+		buffer_offset = 0;
 
+/* TODO do an empty block check */
 		if( buffer[ 0 ] == 0 )
 		{
 			continue;
@@ -3227,8 +3229,9 @@ int info_handle_user_journal_fprint(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to copy USN record from byte stream.",
-				 function );
+				 "%s: unable to copy USN record from byte stream at block offset: %" PRIzd ".",
+				 function,
+				 buffer_offset );
 
 				goto on_error;
 			}
