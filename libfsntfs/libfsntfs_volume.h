@@ -191,6 +191,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 
 int libfsntfs_volume_read_bitmap(
      libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -3471,7 +3471,7 @@ int info_handle_volume_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tVersion\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
+	 "\tVersion\t\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
 	 major_version,
 	 minor_version );
 

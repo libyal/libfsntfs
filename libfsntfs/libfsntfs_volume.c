@@ -1064,6 +1064,7 @@ int libfsntfs_volume_open_read(
 #endif
 	if( libfsntfs_volume_read_bitmap(
 	     internal_volume,
+	     file_io_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2222,6 +2223,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
  */
 int libfsntfs_volume_read_bitmap(
      libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	libfcache_cache_t *cluster_block_cache   = NULL;
@@ -2261,7 +2263,7 @@ int libfsntfs_volume_read_bitmap(
 	}
 	if( libfdata_vector_get_element_value_by_index(
 	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
+	     (intptr_t *) file_io_handle,
 	     internal_volume->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP,
 	     (intptr_t **) &mft_entry,
@@ -2348,7 +2350,7 @@ int libfsntfs_volume_read_bitmap(
 	{
 		if( libfdata_vector_get_element_value_by_index(
 		     cluster_block_vector,
-		     (intptr_t *) internal_volume->file_io_handle,
+		     (intptr_t *) file_io_handle,
 		     cluster_block_cache,
 		     cluster_block_index,
 		     (intptr_t **) &cluster_block,
