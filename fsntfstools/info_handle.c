@@ -2486,7 +2486,7 @@ int info_handle_mft_entry_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tIs allocated\t\t: " );
+	 "\tIs allocated\t\t\t: " );
 
 	if( is_allocated == 0 )
 	{
