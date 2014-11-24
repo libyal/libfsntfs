@@ -1,6 +1,7 @@
 TODO
 * fsntfsinfo
   - move UsnJrnl to separate tool?
+  - fix remnant data in buffer and remove work around
 * implement UsnJrnl parsing
   - move UsnJrnl parsing into library ?
 * data streams return the offset ranges?
@@ -135,6 +136,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20141124
+* worked on $UsnJrnl support
 
 20141116
 * small fixes

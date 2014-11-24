@@ -2660,6 +2660,183 @@ on_error:
 	return( -1 );
 }
 
+/* Prints the user journal ($UsnJrnl) record update reason to the notify stream
+ */
+void info_handle_usn_record_update_reason_flags_fprint(
+      uint32_t update_reason_flags,
+      FILE *notify_stream )
+{
+/* TODO add description */
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_DATA_OVERWRITE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_DATA_OVERWRITE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_DATA_EXTEND ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_DATA_EXTEND)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_DATA_TRUNCATION ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_DATA_TRUNCATION)\n" );
+	}
+
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_OVERWRITE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_NAMED_DATA_OVERWRITE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_EXTEND ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_NAMED_DATA_EXTEND)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_TRUNCATION ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_NAMED_DATA_TRUNCATION)\n" );
+	}
+
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_FILE_CREATE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_FILE_CREATE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_FILE_DELETE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_FILE_DELETE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_EXTENDED_ATTRIBUTE_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_EA_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_SECURITY_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_SECURITY_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_RENAME_OLD_NAME ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_RENAME_OLD_NAME)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_RENAME_NEW_NAME ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_RENAME_NEW_NAME)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_INDEXABLE_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_INDEXABLE_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_BASIC_INFO_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_BASIC_INFO_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_HARD_LINK_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_HARD_LINK_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_COMPRESSION_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_COMPRESSION_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_ENCRYPTION_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_ENCRYPTION_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_OBJECT_IDENTIFIER_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_OBJECT_IDENTIFIER_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_REPARSE_POINT_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_REPARSE_POINT_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_STREAM_CHANGE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_STREAM_CHANGE)\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_UKNOWN_0x00400000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\tUnknown 0x00400000\n" );
+	}
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_CLOSE ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_REASON_CLOSE)\n" );
+	}
+
+	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_UKNOWN_0x80000000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\tUnknown 0x80000000\n" );
+	}
+}
+
+/* Prints the user journal ($UsnJrnl) record update source flags to the notify stream
+ */
+void info_handle_usn_record_update_source_flags_fprint(
+      uint32_t update_source_flags,
+      FILE *notify_stream )
+{
+/* TODO add description */
+	if( ( update_source_flags & LIBFUSN_UPDATE_SOURCE_FLAG_DATA_MANAGEMENT ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_SOURCE_DATA_MANAGEMENT)\n" );
+	}
+	if( ( update_source_flags & LIBFUSN_UPDATE_SOURCE_FLAG_AUXILIARY_DATA ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_SOURCE_AUXILIARY_DATA)\n" );
+	}
+	if( ( update_source_flags & LIBFUSN_UPDATE_SOURCE_FLAG_REPLICATION_MANAGEMENT ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t(USN_SOURCE_REPLICATION_MANAGEMENT)\n" );
+	}
+}
+
 /* Prints the user journal ($UsnJrnl) record information
  * Returns 1 if successful or -1 on error
  */
@@ -2815,7 +2992,12 @@ int info_handle_usn_record_fprint(
 	 info_handle->notify_stream,
 	 "\tUpdate reason flags\t\t: 0x%08" PRIx32 "\n",
 	 value_32bit );
-/* TODO print descriptive strings */
+	info_handle_usn_record_update_reason_flags_fprint(
+	 value_32bit,
+	 info_handle->notify_stream );
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
 
 	if( libfusn_record_get_update_source_flags(
 	     usn_record,
@@ -2835,7 +3017,12 @@ int info_handle_usn_record_fprint(
 	 info_handle->notify_stream,
 	 "\tUpdate source flags\t\t: 0x%08" PRIx32 "\n",
 	 value_32bit );
-/* TODO print descriptive strings */
+	info_handle_usn_record_update_source_flags_fprint(
+	 value_32bit,
+	 info_handle->notify_stream );
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
 
 	fprintf(
 	 info_handle->notify_stream,
@@ -3170,6 +3357,21 @@ int info_handle_user_journal_fprint(
 /* TODO use information about sparse ranges */
 	while( (size64_t) data_offset < data_size )
 	{
+/* TODO work around for remnant data in buffer */
+		if( memory_set(
+		     buffer,
+		     0,
+		     cluster_block_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear buffer.",
+			 function );
+
+			goto on_error;
+		}
 		read_count = libfsntfs_alternate_data_stream_read_buffer(
 		              alternate_data_stream,
 		              buffer,

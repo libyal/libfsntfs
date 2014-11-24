@@ -137,6 +137,14 @@ int info_handle_file_system_hierarchy_fprint(
      info_handle_t *info_handle,
      libfsntfs_error_t **error );
 
+void info_handle_usn_record_update_reason_flags_fprint(
+      uint32_t update_reason_flags,
+      FILE *notify_stream );
+
+void info_handle_usn_record_update_source_flags_fprint(
+      uint32_t update_source_flags,
+      FILE *notify_stream );
+
 int info_handle_usn_record_fprint(
      info_handle_t *info_handle,
      libfusn_record_t *usn_record,
