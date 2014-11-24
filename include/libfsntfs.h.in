@@ -721,6 +721,48 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libfsntfs_error_t **error );
 
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_utf8_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_utf8_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_utf16_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_utf16_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
 /* -------------------------------------------------------------------------
  * $OBJECT_ID attribute functions
  * ------------------------------------------------------------------------- */

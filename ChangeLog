@@ -140,7 +140,9 @@ Deployment
 
 20141124
 * worked on $UsnJrnl support
-* added is allocated function
+* added API functions to retrieve:
+  - file entry allocation status
+  - $FILE_NAME attribute name string
 
 20141116
 * small fixes

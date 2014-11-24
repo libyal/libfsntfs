@@ -843,11 +843,13 @@ int info_handle_file_name_attribute_fprint(
 {
 	libcstring_system_character_t filetime_string[ 32 ];
 
-	libfdatetime_filetime_t *filetime = NULL;
-	static char *function             = "info_handle_file_name_attribute_fprint";
-	uint64_t value_64bit              = 0;
-	uint32_t value_32bit              = 0;
-	int result                        = 0;
+	libcstring_system_character_t *value_string = NULL;
+	libfdatetime_filetime_t *filetime           = NULL;
+	static char *function                       = "info_handle_file_name_attribute_fprint";
+	size_t value_string_size                    = 0;
+	uint64_t value_64bit                        = 0;
+	uint32_t value_32bit                        = 0;
+	int result                                  = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1144,9 +1146,86 @@ int info_handle_file_name_attribute_fprint(
 	 value_32bit,
 	 info_handle->notify_stream );
 
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_file_name_attribute_get_utf16_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#else
+	result = libfsntfs_file_name_attribute_get_utf8_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name size.",
+		 function );
+
+		goto on_error;
+	}
+	if( value_string_size > 0 )
+	{
+		value_string = libcstring_system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create name string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_file_name_attribute_get_utf16_name(
+		          attribute,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libfsntfs_file_name_attribute_get_utf8_name(
+		          attribute,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve name.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tName\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
 	return( 1 );
 
 on_error:
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
 	if( filetime != NULL )
 	{
 		libfdatetime_filetime_free(
