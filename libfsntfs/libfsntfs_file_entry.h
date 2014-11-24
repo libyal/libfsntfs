@@ -83,6 +83,11 @@ int libfsntfs_file_entry_free(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_allocated(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
      uint64_t *creation_time,

@@ -346,6 +346,14 @@ int libfsntfs_file_entry_free(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_error_t **error );
 
+/* Determines if the file entry is allocated
+ * Returns 1 if allocated, 0 if not  or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_allocated(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
 /* Retrieves the creation date and time
  * This value is retrieved from the $FILE_NAME attribute
  * Returns 1 if successful or -1 on error

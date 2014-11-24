@@ -2430,6 +2430,7 @@ int info_handle_mft_entry_fprint(
 	libfsntfs_file_entry_t *file_entry = NULL;
 	static char *function              = "info_handle_mft_entry_fprint";
 	int attribute_index                = 0;
+	int is_allocated                   = 0;
 	int number_of_attributes           = 0;
 
 	if( info_handle == NULL )
@@ -2468,6 +2469,41 @@ int info_handle_mft_entry_fprint(
 
 		goto on_error;
 	}
+	is_allocated = libfsntfs_file_entry_is_allocated(
+	                file_entry,
+	                error );
+
+	if( is_allocated == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry is allocated.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tIs allocated\t\t: " );
+
+	if( is_allocated == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "false" );
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "true" );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
 	if( libfsntfs_file_entry_get_number_of_attributes(
 	     file_entry,
 	     &number_of_attributes,

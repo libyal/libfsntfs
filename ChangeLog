@@ -6,6 +6,7 @@ TODO
   - move UsnJrnl parsing into library ?
 * data streams return the offset ranges?
 * add stand-alone MTF parsing support
+* change MFT entry flags value checks to named definitions
 
 * API
   - expose object identifier attribute
@@ -139,6 +140,7 @@ Deployment
 
 20141124
 * worked on $UsnJrnl support
+* added is allocated function
 
 20141116
 * small fixes
