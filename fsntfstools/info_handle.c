@@ -2671,142 +2671,142 @@ void info_handle_usn_record_update_reason_flags_fprint(
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_DATA_OVERWRITE)\n" );
+		 "\t\t(USN_REASON_DATA_OVERWRITE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_DATA_EXTEND ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_DATA_EXTEND)\n" );
+		 "\t\t(USN_REASON_DATA_EXTEND)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_DATA_TRUNCATION ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_DATA_TRUNCATION)\n" );
+		 "\t\t(USN_REASON_DATA_TRUNCATION)\n" );
 	}
 
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_OVERWRITE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_NAMED_DATA_OVERWRITE)\n" );
+		 "\t\t(USN_REASON_NAMED_DATA_OVERWRITE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_EXTEND ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_NAMED_DATA_EXTEND)\n" );
+		 "\t\t(USN_REASON_NAMED_DATA_EXTEND)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_NAMED_DATA_TRUNCATION ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_NAMED_DATA_TRUNCATION)\n" );
+		 "\t\t(USN_REASON_NAMED_DATA_TRUNCATION)\n" );
 	}
 
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_FILE_CREATE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_FILE_CREATE)\n" );
+		 "\t\t(USN_REASON_FILE_CREATE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_FILE_DELETE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_FILE_DELETE)\n" );
+		 "\t\t(USN_REASON_FILE_DELETE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_EXTENDED_ATTRIBUTE_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_EA_CHANGE)\n" );
+		 "\t\t(USN_REASON_EA_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_SECURITY_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_SECURITY_CHANGE)\n" );
+		 "\t\t(USN_REASON_SECURITY_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_RENAME_OLD_NAME ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_RENAME_OLD_NAME)\n" );
+		 "\t\t(USN_REASON_RENAME_OLD_NAME)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_RENAME_NEW_NAME ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_RENAME_NEW_NAME)\n" );
+		 "\t\t(USN_REASON_RENAME_NEW_NAME)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_INDEXABLE_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_INDEXABLE_CHANGE)\n" );
+		 "\t\t(USN_REASON_INDEXABLE_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_BASIC_INFO_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_BASIC_INFO_CHANGE)\n" );
+		 "\t\t(USN_REASON_BASIC_INFO_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_HARD_LINK_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_HARD_LINK_CHANGE)\n" );
+		 "\t\t(USN_REASON_HARD_LINK_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_COMPRESSION_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_COMPRESSION_CHANGE)\n" );
+		 "\t\t(USN_REASON_COMPRESSION_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_ENCRYPTION_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_ENCRYPTION_CHANGE)\n" );
+		 "\t\t(USN_REASON_ENCRYPTION_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_OBJECT_IDENTIFIER_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_OBJECT_IDENTIFIER_CHANGE)\n" );
+		 "\t\t(USN_REASON_OBJECT_IDENTIFIER_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_REPARSE_POINT_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_REPARSE_POINT_CHANGE)\n" );
+		 "\t\t(USN_REASON_REPARSE_POINT_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_STREAM_CHANGE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_STREAM_CHANGE)\n" );
+		 "\t\t(USN_REASON_STREAM_CHANGE)\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_UKNOWN_0x00400000 ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\tUnknown 0x00400000\n" );
+		 "\t\tUnknown 0x00400000\n" );
 	}
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_CLOSE ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_REASON_CLOSE)\n" );
+		 "\t\t(USN_REASON_CLOSE)\n" );
 	}
 
 	if( ( update_reason_flags & LIBFUSN_UPDATE_REASON_FLAG_UKNOWN_0x80000000 ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\tUnknown 0x80000000\n" );
+		 "\t\tUnknown 0x80000000\n" );
 	}
 }
 
@@ -2821,19 +2821,19 @@ void info_handle_usn_record_update_source_flags_fprint(
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_SOURCE_DATA_MANAGEMENT)\n" );
+		 "\t\t(USN_SOURCE_DATA_MANAGEMENT)\n" );
 	}
 	if( ( update_source_flags & LIBFUSN_UPDATE_SOURCE_FLAG_AUXILIARY_DATA ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_SOURCE_AUXILIARY_DATA)\n" );
+		 "\t\t(USN_SOURCE_AUXILIARY_DATA)\n" );
 	}
 	if( ( update_source_flags & LIBFUSN_UPDATE_SOURCE_FLAG_REPLICATION_MANAGEMENT ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t(USN_SOURCE_REPLICATION_MANAGEMENT)\n" );
+		 "\t\t(USN_SOURCE_REPLICATION_MANAGEMENT)\n" );
 	}
 }
 
