@@ -143,6 +143,7 @@ Deployment
 * added API functions to retrieve:
   - file entry allocation status
   - $FILE_NAME attribute name string
+  - $FILE_NAME attribute parent file reference
 
 20141116
 * small fixes

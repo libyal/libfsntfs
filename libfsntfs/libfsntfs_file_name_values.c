@@ -212,6 +212,10 @@ int libfsntfs_file_name_values_read(
 	}
 #endif
 	byte_stream_copy_to_uint64_little_endian(
+	 ( (fsntfs_file_name_t *) data )->parent_file_reference,
+	 file_name_values->parent_file_reference );
+
+	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_file_name_t *) data )->creation_time,
 	 file_name_values->creation_time );
 
@@ -238,14 +242,11 @@ int libfsntfs_file_name_values_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_file_name_t *) data )->parent_file_reference,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: parent file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
-		 value_64bit & 0xffffffffffffUL,
-		 value_64bit >> 48 );
+		 file_name_values->parent_file_reference & 0xffffffffffffUL,
+		 file_name_values->parent_file_reference >> 48 );
 
 		if( libfdatetime_filetime_initialize(
 		     &filetime,
@@ -670,6 +671,43 @@ on_error:
 	file_name_values->name_size = 0;
 
 	return( -1 );
+}
+
+/* Retrieves the parent file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_get_parent_file_reference(
+     libfsntfs_file_name_values_t *file_name_values,
+     uint64_t *parent_file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_file_name_values_get_parent_file_reference";
+
+	if( file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( parent_file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid parent file reference.",
+		 function );
+
+		return( -1 );
+	}
+	*parent_file_reference = file_name_values->parent_file_reference;
+
+	return( 1 );
 }
 
 /* Retrieves the creation date and time

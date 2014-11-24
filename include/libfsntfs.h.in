@@ -676,6 +676,15 @@ int libfsntfs_attribute_get_utf16_name(
  * $FILE_NAME attribute functions
  * ------------------------------------------------------------------------- */
 
+/* Retrieves the parent file reference
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_parent_file_reference(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *parent_file_reference,
+     libfsntfs_error_t **error );
+
 /* Retrieves the creation date and time
  * Returns 1 if successful or -1 on error
  */

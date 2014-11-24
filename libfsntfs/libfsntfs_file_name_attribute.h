@@ -33,6 +33,12 @@ extern "C" {
 #endif
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_parent_file_reference(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *parent_file_reference,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_creation_time(
      libfsntfs_attribute_t *attribute,
      uint64_t *creation_time,

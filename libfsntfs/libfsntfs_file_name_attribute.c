@@ -29,6 +29,58 @@
 #include "libfsntfs_file_name_values.h"
 #include "libfsntfs_types.h"
 
+/* Retrieves the parent file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_attribute_get_parent_file_reference(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *parent_file_reference,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_file_name_attribute_get_parent_file_reference";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_parent_file_reference(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     parent_file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent file reference.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the creation date and time
  * Returns 1 if successful or -1 on error
  */
@@ -37,7 +89,6 @@ int libfsntfs_file_name_attribute_get_creation_time(
      uint64_t *creation_time,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_file_name_attribute_get_creation_time";
 
@@ -65,32 +116,20 @@ int libfsntfs_file_name_attribute_get_creation_time(
 
 		return( -1 );
 	}
-	if( internal_attribute->value == NULL )
+	if( libfsntfs_file_name_values_get_creation_time(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     creation_time,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid attribute - missing value.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
 		 function );
 
 		return( -1 );
 	}
-	file_name_values = (libfsntfs_file_name_values_t *) internal_attribute->value;
-
-	if( creation_time == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid creation time.",
-		 function );
-
-		return( -1 );
-	}
-	*creation_time = file_name_values->creation_time;
-
 	return( 1 );
 }
 
@@ -102,7 +141,6 @@ int libfsntfs_file_name_attribute_get_modification_time(
      uint64_t *modification_time,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_file_name_attribute_get_modification_time";
 
@@ -130,32 +168,20 @@ int libfsntfs_file_name_attribute_get_modification_time(
 
 		return( -1 );
 	}
-	if( internal_attribute->value == NULL )
+	if( libfsntfs_file_name_values_get_modification_time(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     modification_time,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid attribute - missing value.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
 		 function );
 
 		return( -1 );
 	}
-	file_name_values = (libfsntfs_file_name_values_t *) internal_attribute->value;
-
-	if( modification_time == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid modification time.",
-		 function );
-
-		return( -1 );
-	}
-	*modification_time = file_name_values->modification_time;
-
 	return( 1 );
 }
 
@@ -167,7 +193,6 @@ int libfsntfs_file_name_attribute_get_access_time(
      uint64_t *access_time,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_file_name_attribute_get_access_time";
 
@@ -195,32 +220,20 @@ int libfsntfs_file_name_attribute_get_access_time(
 
 		return( -1 );
 	}
-	if( internal_attribute->value == NULL )
+	if( libfsntfs_file_name_values_get_access_time(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     access_time,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid attribute - missing value.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
 		 function );
 
 		return( -1 );
 	}
-	file_name_values = (libfsntfs_file_name_values_t *) internal_attribute->value;
-
-	if( access_time == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid access time.",
-		 function );
-
-		return( -1 );
-	}
-	*access_time = file_name_values->access_time;
-
 	return( 1 );
 }
 
@@ -232,7 +245,6 @@ int libfsntfs_file_name_attribute_get_entry_modification_time(
      uint64_t *entry_modification_time,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_file_name_attribute_get_entry_modification_time";
 
@@ -260,32 +272,20 @@ int libfsntfs_file_name_attribute_get_entry_modification_time(
 
 		return( -1 );
 	}
-	if( internal_attribute->value == NULL )
+	if( libfsntfs_file_name_values_get_entry_modification_time(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     entry_modification_time,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid attribute - missing value.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time.",
 		 function );
 
 		return( -1 );
 	}
-	file_name_values = (libfsntfs_file_name_values_t *) internal_attribute->value;
-
-	if( entry_modification_time == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid entry modification time.",
-		 function );
-
-		return( -1 );
-	}
-	*entry_modification_time = file_name_values->entry_modification_time;
-
 	return( 1 );
 }
 
@@ -297,7 +297,6 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_file_name_attribute_get_file_attribute_flags";
 
@@ -325,32 +324,20 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
 
 		return( -1 );
 	}
-	if( internal_attribute->value == NULL )
+	if( libfsntfs_file_name_values_get_file_attribute_flags(
+	     (libfsntfs_file_name_values_t *) internal_attribute->value,
+	     file_attribute_flags,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid attribute - missing value.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
 		 function );
 
 		return( -1 );
 	}
-	file_name_values = (libfsntfs_file_name_values_t *) internal_attribute->value;
-
-	if( file_attribute_flags == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file attribute flags.",
-		 function );
-
-		return( -1 );
-	}
-	*file_attribute_flags = file_name_values->file_attribute_flags;
-
 	return( 1 );
 }
 

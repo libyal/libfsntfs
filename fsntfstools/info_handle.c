@@ -862,6 +862,35 @@ int info_handle_file_name_attribute_fprint(
 
 		return( -1 );
 	}
+	if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	     attribute,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent file reference.",
+		 function );
+
+		goto on_error;
+	}
+	if( value_64bit == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tParent file reference\t\t\t: %" PRIu64 "\n",
+		 value_64bit );
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tParent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 value_64bit & 0xffffffffffffUL,
+		 value_64bit >> 48 );
+	}
 	if( libfdatetime_filetime_initialize(
 	     &filetime,
 	     error ) != 1 )
