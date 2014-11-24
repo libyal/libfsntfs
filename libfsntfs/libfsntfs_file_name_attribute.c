@@ -379,7 +379,7 @@ int libfsntfs_file_name_attribute_get_utf8_name_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
 	{
 		libcerror_error_set(
 		 error,
@@ -433,7 +433,7 @@ int libfsntfs_file_name_attribute_get_utf8_name(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
 	{
 		libcerror_error_set(
 		 error,
@@ -487,7 +487,7 @@ int libfsntfs_file_name_attribute_get_utf16_name_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
 	{
 		libcerror_error_set(
 		 error,
@@ -541,7 +541,7 @@ int libfsntfs_file_name_attribute_get_utf16_name(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
 	{
 		libcerror_error_set(
 		 error,
