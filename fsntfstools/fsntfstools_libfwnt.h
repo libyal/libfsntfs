@@ -1,7 +1,7 @@
 /*
- * The libfusn header wrapper
+ * The libfwnt header wrapper
  *
- * Copyright (C) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,29 +19,30 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFSTOOLS_LIBFUSN_H )
-#define _FSNTFSTOOLS_LIBFUSN_H
+#if !defined( _FSNTFSTOOLS_LIBFWNT_H )
+#define _FSNTFSTOOLS_LIBFWNT_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFUSN for local use of libfusn
+/* Define HAVE_LOCAL_LIBFWNT for local use of libfwnt
  */
-#if defined( HAVE_LOCAL_LIBFUSN )
+#if defined( HAVE_LOCAL_LIBFWNT )
 
-#include <libfusn_definitions.h>
-#include <libfusn_record.h>
-#include <libfusn_types.h>
+#include <libfwnt_definitions.h>
+#include <libfwnt_locale_identifier.h>
+#include <libfwnt_security_identifier.h>
+#include <libfwnt_types.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBFUSN_DLL_IMPORT
- * before including libfusn.h
+/* If libtool DLL support is enabled set LIBFWNT_DLL_IMPORT
+ * before including libfwnt.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFUSN_DLL_IMPORT
+#define LIBFWNT_DLL_IMPORT
 #endif
 
-#include <libfusn.h>
+#include <libfwnt.h>
 
 #endif
 

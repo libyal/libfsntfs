@@ -49,7 +49,31 @@ LIBFSNTFS_EXTERN \
 const char *libfsntfs_get_version(
              void );
 
-/* Determines if an volume containt the NTFS file system (check for the NTFS signature)
+/* Returns the access flags for reading
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_get_access_flags_read(
+     void );
+
+/* Retrieves the narrow system string codepage
+ * A value of 0 represents no codepage, UTF-8 encoding is used instead
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_get_codepage(
+     int *codepage,
+     libfsntfs_error_t **error );
+
+/* Sets the narrow system string codepage
+ * A value of 0 represents no codepage, UTF-8 encoding is used instead
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_set_codepage(
+     int codepage,
+     libfsntfs_error_t **error );
+
+/* Determines if a file contains a NTFS volume signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -58,24 +82,28 @@ int libfsntfs_check_volume_signature(
      libfsntfs_error_t **error );
 
 #if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
-/* Determines if an volume containt the NTFS file system (check for the NTFS signature)
+
+/* Determines if a file contains a NTFS volume signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature_wide(
      const wchar_t *filename,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBFSNTFS_HAVE_BFIO )
-/* Determines if an volume containt the NTFS file system (check for the NTFS signature) using a Basic File IO (bfio) handle
+
+/* Determines if a file contains a NTFS volume signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
 
 /* -------------------------------------------------------------------------
  * Notify functions
@@ -197,6 +225,7 @@ int libfsntfs_volume_open(
      libfsntfs_error_t **error );
 
 #if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a volume
  * Returns 1 if successful or -1 on error
  */
@@ -206,9 +235,11 @@ int libfsntfs_volume_open_wide(
      const wchar_t *filename,
      int access_flags,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBFSNTFS_HAVE_BFIO )
+
 /* Opens a volume using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
  */
@@ -218,7 +249,8 @@ int libfsntfs_volume_open_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
 
 /* Closes a volume
  * Returns 0 if successful or -1 on error

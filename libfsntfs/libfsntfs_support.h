@@ -33,9 +33,27 @@
 extern "C" {
 #endif
 
+#if !defined( HAVE_LOCAL_LIBFSNTFS )
+
 LIBFSNTFS_EXTERN \
 const char *libfsntfs_get_version(
              void );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_get_access_flags_read(
+     void );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_get_codepage(
+     int *codepage,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_set_codepage(
+     int codepage,
+     libcerror_error_t **error );
+
+#endif /* !defined( HAVE_LOCAL_LIBFSNTFS ) */
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature(
@@ -43,11 +61,13 @@ int libfsntfs_check_volume_signature(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature_wide(
      const wchar_t *filename,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature_file_io_handle(

@@ -42,6 +42,10 @@ typedef struct libfsntfs_internal_volume libfsntfs_internal_volume_t;
 
 struct libfsntfs_internal_volume
 {
+	/* The IO handle
+	 */
+	libfsntfs_io_handle_t *io_handle;
+
 	/* The file IO handle
 	 */
 	libbfio_handle_t *file_io_handle;
@@ -53,10 +57,6 @@ struct libfsntfs_internal_volume
 	/* Value to indicate if the file IO handle was opened inside the library
 	 */
 	uint8_t file_io_handle_opened_in_library;
-
-	/* The IO handle
-	 */
-	libfsntfs_io_handle_t *io_handle;
 
 	/* The MFT entry vector
 	 */

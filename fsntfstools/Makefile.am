@@ -34,10 +34,14 @@ fsntfsinfo_SOURCES = \
 	fsntfstools_libcnotify.h \
 	fsntfstools_libcstring.h \
 	fsntfstools_libcsystem.h \
+	fsntfstools_libfcache.h \
+	fsntfstools_libfdata.h \
 	fsntfstools_libfdatetime.h \
 	fsntfstools_libfguid.h \
 	fsntfstools_libfsntfs.h \
 	fsntfstools_libfusn.h \
+	fsntfstools_libfwnt.h \
+	fsntfstools_libuna.h \
 	info_handle.c info_handle.h
 
 fsntfsinfo_LDADD = \

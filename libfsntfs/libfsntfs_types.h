@@ -49,7 +49,7 @@ typedef intptr_t libfsntfs_volume_t;
 
 #endif
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBFSNTFS ) */
 
 #endif
 

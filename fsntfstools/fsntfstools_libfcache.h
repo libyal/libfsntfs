@@ -1,7 +1,7 @@
 /*
- * The libfusn header wrapper
+ * The internal libfcache header
  *
- * Copyright (C) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (c) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,29 +19,30 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFSTOOLS_LIBFUSN_H )
-#define _FSNTFSTOOLS_LIBFUSN_H
+#if !defined( _FSNTFSTOOLS_LIBFCACHE_H )
+#define _FSNTFSTOOLS_LIBFCACHE_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFUSN for local use of libfusn
+/* Define HAVE_LOCAL_LIBFCACHE for local use of libfcache
  */
-#if defined( HAVE_LOCAL_LIBFUSN )
+#if defined( HAVE_LOCAL_LIBFCACHE )
 
-#include <libfusn_definitions.h>
-#include <libfusn_record.h>
-#include <libfusn_types.h>
+#include <libfcache_cache.h>
+#include <libfcache_date_time.h>
+#include <libfcache_definitions.h>
+#include <libfcache_types.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBFUSN_DLL_IMPORT
- * before including libfusn.h
+/* If libtool DLL support is enabled set LIBFCACHE_DLL_IMPORT
+ * before including libfcache.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFUSN_DLL_IMPORT
+#define LIBFCACHE_DLL_IMPORT
 #endif
 
-#include <libfusn.h>
+#include <libfcache.h>
 
 #endif
 

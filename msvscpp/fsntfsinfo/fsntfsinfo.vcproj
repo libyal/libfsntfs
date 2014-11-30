@@ -222,6 +222,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_libfcache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_libfdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\fsntfstools\fsntfstools_libfdatetime.h"
 				>
 			</File>
@@ -235,6 +243,14 @@
 			</File>
 			<File
 				RelativePath="..\..\fsntfstools\fsntfstools_libfusn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_libfwnt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_libuna.h"
 				>
 			</File>
 			<File

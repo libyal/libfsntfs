@@ -24,49 +24,21 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_LOCAL_LIBUNA )
-#include <libuna_definitions.h>
-#elif defined( HAVE_LIBUNA_H )
-#include <libuna.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBBFIO )
-#include <libbfio_definitions.h>
-#elif defined( HAVE_LIBBFIO_H )
-#include <libbfio.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFDATA )
-#include <libfdata_definitions.h>
-#elif defined( HAVE_LIBFDATA )
-#include <libfdata.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFDATETIME )
-#include <libfdatetime_definitions.h>
-#elif defined( HAVE_LIBFDATETIME_H )
-#include <libfdatetime.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFGUID )
-#include <libfguid_definitions.h>
-#elif defined( HAVE_LIBFGUID )
-#include <libfguid.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFWNT )
-#include <libfwnt_definitions.h>
-#elif defined( HAVE_LIBFWNT )
-#include <libfwnt.h>
-#endif
-
 #include "fsntfsoutput.h"
+#include "fsntfstools_libbfio.h"
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
 #include "fsntfstools_libcnotify.h"
 #include "fsntfstools_libcstring.h"
 #include "fsntfstools_libcsystem.h"
+#include "fsntfstools_libfcache.h"
+#include "fsntfstools_libfdata.h"
+#include "fsntfstools_libfdatetime.h"
+#include "fsntfstools_libfguid.h"
 #include "fsntfstools_libfsntfs.h"
+#include "fsntfstools_libfusn.h"
+#include "fsntfstools_libfwnt.h"
+#include "fsntfstools_libuna.h"
 
 /* Prints the copyright information
  */
@@ -77,11 +49,26 @@ void fsntfsoutput_copyright_fprint(
 	{
 		return;
 	}
+	/* TRANSLATORS: This is a proper name.
+	 */
 	fprintf(
 	 stream,
-	 "Copyright (c) 2010-2014, Joachim Metz <%s>.\n"
-	 "This is free software; see the source for copying conditions. There is NO\n"
-	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	 _( "Copyright (c) 2010-2014, %s.\n" ),
+	 _( "Joachim Metz" ) );
+
+	fprintf(
+	 stream,
+	 _( "This is free software; see the source for copying conditions. There is NO\n"
+	    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" ) );
+
+	/* TRANSLATORS: The placeholder indicates the bug-reporting address
+	 * for this package.  Please add _another line_ saying
+	 * "Report translation bugs to <...>\n" with the address for translation
+	 * bugs (typically your translation team's web or email address).
+	 */
+	fprintf(
+	 stream,
+	 _( "Report bugs to <%s>.\n" ),
 	 PACKAGE_BUGREPORT );
 }
 
@@ -139,6 +126,11 @@ void fsntfsoutput_version_detailed_fprint(
 
 	fprintf(
 	 stream,
+	 ", libfcache %s",
+	 LIBFCACHE_VERSION_STRING );
+
+	fprintf(
+	 stream,
 	 ", libfdata %s",
 	 LIBFDATA_VERSION_STRING );
 
@@ -151,6 +143,11 @@ void fsntfsoutput_version_detailed_fprint(
 	 stream,
 	 ", libfguid %s",
 	 LIBFGUID_VERSION_STRING );
+
+	fprintf(
+	 stream,
+	 ", libfusn %s",
+	 LIBFUSN_VERSION_STRING );
 
 	fprintf(
 	 stream,

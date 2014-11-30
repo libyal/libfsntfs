@@ -1,9 +1,7 @@
 /*
- * The libfusn header wrapper
+ * The libuna header wrapper
  *
  * Copyright (C) 2010-2014, Joachim Metz <joachim.metz@gmail.com>
- *
- * Refer to AUTHORS for acknowledgements.
  *
  * This software is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,29 +17,41 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFSTOOLS_LIBFUSN_H )
-#define _FSNTFSTOOLS_LIBFUSN_H
+#if !defined( _FSNTFSTOOLS_LIBUNA_H )
+#define _FSNTFSTOOLS_LIBUNA_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFUSN for local use of libfusn
+/* Define HAVE_LOCAL_LIBUNA for local use of libuna
  */
-#if defined( HAVE_LOCAL_LIBFUSN )
+#if defined( HAVE_LOCAL_LIBUNA )
 
-#include <libfusn_definitions.h>
-#include <libfusn_record.h>
-#include <libfusn_types.h>
+#include <libuna_base16_stream.h>
+#include <libuna_base32_stream.h>
+#include <libuna_base64_stream.h>
+#include <libuna_byte_stream.h>
+#include <libuna_error.h>
+#include <libuna_unicode_character.h>
+#include <libuna_url_stream.h>
+#include <libuna_utf16_stream.h>
+#include <libuna_utf16_string.h>
+#include <libuna_utf32_stream.h>
+#include <libuna_utf32_string.h>
+#include <libuna_utf7_stream.h>
+#include <libuna_utf8_stream.h>
+#include <libuna_utf8_string.h>
+#include <libuna_types.h>
 
 #else
 
-/* If libtool DLL support is enabled set LIBFUSN_DLL_IMPORT
- * before including libfusn.h
+/* If libtool DLL support is enabled set LIBUNA_DLL_IMPORT
+ * before including libuna.h
  */
 #if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFUSN_DLL_IMPORT
+#define LIBUNA_DLL_IMPORT
 #endif
 
-#include <libfusn.h>
+#include <libuna.h>
 
 #endif
 
