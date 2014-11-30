@@ -450,6 +450,10 @@ int libfsntfs_mft_entry_read(
 	 mft_entry->attributes_offset );
 
 	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->flags,
+	 mft_entry->flags );
+
+	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->used_entry_size,
 	 mft_entry->used_entry_size );
 
@@ -511,15 +515,12 @@ int libfsntfs_mft_entry_read(
 		 function,
 		 mft_entry->attributes_offset );
 
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->flags,
-		 value_16bit );
 		libcnotify_printf(
 		 "%s: flags\t\t\t\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
-		 value_16bit );
+		 mft_entry->flags );
 		libfsntfs_debug_print_mft_entry_flags(
-		 value_16bit );
+		 mft_entry->flags );
 		libcnotify_printf(
 		 "\n" );
 

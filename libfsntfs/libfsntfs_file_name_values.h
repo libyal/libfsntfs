@@ -35,6 +35,10 @@ typedef struct libfsntfs_file_name_values libfsntfs_file_name_values_t;
 
 struct libfsntfs_file_name_values
 {
+	/* The parent file reference
+	 */
+	uint64_t parent_file_reference;
+
 	/* The creation time
 	 */
 	uint64_t creation_time;
@@ -85,6 +89,11 @@ int libfsntfs_file_name_values_read(
 int libfsntfs_file_name_values_read_from_attribute(
      libfsntfs_file_name_values_t *file_name_values,
      libfsntfs_attribute_t *attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_file_name_values_get_parent_file_reference(
+     libfsntfs_file_name_values_t *file_name_values,
+     uint64_t *parent_file_reference,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_creation_time(

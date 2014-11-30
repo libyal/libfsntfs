@@ -206,6 +206,48 @@ int libfsntfs_file_entry_free(
 	return( result );
 }
 
+/* Determines if the file entry is allocated
+ * Returns 1 if allocated, 0 if not  or -1 on error
+ */
+int libfsntfs_file_entry_is_allocated(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_is_allocated";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO change 0x0001 to definition */
+	if( ( internal_file_entry->mft_entry->flags & 0x0001 ) != 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
 /* Retrieves the creation date and time
  * This value is retrieved from the $FILE_NAME attribute
  * Returns 1 if successful or -1 on error
