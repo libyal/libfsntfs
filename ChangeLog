@@ -138,6 +138,12 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20141225
+* worked on Python 3 support
+
+20141130
+* code clean up
+
 20141124
 * worked on $UsnJrnl support
 * added API functions to retrieve:

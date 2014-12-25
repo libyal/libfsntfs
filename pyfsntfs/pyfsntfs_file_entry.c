@@ -240,10 +240,8 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 };
 
 PyTypeObject pyfsntfs_file_entry_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyfsntfs.file_entry",
 	/* tp_basicsize */
@@ -424,9 +422,10 @@ int pyfsntfs_file_entry_init(
 void pyfsntfs_file_entry_free(
       pyfsntfs_file_entry_t *pyfsntfs_file_entry )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyfsntfs_file_entry_free";
-	int result               = 0;
+	libcerror_error_t *error    = NULL;
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyfsntfs_file_entry_free";
+	int result                  = 0;
 
 	if( pyfsntfs_file_entry == NULL )
 	{
@@ -437,29 +436,32 @@ void pyfsntfs_file_entry_free(
 
 		return;
 	}
-	if( pyfsntfs_file_entry->ob_type == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid file_entry - missing ob_type.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_file_entry->ob_type->tp_free == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid file_entry - invalid ob_type - missing tp_free.",
-		 function );
-
-		return;
-	}
 	if( pyfsntfs_file_entry->file_entry == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid file_entry - missing libfsntfs file_entry.",
+		 function );
+
+		return;
+	}
+	ob_type = Py_TYPE(
+	           pyfsntfs_file_entry );
+
+	if( ob_type == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
+		 function );
+
+		return;
+	}
+	if( ob_type->tp_free == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -488,7 +490,7 @@ void pyfsntfs_file_entry_free(
 		Py_DecRef(
 		 (PyObject *) pyfsntfs_file_entry->volume_object );
 	}
-	pyfsntfs_file_entry->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_file_entry );
 }
 
@@ -504,6 +506,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	PyObject *string_object     = NULL;
 	static char *function       = "pyfsntfs_file_entry_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
+	char *buffer                = NULL;
 	ssize_t read_count          = 0;
 	int read_size               = -1;
 
@@ -554,16 +557,26 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 
 		return( NULL );
 	}
+#if PY_MAJOR_VERSION >= 3
+	string_object = PyBytes_FromStringAndSize(
+	                 NULL,
+	                 read_size );
+
+	buffer = PyBytes_AsString(
+	          string_object );
+#else
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );
 
+	buffer = PyString_AsString(
+	          string_object );
+#endif
 	Py_BEGIN_ALLOW_THREADS
 
 	read_count = libfsntfs_file_entry_read_buffer(
 	              pyfsntfs_file_entry->file_entry,
-	              PyString_AsString(
-	               string_object ),
+	              (uint8_t *) buffer,
 	              (size_t) read_size,
 	              &error );
 
@@ -587,9 +600,15 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	}
 	/* Need to resize the string here in case read_size was not fully read.
 	 */
+#if PY_MAJOR_VERSION >= 3
+	if( _PyBytes_Resize(
+	     &string_object,
+	     (Py_ssize_t) read_count ) != 0 )
+#else
 	if( _PyString_Resize(
 	     &string_object,
 	     (Py_ssize_t) read_count ) != 0 )
+#endif
 	{
 		Py_DecRef(
 		 (PyObject *) string_object );
@@ -611,6 +630,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	PyObject *string_object     = NULL;
 	static char *function       = "pyfsntfs_file_entry_read_buffer_at_offset";
 	static char *keyword_list[] = { "size", "offset", NULL };
+	char *buffer                = NULL;
 	off64_t read_offset         = 0;
 	ssize_t read_count          = 0;
 	int read_size               = 0;
@@ -674,16 +694,26 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	}
 	/* Make sure the data fits into a memory buffer
 	 */
+#if PY_MAJOR_VERSION >= 3
+	string_object = PyBytes_FromStringAndSize(
+	                 NULL,
+	                 read_size );
+
+	buffer = PyBytes_AsString(
+	          string_object );
+#else
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );
 
+	buffer = PyString_AsString(
+	          string_object );
+#endif
 	Py_BEGIN_ALLOW_THREADS
 
 	read_count = libfsntfs_file_entry_read_buffer_at_offset(
 	              pyfsntfs_file_entry->file_entry,
-	              PyString_AsString(
-	               string_object ),
+	              (uint8_t *) buffer,
 	              (size_t) read_size,
 	              (off64_t) read_offset,
 	              &error );
@@ -708,9 +738,15 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	}
 	/* Need to resize the string here in case read_size was not fully read.
 	 */
+#if PY_MAJOR_VERSION >= 3
+	if( _PyBytes_Resize(
+	     &string_object,
+	     (Py_ssize_t) read_count ) != 0 )
+#else
 	if( _PyString_Resize(
 	     &string_object,
 	     (Py_ssize_t) read_count ) != 0 )
+#endif
 	{
 		Py_DecRef(
 		 (PyObject *) string_object );
@@ -1433,6 +1469,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error       = NULL;
+	PyObject *integer_object       = NULL;
 	static char *function          = "pyfsntfs_file_entry_get_number_of_sub_file_entries";
 	int number_of_sub_file_entries = 0;
 	int result                     = 0;
@@ -1470,8 +1507,14 @@ PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
 
 		return( NULL );
 	}
-	return( PyInt_FromLong(
-	         (long) number_of_sub_file_entries ) );
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_sub_file_entries );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_sub_file_entries );
+#endif
+	return( integer_object );
 }
 
 /* Retrieves a specific sub file entry by index
