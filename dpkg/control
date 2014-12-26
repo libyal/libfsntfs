@@ -10,8 +10,16 @@ Package: libfsntfs
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: libfsntfs-dbg
 Description: Library to access the Windows NT File System (NTFS) format
  libfsntfs is a library to access the Windows NT File System (NTFS) format.
+
+Package: libfsntfs-dbg
+Architecture: any
+Section: debug
+Depends: libfsntfs (= ${Source-Version}), ${misc:Depends}
+Description: Debugging symbols for libfsntfs
+ Debugging symbols for libfsntfs.
 
 Package: libfsntfs-dev
 Section: libdevel
@@ -31,6 +39,14 @@ Package: libfsntfs-python
 Section: python
 Architecture: any
 Depends: libfsntfs (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Suggests: libfsntfs-python-dbg
 Description: Python bindings for libfsntfs
  Python bindings for libfsntfs.
+
+Package: libfsntfs-python-dbg
+Section: debug
+Architecture: any
+Depends: libfsntfs-python (= ${Source-Version})
+Description: Debugging symbols for libfsntfs-python
+ Debugging symbols for libfsntfs-python.
 

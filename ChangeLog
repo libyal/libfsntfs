@@ -138,6 +138,9 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20141226
+* updated dpkg files
+
 20141225
 * worked on Python 3 support
 
