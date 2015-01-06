@@ -39,7 +39,8 @@ DPKG_FILES = \
 	dpkg/rules \
 	dpkg/libfsntfs-dev.docs \
 	dpkg/libfsntfs.docs \
-	dpkg/libfsntfs-tools.docs
+	dpkg/libfsntfs-tools.docs \
+	dpkg/source/format
 
 GETTEXT_FILES = \
 	config.rpath \
@@ -56,7 +57,7 @@ EXTRA_DIST = \
 	$(DPKG_FILES) \
 	$(GETTEXT_FILES) \
 	$(PKGCONFIG_FILES) \
-        $(SPEC_FILES)
+	$(SPEC_FILES)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
