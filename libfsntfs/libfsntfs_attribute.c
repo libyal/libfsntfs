@@ -1658,15 +1658,20 @@ int libfsntfs_attribute_read_value(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfcache_cache_t *cluster_block_cache             = NULL;
-	libfdata_vector_t *cluster_block_vector            = NULL;
-	libfsntfs_cluster_block_t *cluster_block           = NULL;
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_read_value";
-	int cluster_block_index                            = 0;
-	int number_of_cluster_blocks                       = 0;
-	int number_of_data_runs                            = 0;
-	int result                                         = 0;
+	libfcache_cache_t *cluster_block_cache                             = NULL;
+	libfdata_vector_t *cluster_block_vector                            = NULL;
+	libfsntfs_cluster_block_t *cluster_block                           = NULL;
+	libfsntfs_internal_attribute_t *internal_attribute                 = NULL;
+	static char *function                                              = "libfsntfs_attribute_read_value";
+	int cluster_block_index                                            = 0;
+	int number_of_cluster_blocks                                       = 0;
+	int number_of_data_runs                                            = 0;
+	int result                                                         = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libfsntfs_bitmap_values_t *bitmap_values                           = NULL;
+	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
+#endif
 
 	if( attribute == NULL )
 	{
@@ -1697,36 +1702,86 @@ int libfsntfs_attribute_read_value(
 		switch( internal_attribute->type )
 		{
 			case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
-				internal_attribute->free_value = (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_bitmap_values_free;
-
-				if( libfsntfs_bitmap_values_initialize(
-				     (libfsntfs_bitmap_values_t **) &( internal_attribute->value ),
-				     error ) != 1 )
+				if( internal_attribute->value == NULL )
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create bitmap values.",
-					 function );
+					internal_attribute->free_value = (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_bitmap_values_free;
 
-					goto on_error;
+					if( libfsntfs_bitmap_values_initialize(
+					     (libfsntfs_bitmap_values_t **) &( internal_attribute->value ),
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+						 "%s: unable to create bitmap values.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfsntfs_bitmap_values_read(
+					     (libfsntfs_bitmap_values_t *) internal_attribute->value,
+					     internal_attribute->data,
+					     (size_t) internal_attribute->data_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read bitmap values.",
+						 function );
+
+						goto on_error;
+					}
 				}
-				if( libfsntfs_bitmap_values_read(
-				     (libfsntfs_bitmap_values_t *) internal_attribute->value,
-				     internal_attribute->data,
-				     (size_t) internal_attribute->data_size,
-				     error ) != 1 )
+#if defined( HAVE_DEBUG_OUTPUT )
+/* TODO is this normal behavior? Useful for error resilience. */
+				else
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read bitmap values.",
-					 function );
+					if( libfsntfs_bitmap_values_initialize(
+					     &bitmap_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+						 "%s: unable to create bitmap values.",
+						 function );
 
-					goto on_error;
+						goto on_error;
+					}
+					if( libfsntfs_bitmap_values_read(
+					     bitmap_values,
+					     internal_attribute->data,
+					     (size_t) internal_attribute->data_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read bitmap values.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfsntfs_bitmap_values_free(
+					     &bitmap_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 "%s: unable to free bitmap values.",
+						 function );
+
+						goto on_error;
+					}
 				}
+#endif
 				break;
 
 			case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
@@ -1917,36 +1972,86 @@ int libfsntfs_attribute_read_value(
 				break;
 
 			case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
-				internal_attribute->free_value = (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_security_descriptor_values_free;
-
-				if( libfsntfs_security_descriptor_values_initialize(
-				     (libfsntfs_security_descriptor_values_t **) &( internal_attribute->value ),
-				     error ) != 1 )
+				if( internal_attribute->value == NULL )
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create security descriptor values.",
-					 function );
+					internal_attribute->free_value = (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_security_descriptor_values_free;
 
-					goto on_error;
+					if( libfsntfs_security_descriptor_values_initialize(
+					     (libfsntfs_security_descriptor_values_t **) &( internal_attribute->value ),
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+						 "%s: unable to create security descriptor values.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfsntfs_security_descriptor_values_read(
+					     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
+					     internal_attribute->data,
+					     (size_t) internal_attribute->data_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read security descriptor values.",
+						 function );
+
+						goto on_error;
+					}
 				}
-				if( libfsntfs_security_descriptor_values_read(
-				     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
-				     internal_attribute->data,
-				     (size_t) internal_attribute->data_size,
-				     error ) != 1 )
+#if defined( HAVE_DEBUG_OUTPUT )
+				else
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read security descriptor values.",
-					 function );
+/* TODO is this normal behavior? Useful for error resilience. */
+					if( libfsntfs_security_descriptor_values_initialize(
+					     &security_descriptor_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+						 "%s: unable to create security descriptor values.",
+						 function );
 
-					goto on_error;
+						goto on_error;
+					}
+					if( libfsntfs_security_descriptor_values_read(
+					     security_descriptor_values,
+					     internal_attribute->data,
+					     (size_t) internal_attribute->data_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_IO,
+						 LIBCERROR_IO_ERROR_READ_FAILED,
+						 "%s: unable to read security descriptor values.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfsntfs_security_descriptor_values_free(
+					     &security_descriptor_values,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 "%s: unable to free security descriptor values.",
+						 function );
+
+						goto on_error;
+					}
 				}
+#endif
 				break;
 
 			case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
@@ -2291,6 +2396,20 @@ int libfsntfs_attribute_read_value(
 	return( 1 );
 
 on_error:
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( security_descriptor_values != NULL )
+	{
+		libfsntfs_security_descriptor_values_free(
+		 &security_descriptor_values,
+		 NULL );
+	}
+	if( bitmap_values != NULL )
+	{
+		libfsntfs_bitmap_values_free(
+		 &bitmap_values,
+		 NULL );
+	}
+#endif
 	if( cluster_block_cache != NULL )
 	{
 		libfcache_cache_free(

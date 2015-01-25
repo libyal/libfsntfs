@@ -1104,7 +1104,7 @@ int libfsntfs_file_entry_get_number_of_alternate_data_streams(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( libfsntfs_mft_entry_get_number_of_attributes(
+	if( libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
 	     internal_file_entry->mft_entry,
 	     number_of_alternate_data_streams,
 	     error ) != 1 )

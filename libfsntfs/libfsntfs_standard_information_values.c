@@ -435,7 +435,7 @@ int libfsntfs_standard_information_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: access time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: access time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
