@@ -214,17 +214,6 @@ int libfsntfs_data_stream_get_utf8_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data stream - missing data attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_attribute_get_utf8_name_size(
 	     internal_data_stream->data_attribute,
 	     utf8_name_size,
@@ -268,17 +257,6 @@ int libfsntfs_data_stream_get_utf8_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data stream - missing data attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_attribute_get_utf8_name(
 	     internal_data_stream->data_attribute,
 	     utf8_name,
@@ -322,17 +300,6 @@ int libfsntfs_data_stream_get_utf16_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data stream - missing data attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_attribute_get_utf16_name_size(
 	     internal_data_stream->data_attribute,
 	     utf16_name_size,
@@ -376,17 +343,6 @@ int libfsntfs_data_stream_get_utf16_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data stream - missing data stream.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_attribute_get_utf16_name(
 	     internal_data_stream->data_attribute,
 	     utf16_name,
@@ -611,8 +567,8 @@ int libfsntfs_data_stream_get_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( libfdata_stream_get_size(
-	     internal_data_stream->data_cluster_block_stream,
+	if( libfsntfs_attribute_get_data_size(
+	     internal_data_stream->data_attribute,
 	     size,
 	     error ) != 1 )
 	{
@@ -620,7 +576,7 @@ int libfsntfs_data_stream_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data cluster block stream size.",
+		 "%s: unable to retrieve data attribute data size.",
 		 function );
 
 		return( -1 );
@@ -682,6 +638,7 @@ int libfsntfs_data_stream_get_extent(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_extent";
+	size64_t data_size                                     = 0;
 	int segment_file_index                                 = 0;
 
 	if( data_stream == NULL )
@@ -697,6 +654,42 @@ int libfsntfs_data_stream_get_extent(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+	if( extent_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_size(
+	     internal_data_stream->data_attribute,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data attribute data size.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfdata_stream_get_segment_by_index(
 	     internal_data_stream->data_cluster_block_stream,
 	     extent_index,
@@ -715,6 +708,23 @@ int libfsntfs_data_stream_get_extent(
 		 extent_index );
 
 		return( -1 );
+	}
+	if( (size64_t) *extent_offset >= data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid extent offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	data_size -= *extent_offset;
+
+	if( *extent_size > data_size )
+	{
+		*extent_size = data_size;
 	}
 	return( 1 );
 }

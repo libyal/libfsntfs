@@ -140,6 +140,7 @@ Deployment
 
 20150317
 * worked on format support
+* implemented $UsnJrnl ignore sparse data run support
 
 20150315
 * worked on format support

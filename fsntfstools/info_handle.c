@@ -3362,14 +3362,20 @@ int info_handle_user_journal_fprint(
 	libfusn_record_t *usn_record                   = NULL;
 	uint8_t *buffer                                = NULL;
 	static char *function                          = "info_handle_user_journal_fprint";
-	off64_t data_offset                            = 0;
+	off64_t cluster_block_offset                   = 0;
+	off64_t current_offset                         = 0;
+	off64_t extent_offset                          = 0;
 	size64_t data_size                             = 0;
+	size64_t extent_size                           = 0;
 	size_t buffer_offset                           = 0;
 	size_t cluster_block_size                      = 0;
 	size_t name_length                             = 0;
 	size_t path_length                             = 0;
 	ssize_t read_count                             = 0;
+	uint32_t extent_flags                          = 0;
 	uint32_t usn_record_size                       = 0;
+	int extent_index                               = 0;
+	int number_of_extents                          = 0;
 	int result                                     = 0;
 
 	if( info_handle == NULL )
@@ -3498,131 +3504,195 @@ int info_handle_user_journal_fprint(
 
 		goto on_error;
 	}
-/* TODO use information about sparse ranges */
-	while( (size64_t) data_offset < data_size )
+	if( libfsntfs_data_stream_get_number_of_extents(
+	     alternate_data_stream,
+	     &number_of_extents,
+	     error ) != 1 )
 	{
-/* TODO work around for remnant data in buffer */
-		if( memory_set(
-		     buffer,
-		     0,
-		     cluster_block_size ) == NULL )
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve alternate data stream number of extents.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO check if extent size is within data size */
+	for( extent_index = 0;
+	     extent_index < number_of_extents;
+	     extent_index++ )
+	{
+		if( libfsntfs_data_stream_get_extent(
+		     alternate_data_stream,
+		     extent_index,
+		     &extent_offset,
+		     &extent_size,
+		     &extent_flags,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear buffer.",
-			 function );
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve alternate data stream extent: %d.",
+			 function,
+			 extent_index );
 
 			goto on_error;
 		}
-		read_count = libfsntfs_data_stream_read_buffer(
-		              alternate_data_stream,
-		              buffer,
-		              cluster_block_size,
-		              error );
-
-		if( read_count < 0 )
+		if( libfsntfs_data_stream_seek_offset(
+		     alternate_data_stream,
+		     extent_offset,
+		     SEEK_SET,
+		     error ) != extent_offset )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read from alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek offset: 0x%08" PRIx64 " in alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
 			 function,
+			 extent_offset,
 			 name );
 
 			goto on_error;
 		}
-		else if( result == 0 )
-		{
-			break;
-		}
-		data_offset  += read_count;
-		buffer_offset = 0;
+		cluster_block_offset = 0;
 
-/* TODO do an empty block check */
-		if( buffer[ 0 ] == 0 )
+/* TODO check if extent size is multitude of cluster block size */
+		while( (size64_t) cluster_block_offset < extent_size )
 		{
-			continue;
-		}
-		while( buffer_offset < ( cluster_block_size - 60 ) )
-		{
-			if( buffer[ buffer_offset ] == 0 )
-			{
-				break;
-			}
-			if( libfusn_record_initialize(
-			     &usn_record,
-			     error ) != 1 )
+/* TODO work around for remnant data in buffer */
+			if( memory_set(
+			     buffer,
+			     0,
+			     cluster_block_size ) == NULL )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to initialize USN record.",
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear buffer.",
 				 function );
 
 				goto on_error;
 			}
-			if( libfusn_record_copy_from_byte_stream(
-			     usn_record,
-			     &( buffer[ buffer_offset ] ),
-			     cluster_block_size,
-			     error ) != 1 )
+			read_count = libfsntfs_data_stream_read_buffer(
+				      alternate_data_stream,
+				      buffer,
+				      cluster_block_size,
+				      error );
+
+			if( read_count < 0 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to copy USN record from byte stream at block offset: %" PRIzd ".",
+				 "%s: unable to read from alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
 				 function,
-				 buffer_offset );
+				 name );
 
 				goto on_error;
 			}
-			if( libfusn_record_get_size(
-			     usn_record,
-			     &usn_record_size,
-			     error ) != 1 )
+			else if( result == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve USN record size.",
-				 function );
-
-				goto on_error;
+				break;
 			}
-			if( info_handle_usn_record_fprint(
-			     info_handle,
-			     usn_record,
-			     error ) != 1 )
+			buffer_offset = 0;
+
+/* TODO do an empty block check
+			if( buffer[ 0 ] == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print USN record information.",
-				 function );
-
-				goto on_error;
+				continue;
 			}
-			if( libfusn_record_free(
-			     &usn_record,
-			     error ) != 1 )
+*/
+			while( buffer_offset < ( (size_t) read_count - 60 ) )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free USN record.",
-				 function );
+				current_offset = extent_offset + cluster_block_offset + (off64_t) buffer_offset;
 
-				goto on_error;
+				if( (size64_t) current_offset >= data_size )
+				{
+					break;
+				}
+				if( buffer[ buffer_offset ] == 0 )
+				{
+					break;
+				}
+				if( libfusn_record_initialize(
+				     &usn_record,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to initialize USN record.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfusn_record_copy_from_byte_stream(
+				     usn_record,
+				     &( buffer[ buffer_offset ] ),
+				     read_count,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to copy USN record from byte stream at offset: 0x%08" PRIx64 ".",
+					 function,
+					 current_offset );
+
+					goto on_error;
+				}
+				if( libfusn_record_get_size(
+				     usn_record,
+				     &usn_record_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve USN record size.",
+					 function );
+
+					goto on_error;
+				}
+				if( info_handle_usn_record_fprint(
+				     info_handle,
+				     usn_record,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print USN record information.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfusn_record_free(
+				     &usn_record,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free USN record.",
+					 function );
+
+					goto on_error;
+				}
+				buffer_offset += usn_record_size;
 			}
-			buffer_offset += usn_record_size;
+			cluster_block_offset += read_count;
 		}
 	}
 	memory_free(

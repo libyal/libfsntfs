@@ -314,6 +314,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	off64_t data_run_offset                            = 0;
 	size64_t data_run_size                             = 0;
 	size_t header_data_size                            = 0;
+	size_t non_resident_data_size                      = 0;
 	size_t unknown_data_size                           = 0;
 	uint64_t data_run_number_of_cluster_blocks         = 0;
 	uint64_t last_data_run_cluster_block_number        = 0;
@@ -639,18 +640,6 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			}
 			mft_attribute_non_resident_data = &( mft_entry_data[ mft_attribute_data_offset ] );
 
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: non-resident data:\n",
-				 function );
-				libcnotify_print_data(
-				 mft_attribute_non_resident_data,
-				 sizeof( fsntfs_mft_attribute_non_resident_t ),
-				 0 );
-			}
-#endif
 			byte_stream_copy_to_uint64_little_endian(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->data_first_vcn,
 			 internal_attribute->data_first_vcn );
@@ -675,6 +664,26 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->data_size,
 			 internal_attribute->data_size );
 
+			if( internal_attribute->compression_unit_size == 0 )
+			{
+				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_t );
+			}
+			else
+			{
+				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: non-resident data:\n",
+				 function );
+				libcnotify_print_data(
+				 mft_attribute_non_resident_data,
+				 non_resident_data_size,
+				 0 );
+			}
+#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
@@ -741,16 +750,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 #endif
 			if( data_runs_offset > 0 )
 			{
-				header_data_size = sizeof( fsntfs_mft_attribute_header_t );
+				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + non_resident_data_size;
 
-				if( internal_attribute->compression_unit_size == 0 )
-				{
-					header_data_size += sizeof( fsntfs_mft_attribute_non_resident_t );
-				}
-				else
-				{
-					header_data_size += sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
-				}
 				if( ( data_runs_offset < header_data_size )
 				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( mft_entry_data_size - header_data_size ) ) )
 				{
