@@ -2155,21 +2155,21 @@ int info_handle_file_entry_fprint(
      int indentation_level,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *data_stream_name          = NULL;
-	libcstring_system_character_t *file_entry_name           = NULL;
-	libfsntfs_alternate_data_stream_t *alternate_data_stream = NULL;
-	libfsntfs_file_entry_t *sub_file_entry                   = NULL;
-	static char *function                                    = "info_handle_file_entry_fprint";
-	size_t data_stream_name_size                             = 0;
-	size_t file_entry_name_size                              = 0;
-	uint32_t file_attribute_flags                            = 0;
-	int alternate_data_stream_index                          = 0;
-	int has_default_data_stream                              = 0;
-	int indentation_level_iterator                           = 0;
-	int number_of_alternate_data_streams                     = 0;
-	int number_of_sub_file_entries                           = 0;
-	int result                                               = 0;
-	int sub_file_entry_index                                 = 0;
+	libcstring_system_character_t *data_stream_name = NULL;
+	libcstring_system_character_t *file_entry_name  = NULL;
+	libfsntfs_data_stream_t *alternate_data_stream  = NULL;
+	libfsntfs_file_entry_t *sub_file_entry          = NULL;
+	static char *function                           = "info_handle_file_entry_fprint";
+	size_t data_stream_name_size                    = 0;
+	size_t file_entry_name_size                     = 0;
+	uint32_t file_attribute_flags                   = 0;
+	int alternate_data_stream_index                 = 0;
+	int has_default_data_stream                     = 0;
+	int indentation_level_iterator                  = 0;
+	int number_of_alternate_data_streams            = 0;
+	int number_of_sub_file_entries                  = 0;
+	int result                                      = 0;
+	int sub_file_entry_index                        = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2344,12 +2344,12 @@ int info_handle_file_entry_fprint(
 				goto on_error;
 			}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libfsntfs_alternate_data_stream_get_utf16_name_size(
+			result = libfsntfs_data_stream_get_utf16_name_size(
 			          alternate_data_stream,
 			          &data_stream_name_size,
 			          error );
 #else
-			result = libfsntfs_alternate_data_stream_get_utf8_name_size(
+			result = libfsntfs_data_stream_get_utf8_name_size(
 			          alternate_data_stream,
 			          &data_stream_name_size,
 			          error );
@@ -2384,13 +2384,13 @@ int info_handle_file_entry_fprint(
 					goto on_error;
 				}
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libfsntfs_alternate_data_stream_get_utf16_name(
+				result = libfsntfs_data_stream_get_utf16_name(
 					  alternate_data_stream,
 					  (uint16_t *) data_stream_name,
 					  data_stream_name_size,
 					  error );
 #else
-				result = libfsntfs_alternate_data_stream_get_utf8_name(
+				result = libfsntfs_data_stream_get_utf8_name(
 					  alternate_data_stream,
 					  (uint8_t *) data_stream_name,
 					  data_stream_name_size,
@@ -2427,7 +2427,7 @@ int info_handle_file_entry_fprint(
 
 				data_stream_name = NULL;
 			}
-			if( libfsntfs_alternate_data_stream_free(
+			if( libfsntfs_data_stream_free(
 			     &alternate_data_stream,
 			     error ) != 1 )
 			{
@@ -2514,7 +2514,7 @@ on_error:
 	}
 	if( alternate_data_stream != NULL )
 	{
-		libfsntfs_alternate_data_stream_free(
+		libfsntfs_data_stream_free(
 		 &alternate_data_stream,
 		 NULL );
 	}
@@ -3355,22 +3355,22 @@ int info_handle_user_journal_fprint(
      info_handle_t *info_handle,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *name                      = NULL;
-	libcstring_system_character_t *path                      = NULL;
-	libfsntfs_alternate_data_stream_t *alternate_data_stream = NULL;
-	libfsntfs_file_entry_t *file_entry                       = NULL;
-	libfusn_record_t *usn_record                             = NULL;
-	uint8_t *buffer                                          = NULL;
-	static char *function                                    = "info_handle_user_journal_fprint";
-	off64_t data_offset                                      = 0;
-	size64_t data_size                                       = 0;
-	size_t buffer_offset                                     = 0;
-	size_t cluster_block_size                                = 0;
-	size_t name_length                                       = 0;
-	size_t path_length                                       = 0;
-	ssize_t read_count                                       = 0;
-	uint32_t usn_record_size                                 = 0;
-	int result                                               = 0;
+	libcstring_system_character_t *name            = NULL;
+	libcstring_system_character_t *path            = NULL;
+	libfsntfs_data_stream_t *alternate_data_stream = NULL;
+	libfsntfs_file_entry_t *file_entry             = NULL;
+	libfusn_record_t *usn_record                   = NULL;
+	uint8_t *buffer                                = NULL;
+	static char *function                          = "info_handle_user_journal_fprint";
+	off64_t data_offset                            = 0;
+	size64_t data_size                             = 0;
+	size_t buffer_offset                           = 0;
+	size_t cluster_block_size                      = 0;
+	size_t name_length                             = 0;
+	size_t path_length                             = 0;
+	ssize_t read_count                             = 0;
+	uint32_t usn_record_size                       = 0;
+	int result                                     = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3470,7 +3470,7 @@ int info_handle_user_journal_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_alternate_data_stream_get_size(
+	if( libfsntfs_data_stream_get_size(
 	     alternate_data_stream,
 	     &data_size,
 	     error ) != 1 )
@@ -3516,7 +3516,7 @@ int info_handle_user_journal_fprint(
 
 			goto on_error;
 		}
-		read_count = libfsntfs_alternate_data_stream_read_buffer(
+		read_count = libfsntfs_data_stream_read_buffer(
 		              alternate_data_stream,
 		              buffer,
 		              cluster_block_size,
@@ -3630,7 +3630,7 @@ int info_handle_user_journal_fprint(
 
 	buffer = NULL;
 
-	if( libfsntfs_alternate_data_stream_free(
+	if( libfsntfs_data_stream_free(
 	     &alternate_data_stream,
 	     error ) != 1 )
 	{
@@ -3676,7 +3676,7 @@ on_error:
 	}
 	if( alternate_data_stream != NULL )
 	{
-		libfsntfs_alternate_data_stream_free(
+		libfsntfs_data_stream_free(
 		 &alternate_data_stream,
 		 NULL );
 	}

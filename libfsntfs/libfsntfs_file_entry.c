@@ -23,9 +23,9 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_alternate_data_stream.h"
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
+#include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_file_entry.h"
@@ -1127,7 +1127,7 @@ int libfsntfs_file_entry_get_number_of_alternate_data_streams(
 int libfsntfs_file_entry_get_alternate_data_stream_by_index(
      libfsntfs_file_entry_t *file_entry,
      int alternate_data_stream_index,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *data_attribute                = NULL;
@@ -1185,7 +1185,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_alternate_data_stream_initialize(
+	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
@@ -1212,7 +1212,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
      libfsntfs_file_entry_t *file_entry,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *data_attribute                = NULL;
@@ -1277,7 +1277,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
 	{
 		return( 0 );
 	}
-	if( libfsntfs_alternate_data_stream_initialize(
+	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
@@ -1303,7 +1303,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
      libfsntfs_file_entry_t *file_entry,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *data_attribute                = NULL;
@@ -1368,7 +1368,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
 	{
 		return( 0 );
 	}
-	if( libfsntfs_alternate_data_stream_initialize(
+	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,

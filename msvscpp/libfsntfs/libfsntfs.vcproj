@@ -174,10 +174,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_alternate_data_stream.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_attribute.c"
 				>
 			</File>
@@ -203,6 +199,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_data_run.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_data_stream.c"
 				>
 			</File>
 			<File
@@ -376,10 +376,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_alternate_data_stream.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_attribute.h"
 				>
 			</File>
@@ -405,6 +401,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_data_run.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_data_stream.h"
 				>
 			</File>
 			<File

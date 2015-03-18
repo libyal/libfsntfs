@@ -171,7 +171,7 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_alternate_data_stream_by_index(
      libfsntfs_file_entry_t *file_entry,
      int alternate_data_stream_index,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -179,7 +179,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
      libfsntfs_file_entry_t *file_entry,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -187,7 +187,7 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
      libfsntfs_file_entry_t *file_entry,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+     libfsntfs_data_stream_t **alternate_data_stream,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

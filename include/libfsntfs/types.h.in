@@ -201,8 +201,8 @@ typedef int64_t off64_t;
 
 /* The following type definitions hide internal data structures
  */
-typedef intptr_t libfsntfs_alternate_data_stream_t;
 typedef intptr_t libfsntfs_attribute_t;
+typedef intptr_t libfsntfs_data_stream_t;
 typedef intptr_t libfsntfs_file_entry_t;
 typedef intptr_t libfsntfs_mft_file_t;
 typedef intptr_t libfsntfs_volume_t;

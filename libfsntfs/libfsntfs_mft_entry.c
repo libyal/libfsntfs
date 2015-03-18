@@ -315,7 +315,56 @@ int libfsntfs_mft_entry_read(
      uint32_t mft_entry_index,
      libcerror_error_t **error )
 {
-	static char *function                     = "libfsntfs_mft_entry_read";
+	static char *function = "libfsntfs_mft_entry_read";
+
+	if( libfsntfs_mft_entry_read_header(
+	     mft_entry,
+	     io_handle,
+	     file_io_handle,
+	     file_offset,
+	     mft_entry_index,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read header.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_entry_read_attributes(
+	     mft_entry,
+	     io_handle,
+	     file_io_handle,
+	     mft_entry_vector,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read attributes.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Reads the MFT entry header
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_read_header(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
+     uint32_t mft_entry_index,
+     libcerror_error_t **error )
+{
+	static char *function                     = "libfsntfs_mft_entry_read_header";
 	size_t mft_entry_data_offset              = 0;
 	size_t mft_entry_fixup_offset             = 0;
 	size_t mft_entry_fixup_placeholder_offset = 0;
@@ -482,7 +531,7 @@ int libfsntfs_mft_entry_read(
 		 fixup_values_offset );
 
 		libcnotify_printf(
-		 "%s: number of fixup values\t\t\t: %" PRIu16 "\n",
+		 "%s: number of fixup values\t\t\t\t: %" PRIu16 "\n",
 		 function,
 		 number_of_fixup_values );
 
@@ -686,7 +735,7 @@ int libfsntfs_mft_entry_read(
 				 &( mft_entry->data[ mft_entry_data_offset ] ),
 				 value_16bit );
 				libcnotify_printf(
-				 "%s: fixup value: %" PRIu16 "\t\t\t\t: 0x%04" PRIx16 "\n",
+				 "%s: fixup value: %" PRIu16 "\t\t\t\t\t: 0x%04" PRIx16 "\n",
 				 function,
 				 fixup_value_index,
 				 value_16bit );
@@ -740,22 +789,6 @@ int libfsntfs_mft_entry_read(
 		}
 	}
 #endif
-	if( libfsntfs_mft_entry_read_attributes(
-	     mft_entry,
-	     io_handle,
-	     file_io_handle,
-	     mft_entry_vector,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read attributes.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
 
 on_error:

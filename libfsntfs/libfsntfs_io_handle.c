@@ -277,6 +277,10 @@ int libfsntfs_io_handle_read_volume_header(
 	 io_handle->bytes_per_sector );
 
 	byte_stream_copy_to_uint64_little_endian(
+	 volume_header_data.total_number_of_sectors,
+	 io_handle->volume_size );
+
+	byte_stream_copy_to_uint64_little_endian(
 	 volume_header_data.mft_cluster_block_number,
 	 mft_cluster_block_number );
 
@@ -387,13 +391,10 @@ int libfsntfs_io_handle_read_volume_header(
 		 value_32bit,
 		 value_32bit );
 
-		byte_stream_copy_to_uint64_little_endian(
-		 volume_header_data.total_number_of_sectors,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: total number of sectors\t\t: %" PRIu64 "\n",
 		 function,
-		 value_64bit );
+		 io_handle->volume_size );
 
 		libcnotify_printf(
 		 "%s: MFT cluster block number\t: %" PRIu64 "\n",
@@ -494,16 +495,36 @@ int libfsntfs_io_handle_read_volume_header(
 	}
 	if( io_handle->mft_entry_size < 128 )
 	{
-/* TODO bounds check */
-		io_handle->mft_entry_size = io_handle->mft_entry_size
-		                          * io_handle->cluster_block_size;
+		if( io_handle->mft_entry_size >= (size32_t) ( ( UINT32_MAX / io_handle->cluster_block_size ) + 1 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid MFT entry size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		io_handle->mft_entry_size *= io_handle->cluster_block_size;
 	}
 	else
 	{
 		/* The size is calculated as: 2 ^ ( 256 - value )
 		 */
 		io_handle->mft_entry_size = 256 - io_handle->mft_entry_size;
-/* TODO bounds check */
+
+		if( io_handle->mft_entry_size >= 32 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid MFT entry size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		io_handle->mft_entry_size = 1 << io_handle->mft_entry_size;
 	}
 	if( ( io_handle->index_entry_size == 0 )
@@ -521,18 +542,51 @@ int libfsntfs_io_handle_read_volume_header(
 	}
 	if( io_handle->index_entry_size < 128 )
 	{
-/* TODO bounds check */
-		io_handle->index_entry_size = io_handle->index_entry_size
-		                            * io_handle->cluster_block_size;
+		if( io_handle->index_entry_size >= (size32_t) ( ( UINT32_MAX / io_handle->cluster_block_size ) + 1 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid index entry size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		io_handle->index_entry_size *= io_handle->cluster_block_size;
 	}
 	else
 	{
 		/* The size is calculated as: 2 ^ ( 256 - value )
 		 */
 		io_handle->index_entry_size = 256 - io_handle->index_entry_size;
-/* TODO bounds check */
+
+		if( io_handle->index_entry_size >= 32 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid index entry size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
 		io_handle->index_entry_size = 1 << io_handle->index_entry_size;
 	}
+	if( io_handle->volume_size > (size64_t) ( ( UINT64_MAX / io_handle->bytes_per_sector ) + 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid volume size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	io_handle->volume_size *= io_handle->bytes_per_sector;
+
 	io_handle->mft_offset = mft_cluster_block_number
 	                      * io_handle->cluster_block_size;
 

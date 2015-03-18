@@ -138,6 +138,14 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20150317
+* worked on format support
+
+20150315
+* worked on format support
+* added support for MTF entry 0 with attribute list
+* bug fix in libfsntfs_attribute_append_to_chain
+
 20150125
 * worked on format support
 

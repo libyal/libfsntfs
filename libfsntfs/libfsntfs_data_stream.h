@@ -1,5 +1,5 @@
 /*
- * Alternate data stream functions
+ * Data stream functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_ALTERNATE_DATA_STREAM_H )
-#define _LIBFSNTFS_INTERNAL_ALTERNATE_DATA_STREAM_H
+#if !defined( _LIBFSNTFS_INTERNAL_DATA_STREAM_H )
+#define _LIBFSNTFS_INTERNAL_DATA_STREAM_H
 
 #include <common.h>
 #include <types.h>
@@ -37,9 +37,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_internal_alternate_data_stream libfsntfs_internal_alternate_data_stream_t;
+typedef struct libfsntfs_internal_data_stream libfsntfs_internal_data_stream_t;
 
-struct libfsntfs_internal_alternate_data_stream
+struct libfsntfs_internal_data_stream
 {
 	/* The file IO handle
 	 */
@@ -54,76 +54,91 @@ struct libfsntfs_internal_alternate_data_stream
 	libfdata_stream_t *data_cluster_block_stream;
 };
 
-int libfsntfs_alternate_data_stream_initialize(
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+int libfsntfs_data_stream_initialize(
+     libfsntfs_data_stream_t **data_stream,
      libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_attribute_t *data_attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_free(
-     libfsntfs_alternate_data_stream_t **alternate_data_stream,
+int libfsntfs_data_stream_free(
+     libfsntfs_data_stream_t **data_stream,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_utf8_name_size(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_utf8_name_size(
+     libfsntfs_data_stream_t *data_stream,
      size_t *utf8_name_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_utf8_name(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_utf8_name(
+     libfsntfs_data_stream_t *data_stream,
      uint8_t *utf8_name,
      size_t utf8_name_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_utf16_name_size(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_utf16_name_size(
+     libfsntfs_data_stream_t *data_stream,
      size_t *utf16_name_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_utf16_name(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_utf16_name(
+     libfsntfs_data_stream_t *data_stream,
      uint16_t *utf16_name,
      size_t utf16_name_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-ssize_t libfsntfs_alternate_data_stream_read_buffer(
-         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+ssize_t libfsntfs_data_stream_read_buffer(
+         libfsntfs_data_stream_t *data_stream,
          void *buffer,
          size_t buffer_size,
          libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-ssize_t libfsntfs_alternate_data_stream_read_buffer_at_offset(
-         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+ssize_t libfsntfs_data_stream_read_buffer_at_offset(
+         libfsntfs_data_stream_t *data_stream,
          void *buffer,
          size_t buffer_size,
          off64_t offset,
          libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-off64_t libfsntfs_alternate_data_stream_seek_offset(
-         libfsntfs_alternate_data_stream_t *alternate_data_stream,
+off64_t libfsntfs_data_stream_seek_offset(
+         libfsntfs_data_stream_t *data_stream,
          off64_t offset,
          int whence,
          libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_offset(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_offset(
+     libfsntfs_data_stream_t *data_stream,
      off64_t *offset,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_alternate_data_stream_get_size(
-     libfsntfs_alternate_data_stream_t *alternate_data_stream,
+int libfsntfs_data_stream_get_size(
+     libfsntfs_data_stream_t *data_stream,
      size64_t *size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_data_stream_get_number_of_extents(
+     libfsntfs_data_stream_t *data_stream,
+     int *number_of_extents,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_data_stream_get_extent(
+     libfsntfs_data_stream_t *data_stream,
+     int extent_index,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

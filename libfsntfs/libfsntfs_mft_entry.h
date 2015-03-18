@@ -129,6 +129,14 @@ int libfsntfs_mft_entry_read(
      uint32_t mft_entry_index,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_read_header(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
+     uint32_t mft_entry_index,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_read_attributes(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,

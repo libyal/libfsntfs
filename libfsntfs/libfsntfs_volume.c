@@ -784,12 +784,14 @@ int libfsntfs_volume_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_data_run_t *data_run   = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_volume_open_read";
-	int data_run_index               = 0;
-	int number_of_data_runs          = 0;
-	int segment_index                = 0;
+	libfsntfs_internal_attribute_t *data_attribute = NULL;
+	libfsntfs_data_run_t *data_run                 = NULL;
+	libfsntfs_mft_entry_t *mft_entry               = NULL;
+	static char *function                          = "libfsntfs_volume_open_read";
+	size64_t mft_size                              = 0;
+	int data_run_index                             = 0;
+	int number_of_data_runs                        = 0;
+	int segment_index                              = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -863,48 +865,9 @@ int libfsntfs_volume_open_read(
 		 "Reading MFT entry: 0:\n" );
 	}
 #endif
-	if( libfsntfs_mft_entry_initialize(
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_mft_entry_read(
-	     mft_entry,
-	     internal_volume->io_handle,
-	     file_io_handle,
-	     NULL,
-	     internal_volume->io_handle->mft_offset,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: 0.",
-		 function );
-
-		goto on_error;
-	}
-	if( mft_entry->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT entry: 0 - missing data attribute.",
-		 function );
-
-		goto on_error;
-	}
+	/* Since MFT entry 0 can contain an attribute list
+	 * we define MFT entry vector before knowning all the data runs
+	 */
 	if( libfdata_vector_initialize(
 	     &( internal_volume->mft_entry_vector ),
 	     (size64_t) internal_volume->io_handle->mft_entry_size,
@@ -925,70 +888,183 @@ int libfsntfs_volume_open_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_attribute_get_number_of_data_runs(
-	     mft_entry->data_attribute,
-	     &number_of_data_runs,
+	if( ( internal_volume->io_handle->mft_offset < 0 )
+	 || ( (size64_t) internal_volume->io_handle->mft_offset >= internal_volume->io_handle->volume_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT offset value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	mft_size = internal_volume->io_handle->volume_size - internal_volume->io_handle->mft_offset;
+
+	if( libfdata_vector_append_segment(
+	     internal_volume->mft_entry_vector,
+	     &segment_index,
+	     0,
+	     internal_volume->io_handle->mft_offset,
+	     mft_size,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of data runs.",
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append segment: %d to MFT entry vector.",
+		 function,
+		 data_run_index );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_entry_initialize(
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT entry.",
 		 function );
 
 		goto on_error;
 	}
-	for( data_run_index = 0;
-	     data_run_index < number_of_data_runs;
-	     data_run_index++ )
+	if( libfsntfs_mft_entry_read(
+	     mft_entry,
+	     internal_volume->io_handle,
+	     file_io_handle,
+	     internal_volume->mft_entry_vector,
+	     internal_volume->io_handle->mft_offset,
+	     0,
+	     error ) != 1 )
 	{
-		if( libfsntfs_attribute_get_data_run_by_index(
-		     mft_entry->data_attribute,
-		     data_run_index,
-		     &data_run,
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read MFT entry: 0.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Initializing MFT entry vector:\n" );
+	}
+#endif
+	if( mft_entry->data_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT entry: 0 - missing data attribute.",
+		 function );
+
+		goto on_error;
+	}
+	data_attribute = (libfsntfs_internal_attribute_t *) mft_entry->data_attribute;
+
+	while( data_attribute != NULL )
+	{
+		if( libfsntfs_attribute_get_number_of_data_runs(
+		     (libfsntfs_attribute_t *) data_attribute,
+		     &number_of_data_runs,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: 0 data run: %d.",
-			 function,
-			 data_run_index );
-
-			goto on_error;
-		}
-		if( data_run == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing MFT entry: 0 data run: %d.",
+			 "%s: unable to retrieve number of data runs.",
 			 function );
 
 			goto on_error;
 		}
-		if( libfdata_vector_append_segment(
-		     internal_volume->mft_entry_vector,
-		     &segment_index,
-		     0,
-		     data_run->start_offset,
-		     data_run->size,
-		     0,
-		     error ) != 1 )
+		for( data_run_index = 0;
+		     data_run_index < number_of_data_runs;
+		     data_run_index++ )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append segment: %d to MFT entry vector.",
-			 function,
-			 data_run_index );
+			if( libfsntfs_attribute_get_data_run_by_index(
+			     (libfsntfs_attribute_t *) data_attribute,
+			     data_run_index,
+			     &data_run,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve MFT entry: 0 data run: %d.",
+				 function,
+				 data_run_index );
 
-			goto on_error;
+				goto on_error;
+			}
+			if( data_run == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing MFT entry: 0 data run: %d.",
+				 function );
+
+				goto on_error;
+			}
+			if( ( data_run_index == 0 )
+			 && ( data_attribute == (libfsntfs_internal_attribute_t *) mft_entry->data_attribute ) )
+			{
+				if( libfdata_vector_set_segment_by_index(
+				     internal_volume->mft_entry_vector,
+				     0,
+				     0,
+				     data_run->start_offset,
+				     data_run->size,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set segment: 0 to MFT entry vector.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			else
+			{
+				if( libfdata_vector_append_segment(
+				     internal_volume->mft_entry_vector,
+				     &segment_index,
+				     0,
+				     data_run->start_offset,
+				     data_run->size,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append segment: %d to MFT entry vector.",
+					 function,
+					 data_run_index );
+
+					goto on_error;
+				}
+			}
 		}
+		data_attribute = (libfsntfs_internal_attribute_t *) data_attribute->next_attribute;
 	}
 #ifdef TODO
 	if( libfcache_cache_initialize(

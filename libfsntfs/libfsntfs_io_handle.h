@@ -46,6 +46,10 @@ struct libfsntfs_io_handle
 	 */
 	uint16_t bytes_per_sector;
 
+	/* The volume size
+	 */
+	size64_t volume_size;
+
 	/* The MFT entry size
 	 */
 	uint32_t mft_entry_size;
