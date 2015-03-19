@@ -426,8 +426,6 @@ record segment is freed; it is 0 if the segment is not used.
 value in the first sector. It also claims the update sequence array size value 
 contains the number of bytes. It seems to be more likely to the number of words.
 
-*TODO migrate remaining documentation*
-
 === [[mft_entry_flags]]MFT entry flags
 
 [cols="1,1,5",options="header"]
@@ -516,6 +514,24 @@ See section: <<mft_attribute_data_flags,MFT attribute data flags>>
 | 0x8000 | ATTRIBUTE_FLAG_SPARSE | Is sparse
 |===
 
+==== Resident MFT attribute
+The resident MFT attribute data is present when the non-resident flag is not 
+set (0). The resident data is 8 bytes in size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Data size (or value length)
+| 4 | 2 | | Data offset (or value size) +
+Contains an offset relative from the start of the MFT attribute
+| 6 | 1 | | Indexed flag +
+[yellow-background]*Only the lower bit is used, do the other bits have any significance?*
+| 7 | 1 | 0x00 | Padding +
+Contains an empty byte
+|===
+
+==== Non-resident MFT attribute
+
 *TODO migrate remaining documentation*
 
 == The attributes
@@ -578,8 +594,7 @@ The data of the file is stored on an offline storage.
 The content of the file or directory should not be indexed by the indexing service.
 | 0x00004000 | FILE_ATTRIBUTE_ENCRYPTED | Is encrypted
 | 0x00008000 | | [yellow-background]*Unknown (seen on Windows 95 FAT)*
-| 0x00010000 | FILE_ATTRIBUTE_VIRTUAL | Currently reserved for future use, not used by the LNK format +
-Is virtual
+| 0x00010000 | FILE_ATTRIBUTE_VIRTUAL | Is virtual
 3+| _The following flags are mainly used in the file name attribute and sparsely in the standard information attribute;_ +
 _it could be that they have a different meaning in both types of attributes or that the standard information flags are not updated._ +
 _For now the latter is assumed._
