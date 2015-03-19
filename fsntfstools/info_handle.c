@@ -3541,6 +3541,10 @@ int info_handle_user_journal_fprint(
 
 			goto on_error;
 		}
+		if( ( extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
+		{
+			continue;
+		}
 		if( libfsntfs_data_stream_seek_offset(
 		     alternate_data_stream,
 		     extent_offset,

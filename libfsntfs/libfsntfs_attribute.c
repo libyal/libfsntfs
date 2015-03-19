@@ -1044,12 +1044,16 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 				if( data_run_value_size == 0 )
 				{
-					if( ( internal_attribute->data_flags & 0x8000 ) != 0 )
+/* TODO if compression unit size != 0 then compressed ? */
+					if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSED ) != 0 )
+					{
+						range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
+					}
+/* TODO error if flag is not sparse or compressed */
+					if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) != 0 )
 					{
 						range_flags = LIBFDATA_RANGE_FLAG_IS_SPARSE;
 					}
-/* TODO if compression unit size != 0 then compressed ? */
-/* TODO error if flag is not sparse or compressed */
 				}
 				else
 				{

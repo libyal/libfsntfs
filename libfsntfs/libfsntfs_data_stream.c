@@ -26,6 +26,7 @@
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_data_stream.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
@@ -639,6 +640,7 @@ int libfsntfs_data_stream_get_extent(
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_extent";
 	size64_t data_size                                     = 0;
+	uint32_t range_flags                                   = 0;
 	int segment_file_index                                 = 0;
 
 	if( data_stream == NULL )
@@ -676,6 +678,17 @@ int libfsntfs_data_stream_get_extent(
 
 		return( -1 );
 	}
+	if( extent_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent flags.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfsntfs_attribute_get_data_size(
 	     internal_data_stream->data_attribute,
 	     &data_size,
@@ -696,7 +709,7 @@ int libfsntfs_data_stream_get_extent(
 	     &segment_file_index,
 	     extent_offset,
 	     extent_size,
-	     extent_flags,
+	     &range_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -709,7 +722,8 @@ int libfsntfs_data_stream_get_extent(
 
 		return( -1 );
 	}
-	if( (size64_t) *extent_offset >= data_size )
+	if( ( *extent_offset < 0 )
+	 || ( (size64_t) *extent_offset >= data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -725,6 +739,16 @@ int libfsntfs_data_stream_get_extent(
 	if( *extent_size > data_size )
 	{
 		*extent_size = data_size;
+	}
+	*extent_flags = 0;
+
+	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	{
+		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_SPARSE;
+	}
+	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+	{
+		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_COMPRESSED;
 	}
 	return( 1 );
 }

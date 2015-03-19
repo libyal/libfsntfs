@@ -102,5 +102,18 @@ enum LIBFSNTFS_ATTRIBUTE_TYPES
 	LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES			= 0xffffffffUL
 };
 
+/* The extent flag definitions
+ */
+enum LIBFSNTFS_EXTENT_FLAGS
+{
+	/* The extent is sparse
+	 */
+        LIBFSNTFS_EXTENT_FLAG_IS_SPARSE					= 0x00000001UL,
+
+	/* The extent is compressed
+	 */
+        LIBFSNTFS_EXTENT_FLAG_IS_COMPRESSED				= 0x00000002UL
+};
+
 #endif
 

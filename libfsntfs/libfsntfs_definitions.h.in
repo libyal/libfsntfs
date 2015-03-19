@@ -117,7 +117,29 @@ enum LIBFSNTFS_ATTRIBUTE_TYPES
 	LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES			= 0xffffffffUL
 };
 
+/* The extent flag definitions
+ */
+enum LIBFSNTFS_EXTENT_FLAGS
+{
+	/* The extent is sparse
+	 */
+        LIBFSNTFS_EXTENT_FLAG_IS_SPARSE					= 0x00000001UL,
+
+	/* The extent is compressed
+	 */
+        LIBFSNTFS_EXTENT_FLAG_IS_COMPRESSED				= 0x00000002UL
+};
+
 #endif
+
+/* The attribute flags
+ */
+enum LIBFSNTFS_ATTRIBUTE_FLAGS
+{
+	LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSED				= 0x0001,
+
+	LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE					= 0x8000
+};
 
 /* The predefined MFT entry index values
  */
