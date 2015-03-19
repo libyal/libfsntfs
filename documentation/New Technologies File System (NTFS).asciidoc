@@ -1,0 +1,986 @@
+= New Technologies File System (NTFS)
+Analysis the Windows NT File System
+
+:numbered!:
+[abstract]
+== Summary
+NTFS is the primary file system for Microsoft Windows versions that are based 
+on Windows NT.
+
+This document is intended as a working document for the NTFS format. Which 
+should allow existing Open Source forensic tooling to be able to process this 
+type of file system.
+
+[preface]
+== Document information
+[cols="1,5"]
+|===
+| Author(s): | Joachim Metz <joachim.metz@gmail.com>
+| Abstract: | This document contains information about the New Technologies File System (NTFS)
+| Classification: | Public
+| Keywords: | NTFS, New Technologies File System
+|===
+
+[preface]
+== License
+....
+Copyright (C) 2009-2015, Joachim Metz <joachim.metz@gmail.com>.
+Permission is granted to copy, distribute and/or modify this document under the 
+terms of the GNU Free Documentation License, Version 1.3 or any later version 
+published by the Free Software Foundation; with no Invariant Sections, no 
+Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included 
+in the section entitled "GNU Free Documentation License".
+....
+
+[preface]
+== Revision history
+[cols="1,1,1,5",options="header"]
+|===
+| Version | Author | Date | Comments
+| 0.0.1 | J.B. Metz | August 2009 +
+September 2010 +
+October 2010 +
+November 2010 +
+December 2010 | Initial version, based on earlier notes.
+| 0.0.2 | J.B. Metz | March 2011 | Additional information about multi data run MFT.
+| 0.0.3 | J.B. Metz | May 2012 | Additional information.
+| 0.0.4 | J.B. Metz | February 2014 | Additional information.
+| 0.0.5 | J.B. Metz | July 2014 +
+August 2014 | Textual changes and additional information.
+| 0.0.6 | J.B. Metz | March 2015 | Additional information. +
+Switched to asccidoc format.
+|===
+
+:numbered:
+== Overview
+NTFS is the primary file system for Microsoft Windows versions that are based 
+on Windows NT.
+
+[yellow-background]*TODO describe relation to OS2 HPFS*
+
+[cols="1,5",options="header"]
+|===
+| Characteristics | Description
+| Byte order | little-endian
+| Date and time values | FILETIME in UTC
+| Character strings | ASCII strings are Single Byte Character (SBC) or Multi Byte Character (MBC) string stored with a codepage. Sometimes referred to as ANSI string representation. +
+Though technically maybe incorrect, this document will use term (extended) ASCII string. +
+Unicode strings are stored in UTF-16 little-endian without the byte order mark (BOM).
+|===
+
+=== Versions
+There are multiple version of NTFS.
+
+[cols="1,5",options="header"]
+|===
+| NTFS version | Remarks
+| 1.0 | Introduced in Windows NT 3.1
+| 1.1 | Introduced in Windows NT 3.5
+| 1.2 | Introduced in Windows NT 3.51
+| 3.0 | Introduced in Windows 2000
+| 3.1 | Introduced in Windows XP
+|===
+
+This document mainly focuses on NTFS 3.1 or later.
+
+[NOTE]
+The versions mentioned above are the version as used by NTFS. Another common 
+versioning schema uses the Windows version, e.g. NTFS 5.0 is the version of 
+NTFS used on Windows XP which is version 3.1 in schema mentioned above.
+
+=== Test version
+The following version of programs were used to test the information within this 
+document:
+
+* [yellow-background]*TODO: Windows NT4*
+* [yellow-background]*TODO: Windows 2000*
+* Windows XP SP3
+* [yellow-background]*TODO: Windows 2003*
+* Windows Vista
+* [yellow-background]*TODO: Windows 2008*
+* Windows 7
+* Windows 8
+* [yellow-background]*TODO: Windows 10*
+* NTFS-3G
+
+== Terminology
+=== Cluster
+NTFS refers to it file system blocks as clusters. Note that these are not the 
+same as the physical clusters of a harddisk. For clarity these are referred to 
+as cluster blocks. In other sources they are also referred to as logical 
+clusters which are numbered globally (or absolute).
+
+Typically the cluster block is 8 sectors (8 x 512 = 4096 bytes) of size.
+
+=== Virtual cluster
+The term virtual cluster refers to cluster blocks which are numbered locally 
+(or relative).
+
+=== Long and short (file) name
+In Windows terminology the name of a file (or directory) can either be short or 
+long. The short name is an equivalent of the filename in the (DOS) 8.3 format. 
+The long name is actual the (full) name of the file. The term long refers to 
+the aspect that the name is longer than the short variant. Because most 
+documentation refer to the (full) name as the long name, for clarity sake so 
+will this document.
+
+== The volume
+Everything on an NTFS volume is a file. There are two types of files:
+
+* files that contain volume and file system metadata (referred to as metadata files);
+* files that contain data (referred to as files).
+
+=== The metadata files
+NTFS uses the Master File Table (MFT) to store information about files and 
+directories. The MFT entries reference the different volume and file system 
+metadata. There are several predefined metadata files.
+
+The following metadata files are predefined and use a fixed MFT entry index.
+
+[cols="1,1,5",options="header"]
+|===
+| MFT entry index | Filename | Description
+| 0 | $MFT | Master File Table
+| 1 | $MFTMirr | Back up of the Master File Table
+| 2 | $LogFile | Metadata journal
+| 3 | $Volume | Volume information
+| 4 | $AttrDef | File and directory attribute definitions
+| 5 | .  | Root directory
+| 6 | $Bitmap | Allocation bitmap
+| 7 | $Boot | Boot code
+| 8 | $BadClus | Bad clusters
+| 9 | $Quota | Quota information +
+Last used in Windows NT 4
+| 9 | $Secure | Security and access control information +
+Introduced in Windows 2000
+| 10 | $UpCase | Table of uppercase characters used for ensuring case insensitivity in Windows and DOS namespaces.
+| 11 | $Extend | A directory containing extended metadata files
+| 12-15 | | Reserved +
+Marked as in use but empty
+| 16-23 | | Unused +
+Marked as unused
+3+| _As of Windows 2000_
+| 24 | $Extend\$Quota | Quota information +
+Was MFT entry 9 in Windows NT 4
+| 25 | $Extend\$ObjId | Unique file identifiers for distributed link tracking 
+| 26 | $Extend\$Reparse | Backreferences to reparse points 
+3+| _As of Windows Vista_ ([yellow-background]*or server 2003?*) +
+_Transactional NTFS metadata (See section: <<transactional_ntfs,Transactional NTFS (TxF)>>)_
+| 27 | $Extend\$RmMetadata | Resource manager metadata directory
+| 28 | $Extend\$RmMetadata\$Repair | Resource manager repair information
+| 29 | $Extend\$RmMetadata\$TxfLog | Transactional NTFS (TxF) log metadata directory
+| 30 | $Extend\$RmMetadata\$Txf | Transactional NTFS (TxF) metadata directory
+| 31 | $Extend\$RmMetadata\$TxfLog\$Tops | TxF Old Page Stream (TOPS) file
+| 32 | $Extend\$RmMetadata\$TxfLog\$TxfLog.blf | Transactional NTFS (TxF) base log metadata file
+3+| _Common_
+| | ... | A file or directory
+|===
+
+The following metadata files are predefined, however the MFT entry index is 
+commonly used but not fixed.
+
+[cols="1,1,5",options="header"]
+|===
+| MFT entry index | Filename | Description
+| | $Extend\$UsnJrnl | Update (or change) journal +
+See section: <<update_journal,Update (or change) journal>> +
+[yellow-background]*Has this file been added in Windows XP SP3? Otherwise what are reasons for it to not be present?*
+|===
+
+== The volume header
+The volume header is stored at the start of the volume (in the $Boot metadata 
+file) and contains:
+
+* the volume signature
+* the BIOS parameter block
+* the boot loader
+
+The volume header is 512 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 3 | | Boot entry point +
+Often contains: +
+eb52   jmp 0x52 +
+90       nop +
+This is a jump instruction to the bootcode at offset 84 followed by a no-operation.
+| 3 | 4 | "NTFS\x20\x20\x20\x20" | File system signature +
+(Also known as OEM and/or dummy identifier) +
+4+| _DOS version 2.0 BIOS parameter block (BPB)_
+| 11 | 2 | | Bytes per sector
+| 13 | 1 | | Sectors per cluster block +
+[yellow-background]*Values seen 1, 8*
+| 14 | 2 | 0x00 | Reserved Sectors +
+not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+| 16 | 1 | 0x00 | Number of File Allocation Tables (FATs) +
+not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+| 17 | 2 | 0 | Root directory entries +
+not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+| 19 | 2 | | Total number of sectors (16-bit) +
+[yellow-background]*Used if the total of number of sectors fits in 16-bit?*
+| 21 | 1 | | Media descriptor +
+See section: <<media_descriptor,Media descriptor>>
+| 22 | 2 | 0x00 | Sectors Per File Allocation Table (FAT) +
+not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+4+| _DOS version 3.4 BIOS parameter block (BPB)_
+| 24 | 2 | 0x3f | Sectors per track +
+Not used by NTFS `[MSDN]`
+| 26 | 2 | 0xff | Number of heads +
+Not used by NTFS `[MSDN]`
+| 28 | 4 | 0x3f | Number of hidden sectors +
+Not used by NTFS `[MSDN]`
+| 32 | 4 | 0x00 | Total number of sectors (32-bit) +
+[yellow-background]*Used if the total of number of sectors fits in 32-bit?* +
+Not used by NTFS must be 0 `[MSDN]`
+4+| _NTFS version 8.0 BIOS parameter block (BPB) or extended BPB_ +
+_Introduced in Windows NT version 3.1_
+| 36 | 1 | 0x80 | [yellow-background]*Unknown (Disc unit number)* +
+Not used by NTFS `[MSDN]`
+| 37 | 1 | 0x00 | [yellow-background]*Unknown (Flags)* +
+Not used by NTFS `[MSDN]`
+| 38 | 1 | 0x80 | [yellow-background]*Unknown (BPB version signature byte)* +
+Not used by NTFS `[MSDN]`
+| 39 | 1 | 0x00 | [yellow-background]*Unknown (Reserved)* +
+Not used by NTFS `[MSDN]`
+| 40 | 8 | | Total number of sectors (64-bit)
+| 48 | 8 | | Master File Table (MFT) cluster block number
+| 56 | 8 | | Mirror MFT cluster block number
+| 64 | 1 | | MFT entry size +
+See below.
+| 65 | 3 | | [yellow-background]*Unknown* +
+Not used by NTFS `[MSDN]`
+| 68 | 1 | | Index entry size +
+See below.
+| 69 | 3 | | [yellow-background]*Unknown* +
+Not used by NTFS `[MSDN]`
+| 72 | 8 | | NTFS volume serial number +
+See below.
+| 80 | 4 | 0x00 | Checksum +
+not used by NTFS `[POLLARD06]`, `[MSDN]`
+4+| 
+| 84 | 426 | | Bootcode +
+[yellow-background]*What is the exact end of the bootcode and are there no trailing values?*
+| 510 | 2 | 0x55 0xaa | Sector signature
+|===
+
+Both the MFT and index entry sizes are defined as following:
+
+* Values 0 to 127 represent sizes of 0 to 127 cluster blocks.
+* Values 128 to 255 represent sizes of `2^(256-n)` bytes; or `2^(-n)` if considered as a signed byte.
+* Other values are not considered valid `[POLLARD06]`.
+
+The cluster block size can be determined as following:
+....
+cluster block size = bytes per sector x sectors per cluster block
+....
+
+Values available in Windows are:
+
+* 512
+* 1024
+* 2048
+* 4096
+* 8192
+* 16K (16384)
+* 32K (32768)
+* 64K (65536)
+
+The MFT offset can be determined as following:
+....
+MFT offset = volume header offset
+           + ( MFT cluster block number x Cluster block size)
+....
+
+Note that the lower 32-bit part of the NTFS volume serial number is the WINAPI 
+volume serial number. E.g. compare the output of:
+....
+fsutil fsinfo volumeinfo C:
+fsutil fsinfo ntfsinfo C:
+....
+
+Often the volume will be smaller than the underlying partition. A (nearly 
+identical) backup of the volume header is stored in last sector of cluster 
+block, that follows the last cluster block of the volume. Often this is the 512 
+bytes after the last sector of the volume, but not necessarily. The backup 
+volume header is not included in the volume size.
+
+=== BitLocker Drive Encryption (BDE)
+BitLocker Drive Encryption (BDE) uses the file system signature: "-FVE-FS-". 
+Where FVE is an abbreviation of Full Volume Encryption.
+
+The data structures of BDE on Windows Vista and 7 differ.
+
+A Windows Vista BDE volume starts with:
+....
+eb 52 90 2d 46 56 45 26 46 53 2d
+....
+
+A Windows 7 BDE volume starts with:
+....
+eb 58 90 2d 46 56 45 26 46 53 2d
+....
+
+BDE is largely a stand-alone but has some integration with NTFS. For more 
+information about BDE see `[LIBBDE]`.
+
+=== Volume Shadow Snapshots (VSS)
+Volume Shadow Snapshots (VSS) uses the GUID 
+3808876b-c176-4e48-b7ae-04046e6cc752 (stored in little-endian) to identify its 
+data. VSS is largely a stand-alone but has some integration with NTFS.
+
+For more information about VSS see `[LIBVSHADOW]`.
+
+=== [[media_descriptor]]Media descriptor
+
+[cols="1,1,1,5",options="header"]
+|===
+| Bit(s) | Identifier | Description
+| 0 | | Sides: +
+0 => single-sided +
+1 => double-sided
+| 1 | | Track size: +
+0 => 9 sectors per track +
+1 => 8 sectors per track
+| 2 | | Density: +
+0 => 80 tracks +
+1 => 40 tracks 
+| 3 | | Type: +
+0 => Fixed disc +
+1 => Removable disc
+| 4 – 7 | | Always set to 1
+|===
+
+=== The boot loader
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 512 | | | [yellow-background]*Windows NT (boot) loader* +
+[yellow-background]*NTLDR/BOOTMGR*
+|===
+
+== The Master File Table (MFT)
+The MFT consist of an array of MFT entries. The offset of the MFT table can be 
+found in the volume header and the size of the MFT is defined by the MFT entry 
+of the $MFT metadata file.
+
+[NOTE]
+The MFT can consists of multiple data ranges, defined by the data runs in the 
+$MFT metadata file.
+
+=== MFT entry
+Although the size of a MFT entry is defined in the volume header is commonly 
+1024 bytes of size and consists of:
+
+* The MFT entry header
+* The fix-up values
+* An array of MFT attribute values
+* Padding, which should contain zero bytes
+
+==== MFT entry header
+The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 48 bytes of size and 
+consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _MULTI_SECTOR_HEADER_
+| 0 | 4 | "FILE" | Signature
+| 4 | 2 | | The fix-up values offset +
+Contains an offset relative from the start of the MFT entry +
+According to `[MSDN]` this value is the update sequence array offset
+| 6 | 2 | | The number of fix-up values +
+According to `[MSDN]` this value is the update sequence array size.
+4+| 
+| 8 | 8 | | Journal sequence number +
+$LogFile Sequence Number (LSN)
+| 16 | 2 | | Sequence (number)
+| 18 | 2 | | Reference (link) count
+| 20 | 2 | | Attributes offset (or first attribute offset) +
+Contains an offset relative from the start of the MFT entry
+| 22 | 2 | | Entry flags +
+See section: <<mft_entry_flags,MFT entry flags>>
+| 24 | 4 | | Used entry size +
+Contains the number of bytes of the MFT entry that are in use
+| 28 | 4 | | Total entry size +
+Contains the number of bytes of the MFT entry
+[yellow-background]*Could this be used to store data larger than 1024 - header continuously?*
+| 32 | 8 | | Base record file reference +
+See section: <<file_reference,The file reference>>
+| 40 | 2 | | First available attribute identifier
+| 42 | 2 | | [yellow-background]*Unknown (wfixupPattern)*
+4+| _Version 3.0 or earlier_
+| 44 | 4 | | [yellow-background]*Unknown*
+4+| _Version 3.1 or later_
+| 44 | 4 | | The index
+|===
+
+The base record file reference indicates if the MFT entry is used to store 
+additional attributes for another MFT entry, e.g. for attribute list attributes.
+
+According to `[MSDN]` the sequence number is incremented each time that a file 
+record segment is freed; it is 0 if the segment is not used.
+
+`[MSDN]` states that the update sequence array must end before the last USHORT 
+value in the first sector. It also claims the update sequence array size value 
+contains the number of bytes. It seems to be more likely to the number of words.
+
+*TODO migrate remaining documentation*
+
+=== [[mft_entry_flags]]MFT entry flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x0001 | FILE_RECORD_SEGMENT_IN_USE | In use
+| 0x0002 | FILE_FILE_NAME_INDEX_PRESENT | Has file name (or $I30) index +
+When this flag is present the file entry is a directory (or contains sub file entries)
+| 0x0004 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse, $UsnJrnl)*
+| 0x0008 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse. $Secure)*
+|===
+
+=== [[file_reference]]The file reference
+The file reference (FILE_REFERENCE or MFT_SEGMENT_REFERENCE) is 8 bytes of size 
+and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 6 | | MFT entry index +
+Note that the index value in the MFT entry is only 32-bit of size.
+| 6 | 2 | | Sequence number
+|===
+
+=== [[fix_up_values]]The fix-up values
+The fix-up values are variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | | Fix-up placeholder value
+| 2 | 2 x number of fix-up values | | Fix-up (original) value array
+|===
+
+On disk the last 2 bytes in each sector is replaced by the fix-up placeholder 
+value. The original value is stored in the corresponding fix-up (original) 
+value array entry.
+
+[NOTE]
+There can be more fix-up values than the amount of sectors in the data.
+
+See `[CARRIER05]` and/or `[RUSSON05]` for examples on applying the fix-up values.
+
+=== MFT attribute
+The MFT attribute consist of:
+
+* the attribute header
+* the attribute resident or non-resident data
+* the attribute name
+* the attribute data runs or data
+* alignment padding (8-byte alignment), can contain remnant data
+
+==== MFT attribute header
+The MFT attribute header (ATTRIBUTE_RECORD_HEADER) is 16 bytes of size and 
+consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Attribute type (or type code) +
+See section: <<attribute_types,The attribute types>>
+| 4 | 4 | | Size (or record length) +
+The size of the attribute including the 8 bytes of the attribute type and size
+| 8 | 1 | | Non-resident flag (or form code) +
+0 => RESIDENT_FORM +
+1 => NONRESIDENT_FORM
+| 9 | 1 | | Name size (or name length) +
+Contains the number of characters with-out the end-of-string character
+| 10 | 2 | | Name offset +
+Contains an offset relative from the start of the MFT entry
+| 12 | 2 | | Attribute data flags +
+See section: <<mft_attribute_data_flags,MFT attribute data flags>>
+| 14 | 2 | | Attribute identifier (or instance) +
+[yellow-background]*A unique identifier to distinguish between attributes that contain segmented data.*
+|===
+
+===== [[mft_attribute_data_flags]]MFT attribute data flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x0001 | | Is compressed
+| 0x00ff | ATTRIBUTE_FLAG_COMPRESSION_MASK | 
+| | | 
+| 0x4000 | ATTRIBUTE_FLAG_ENCRYPTED | Is encrypted
+| 0x8000 | ATTRIBUTE_FLAG_SPARSE | Is sparse
+|===
+
+*TODO migrate remaining documentation*
+
+== The attributes
+
+*TODO migrate remaining documentation*
+
+=== [[attribute_types]]The attribute types
+
+== [[index]]The index
+
+*TODO migrate remaining documentation*
+
+== Compression
+
+*TODO migrate remaining documentation*
+
+== [[reparse_point]]The reparse point
+
+*TODO migrate remaining documentation*
+
+== The allocation bitmap
+The metadata file $Bitmap contains the allocation bitmap.
+
+Every bit in the allocation bitmap represents a block the size of the cluster 
+block, where the LSB is the first bit in a byte.
+
+== [[update_journal]]Update (or change) journal
+
+*TODO migrate remaining documentation*
+
+== [[transactional_ntfs]]Transactional NTFS (TxF)
+
+*TODO migrate remaining documentation*
+
+== Windows definitions
+The file attribute flags consist of the following values:
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | FILE_ATTRIBUTE_READONLY | Is read-only
+| 0x00000002 | FILE_ATTRIBUTE_HIDDEN | Is hidden
+| 0x00000004 | FILE_ATTRIBUTE_SYSTEM | Is a system file or directory
+| 0x00000008 | | Is a volume label +
+[yellow-background]*Not used by NTFS*
+| 0x00000010 | FILE_ATTRIBUTE_DIRECTORY | Is a directory +
+[yellow-background]*Not used by NTFS*
+| 0x00000020 | FILE_ATTRIBUTE_ARCHIVE | Should be archived
+| 0x00000040 | FILE_ATTRIBUTE_DEVICE | Is a device +
+[yellow-background]*Not used by NTFS*
+| 0x00000080 | FILE_ATTRIBUTE_NORMAL | Is normal +
+None of the other flags should be set
+| 0x00000100 | FILE_ATTRIBUTE_TEMPORARY | Is temporary
+| 0x00000200 | FILE_ATTRIBUTE_SPARSE_FILE | Is a sparse file
+| 0x00000400 | FILE_ATTRIBUTE_REPARSE_POINT | Is a reparse point or symbolic link
+| 0x00000800 | FILE_ATTRIBUTE_COMPRESSED | Is compressed
+| 0x00001000 | FILE_ATTRIBUTE_OFFLINE | Is offline +
+The data of the file is stored on an offline storage.
+| 0x00002000 | FILE_ATTRIBUTE_NOT_CONTENT_INDEXED | Do not index content +
+The content of the file or directory should not be indexed by the indexing service.
+| 0x00004000 | FILE_ATTRIBUTE_ENCRYPTED | Is encrypted
+| 0x00008000 | | [yellow-background]*Unknown (seen on Windows 95 FAT)*
+| 0x00010000 | FILE_ATTRIBUTE_VIRTUAL | Currently reserved for future use, not used by the LNK format +
+Is virtual
+3+| _The following flags are mainly used in the file name attribute and sparsely in the standard information attribute;_ +
+_it could be that they have a different meaning in both types of attributes or that the standard information flags are not updated._ +
+_For now the latter is assumed._
+| 0x10000000 | | [yellow-background]*Is directory (or has $I30 index ?)* +
+[yellow-background]*(used instead of 0x00000010 ?)*
+| 0x20000000 | | [yellow-background]*Is index view* +
+[yellow-background]*(copy from corresponding bit in MFT record)*
+|===
+
+== Notes
+
+*TODO migrate remaining documentation*
+
+:numbered!:
+[appendix]
+== References
+
+`[REFERENCE]`
+
+[cols="1,5",options="header"]
+|===
+| Title: | 
+| Author(s): | 
+| Date: | 
+| URL: | 
+|===
+
+[appendix]
+== GNU Free Documentation License
+Version 1.3, 3 November 2008
+Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc. 
+<http://fsf.org/>
+
+Everyone is permitted to copy and distribute verbatim copies of this license 
+document, but changing it is not allowed.
+
+=== 0. PREAMBLE
+The purpose of this License is to make a manual, textbook, or other functional 
+and useful document "free" in the sense of freedom: to assure everyone the 
+effective freedom to copy and redistribute it, with or without modifying it, 
+either commercially or noncommercially. Secondarily, this License preserves for 
+the author and publisher a way to get credit for their work, while not being 
+considered responsible for modifications made by others.
+
+This License is a kind of "copyleft", which means that derivative works of the 
+document must themselves be free in the same sense. It complements the GNU 
+General Public License, which is a copyleft license designed for free software.
+
+We have designed this License in order to use it for manuals for free software, 
+because free software needs free documentation: a free program should come with 
+manuals providing the same freedoms that the software does. But this License is 
+not limited to software manuals; it can be used for any textual work, 
+regardless of subject matter or whether it is published as a printed book. We 
+recommend this License principally for works whose purpose is instruction or 
+reference.
+
+=== 1. APPLICABILITY AND DEFINITIONS
+This License applies to any manual or other work, in any medium, that contains 
+a notice placed by the copyright holder saying it can be distributed under the 
+terms of this License. Such a notice grants a world-wide, royalty-free license, 
+unlimited in duration, to use that work under the conditions stated herein. The 
+"Document", below, refers to any such manual or work. Any member of the public 
+is a licensee, and is addressed as "you". You accept the license if you copy, 
+modify or distribute the work in a way requiring permission under copyright law.
+
+A "Modified Version" of the Document means any work containing the Document or 
+a portion of it, either copied verbatim, or with modifications and/or 
+translated into another language.
+
+A "Secondary Section" is a named appendix or a front-matter section of the 
+Document that deals exclusively with the relationship of the publishers or 
+authors of the Document to the Document's overall subject (or to related 
+matters) and contains nothing that could fall directly within that overall 
+subject. (Thus, if the Document is in part a textbook of mathematics, a 
+Secondary Section may not explain any mathematics.) The relationship could be a 
+matter of historical connection with the subject or with related matters, or of 
+legal, commercial, philosophical, ethical or political position regarding them.
+
+The "Invariant Sections" are certain Secondary Sections whose titles are 
+designated, as being those of Invariant Sections, in the notice that says that 
+the Document is released under this License. If a section does not fit the 
+above definition of Secondary then it is not allowed to be designated as 
+Invariant. The Document may contain zero Invariant Sections. If the Document 
+does not identify any Invariant Sections then there are none.
+
+The "Cover Texts" are certain short passages of text that are listed, as 
+Front-Cover Texts or Back-Cover Texts, in the notice that says that the 
+Document is released under this License. A Front-Cover Text may be at most 5 
+words, and a Back-Cover Text may be at most 25 words.
+
+A "Transparent" copy of the Document means a machine-readable copy, represented 
+in a format whose specification is available to the general public, that is 
+suitable for revising the document straightforwardly with generic text editors 
+or (for images composed of pixels) generic paint programs or (for drawings) 
+some widely available drawing editor, and that is suitable for input to text 
+formatters or for automatic translation to a variety of formats suitable for 
+input to text formatters. A copy made in an otherwise Transparent file format 
+whose markup, or absence of markup, has been arranged to thwart or discourage 
+subsequent modification by readers is not Transparent. An image format is not 
+Transparent if used for any substantial amount of text. A copy that is not 
+"Transparent" is called "Opaque".
+
+Examples of suitable formats for Transparent copies include plain ASCII without 
+markup, Texinfo input format, LaTeX input format, SGML or XML using a publicly 
+available DTD, and standard-conforming simple HTML, PostScript or PDF designed 
+for human modification. Examples of transparent image formats include PNG, XCF 
+and JPG. Opaque formats include proprietary formats that can be read and edited 
+only by proprietary word processors, SGML or XML for which the DTD and/or 
+processing tools are not generally available, and the machine-generated HTML, 
+PostScript or PDF produced by some word processors for output purposes only.
+
+The "Title Page" means, for a printed book, the title page itself, plus such 
+following pages as are needed to hold, legibly, the material this License 
+requires to appear in the title page. For works in formats which do not have 
+any title page as such, "Title Page" means the text near the most prominent 
+appearance of the work's title, preceding the beginning of the body of the text.
+
+The "publisher" means any person or entity that distributes copies of the 
+Document to the public.
+
+A section "Entitled XYZ" means a named subunit of the Document whose title 
+either is precisely XYZ or contains XYZ in parentheses following text that 
+translates XYZ in another language. (Here XYZ stands for a specific section 
+name mentioned below, such as "Acknowledgements", "Dedications", 
+"Endorsements", or "History".) To "Preserve the Title" of such a section when 
+you modify the Document means that it remains a section "Entitled XYZ" 
+according to this definition.
+
+The Document may include Warranty Disclaimers next to the notice which states 
+that this License applies to the Document. These Warranty Disclaimers are 
+considered to be included by reference in this License, but only as regards 
+disclaiming warranties: any other implication that these Warranty Disclaimers 
+may have is void and has no effect on the meaning of this License.
+
+=== 2. VERBATIM COPYING
+You may copy and distribute the Document in any medium, either commercially or 
+noncommercially, provided that this License, the copyright notices, and the 
+license notice saying this License applies to the Document are reproduced in 
+all copies, and that you add no other conditions whatsoever to those of this 
+License. You may not use technical measures to obstruct or control the reading 
+or further copying of the copies you make or distribute. However, you may 
+accept compensation in exchange for copies. If you distribute a large enough 
+number of copies you must also follow the conditions in section 3.
+
+You may also lend copies, under the same conditions stated above, and you may 
+publicly display copies.
+
+=== 3. COPYING IN QUANTITY
+If you publish printed copies (or copies in media that commonly have printed 
+covers) of the Document, numbering more than 100, and the Document's license 
+notice requires Cover Texts, you must enclose the copies in covers that carry, 
+clearly and legibly, all these Cover Texts: Front-Cover Texts on the front 
+cover, and Back-Cover Texts on the back cover. Both covers must also clearly 
+and legibly identify you as the publisher of these copies. The front cover must 
+present the full title with all words of the title equally prominent and 
+visible. You may add other material on the covers in addition. Copying with 
+changes limited to the covers, as long as they preserve the title of the 
+Document and satisfy these conditions, can be treated as verbatim copying in 
+other respects.
+
+If the required texts for either cover are too voluminous to fit legibly, you 
+should put the first ones listed (as many as fit reasonably) on the actual 
+cover, and continue the rest onto adjacent pages.
+
+If you publish or distribute Opaque copies of the Document numbering more than 
+100, you must either include a machine-readable Transparent copy along with 
+each Opaque copy, or state in or with each Opaque copy a computer-network 
+location from which the general network-using public has access to download 
+using public-standard network protocols a complete Transparent copy of the 
+Document, free of added material. If you use the latter option, you must take 
+reasonably prudent steps, when you begin distribution of Opaque copies in 
+quantity, to ensure that this Transparent copy will remain thus accessible at 
+the stated location until at least one year after the last time you distribute 
+an Opaque copy (directly or through your agents or retailers) of that edition 
+to the public.
+
+It is requested, but not required, that you contact the authors of the Document 
+well before redistributing any large number of copies, to give them a chance to 
+provide you with an updated version of the Document.
+
+=== 4. MODIFICATIONS
+You may copy and distribute a Modified Version of the Document under the 
+conditions of sections 2 and 3 above, provided that you release the Modified 
+Version under precisely this License, with the Modified Version filling the 
+role of the Document, thus licensing distribution and modification of the 
+Modified Version to whoever possesses a copy of it. In addition, you must do 
+these things in the Modified Version:
+
+A. Use in the Title Page (and on the covers, if any) a title distinct from that 
+of the Document, and from those of previous versions (which should, if there 
+were any, be listed in the History section of the Document). You may use the 
+same title as a previous version if the original publisher of that version 
+gives permission. 
+
+B. List on the Title Page, as authors, one or more persons or entities 
+responsible for authorship of the modifications in the Modified Version, 
+together with at least five of the principal authors of the Document (all of 
+its principal authors, if it has fewer than five), unless they release you from 
+this requirement. 
+
+C. State on the Title page the name of the publisher of the Modified Version, 
+as the publisher. 
+
+D. Preserve all the copyright notices of the Document. 
+
+E. Add an appropriate copyright notice for your modifications adjacent to the 
+other copyright notices. 
+
+F. Include, immediately after the copyright notices, a license notice giving 
+the public permission to use the Modified Version under the terms of this 
+License, in the form shown in the Addendum below. 
+
+G. Preserve in that license notice the full lists of Invariant Sections and 
+required Cover Texts given in the Document's license notice. 
+
+H. Include an unaltered copy of this License. 
+
+I. Preserve the section Entitled "History", Preserve its Title, and add to it 
+an item stating at least the title, year, new authors, and publisher of the 
+Modified Version as given on the Title Page. If there is no section Entitled 
+"History" in the Document, create one stating the title, year, authors, and 
+publisher of the Document as given on its Title Page, then add an item 
+describing the Modified Version as stated in the previous sentence. 
+
+J. Preserve the network location, if any, given in the Document for public 
+access to a Transparent copy of the Document, and likewise the network 
+locations given in the Document for previous versions it was based on. These 
+may be placed in the "History" section. You may omit a network location for a 
+work that was published at least four years before the Document itself, or if 
+the original publisher of the version it refers to gives permission. 
+
+K. For any section Entitled "Acknowledgements" or "Dedications", Preserve the 
+Title of the section, and preserve in the section all the substance and tone of 
+each of the contributor acknowledgements and/or dedications given therein. 
+
+L. Preserve all the Invariant Sections of the Document, unaltered in their text 
+and in their titles. Section numbers or the equivalent are not considered part 
+of the section titles. 
+
+M. Delete any section Entitled "Endorsements". Such a section may not be 
+included in the Modified Version. 
+
+N. Do not retitle any existing section to be Entitled "Endorsements" or to 
+conflict in title with any Invariant Section. 
+
+O. Preserve any Warranty Disclaimers. 
+
+If the Modified Version includes new front-matter sections or appendices that 
+qualify as Secondary Sections and contain no material copied from the Document, 
+you may at your option designate some or all of these sections as invariant. To 
+do this, add their titles to the list of Invariant Sections in the Modified 
+Version's license notice. These titles must be distinct from any other section 
+titles.
+
+You may add a section Entitled "Endorsements", provided it contains nothing but 
+endorsements of your Modified Version by various parties—for example, 
+statements of peer review or that the text has been approved by an organization 
+as the authoritative definition of a standard.
+
+You may add a passage of up to five words as a Front-Cover Text, and a passage 
+of up to 25 words as a Back-Cover Text, to the end of the list of Cover Texts 
+in the Modified Version. Only one passage of Front-Cover Text and one of 
+Back-Cover Text may be added by (or through arrangements made by) any one 
+entity. If the Document already includes a cover text for the same cover, 
+previously added by you or by arrangement made by the same entity you are 
+acting on behalf of, you may not add another; but you may replace the old one, 
+on explicit permission from the previous publisher that added the old one.
+
+The author(s) and publisher(s) of the Document do not by this License give 
+permission to use their names for publicity for or to assert or imply 
+endorsement of any Modified Version.
+
+=== 5. COMBINING DOCUMENTS
+You may combine the Document with other documents released under this License, 
+under the terms defined in section 4 above for modified versions, provided that 
+you include in the combination all of the Invariant Sections of all of the 
+original documents, unmodified, and list them all as Invariant Sections of your 
+combined work in its license notice, and that you preserve all their Warranty 
+Disclaimers.
+
+The combined work need only contain one copy of this License, and multiple 
+identical Invariant Sections may be replaced with a single copy. If there are 
+multiple Invariant Sections with the same name but different contents, make the 
+title of each such section unique by adding at the end of it, in parentheses, 
+the name of the original author or publisher of that section if known, or else 
+a unique number. Make the same adjustment to the section titles in the list of 
+Invariant Sections in the license notice of the combined work.
+
+In the combination, you must combine any sections Entitled "History" in the 
+various original documents, forming one section Entitled "History"; likewise 
+combine any sections Entitled "Acknowledgements", and any sections Entitled 
+"Dedications". You must delete all sections Entitled "Endorsements".
+
+=== 6. COLLECTIONS OF DOCUMENTS
+You may make a collection consisting of the Document and other documents 
+released under this License, and replace the individual copies of this License 
+in the various documents with a single copy that is included in the collection, 
+provided that you follow the rules of this License for verbatim copying of each 
+of the documents in all other respects.
+
+You may extract a single document from such a collection, and distribute it 
+individually under this License, provided you insert a copy of this License 
+into the extracted document, and follow this License in all other respects 
+regarding verbatim copying of that document.
+
+=== 7. AGGREGATION WITH INDEPENDENT WORKS
+A compilation of the Document or its derivatives with other separate and 
+independent documents or works, in or on a volume of a storage or distribution 
+medium, is called an "aggregate" if the copyright resulting from the 
+compilation is not used to limit the legal rights of the compilation's users 
+beyond what the individual works permit. When the Document is included in an 
+aggregate, this License does not apply to the other works in the aggregate 
+which are not themselves derivative works of the Document.
+
+If the Cover Text requirement of section 3 is applicable to these copies of the 
+Document, then if the Document is less than one half of the entire aggregate, 
+the Document's Cover Texts may be placed on covers that bracket the Document 
+within the aggregate, or the electronic equivalent of covers if the Document is 
+in electronic form. Otherwise they must appear on printed covers that bracket 
+the whole aggregate.
+
+=== 8. TRANSLATION
+Translation is considered a kind of modification, so you may distribute 
+translations of the Document under the terms of section 4. Replacing Invariant 
+Sections with translations requires special permission from their copyright 
+holders, but you may include translations of some or all Invariant Sections in 
+addition to the original versions of these Invariant Sections. You may include 
+a translation of this License, and all the license notices in the Document, and 
+any Warranty Disclaimers, provided that you also include the original English 
+version of this License and the original versions of those notices and 
+disclaimers. In case of a disagreement between the translation and the original 
+version of this License or a notice or disclaimer, the original version will 
+prevail.
+
+If a section in the Document is Entitled "Acknowledgements", "Dedications", or 
+"History", the requirement (section 4) to Preserve its Title (section 1) will 
+typically require changing the actual title.
+
+=== 9. TERMINATION
+You may not copy, modify, sublicense, or distribute the Document except as 
+expressly provided under this License. Any attempt otherwise to copy, modify, 
+sublicense, or distribute it is void, and will automatically terminate your 
+rights under this License.
+
+However, if you cease all violation of this License, then your license from a 
+particular copyright holder is reinstated (a) provisionally, unless and until 
+the copyright holder explicitly and finally terminates your license, and (b) 
+permanently, if the copyright holder fails to notify you of the violation by 
+some reasonable means prior to 60 days after the cessation.
+
+Moreover, your license from a particular copyright holder is reinstated 
+permanently if the copyright holder notifies you of the violation by some 
+reasonable means, this is the first time you have received notice of violation 
+of this License (for any work) from that copyright holder, and you cure the 
+violation prior to 30 days after your receipt of the notice.
+
+Termination of your rights under this section does not terminate the licenses 
+of parties who have received copies or rights from you under this License. If 
+your rights have been terminated and not permanently reinstated, receipt of a 
+copy of some or all of the same material does not give you any rights to use it.
+
+=== 10. FUTURE REVISIONS OF THIS LICENSE
+The Free Software Foundation may publish new, revised versions of the GNU Free 
+Documentation License from time to time. Such new versions will be similar in 
+spirit to the present version, but may differ in detail to address new problems 
+or concerns. See http://www.gnu.org/copyleft/.
+
+Each version of the License is given a distinguishing version number. If the 
+Document specifies that a particular numbered version of this License "or any 
+later version" applies to it, you have the option of following the terms and 
+conditions either of that specified version or of any later version that has 
+been published (not as a draft) by the Free Software Foundation. If the 
+Document does not specify a version number of this License, you may choose any 
+version ever published (not as a draft) by the Free Software Foundation. If the 
+Document specifies that a proxy can decide which future versions of this 
+License can be used, that proxy's public statement of acceptance of a version 
+permanently authorizes you to choose that version for the Document.
+
+=== 11. RELICENSING
+"Massive Multiauthor Collaboration Site" (or "MMC Site") means any World Wide 
+Web server that publishes copyrightable works and also provides prominent 
+facilities for anybody to edit those works. A public wiki that anybody can edit 
+is an example of such a server. A "Massive Multiauthor Collaboration" (or 
+"MMC") contained in the site means any set of copyrightable works thus 
+published on the MMC site.
+
+"CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0 license 
+published by Creative Commons Corporation, a not-for-profit corporation with a 
+principal place of business in San Francisco, California, as well as future 
+copyleft versions of that license published by that same organization.
+
+"Incorporate" means to publish or republish a Document, in whole or in part, as 
+part of another Document.
+
+An MMC is "eligible for relicensing" if it is licensed under this License, and 
+if all works that were first published under this License somewhere other than 
+this MMC, and subsequently incorporated in whole or in part into the MMC, (1) 
+had no cover texts or invariant sections, and (2) were thus incorporated prior 
+to November 1, 2008.
+
+The operator of an MMC Site may republish an MMC contained in the site under 
+CC-BY-SA on the same site at any time before August 1, 2009, provided the MMC 
+is eligible for relicensing.
+
