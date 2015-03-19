@@ -333,7 +333,7 @@ For more information about VSS see `[LIBVSHADOW]`.
 
 === [[media_descriptor]]Media descriptor
 
-[cols="1,1,1,5",options="header"]
+[cols="1,1,5",options="header"]
 |===
 | Bit(s) | Identifier | Description
 | 0 | | Sides: +
