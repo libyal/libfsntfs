@@ -499,7 +499,7 @@ Contains an offset relative from the start of the MFT entry
 | 12 | 2 | | Attribute data flags +
 See section: <<mft_attribute_data_flags,MFT attribute data flags>>
 | 14 | 2 | | Attribute identifier (or instance) +
-[yellow-background]*A unique identifier to distinguish between attributes that contain segmented data.*
+[yellow-background]*An unique identifier to distinguish between attributes that contain segmented data.*
 |===
 
 ===== [[mft_attribute_data_flags]]MFT attribute data flags
@@ -531,14 +531,353 @@ Contains an empty byte
 |===
 
 ==== Non-resident MFT attribute
+The non-resident MFT attribute data is present when the non-resident flag is 
+set (1). The non-resident data is 48 or 56 bytes in size and consists of:
 
-*TODO migrate remaining documentation*
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | First (or lowest) Virtual Cluster Number (VCN) of the data
+| 8 | 8 | | Last (or highest) Virtual Cluster Number (VCN) of the data
+| 16 | 2 | | Data runs offset (or mappings pairs offset) +
+Contains an offset relative from the start of the MFT attribute
+| 18 | 2 | | Compression unit size +
+Contains the compression unit size in number of cluster blocks. This value is used for compressed data in the data runs.
+| 20 | 4 | | Padding +
+Contains zero-bytes
+| 24 | 8 | | Allocated data size (or allocated length) +
+Contains the allocated data size in number of bytes. +
+This value is not valid if the first VCN is nonzero.
+| 32 | 8 | | Data size (or file size) +
+Contains the data size in number of bytes. +
+This value is not valid if the first VCN is nonzero.
+| 40 | 8 | | Valid data size (or valid data length) +
+Contains the valid data size in number of bytes. +
+[yellow-background]*What does it contain and what is it used for?* +
+This value is not valid if the first VCN is nonzero. +
+4+| _If compression unit size > 0_
+| 48 | 8 | | Total allocated size +
+Contains the total allocated size in number of cluster blocks.
+|===
+
+[yellow-background]*The sizes do not always seem to map to the entire range 
+defined by the data runs. Seen in multi $DATA attribute MFT.*
+
+==== Attribute name
+The attribute name is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ... | | Name +
+UTF-16 little-endian without the end-of-string character
+|===
+
+==== Data runs
+The data runs are stored in a variable size (data) runlist. This runlist 
+consists of runlist elements.
+
+A runlist element is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0.0  | 4 bits | | Number of cluster blocks value size +
+Contains the number of bytes used to store the data run size
+| 0.4 | 4 bits | | Cluster block number value size +
+Contains the number of bytes used to store the data run size
+| 1 | Size value size | | Data run number of cluster blocks +
+Contains the number of cluster blocks
+| ... | Cluster block number value size | | Data run cluster block number +
+See below.
+|===
+
+The data run cluster block number is a singed value, where the MSB is the 
+singed bit, e.g. if the data run cluster block contains 'dbc8' it corresponds 
+to the 64-bit value 0xffffffffffffdbc8.
+
+The first data run offset contains the absolute cluster block number where 
+successive data run offsets are relative to the last data run offset.
+
+Note that the cluster block number byte size is the first nibble when reading 
+the byte stream, but here it is represented as the upper nibble of the first 
+byte.
+
+The last runlist element is an empty value size tuple; in other words a 0 byte.
+
+For [yellow-background]*compressed* or sparse data runs, the size of the offset 
+is value 0, representing there is no offset. The attribute data flag indicates 
+if the data run is either compressed or sparse.
+
+A sparse data run should be filled with 0-byte values.
+
+[yellow-background]*A compressed data run is read*
+[yellow-background]*For every compression unit block:*
+
+* [yellow-background]*if the size is less than the compression unit size the previous data run is compressed (the size signifies the remaining unused data)*
+* [yellow-background]*if the size is equal to the compression unit size the data run is sparse*
+
+[yellow-background]*Note that the compression unit blocks must be aligned to 
+the virtual cluster blocks.*
+
+According to `[RUSSON05]` the size of the runlist is rounded up to the next 
+multitude of 4 bytes. The size of the trailing data can be even larger than 3 
+and are not always zero-bytes. 
+
+See `[CARRIER05]` and/or `[RUSSON05]` for examples on reading the runlist.
 
 == The attributes
+=== [[attribute_types]]The attribute types
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000000 | | Unused
+| 0x00000010 | $STANDARD_INFORMATION | Standard information
+| 0x00000020 | $ATTRIBUTE_LIST | Attributes list
+| 0x00000030 | $FILE_NAME | The file or directory name
+| 0x00000040 | $VOLUME_VERSION | Volume version +
+_Removed in NTFS version 3.0
+| 0x00000040 | $OBJECT_ID | Object identifier +
+Introduced in NTFS version 3.0
+| 0x00000050 | $SECURITY_DESCRIPTOR | Security descriptor
+| 0x00000060 | $VOLUME_NAME | Volume name
+| 0x00000070 | $VOLUME_INFORMATION | Volume information
+| 0x00000080 | $DATA | Data stream
+| 0x00000090 | $INDEX_ROOT | Index root
+| 0x000000a0 | $INDEX_ALLOCATION | Index allocation
+| 0x000000b0 | $BITMAP | Bitmap
+| 0x000000c0 | $SYMBOLIC_LINK | Symbolic link +
+Removed in NTFS version 3.0
+| 0x000000c0 | $REPARSE_POINT | Reparse point +
+Introduced in NTFS version 3.0
+| 0x000000d0 | $EA_INFORMATION | (HPFS) extended attribute information
+| 0x000000e0 | $EA | (HPFS) extended attribute
+| 0x000000f0 | $PROPERTY_SET | Property set +
+Removed in NTFS version 3.0
+| 0x00000100 | $LOGGED_UTILITY_STREAM | Logged utility stream +
+Introduced in NTFS version 3.0
+| | | 
+| 0x00001000 | | First user defined attribute
+| | | 
+| 0xffffffff | | End of attributes marker
+|===
+
+=== The standard information attribute
+The standard information attribute ($STANDARD_INFORMATION) contains the basic 
+file entry metadata. It is stored as a resident MFT attribute.
+
+The standard information data (STANDARD_INFORMATION) is either 48 or 72 bytes 
+of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Creation date and time +
+Contains a FILETIME
+| 8 | 8 | | Last modification date and time +
+(Also referred to as last written date and time) +
+Contains a FILETIME
+| 16 | 8 | | MFT entry last modification date and time +
+Contains a FILETIME
+| 24 | 8 | | Last access date and time +
+Contains a FILETIME
+| 32 | 4 | | File attribute flags +
+See section: <<file_attribute_flags,File attribute flags>>
+| 36 | 4 | | Maximum number of versions +
+[yellow-background]*What does it contain and what is it used for?*
+| 40 | 4 | | Version number +
+[yellow-background]*What does it contain and what is it used for?*
+| 44 | 4 | | Class identifier +
+[yellow-background]*What does it contain and what is it used for?*
+4+| _Introduced in NTFS version 3.0 (Windows 2000)_
+| 48 | 4 | | Owner identifier +
+[yellow-background]*What does it contain and what is it used for?*
+| 52 | 4 | | Security identifier [yellow-background]*index* +
+Contains the index of the security identifier in the $Secure metadata file
+| 56 | 8 | | Quota charged +
+[yellow-background]*What does it contain and what is it used for?*
+| 64 | 8 | | Update Sequence Number (USN)
+[yellow-background]*What does it contain and what is it used for?*
+|===
+
+=== The attribute list attribute
+The attribute list attribute ($ATTRIBUTE_LIST) is a list of attributes in an 
+MFT entry. The attributes stored in the list are placeholders for other 
+attributes. Some of these attributes could not be stored in the MFT entry due 
+to space limitations. The attribute list attribute can be stored as either a 
+resident (for a small amount of data) and non-resident MFT attribute.
+
+The attribute list data contains an array of attribute list entries.
+
+Note that MFT entry 0 also can contain an attribute list. 
+[yellow-background]*Does NTFS allow to store listed attributed beyond the first 
+data run?*
+
+==== The attribute list entry
+The attribute list entry consists of:
+
+* the attribute list entry header
+* the the attribute name
+* alignment padding (8-byte alignment), can contain remnant data
+
+===== The attribute list entry header
+The attribute list entry header (ATTRIBUTE_LIST_ENTRY) is 26 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Attribute type (or type code) +
+See section: <<attribute_types,The attribute types>>
+| 4 | 2 | | Size (or record length) +
+The size of the attribute including the 6 bytes of the attribute type and size
+| 6 | 1 | | Name size (or name length) +
+Contains the number of characters with-out the end-of-string character
+| 7 | 1 | | Name offset +
+Contains an offset relative from the start of the attribute list entry
+| 8 | 8 | | Data first (or lowest) VCN
+| 16 | 8 | | File reference (or segment reference) +
+The file reference to the MFT entry that contains (part of) the attribute data +
+See section: <<file_reference,The file reference>>
+| 24 | 2 | | Attribute identifier +
+[yellow-background]*An unique identifier to distinguish between attributes that contain segmented data.*
+|===
+
+The data first VCN is used when the attribute data is stored in multiple MFT 
+entries. The attribute list contains an attribute list entry for every MFT 
+entry. The corresponding MFT entry will contain an MFT attribute containing the 
+attribute data. See `[CARRIER05]` pages 365 and 366 for more information.
+
+===== Attribute name
+The attribute name is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ...  | | Name +
+UTF-16 little-endian without the end-of-string character
+|===
+
+=== [[file_name_attribute]]The file name attribute
+The file name attribute ($FILE_NAME) contains the basic file system 
+information, like the parent file entry, MAC times and filename. It is stored 
+as a resident MFT attribute.
+
+The file name data (FILE_NAME) is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Parent file reference +
+See section: <<file_reference,The file reference>>
+| 8 | 8 | | Creation date and time +
+Contains a FILETIME
+| 16 | 8 | | Last modification date and time +
+(Also referred to as last written date and time) +
+Contains a FILETIME
+| 24 | 8 | | MFT entry last modification date and time +
+Contains a FILETIME
+| 32 | 8 | | Last access date and time +
+Contains a FILETIME
+| 40 | 8 | | Allocated (or reserved) file size +
+See below.
+| 48 | 8 | | File size +
+See below.
+| 56 | 4 | | File attribute flags +
+See section: <<file_attribute_flags,File attribute flags>>
+| 60 | 4 | | Extended data +
+See below.
+| 64 | 1 | | Name string size +
+Contains the number of characters with-out the end-of-string character
+| 65 | 1 | | Namespace of the name string +
+| 66 | ... | | Name string
+UTF-16 little-endian without an end-of-string character
+|===
+
+The extended data contains:
+
+* the reparse point tag (see section <<reparse_point_rage,Reparse point tag>>) if the reparse point file attribute flag (FILE_ATTRIBUTE_REPARSE_POINT) is set;
+* [yellow-background]*the extended attribute data size.*
+
+The allocated file size and file size values do not always contain accurate 
+values when stored in a MFT attribute, see `[CARRIER05]` page 363 for more 
+information. [CARRIER05] also states that the file size values are accurate 
+when 'used in a directory index' (stored in an index value), however this seems 
+to be true for most files but not for all. At least the $MFT and $MFTMirror 
+metadata file directory entries on a Windows Vista NTFS volume were found to 
+contain the same value as the corresponding MFT entries, which were not equal 
+to the size of the data stream.
+
+An MFT attribute can contain multiple file name attributes, e.g. for a separate 
+(long) name and short name.
+
+In several cases on a Vista NTFS volume the MFT entry contained both a DOS & 
+Windows and POSIX namespace name. However the directory entry index ($I30) of 
+the parent directory only contained the DOS & Windows name.
+
+In case of a hard link the MFT entry will contain additional file name 
+attributes with the parent file reference of each hard link.
+
+==== Namespace
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0 | POSIX | Case sensitive character set that consists of all Unicode characters except for: +
+'\0' (zero character), +
+'/' (forward slash). +
+ +
+The ':' (colon) is valid for NTFS but not for Windows. +
+| 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
+'"' '*' '/' ':' '<' '>' '?' '\' '|' +
+ +
+Note that names cannot end with a '.' (dot) or ' ' (space).
+| 2 | FILE_NAME_DOS (or DOS) | A case insensitive sub set of the WINDOWS character set that consists of all upper case ASCII characters except for: +
+'"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\' +
+ +
+Note the name must follow the 8.3 format.
+| 3 | DOS_WINDOWS | Both the DOS and WINDOWS names are identical +
+[yellow-background]*Which is the same as the DOS character set, with the exception that lower case is used as well.*
+|===
+
+==== Long to short name conversion
+Basically the conversion from a long name to short name boils down to the 
+approach mentioned below. Note that it differs from the approach mentioned in 
+[RUSSON05] and [MSSUPPORT], in regard of the third case to make the short name 
+unique.
+
+In the long name:
+
+* ignore Unicode characters beyond the first 8-bit (extended ASCII)
+* ignore control characters and spaces (character < 0x20)
+* ignore non-allowed characters ('"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\')
+* ignore dots except the last one (extension) and one at the start of the name
+* make all letters upper case
+
+Make the name unique:
+
+1. use the characters 1 to 6 add ~1 and if the long name has an extension add the a dot and its first 3 letters
+2. if the name already exists try ~2 up to ~9
+3. if the name already exists use [yellow-background]*some 16-bit hexadecimal value* for characters 3 to 6 with ~1
+
+[yellow-background]*`[MSDN]` Generates the next four letters of the short file 
+name by mathematically manipulating the remaining letters of the long file 
+name.*
+
+[yellow-background]*Note: behavior dependent on fsutil?*
+
+case 1: "Program Files" becomes "PROGRA~1" or " ~PLAYMOVIE.REG" becomes "~PLAYM~1.REG"
+
+case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA~2"
+
+case 3: 
+"x86_microsoft-windows-r..ry-editor.resources_31bf3856ad364e35_6.0.6000.16386_en-us_f89a7b0005d42fd4", 
+in a directory with a lot of filenames starting with "x86_microsoft", becomes "X8FCA6~1.163"
+
+=== The volume version attribute
+[yellow-background]*TODO, need a pre NTFS 3.0 volume*
 
 *TODO migrate remaining documentation*
-
-=== [[attribute_types]]The attribute types
 
 == [[index]]The index
 
@@ -605,21 +944,396 @@ _For now the latter is assumed._
 |===
 
 == Notes
+=== $ObjID:$O
+....
+00000000  00 00 00 00 13 00 00 00  00 10 00 00 01 00 00 00  |................| 
+00000010  10 00 00 00 88 00 00 00  88 00 00 00 01 00 00 00  |................| 
+00000020  20 00 38 00 00 00 00 00  60 00 10 00 01 00 00 00  | .8.....`.......| 
 
-*TODO migrate remaining documentation*
+OBJECT_ID: 43ecee59-e2b3-11dc-ad7e-001c2582598f of root directory
+
+00000030  59 ee ec 43 b3 e2 dc 11  ad 7e 00 1c 25 82 59 8f  |Y..C.....~..%.Y.| 
+
+MFT file reference
+OBJECT_ID: e6a67b60-c0b5-4b53-b8fe-94470c83df89 of $VOlume
+
+00000040  05 00 00 00 00 00 05 00  60 7b a6 e6 b5 c0 53 4b  |........`{....SK| 
+00000050  b8 fe 94 47 0c 83 df 89  59 ee ec 43 b3 e2 dc 11  |...G....Y..C....| 
+00000060  ad 7e 00 1c 25 82 59 8f  00 00 00 00 00 00 00 00  |.~..%.Y.........| 
+00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
+00000080  00 00 00 00 00 00 00 00  18 00 00 00 03 00 00 00  |................| 
+00000090  01 00 00 00 00 00 00 00                           |........| 
+....
+
+=== NTFS reserved file names
+....
+Filename
+Description
+
+\$Mft
+Master File Table (MFT) - an index of every file
+
+\$MftMirr
+A backup copy of the first 4 records of the MFT
+
+\$LogFile
+Transactional logging file
+
+\$Volume
+Serial number, creation time, dirty flag
+
+\$AttrDef
+Attribute definitions
+
+\$Bitmap
+Contains volume's cluster map (in-use vs. free)
+
+\$Boot
+Boot record of the volume
+
+\$BadClus
+Lists bad clusters on the volume
+
+\$Secure
+Security descriptors used by the volume
+
+\$UpCase
+Table of uppercase characters used for collating
+
+\$Extend
+A directory
+....
+
+....
+Filename
+Description
+
+\$Extend\$Config
+Use for NTFS repair activity
+
+\$Extend\$Delete
+Delete file name
+
+\$Extend\$ObjId
+Unique Ids given to every file
+
+\$Extend\$Quota
+Quota information
+
+\$Extend\$Repair
+Repair name
+
+\$Extend\$Repair.log
+Repair log name
+
+\$Extend\$Reparse
+Reparse point information
+
+\$Extend\$RmMetadata
+Transactional NTFS resource manager metadata name
+
+\$Extend\$Tops
+Transactional NTFS Old Page Stream, used to store data that has been overwritten inside a currently active transaction
+
+\$Extend\$Txf
+Transactional NTFS
+
+\$Extend\$TxfLog
+Transactional NTFS log
+....
+
+=== File system flags
+....
+fsutil fsinfo volumeinfo C:
+....
+
+....
+FILE_CASE_PRESERVED_NAMES
+0x00000002
+
+The specified volume supports preserved case of file names when it places a name on disk.
+
+FILE_CASE_SENSITIVE_SEARCH
+0x00000001
+
+The specified volume supports case-sensitive file names.
+
+FILE_FILE_COMPRESSION
+0x00000010
+
+The specified volume supports file-based compression.
+
+FILE_NAMED_STREAMS
+0x00040000
+
+The specified volume supports named streams.
+
+FILE_PERSISTENT_ACLS
+0x00000008
+
+The specified volume preserves and enforces access control lists (ACL). For example, the NTFS file system preserves and enforces ACLs, and the FAT file system does not.
+
+FILE_READ_ONLY_VOLUME
+0x00080000
+
+The specified volume is read-only.
+
+    Windows 2000:  This value is not supported.
+
+FILE_SEQUENTIAL_WRITE_ONCE
+0x00100000
+
+The specified volume supports a single sequential write.
+
+    Windows 2000:  This value is not supported.
+
+FILE_SUPPORTS_ENCRYPTION
+0x00020000
+
+The specified volume supports the Encrypted File System (EFS). For more information, see File Encryption.
+
+FILE_SUPPORTS_EXTENDED_ATTRIBUTES
+0x00800000
+
+The specified volume supports extended attributes. An extended attribute is a piece of application-specific metadata that an application can associate with a file and is not part of the file's data.
+
+    Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP/2000:  This value is not supported until Windows Server 2008 R2 and Windows 7.
+
+FILE_SUPPORTS_HARD_LINKS
+0x00400000
+
+The specified volume supports hard links. For more information, see Hard Links and Junctions.
+
+    Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP/2000:  This value is not supported until Windows Server 2008 R2 and Windows 7.
+
+FILE_SUPPORTS_OBJECT_IDS
+0x00010000
+
+The specified volume supports object identifiers.
+
+FILE_SUPPORTS_OPEN_BY_FILE_ID
+0x01000000
+
+The file system supports open by FileID. For more information, see FILE_ID_BOTH_DIR_INFO.
+
+    Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP/2000:  This value is not supported until Windows Server 2008 R2 and Windows 7.
+
+FILE_SUPPORTS_REPARSE_POINTS
+0x00000080
+
+The specified volume supports re-parse points.
+
+FILE_SUPPORTS_SPARSE_FILES
+0x00000040
+
+The specified volume supports sparse files.
+
+FILE_SUPPORTS_TRANSACTIONS
+0x00200000
+
+The specified volume supports transactions. For more information, see About KTM.
+
+    Windows 2000:  This value is not supported.
+
+FILE_SUPPORTS_USN_JOURNAL
+0x02000000
+
+The specified volume supports update sequence number (USN) journals. For more information, see Change Journal Records.
+
+    Windows Server 2008, Windows Vista, Windows Server 2003, and Windows XP/2000:  This value is not supported until Windows Server 2008 R2 and Windows 7.
+
+FILE_UNICODE_ON_DISK
+0x00000004
+
+The specified volume supports Unicode in file names as they appear on disk.
+
+FILE_VOLUME_IS_COMPRESSED
+0x00008000
+
+The specified volume is a compressed volume, for example, a DoubleSpace volume.
+
+FILE_VOLUME_QUOTAS
+0x00000020
+
+The specified volume supports disk quotas.
+....
 
 :numbered!:
 [appendix]
 == References
 
-`[REFERENCE]`
+`[SANDERSON02]`
 
 [cols="1,5",options="header"]
 |===
-| Title: | 
-| Author(s): | 
-| Date: | 
-| URL: | 
+| Title | NTFS Compression – a forensic view
+| Author(s) | Paul Sanderson
+| Date | October 2002
+| URL | http://www.sandersonforensics.co.uk/Files/NTFS%20compression%20white%20paper.pdf
+|===
+
+`[CARRIER05]`
+
+[cols="1,5",options="header"]
+|===
+| Title | File System Forensic Analysis
+| Author(s) | Brian Carrier
+| Date | 2005
+| ISBN-10 | 0-321-26817-2
+|===
+
+`[RUSSON05]`
+
+[cols="1,5",options="header"]
+|===
+| Title | NTFS Documentation
+| Author(s) | Richard Russon, Yuval Fiedel
+| Date | 2005
+| URL | http://linux-ntfs.org/
+|===
+
+`[POLLARD06]`
+
+[cols="1,5",options="header"]
+|===
+| Title | All about BIOS parameter blocks
+| Author(s) | Jonathan de Boyne Pollard
+| URL | http://homepage.ntlworld.com./jonathan.deboynepollard/FGA/bios-parameter-block.html
+|===
+
+`[MEDEIROS08]`
+
+[cols="1,5",options="header"]
+|===
+| Title | NTFS Forensics - A Programmers View of Raw Filesystem Data Extraction 
+| Author(s) | Jason Medeiros
+| URL | http://grayscale-research.org/new/pdfs/NTFS%20forensics.pdf
+|===
+
+`[RUSSNOVICH09]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Windows Internals 5 - Covering Windows Server 2008 and Windows Vista
+| Author(s) | Mark E. Russinovich and David A. Solomon 
+| Date | June 17, 2009
+| ISBN-13 | 978-0735625303
+|===
+
+`[LIBBDE]`
+
+[cols="1,5",options="header"]
+|===
+| Title | BitLocker Drive Encryption (BDE) format specification - Analysis of theBitLocker Drive Encryption (BDE) volume format 
+| Date | March 2011
+| Author(s) | Joachim Metz
+| URL | https://github.com/libyal/libbde/blob/master/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc
+|===
+
+`[LIBFSCLFS]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Common Log File System – Analysis of the Windows ARIES log system
+| Date | November 2010
+| Author(s) | Joachim Metz
+| URL | https://googledrive.com/host/0B3fBvzttpiiSM1QwSmdTYjB0b0E/Common%20Log%20File%20System%20(CLFS).pdf
+|===
+
+`[LIBVSHADOW]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Volume Shadow Snapshot (VSS) - Analysis the Windows NT VSS format 
+| Date | March 2011
+| Author(s) | Joachim Metz
+| URL | https://github.com/libyal/libvshadow/blob/master/documentation/Volume%20Shadow%20Snapshot%20(VSS)%20format.asciidoc
+|===
+
+`[LINUXNTFS]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Linux-NTFS Project
+| URL | http://inform.pucp.edu.pe/~inf232/Ntfs/ntfs_doc_v0.5/index.html
+|===
+
+`[MSSUPPORT]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Microsoft Support - How Windows Generates 8.3 File Names from Long File Names
+| URL | http://support.microsoft.com/kb/142982/en-us
+|===
+
+`[MSDN]`
+
+[cols="1,5",options="header"]
+|===
+| Title | Microsoft Developer Network
+| URL | http://technet.microsoft.com/en-us/library/cc781134%28WS.10%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | Master File Table
+| URL | http://msdn.microsoft.com/en-us/library/bb470206(v=vs.85).aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | Reserved file names
+| URL | http://msdn.microsoft.com/en-us/library/ff469234%28v=PROT.10%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | NTFS attribute types
+| URL | http://msdn.microsoft.com/en-us/library/ff469236%28PROT.10%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | Reparse point
+| URL | http://msdn.microsoft.com/en-us/library/aa365740%28VS.85%29.aspx +
+http://msdn.microsoft.com/en-us/library/aa365511%28v=VS.85%29.aspx +
+http://msdn.microsoft.com/en-us/library/dd541667%28PROT.13%29.aspx +
+http://msdn.microsoft.com/en-us/library/cc232005%28v=PROT.13%29.aspx +
+http://msdn.microsoft.com/en-us/library/cc232006%28v=PROT.13%29.aspx +
+http://msdn.microsoft.com/en-us/library/cc232007%28v=PROT.13%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | Update (or change) journal
+| URL | http://msdn.microsoft.com/en-us/library/aa363798.aspx +
+http://msdn.microsoft.com/en-us/library/aa363803%28VS.85%29.aspx +
+http://msdn.microsoft.com/en-us/library/aa365722%28VS.85%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | transactional NTFS
+| URL | http://msdn.microsoft.com/en-us/library/bb968806%28v=VS.85%29.aspx +
+http://msdn.microsoft.com/en-us/library/bb986748%28VS.85%29.aspx +
+http://msdn.microsoft.com/en-us/library/bb540368%28VS.85%29.aspx
+|===
+
+`[WIKI]`
+
+[cols="1,5",options="header"]
+|===
+| URL | http://en.wikipedia.org/wiki/NTFS +
+http://en.wikipedia.org/wiki/BIOS_parameter_block +
+http://en.wikipedia.org/wiki/Transactional_NTFS
+|===
+
+`[WIN32PROG]`
+
+[cols="1,5",options="header"]
+|===
+| Title | The Win32 Programming Tutorials For Fun – Appendix E. NTFS On-Disk Structure
+| URL | http://www.installsetupconfig.com/win32programming/1996%20AppE_apnilife.pdf
 |===
 
 [appendix]
