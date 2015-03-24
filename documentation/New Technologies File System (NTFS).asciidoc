@@ -593,7 +593,7 @@ See below.
 |===
 
 The data run cluster block number is a singed value, where the MSB is the 
-singed bit, e.g. if the data run cluster block contains \'dbc8\' it corresponds 
+singed bit, e.g. if the data run cluster block contains \'dbc8' it corresponds 
 to the 64-bit value 0xffffffffffffdbc8.
 
 The first data run offset contains the absolute cluster block number where 
@@ -802,7 +802,7 @@ The extended data contains:
 The allocated file size and file size values do not always contain accurate 
 values when stored in a MFT attribute, see `[CARRIER05]` page 363 for more 
 information. [CARRIER05] also states that the file size values are accurate 
-when \'used in a directory index\' (stored in an index value), however this seems 
+when \'used in a directory index' (stored in an index value), however this seems 
 to be true for most files but not for all. At least the $MFT and $MFTMirror 
 metadata file directory entries on a Windows Vista NTFS volume were found to 
 contain the same value as the corresponding MFT entries, which were not equal 
@@ -824,16 +824,16 @@ attributes with the parent file reference of each hard link.
 |===
 | Value | Identifier | Description
 | 0 | POSIX | Case sensitive character set that consists of all Unicode characters except for: +
-\'\0\' (zero character), +
-\'/\' (forward slash). +
+\'\0' (zero character), +
+\'/' (forward slash). +
  +
-The \':\' (colon) is valid for NTFS but not for Windows. +
+The \':' (colon) is valid for NTFS but not for Windows. +
 | 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
-\'"\' \'*\' \'/\' \':\' \'<\' \'>\' \'?\' \'\\' \'\|\' +
+\'"' \'*' \'/' \':' \'<' \'>' \'?' \'\' \'\|' +
  +
-Note that names cannot end with a \'.\' (dot) or \' \' (space).
+Note that names cannot end with a \'.' (dot) or \' ' (space).
 | 2 | FILE_NAME_DOS (or DOS) | A case insensitive sub set of the WINDOWS character set that consists of all upper case ASCII characters except for: +
-\'"\' \'*\' \'+\' \',\' \'/\' \':\' \';\' \'<\' \'=\' \'>\' \'?\' \'\\' +
+\'"' \'*' \'+' \',' \'/' \':' \';' \'<' \'=' \'>' \'?' \'\' +
  +
 Note the name must follow the 8.3 format.
 | 3 | DOS_WINDOWS | Both the DOS and WINDOWS names are identical +
@@ -850,7 +850,7 @@ In the long name:
 
 * ignore Unicode characters beyond the first 8-bit (extended ASCII)
 * ignore control characters and spaces (character < 0x20)
-* ignore non-allowed characters (\'"\' \'*\' \'+\' \',\' \'/\' \':\' \';\' \'<\' \'=\' \'>\' \'?\' \'\\')
+* ignore non-allowed characters (\'"' \'*' \'+' \',' \'/' \':' \';' \'<' \'=' \'>' \'?' \'\')
 * ignore dots except the last one (extension) and one at the start of the name
 * make all letters upper case
 
