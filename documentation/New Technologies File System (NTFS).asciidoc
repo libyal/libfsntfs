@@ -829,11 +829,11 @@ attributes with the parent file reference of each hard link.
  +
 The ':' (colon) is valid for NTFS but not for Windows. +
 | 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
-'"' '*' '/' ':' '<' '>' '?' '\\' '\|' +
+'"' '*' '/' ':' '<' '>' '?' '\' '\|' +
  +
 Note that names cannot end with a '.' (dot) or ' ' (space).
 | 2 | FILE_NAME_DOS (or DOS) | A case insensitive sub set of the WINDOWS character set that consists of all upper case ASCII characters except for: +
-'"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\\' +
+'"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\' +
  +
 Note the name must follow the 8.3 format.
 | 3 | DOS_WINDOWS | Both the DOS and WINDOWS names are identical +
@@ -850,7 +850,7 @@ In the long name:
 
 * ignore Unicode characters beyond the first 8-bit (extended ASCII)
 * ignore control characters and spaces (character < 0x20)
-* ignore non-allowed characters ('"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\\')
+* ignore non-allowed characters ('"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\')
 * ignore dots except the last one (extension) and one at the start of the name
 * make all letters upper case
 
