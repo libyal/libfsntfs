@@ -1439,8 +1439,128 @@ This tuples refer to:
 ....
 
 == [[reparse_point]]The reparse point
+The reparse point is used to create file system-level links. Reparse data is stored in the reparse point attribute.
 
-*TODO migrate remaining documentation*
+The reparse point data (REPARSE_DATA_BUFFER) is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Reparse point tag
+| 4 | 2 | | Reparse data size
+| 6 | 2 | 0 | Reserved
+| 8 | ... | | Reparse data
+|===
+
+[yellow-background]*What about the GUID mentioned in `[RUSSON05]` in third 
+party reparse points.*
+
+[yellow-background]*`[MSDN]` ReparseGuid: A 16-byte GUID that uniquely 
+identifies the owner of the reparse point. Reparse pointGUIDs are assigned by 
+the implementer of a file system, the file system filter driver, or the 
+minifilter driver. The implementer must generate one GUID to use with their 
+assigned reparse point tag, and must always use this GUID as the ReparseGuid 
+for that tag.*
+
+=== [[reparse_point_tag]]Reparse point tag
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0.0  | 16 bits | | Type
+| 2.0  | 12 bits | | Reserved
+| 3.4 | 4 bits | | Flags
+|===
+
+==== Predefined reparse point tag values
+Predefined reparse point tag values according to `[MSDN]`:
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000000 | IO_REPARSE_TAG_RESERVED_ZERO | Reserved
+| 0x00000001 | IO_REPARSE_TAG_RESERVED_ONE | Reserved
+| | | 
+| 0x80000005 | IO_REPARSE_TAG_DRIVER_EXTENDER | Used by Home server drive extender
+| 0x80000006 | IO_REPARSE_TAG_HSM2 | Used by Hierarchical Storage Manager Product
+| 0x80000007 | IO_REPARSE_TAG_SIS | Used by single-instance storage (SIS) filter driver
+| | | 
+| 0x8000000a | IO_REPARSE_TAG_DFS | Used by the Distributed File System (DFS)
+| 0x8000000b | IO_REPARSE_TAG_FILTER_MANAGER | Used by filter manager test harnes
+| | | 
+| 0x80000012 | IO_REPARSE_TAG_DFSR | Used by the Distributed File System (DFS)
+| | | 
+| 0xa0000003 | IO_REPARSE_TAG_MOUNT_POINT | Junction or mount point
+| | | 
+| 0xa000000c | IO_REPARSE_TAG_SYMLINK | Symbolic link
+| | | 
+| 0xc0000004 | IO_REPARSE_TAG_HSM | Used by Hierarchical Storage Manager Product
+|===
+
+==== Reparse point tag flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x1 | | Reserved according to `[MSDN]`
+| 0x2 | | Name surrogate bit +
+If this bit is set, the file or directory represents another named entity in the system.
+| 0x4 | | Reserved according to `[MSDN]` +
+[yellow-background]*According to `[RUSSON05]` this is high-latency media.*
+| 0x8 | | Is native (Microsoft-bit) +
+[yellow-background]*Does this flag influence the reparse point GUID?*
+|===
+
+=== Junction or mount point reparse data
+The junction or mount point reparse data is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | | Substitute name offset +
+The offset is relative from the start of the reparse name data
+| 2 | 2 | | Substitute name size +
+Value in bytes, the size of the end-of-string character is not included
+| 4 | 2 | | Print name offset +
+The offset is relative from the start of the reparse name data
+| 6 | 2 | | Print name size +
+Value in bytes, the size of the end-of-string character is not included
+4+| _Reparse name data_
+| 8 | ... | | Substitute name +
+UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+| ... | ... | | Print name +
+UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+|===
+
+=== Symbolic link reparse data
+The symbolic link reparse data is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | | Substitute name offset +
+The offset is relative from the start of the reparse name data
+| 2 | 2 | | Substitute name size +
+Value in bytes, the size of the end-of-string character is not included
+| 4 | 2 | | Print name offset +
+The offset is relative from the start of the reparse name data
+| 6 | 2 | | Print name size +
+Value in bytes, the size of the end-of-string character is not included
+| 8 | 4 | | Symbolic link flags
+4+| _Reparse name data_
+| 12 | ... | | Substitute name +
+UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+| ... | ... | | Print name +
+UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+|===
+
+==== Symbolic link flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | SYMLINK_FLAG_RELATIVE | The substitute name is a path name relative to the directory containing the symbolic link.
+|===
 
 == The allocation bitmap
 The metadata file $Bitmap contains the allocation bitmap.
