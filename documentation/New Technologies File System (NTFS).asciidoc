@@ -1239,8 +1239,10 @@ The index values are 8 byte aligned.
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x00000001 | | Has sub node | If set the index value contains a sub node Virtual Cluster Number (VCN)
-| 0x00000002 | | Is last If set the index value is the last in the index values array
+| 0x00000001 | | Has sub node +
+If set the index value contains a sub node Virtual Cluster Number (VCN)
+| 0x00000002 | | Is last +
+If set the index value is the last in the index values array
 |===
 
 === The index value data
@@ -1275,7 +1277,166 @@ The amount and offset of NTFS compressed and raw cluster block is maintained in
 the NTFS Master File Table (MFT). This allows NTFS compression to be combined 
 with sparse cluster blocks.
 
-*TODO migrate remaining documentation*
+=== Block based storage
+NTFS compression stores the \'compressed' data in blocks. Each block has a 2 
+byte block header.
+
+The block is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | | Block size
+| 2 | (compressed data size) | |
+|===
+
+The upper 4 bits of the block size are used as flags.
+
+[cols="1,5",options="header"]
+|===
+| Bit(s) | Description
+| 0 ‑ 11 | Compressed data size
+| 12 - 14 | [yellow-background]*Unknown flags*
+| 15 | Data is compressed
+|===
+
+=== LZNT1 compression method
+The LZNT1 compression method is based on LZ77 compression.
+
+Every compression block consists of tagged compression groups . A tagged group 
+consist of 8 values (not bytes) preceded by a tag byte:
+....
+tag A B C D E F G H 
+....
+
+The LSB of the tag byte represents the first value in the group, the MSB the 
+last
+
+* a tag bit of 0 indicates an uncompressed byte;
+* a tag bit of 1 indicates compressed data using a little-endian 16-bit (2-byte) compression tuple (meaning combination of two values).
+
+The compression tuple contains an offset (back reference) and a size value. 
+
+Where the size is the actual size minus 3. Use the following calculation to 
+correct the size value in the tuple.
+....
+size = size + 3 
+....
+
+And the offset a positive representation of a back reference minus 1. Use the 
+following calculation to correct the offset value in the tuple.
+....
+offset = -1 * ( offset + 1 ) 
+....
+
+The compression tuple uses a dynamic amount of bits to store the offset and 
+size values. 
+
+The calculation of the amount of bits used for the offset and size values is as 
+following: 
+
+* at the uncompressed data block offset 0, the size is stored in the least significant 12 bits of size and the offset 4 bits 
+* the larger the uncompressed data block offset, the larger the amount of bits are used for the offset value and the smaller the amount of bits for the size .
+
+The following calculation is used to determine the amount of bits to store the offset and size values. 
+....
+compression_tuple_size_offset_shift = 12; 
+compression_tuple_size_mask         = 0xfff; 
+
+for( iterator = uncompressed_data_block_offset - 1; 
+     iterator >= 0x10; 
+     iterator >>= 1 ) 
+{ 
+	/* bit shift for the offset value */ 
+	compression_tuple_size_offset_shift--; 
+
+	/* bit mask for size value */ 
+	compression_tuple_size_mask >>= 1; 
+} 
+....
+
+The tuple is uncompressed by copying the byte at the offset in the uncompressed 
+data to the end of the uncompressed data. This is repeated for the size value 
+of the tuple.
+
+[NOTE]
+The offset value itself does not change, the offset remains fixed relative to 
+the end of the uncompressed data. However this means that for every increment 
+of the size value the offset refers to another byte in the uncompressed data. 
+Consider the following example.
+
+==== Example
+Consider the following tagged compression group:
+....
+0x02 0x20 0xfc 0x0f 
+....
+
+The tag byte consists of:
+....
+0x02 => 00000010b
+....
+
+This means that the 2nd and 3rd values contain a 16-bit compression tuple.
+....
+0x0ffc
+....
+
+Because this compression tuple is near the start of the uncompressed data the 
+offset shift is 12 and the size mask is 0x0fff.
+....
+offset:	0x0ffc >> 12    => -1 * ( 0 + 1 ) => -1 
+size:	0x0ffc & 0x0fff => 4092 + 3       => 4095 
+....
+
+The algorithm starts with an uncompressed value of 0x20 which represents the 
+space character (ASCII). This value is added to the uncompressed data. Next the 
+algorithm reads the compression tuple and determines the offset and size 
+values. The offset refers to the previous space value in the uncompressed data 
+and add this to uncompressed data. And so on. Note that the offset remains 
+referring to the last value in the uncompressed data. In the end we end up with 
+a block of 4096 spaces.
+
+Now consider the following uncompressed data: 
+....
+#include <ntfs.h>\n
+#include <stdio.h>\n
+....
+
+Note that the \n is the string representation of the newline character (ASCII: 
+0x0a)
+
+This is logically compressed to: 
+....
+#include <ntfs.h>\n(-18,10)stdio(-17,4)
+....
+
+In the example above the tuples are represented by (offset,size).
+
+The first part of this is data stored with tag bytes looks like:
+....
+00000000b '#' 'i' 'n' 'c' 'l' 'u' 'd' 'e' 
+00000000b ' ' '<' 'n' 't' 'f' 's' '.' 'h' 
+00000100b '>' '\n' 0x07 0x88 's' 't' 'd' 'i' 'o'
+00000001b 0x01 0x80
+....
+
+And as a hexdump:
+....
+00000000  00 23 69 6e 63 6c 75 64  65 00 20 3c 6e 74 66 73  |.#include. <ntfs|
+00000010  2e 68 04 3e 0a 07 88 3c  73 74 64 69 01 01 80     |.h.>...stdio... |
+....
+
+For the first tuple the offset shift is 11 and the size mask is 0x07ff. The 
+tuple consists of:
+....
+offset:	0x8807 >> 11    => -1 * ( 17 + 1 ) => -18
+size:	0x8807 & 0x07ff =>  7 + 3          => 10
+....
+
+This tuples refer to:
+....
+(-18,10) => #include < 
+....
 
 == [[reparse_point]]The reparse point
 
