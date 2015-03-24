@@ -754,7 +754,7 @@ The attribute name is variable of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0 | ...  | | Name +
+| 0 | ... | | Name +
 UTF-16 little-endian without the end-of-string character
 |===
 
@@ -802,7 +802,7 @@ The extended data contains:
 The allocated file size and file size values do not always contain accurate 
 values when stored in a MFT attribute, see `[CARRIER05]` page 363 for more 
 information. [CARRIER05] also states that the file size values are accurate 
-when \'used in a directory index' (stored in an index value), however this seems 
+when 'used in a directory index' (stored in an index value), however this seems 
 to be true for most files but not for all. At least the $MFT and $MFTMirror 
 metadata file directory entries on a Windows Vista NTFS volume were found to 
 contain the same value as the corresponding MFT entries, which were not equal 
@@ -831,7 +831,7 @@ The : (colon) is valid for NTFS but not for Windows. +
 | 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
 " * / : < > ? \ \| +
  +
-Note that names cannot end with a . (dot) or \' ' (space).
+Note that names cannot end with a . (dot) or ' ' (space).
 | 2 | FILE_NAME_DOS (or DOS) | A case insensitive sub set of the WINDOWS character set that consists of all upper case ASCII characters except for: +
 " * + , / : ; < = > ? \ +
  +
@@ -866,7 +866,7 @@ name.*
 
 [yellow-background]*Note: behavior dependent on fsutil?*
 
-case 1: "Program Files" becomes "PROGRA\~1" or " ~PLAYMOVIE.REG" becomes "~PLAYM~1.REG"
+case 1: "Program Files" becomes "PROGRA\~1" or " ~PLAYMOVIE.REG" becomes "\~PLAYM~1.REG"
 
 case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA~2"
 
@@ -877,7 +877,189 @@ in a directory with a lot of filenames starting with "x86_microsoft", becomes "X
 === The volume version attribute
 [yellow-background]*TODO, need a pre NTFS 3.0 volume*
 
-*TODO migrate remaining documentation*
+=== The object identifier attribute
+The object identifier attribute ($OBJECT_ID) contains distributed link tracker 
+properties. It is stored as a resident MFT attribute.
+
+The object identifier data is either 16 or 64 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 16 | | Droid file identifier +
+Contains a GUID
+| 16 | 16 | | Birth droid volume identifier +
+Contains a GUID
+| 32 | 16 | | Birth droid file identifier +
+Contains a GUID
+| 48 | 16 | | Birth droid domain identifier +
+Contains a GUID
+|===
+
+=== The security descriptor attribute
+The security descriptor attribute ($SECURITY_DESCRIPTOR) contains 
+[yellow-background]*TODO*. It can be stored as either a resident (for a small 
+amount of data) and non-resident MFT attribute.
+
+The security descriptor data is variable of size and consists of:
+
+[yellow-background]*TODO add text.*
+
+=== The volume name attribute
+The volume name attribute ($VOLUME_NAME) contains the name of the volume. It is 
+stored as a resident MFT attribute.
+
+The volume name data is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ... | | Name string +
+UTF-16 little-endian without an end-of-string character
+|===
+
+The volume name attribute is used in the $Volume metadata file MFT entry.
+
+=== The volume information attribute
+The volume information attribute ($VOLUME_INFORMATION) contains the name of the 
+volume. It is stored as a resident MFT attribute.
+
+The volume information data is 12 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | [yellow-background]*Unknown (empty value?)*
+| 8 | 1 | | Major version number
+| 9 | 1 | | Minor version number
+| 10 | 2 | | Volume flags
+|===
+
+The volume information attribute is used in the $Volume metadata file MFT entry.
+
+==== Volume flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x0001 | | [yellow-background]*Is dirty*
+| 0x0002 | | [yellow-background]*Re-size journal (LogFile)*
+| 0x0004 | | [yellow-background]*Upgrade on next mount*
+| 0x0008 | | [yellow-background]*Mounted on Windows NT 4*
+| 0x0010 | | [yellow-background]*Delete USN underway*
+| 0x0020 | | [yellow-background]*Repair object identifiers*
+| | | 
+| 0x8000 | | [yellow-background]*Modified by chkdsk*
+|===
+
+=== The data stream attribute
+The data stream attribute ($DATA) contains the file data. It can be stored as 
+either a resident (for a small amount of data) and non-resident MFT attribute.
+
+Also note that multiple data attributes for the same data stream can be used in 
+the attribute list to define different parts of the data stream data. The first 
+data stream attribute will contain the size of the entire data stream data. 
+Other data stream attributes should have a size of 0. Also see: 
+<<attribute_chains,Attribute chains>>.
+
+=== The index root attribute
+The index root attribute ($INDEX_ROOT) contains the root of the index tree. It 
+is stored as a resident MFT attribute.
+
+See section: <<index,The index>> and <<index_root,The index root>>.
+
+=== The index allocation attribute
+The index allocation attribute ($INDEX_ALLOCATION) contains an array of index 
+entries. It is stored as a non-resident MFT attribute.
+
+Note that the index allocation attribute itself does not define which attribute 
+type it contains in the index value data. For this information it needs the 
+corresponding index root attribute.
+
+Also note that multiple index allocation attributes for the same index can be 
+used in the attribute list to define different parts of the index allocation 
+data. The first index allocation attribute will contain the size of the entire 
+index allocation data. Other index allocation attributes should have a size of 
+0. Also see: <<attribute_chains,Attribute chains>>.
+
+See section: <<index,The index>>.
+
+=== The bitmap attribute
+The bitmap attribute ($BITMAP) contains the allocation bitmap. It can be stored 
+as either a resident (for a small amount of data) and non-resident MFT 
+attribute.
+
+It is used to maintain information about which entry is used and which is not. 
+Every bit in the bitmap represents an entry. The index is stored byte-wise with 
+the LSB of the byte corresponds to the first allocation element; the allocation 
+element can represent several things, see below.
+
+The allocation element is allocated if the corresponding bit contains 1 or 
+unallocated if 0.
+
+It is known to be used in:
+
+* the MFT (nameless), where an allocation element represents a MFT entry;
+* indexes ($I##), where an allocation element represents an index entry.
+
+=== The reparse point attribute
+The reparse point attribute ($REPARSE_POINT) contains information about a file 
+system-level link. It is stored as a resident MFT attribute.
+
+See section: <<reparse_point,The reparse point>>.
+
+=== The (HPFS) extended attribute information
+[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes*
+
+....
+0x00 2 Size of the packed Extended Attributes 
+0x02 2 Number of Extended Attributes which have NEED_EA set 
+0x04 4 Size of the unpacked Extended Attributes 
+....
+
+=== The (HPFS) extended attribute
+[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes*
+
+....
+0x00   4 Offset to next Extended Attribute 
+0x04   1 Flags 
+0x05   1 Name Length (N) 
+0x06   2 Value Length (V) 
+0x08   N Name 
+N+0x08 V Value 
+
+Flags:
+0x80 Need EA
+....
+
+=== The property set attribute
+i[yellow-background]*TODO, need a pre NTFS 3.0 volume*
+
+=== The logged utility stream attribute
+[yellow-background]*attribute type for storing additional data for the files and directories*
+
+[yellow-background]*resident, known to cause problems when non-resident on Windows Vista*
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| $EFS | | Encrypted NTFS (EFS)
+| $TXF_DATA | | Transactional NTFS (TxF)
+|===
+
+[yellow-background]*TODO add text*
+
+=== Attribute chains
+Multiple attributes can make up a single attribute, e.g. the attributes:
+
+1. $INDEX_ALLOCATION ($I30) VCN: 0
+2. $INDEX_ALLOCATION ($I30) VCN: 596
+
+The first attribute will contain the size of the data defined by all the 
+attributes. Other attributes should have a size of 0.
+
+It is assumed that the attributes in a chain must be continuous and defined 
+in-order.
 
 == [[index]]The index
 
