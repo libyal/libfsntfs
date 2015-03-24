@@ -1033,7 +1033,7 @@ Flags:
 ....
 
 === The property set attribute
-i[yellow-background]*TODO, need a pre NTFS 3.0 volume*
+[yellow-background]*TODO, need a pre NTFS 3.0 volume*
 
 === The logged utility stream attribute
 [yellow-background]*attribute type for storing additional data for the files and directories*
@@ -1062,10 +1062,218 @@ It is assumed that the attributes in a chain must be continuous and defined
 in-order.
 
 == [[index]]The index
+The index structures are used for various purposes one of which are the 
+directory entries.
 
-*TODO migrate remaining documentation*
+The root of the index is stored in index root. The index root attribute defines 
+which type of attribute is stored in the index and the root index node.
+
+If the index is too large part of the index is stored in an index allocation 
+attribute with the same attribute name. The index allocation attribute defines 
+a data stream which contains index entries. Each index entry contains an index 
+node.
+
+See `[CARRIER05]` page 378 for an illustration how the index root and index 
+allocation attribute relate.
+
+An index consists of a tree, where both the branch and index leaf nodes contain 
+the actual data. E.g. in case of a directory entries index, any node that 
+contains index value data make up for the directory entries.
+
+The index value data in a branch node signifies the upper bound of the values 
+in the that specific branch. E.g. if directory entries index branch node 
+contains the name \'textfile.txt' all names in that index branch are smaller 
+than \'textfile.txt'. Note the actual sorting order is dependent on the 
+collation type defined in the index root attribute.
+
+The index allocation attribute is accompanied by a bitmap attribute with the 
+corresponding attribute name. The bitmap attribute defines the allocation of 
+virtual cluster blocks within the index allocation attribute data stream.
+
+[NOTE]
+The index allocation attribute can be present even though it is not used.
+
+=== Common used indexes
+Indexes commonly used by NTFS are:
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| $I30 | | Directory entries (used by directories)
+| $SDH | | Security descriptors (used by $Secure)
+| $SII | | Security identifiers (used by $Secure)
+| $O | | Object identifiers (used by $ObjId)
+| $O | | Owner identifiers (used by $Quota)
+| $Q | | Quotas (used by $Quota)
+| $R | | Reparse points (used by $Reparse)
+|===
+
+=== [[index_root]]The index root
+The index root consists of:
+
+* index root header
+* index node header
+* an array of index values
+
+==== The index root header
+The index root header is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Attribute type +
+Contains the type of the indexed attribute or 0 if none
+| 4 | 4 | | Collation type +
+Contains a value to indicate the ordering of the index entries +
+See section: <<collection_type,Collation type>>
+| 8 | 4 | | Index entry size
+| 12 | 4 | | Index entry number of cluster blocks
+|===
+
+Note that `[CARRIER05]` and `[RUSSON05]` state that the last 3 bytes are unused 
+(alignment padding). However it is highly probably that the last value is 
+32-bit of size.
+
+==== [[collation_type]]Collation type
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000000 | COLLATION_BINARY | Binary +
+The first byte is most significant 
+| 0x00000001 | COLLATION_FILENAME | Unicode strings case-insensitive
+| 0x00000002 | COLLATION_UNICODE_STRING | Unicode strings case-sensitive +
+Upper case letters should come first 
+| | | 
+| 0x00000010 | COLLATION_NTOFS_ULONG | Unsigned 32-bit little-endian integer
+| 0x00000011 | COLLATION_NTOFS_SID | NT security identifier (SID)
+| 0x00000012 | COLLATION_NTOFS_SECURITY_HASH | Security hash first, then NT security identifier 
+| 0x00000013 | COLLATION_NTOFS_ULONGS | An array of unsigned 32-bit little-endian integer values
+|===
+
+=== The index entry
+The index entry consists of:
+
+* the index entry header
+* the index node header
+* the fix-up values
+* alignment padding (8-byte alignment), contains zero-bytes
+* an array of index values
+
+==== The index entry header
+The index entry header is 32 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | "INDX" | Signature
+| 4 | 2 | | The fix-up values offset +
+Contains an offset relative from the start of the index entry header.
+| 6 | 2 | | The number of fix-up values
+| 8 | 8 | | Journal sequence number +
+$LogFile Sequence Number (LSN)
+| 16 | 8 | | Virtual Cluster Number (VCN) of the index entry
+|===
+
+[NOTE]
+There can be more fix-up value than supported by the index entry data size.
+
+=== The index node header
+The index node header is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Index values offset +
+The offset is relative from the start of the index node header
+| 4 | 4 | | Index node size +
+The value includes the size of the index node header. See below.
+| 8 | 4 | | Allocated index node size +
+The value includes the size of the index node header
+| 12 | 4 | | Index node flags +
+See section: <<index_node_flags,The index node flags>>
+|===
+
+Note that `[RUSSON05]` states that the last 3 bytes are unused (alignment 
+padding), while `[CARRIER05]` states that the last value is 32-bit of size. 
+Here we assume that the index node flags are a 32‑bit value.
+
+In an index entry (index allocation attribute) the index node size includes the 
+size of the fix-up values and the alignment padding following it.
+
+The remainder of the index node contains remnant data and/or zero-byte values.
+
+==== [[index_node_flags]]The index node flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | | Has index allocation attribute +
+Used in an index root attribute to indicate the presence of an index allocation attribute which contains the index values
+|===
+
+=== The index value
+The index value is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | File reference +
+See section: <<file_reference,The file reference>>
+| 8 | 2 | | Index value size
+| 10 | 2 | | Index value data size +
+Note that the size of the padding is not included in the value data size
+| 12 | 4 | | Index value flags
+4+| _If index value data size > 0_
+| 16 | ... | | Index value data
+| ... | ... | | Alignment padding (8-byte alignment) +
+Can contain remnant data
+4+| _If index value flag 0x00000001 (has sub node) is set_
+| ... | 8 | | Sub node Virtual Cluster Number (VCN) 
+|===
+
+The index values are 8 byte aligned.
+
+==== The index value flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | | Has sub node | If set the index value contains a sub node Virtual Cluster Number (VCN)
+| 0x00000002 | | Is last If set the index value is the last in the index values array
+|===
+
+=== The index value data
+==== The directory entry
+The MFT attribute name of the directory entry index is: $I30.
+
+The directory entry index value data contains a file name attribute. See 
+section: <<file_name_attribute,The file name attribute>>.
+
+Note that both the short and long names of the same file have a separate index 
+value. The short name uses the DOS namespace and the long name the WINDOWS 
+namespace. [yellow-background]*Index values with a single name use either the 
+POSIX or DOS_WINDOWS namespace.*
+
+A hard link to a file in the same directory will also have a separate index 
+value.
+
+[yellow-background]*Does the hard link always has POSIX namespace?*
 
 == Compression
+The NTFS compression groups 16 cluster blocks together. This group of 16 
+cluster blocks is either \'compressed' or raw data. The word compressed is 
+quoted because, as you will see below, the group of cluster blocks can also 
+contain uncompressed data. A group of cluster block is \'compressed' when it's 
+compressed size is smaller than its raw data size.
+
+Within a group of cluster blocks each of the 16 blocks is \'compressed' 
+individually. The maximum uncompressed data size is always the cluster size (in 
+most cases 4096). 
+
+The amount and offset of NTFS compressed and raw cluster block is maintained in 
+the NTFS Master File Table (MFT). This allows NTFS compression to be combined 
+with sparse cluster blocks.
 
 *TODO migrate remaining documentation*
 
