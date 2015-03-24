@@ -824,16 +824,16 @@ attributes with the parent file reference of each hard link.
 |===
 | Value | Identifier | Description
 | 0 | POSIX | Case sensitive character set that consists of all Unicode characters except for: +
-\'\0' (zero character), +
-\'/' (forward slash). +
+\0 (zero character), +
+/ (forward slash). +
  +
-The \':' (colon) is valid for NTFS but not for Windows. +
+The : (colon) is valid for NTFS but not for Windows. +
 | 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
-\'"' \'*' \'/' \':' \'<' \'>' \'?' \'\' \'\|' +
+" * / : < > ? \ \| +
  +
-Note that names cannot end with a \'.' (dot) or \' ' (space).
+Note that names cannot end with a . (dot) or \' ' (space).
 | 2 | FILE_NAME_DOS (or DOS) | A case insensitive sub set of the WINDOWS character set that consists of all upper case ASCII characters except for: +
-\'"' \'*' \'+' \',' \'/' \':' \';' \'<' \'=' \'>' \'?' \'\' +
+" * + , / : ; < = > ? \ +
  +
 Note the name must follow the 8.3 format.
 | 3 | DOS_WINDOWS | Both the DOS and WINDOWS names are identical +
@@ -850,15 +850,15 @@ In the long name:
 
 * ignore Unicode characters beyond the first 8-bit (extended ASCII)
 * ignore control characters and spaces (character < 0x20)
-* ignore non-allowed characters (\'"' \'*' \'+' \',' \'/' \':' \';' \'<' \'=' \'>' \'?' \'\')
+* ignore non-allowed characters (" * + , / : ; < = > ? \)
 * ignore dots except the last one (extension) and one at the start of the name
 * make all letters upper case
 
 Make the name unique:
 
-1. use the characters 1 to 6 add \~1 and if the long name has an extension add the a dot and its first 3 letters
-2. if the name already exists try \~2 up to \~9
-3. if the name already exists use [yellow-background]*some 16-bit hexadecimal value* for characters 3 to 6 with \~1
+1. use the characters 1 to 6 add ~1 and if the long name has an extension add the a dot and its first 3 letters
+2. if the name already exists try \~2 up to ~9
+3. if the name already exists use [yellow-background]*some 16-bit hexadecimal value* for characters 3 to 6 with ~1
 
 [yellow-background]*`[MSDN]` Generates the next four letters of the short file 
 name by mathematically manipulating the remaining letters of the long file 
@@ -866,13 +866,13 @@ name.*
 
 [yellow-background]*Note: behavior dependent on fsutil?*
 
-case 1: "Program Files" becomes "PROGRA\~1" or " \~PLAYMOVIE.REG" becomes "\~PLAYM\~1.REG"
+case 1: "Program Files" becomes "PROGRA\~1" or " ~PLAYMOVIE.REG" becomes "~PLAYM~1.REG"
 
-case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA\~2"
+case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA~2"
 
 case 3: 
 "x86_microsoft-windows-r..ry-editor.resources_31bf3856ad364e35_6.0.6000.16386_en-us_f89a7b0005d42fd4", 
-in a directory with a lot of filenames starting with "x86_microsoft", becomes "X8FCA6\~1.163"
+in a directory with a lot of filenames starting with "x86_microsoft", becomes "X8FCA6~1.163"
 
 === The volume version attribute
 [yellow-background]*TODO, need a pre NTFS 3.0 volume*
