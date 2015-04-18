@@ -138,6 +138,9 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20150406
+* worked on Python bindings
+
 20150318
 * worked on $UsnJrnl ignore sparse data run support
 
@@ -177,7 +180,7 @@ Deployment
 
 20141028
 * changes for deployment
-* bug fix in Python-bindings
+* bug fix in Python bindings
 
 20141022
 * changes for deployment
@@ -200,7 +203,7 @@ Deployment
 * worked on data streams support
 
 20140803
-* bug fix in Python-bindings
+* bug fix in Python bindings
 
 20140628
 * Worked on format support

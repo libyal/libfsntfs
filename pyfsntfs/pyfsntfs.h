@@ -45,8 +45,13 @@ PyObject *pyfsntfs_check_volume_signature_file_object(
            PyObject *arguments,
            PyObject *keywords );
 
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit_pyfsntfs(
+                void );
+#else
 PyMODINIT_FUNC initpyfsntfs(
                 void );
+#endif
 
 #if defined( __cplusplus )
 }

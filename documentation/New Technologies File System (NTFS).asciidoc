@@ -1,6 +1,11 @@
 = New Technologies File System (NTFS)
 Analysis the Windows NT File System
 
+:toc:
+:toc-placement: manual
+:toc-title: 
+:toclevels: 4
+
 :numbered!:
 [abstract]
 == Summary
@@ -31,6 +36,10 @@ published by the Free Software Foundation; with no Invariant Sections, no
 Front-Cover Texts, and no Back-Cover Texts. A copy of the license is included 
 in the section entitled "GNU Free Documentation License".
 ....
+
+[preface]
+== Table of contents
+toc::[]
 
 [preface]
 == Revision history
@@ -1569,12 +1578,302 @@ Every bit in the allocation bitmap represents a block the size of the cluster
 block, where the LSB is the first bit in a byte.
 
 == [[update_journal]]Update (or change) journal
+The metadata file $Extend\$UsnJrnl contains the update (or change) journal. It 
+is a sparse file in which NTFS stores records of changes to files and 
+directories. Applications make use of the journal to respond to file and 
+directory changes as they occur, like e.g. the Windows File Replication Service 
+(FRS) and the Windows (Desktop) Search service.
 
-*TODO migrate remaining documentation*
+The update journal consists of:
+
+* the $UsnJrnl:$Max data stream, containing metadata like the maximum size of the journal 
+* the $UsnJrnl:$J data stream, containing the update (or change) entries. The $UsnJrnl:$J data stream is sparse.
+
+=== Update journal metadata
+The update journal metadata is 32 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Maximum size
+| 8 | 8 | | Allocation Delta
+| 16 | 8 | | Update (USN) journal identifier +
+Contains a FILETIME
+| 24 | 8 | | [yellow-background]*Unknown (empty)*
+|===
+
+=== Update journal entries
+The $UsnJrnl:$J data stream consists of an array of update journal entries. The 
+update journal entries are stored on a per-cluster block-basis and thus the 
+remaining cluster block can contain 0-byte values. The stream starts with a 
+sparse data run.
+
+==== Update journal entry
+The update journal entry (USN_RECORD) is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Entry (or record) size
+| 4 | 2 | 0x0002 | Major version
+| 6 | 2 | 0x0000 | Minor version
+| 8 | 8 | | File reference
+| 16 | 8 | | Parent file reference
+| 24 | 8 | | Update sequence number (USN) +
+Contains the file offset of the update journal entry which is used as a unique identifier
+| 32 | 8 | | Update date and time +
+Contains a FILETIME
+| 40 | 4 | | Update reason flags +
+See section: <<update_reason_flags,Update reason flags>>
+| 44 | 4 | | Update source flags +
+See section: <<update_source_flags,Update source flags>>
+| 48 | 4 | | Security identifier [yellow-background]*index* +
+Contains the index of the security identifier in the $Secure metadata file
+| 52 | 4 | | File attribute flags +
+See section: <<file_attribute_flags,File attribute flags>>
+| 56 | 2 | | Name size +
+Contains the byte size of the name
+| 58 | 2 | | Name offset +
+The offset is relative from the start of the update journal entry
+4+| _Common_
+| 60 | (name size) | | Name
+| ... | ... | 0x00 | Padding
+|===
+
+[yellow-background]*TODO what about other update journal entry versions?*
+
+==== [[update_reason_flags]]Update reason flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | USN_REASON_DATA_OVERWRITE | The data in the file or directory is overwritten. +
+[yellow-background]*The default (unnamed) $DATA attribute was overwritten*
+| 0x00000002 | USN_REASON_DATA_EXTEND | The file or directory is extended +
+[yellow-background]*The default (unnamed) $DATA attribute was extended*
+| 0x00000004 | USN_REASON_DATA_TRUNCATION | The file or directory is truncated. +
+[yellow-background]*The default (unnamed) $DATA attribute was truncated*
+| | | 
+| 0x00000010 | USN_REASON_NAMED_DATA_OVERWRITE | One or more named data streams ($DATA attributes) of file were overwritten
+| 0x00000020 | USN_REASON_NAMED_DATA_EXTEND | One or more named data streams ($DATA attributes) of file were extended
+| 0x00000040 | USN_REASON_NAMED_DATA_TRUNCATION | One or more named data streams ($DATA attributes) of a file were truncated
+| | | 
+| 0x00000100 | USN_REASON_FILE_CREATE | The file or directory was created
+| 0x00000200 | USN_REASON_FILE_DELETE | The file or directory was deleted
+| 0x00000400 | USN_REASON_EA_CHANGE | The extended attributes of the file were changed
+| 0x00000800 | USN_REASON_SECURITY_CHANGE | The access rights (security descriptor) of a file or directory were changed
+| 0x00001000 | USN_REASON_RENAME_OLD_NAME | The name changed +
+The update journal entry contains the old name
+| 0x00002000 | USN_REASON_RENAME_NEW_NAME | The name changed +
+The update journal entry contains the new name
+| 0x00004000 | USN_REASON_INDEXABLE_CHANGE | Content indexed status changed +
+the file attribute: FILE_ATTRIBUTE_NOT_CONTENT_INDEXED was changed
+| 0x00008000 | USN_REASON_BASIC_INFO_CHANGE | Basic file or directory attributes changed +
+One or more file or directory attributes were changed e.g. read-only, hidden, system, archive, or sparse attribute, or one or more time stamps.
+| 0x00010000 | USN_REASON_HARD_LINK_CHANGE | A hard link was created or deleted
+| 0x00020000 | USN_REASON_COMPRESSION_CHANGE | The file or directory was compressed or decompressed
+| 0x00040000 | USN_REASON_ENCRYPTION_CHANGE | The file or directory was encrypted or decrypted
+| 0x00080000 | USN_REASON_OBJECT_ID_CHANGE | The object identifier of a file or directory was changed
+| 0x00100000 | USN_REASON_REPARSE_POINT_CHANGE | The reparse point that in a file or directory was changed, or a reparse point was added to or deleted from a file or directory.
+| 0x00200000 | USN_REASON_STREAM_CHANGE | A named data stream ($DATA attribute) is added to or removed from a file, or a named stream is renamed
+| 0x00400000 | | [yellow-background]*Unknown found in TxF update journal entry list*
+| 0x00800000 | USN_REASON_CLOSE | The file or directory was closed
+| | | 
+| 0x80000000 | | [yellow-background]*Unknown found in TxF update journal entry list*
+|===
+
+==== [[update_source_flags]]Update source flags
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x00000001 | USN_SOURCE_DATA_MANAGEMENT | The operation added a private data stream to a file or directory. The modifications did not change the application data.
+| 0x00000002 | USN_SOURCE_AUXILIARY_DATA | The operation was caused by the operating system. Although a write operation is performed on the item, the data was not changed.
+| 0x00000004 | USN_SOURCE_REPLICATION_MANAGEMENT | The operation was caused by file replication
+|===
 
 == [[transactional_ntfs]]Transactional NTFS (TxF)
+As of Vista ([yellow-background]*or windows server 2003?*) Transactional NTFS 
+(TxF) was added.
 
-*TODO migrate remaining documentation*
+In TxF the resource manager (RM) keeps track of transactional metadata and log 
+files . The TxF related metadata files are stored in the metadata directory:
+....
+$Extend\$RmMetadata
+....
+
+=== Resource manager repair information
+The resource manager repair information metadata file: 
+$Extend\$RmMetadata\$Repair consists of the following data streams:
+
+* the default (unnamed) data stream, [yellow-background]*purpose unknown*
+* the $Config data stream, contains the resource manager repair configuration information
+
+==== Resource manager repair configuration information
+The $Repair:$Config data streams contains:
+
+[yellow-background]*TODO*
+
+....
+00000000  01 00 00 00 01 00 00 00                           |........|
+....
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown*
+| 4 | 4 | | [yellow-background]*Unknown*
+|===
+
+=== Transactional NTFS (TxF) metadata directory
+
+The transactional NTFS (TxF) metadata directory: $Extend\$RmMetadata\$Txf is used to isolate files for delete or overwrite operations.
+
+File format? All files seem to start with similar information
+
+=== TxF Old Page Stream (TOPS) file
+The TxF Old Page Stream (TOPS) file: $Extend\$RmMetadata\$TxfLog\$Tops consists of the following data streams:
+
+* the default (unnamed) data stream, contains metadata about the resource manager, such as its GUID, its CLFS log policy, and the LSN at which recovery should start
+* the $T data stream, contains the file data that is partially overwritten by a transaction as opposed to a full overwrite, which would move the file into the Transactional NTFS (TxF) metadata directory
+
+==== TxF Old Page Stream (TOPS) metadata
+The $Tops default (unnamed) data streams contains:
+
+[yellow-background]*TODO*
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | 0x000a | [yellow-background]*Unknown*
+| 2 | 2 | 0x0064 | [yellow-background]*Size of TOPS metadata*
+| 4 | 4 | 0x0001 | [yellow-background]*Unknown* +
+[yellow-background]*Number of resource managers/streams?*
+| 8 | 16 | | Resource Manager (RM) identifier +
+Contains a GUID
+| 24 | 8 | | [yellow-background]*Unknown (empty)*
+| 32 | 8 | | [yellow-background]*Base (or log start)* LSN of TxFLog stream
+| 40 | 8 | | [yellow-background]*Unknown*
+| 48 | 8 | | [yellow-background]*Last* flushed LSN of TxFLog stream
+| 56 | 8 | | [yellow-background]*Unknown*
+| 64 | 8 | | [yellow-background]*Unknown (empty)*
+| 72 | 8 | | [yellow-background]*Restart LSN?*
+| 80 | 20 | | [yellow-background]*Unknown*
+|===
+
+==== TxF Old Page Stream (TOPS) file data
+The $Tops:$T data streams contains the file data that is partially overwritten 
+by a transaction. It consists of multiple pending transaction XML-documents.
+
+[yellow-background]*Note that the start of each sector contains 0x0001, is this 
+a value indication the sector is empty? Or are there fix-up values stored 
+somewhere else?*
+
+A pending transaction XML-document starts with an UTF-8 byte-order-mark. Is 
+roughly contains the following data:
+....
+<?xml version='1.0' encoding='utf-8'?> 
+<PendingTransaction Version="2.0" Identifier="..."> 
+   <Transactions>
+      <Transaction TransactionId="...">
+      <Install Application="..., Culture=..., Version=..., PublicKeyToken=...,
+                           ProcessorArchitecture=..., versionScope=..."
+               RefGuid="..."
+               RefIdentifier="..."
+               RefExtra="..."/> 
+      ...
+      </Transaction> 
+   </Transactions> 
+   <ChangeList> 
+      <Change Family="..., Culture=..., PublicKeyToken=...,
+                     ProcessorArchitecture=..., versionScope=..."
+              New="..."/>
+      ...
+   </ChangeList> 
+   <POQ>
+      <BeginTransaction id="..."/>
+
+      <CreateFile path="..."
+                  fileAttribute="..."/> 
+      <DeleteFile path="..."/> 
+      <MoveFile source="..." destination="..."/>
+      <HardlinkFile source="..." destination="..."/> 
+      <SetFileInformation path="..."
+                          securityDescriptor="binary base64:..."
+                          flags="..."/> 
+
+       <CreateKey path="..."/>
+       <SetKeyValue path="..."
+                    name="..."
+                    type="..."
+                    encoding="base64"
+                    value="..."/> 
+      <DeleteKeyValue path="..."
+                      name="..."/>
+
+      ...
+   </POQ>
+   <InstallerQueue Length="...">
+      <Action Installer="..."
+              Mode="..."
+              Phase="..."
+              Family="..., Culture=..., PublicKeyToken=...,
+                     ProcessorArchitecture=..., versionScope=..."
+              Old="..."
+              New="..."/> 
+
+      ...
+   </InstallerQueue >
+</PendingTransaction>
+....
+
+=== Transactional NTFS (TxF) Common Log File System (CLFS) files
+TxF uses a Common Log File System (CLFS) log store and the logged utility 
+stream attribute named $TXF_DATA.
+
+See `[RUSSNOVICH09]`, `[MSDN]` and `[LIBFSCLFS]` for more information about 
+CLFS.
+
+The base log file (BLF) of the TxF log store is:
+....
+$Extend\$RmMetadata\$TxfLog\TxfLog.blf
+....
+
+Commonly the corresponding container files are:
+....
+$Extend\$RmMetadata\$TxfLog\TxfLogContainer00000000000000000001
+$Extend\$RmMetadata\$TxfLog\TxfLogContainer00000000000000000002
+....
+
+TxF uses a multiplexed log store which contains two streams:
+
+* the KtmLog stream used for Kernel Transaction Manager (KTM) metadata records
+* TxfLog stream, which contains the TxF log records.
+
+=== Transactional data logged utility stream attribute
+The transactional data ($TXF_DATA) logged utility stream attribute is 56 bytes 
+of size and consist of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 6 | | [yellow-background]*Unknown (remnant data)*
+| 6 | 8 | | Resource manager root file reference +
+Contains an NTFS file reference that refers to the MFT
+| 14 | 8 | | [yellow-background]*USN index?*
+| 22 | 8 | | File identifier (TxID) +
+Contains a TxF file identifier
+| 30 | 8 | | Data LSN +
+Contains a CLFS LSN of file data transaction records
+| 38 | 8 | | Metadata LSN +
+Contains a CLFS LSN of file system metadata transaction records
+| 46 | 8 | | Directory index LSN +
+Contains a CLFS LSN of directory index transaction records
+| 54 | 2 | | [yellow-background]*Flags?* +
+[yellow-background]*Seen: 0x0000, 0x0002*
+|===
+
+[yellow-background]*Note there can be more than 1 per MTF entry*
 
 == Windows definitions
 The file attribute flags consist of the following values:
