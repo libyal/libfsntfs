@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_mft_metadata_file.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_volume.c"
 				>
 			</File>
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_libfsntfs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_mft_metadata_file.h"
 				>
 			</File>
 			<File
