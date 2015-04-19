@@ -56,6 +56,10 @@ struct info_handle
 	 */
 	libfsntfs_volume_t *input_volume;
 
+	/* The libfsntfs input MFT metadata file
+	 */
+	libfsntfs_mft_metadata_file_t *input_mft_metadata_file;
+
 	/* The nofication output stream
 	 */
 	FILE *notify_stream;

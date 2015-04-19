@@ -1,4 +1,4 @@
-.Dd March 15, 2015
+.Dd April 19, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -244,6 +244,26 @@ Data stream functions
 .Fn libfsntfs_data_stream_get_number_of_extents "libfsntfs_data_stream_t *data_stream, int *number_of_extents, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_data_stream_get_extent "libfsntfs_data_stream_t *data_stream, int extent_index, off64_t *extent_offset, size64_t *extent_size, uint32_t *extent_flags, libfsntfs_error_t **error"
+.Pp
+MFT metadata file functions
+.Ft int
+.Fn libfsntfs_mft_metadata_file_initialize "libfsntfs_mft_metadata_file_t **mft_metadata_file, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_free "libfsntfs_mft_metadata_file_t **mft_metadata_file, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_open "libfsntfs_mft_metadata_file_t *mft_metadata_file, const char *filename, int access_flags, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_close "libfsntfs_mft_metadata_file_t *mft_metadata_file, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_file_entry_by_index "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint64_t mft_entry_index, libfsntfs_file_entry_t **file_entry, libfsntfs_error_t **error"
+.Pp
+Available when compiled with wide character string support:
+.Ft int
+.Fn libfsntfs_mft_metadata_file_open_wide "libfsntfs_mft_metadata_file_t *mft_metadata_file, const wchar_t *filename, int access_flags, libfsntfs_error_t **error"
+.Pp
+Available when compiled with libbfio support:
+.Ft int
+.Fn libfsntfs_mft_metadata_file_open_file_io_handle "libfsntfs_mft_metadata_file_t *mft_metadata_file, libbfio_handle_t *file_io_handle, int access_flags, libfsntfs_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libfsntfs_get_version

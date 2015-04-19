@@ -338,6 +338,14 @@ int main( int argc, char * const argv[] )
 			break;
 
 		case FSNTFSINFO_MODE_USER_JOURNAL:
+			if( fsntfsinfo_info_handle->input_volume == NULL )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to print user journal ($UsnJrnl) information.\n" );
+
+				goto on_error;
+			}
 			if( info_handle_user_journal_fprint(
 			     fsntfsinfo_info_handle,
 			     &error ) != 1 )

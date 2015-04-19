@@ -1,5 +1,5 @@
 /*
- * $MFT file functions
+ * $MFT metadata file functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_MFT_FILE_H )
-#define _LIBFSNTFS_INTERNAL_MFT_FILE_H
+#if !defined( _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H )
+#define _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H
 
 #include <common.h>
 #include <types.h>
@@ -29,18 +29,16 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
-#include "libfsntfs_libfdata.h"
-#include "libfsntfs_mft_entry.h"
+#include "libfsntfs_mft.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libfsntfs_internal_mft_file libfsntfs_internal_mft_file_t;
+typedef struct libfsntfs_internal_mft_metadata_file libfsntfs_internal_mft_metadata_file_t;
 
-struct libfsntfs_internal_mft_file
+struct libfsntfs_internal_mft_metadata_file
 {
 	/* The file IO handle
 	 */
@@ -58,61 +56,64 @@ struct libfsntfs_internal_mft_file
 	 */
 	libfsntfs_io_handle_t *io_handle;
 
-	/* The MFT entry vector
+	/* The MFT
 	 */
-	libfdata_vector_t *mft_entry_vector;
-
-	/* The MFT entry cache
-	 */
-	libfcache_cache_t *mft_entry_cache;
+	libfsntfs_mft_t *mft;
 };
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_initialize(
-     libfsntfs_mft_file_t **mft_file,
+int libfsntfs_mft_metadata_file_initialize(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_free(
-     libfsntfs_mft_file_t **mft_file,
+int libfsntfs_mft_metadata_file_free(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_signal_abort(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_signal_abort(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_open(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      const char *filename,
      int access_flags,
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_open_wide(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open_wide(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error );
 #endif
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_open_file_io_handle(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open_file_io_handle(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_mft_file_close(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_close(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libcerror_error_t **error );
 
-int libfsntfs_mft_file_open_read(
-     libfsntfs_internal_mft_file_t *internal_mft_file,
+int libfsntfs_mft_metadata_file_open_read(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
      libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_get_file_entry_by_index(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint64_t mft_entry_index,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

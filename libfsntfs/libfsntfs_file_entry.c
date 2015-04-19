@@ -46,9 +46,10 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
      libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_internal_volume_t *internal_volume,
+     libfsntfs_mft_t *mft,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -65,6 +66,17 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
+	if( *file_entry != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -76,13 +88,24 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( *file_entry != NULL )
+	if( mft == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file entry value already set.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
 		 function );
 
 		return( -1 );
@@ -118,7 +141,10 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( mft_entry->data_attribute != NULL )
+	/* If we only have the MFT or no data attribute we cannot create a data stream
+	 */
+	if( ( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
+	 && ( mft_entry->data_attribute != NULL ) )
 	{
 		if( libfsntfs_cluster_block_stream_initialize(
 		     &( internal_file_entry->data_cluster_block_stream ),
@@ -138,9 +164,10 @@ int libfsntfs_file_entry_initialize(
 	}
 	internal_file_entry->file_io_handle  = file_io_handle;
 	internal_file_entry->io_handle       = io_handle;
-	internal_file_entry->internal_volume = internal_volume;
+	internal_file_entry->mft             = mft;
 	internal_file_entry->mft_entry       = mft_entry;
 	internal_file_entry->directory_entry = directory_entry;
+	internal_file_entry->flags           = flags;
 
 	*file_entry = (libfsntfs_file_entry_t *) internal_file_entry;
 
@@ -182,7 +209,7 @@ int libfsntfs_file_entry_free(
 		internal_file_entry = (libfsntfs_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
-		/* The file_io_handle, io_handle, internal_volume, mft_entry and directory_entry references are freed elsewhere
+		/* The file_io_handle, io_handle, mft, mft_entry and directory_entry references are freed elsewhere
 		 */
 		if( internal_file_entry->data_cluster_block_stream != NULL )
 		{
@@ -1508,9 +1535,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_volume_get_mft_entry_by_index(
-	     internal_file_entry->internal_volume,
-	     mft_entry_index,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_file_entry->mft,
+	     internal_file_entry->file_io_handle,
+	     (uint64_t) mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -1556,9 +1584,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	     sub_file_entry,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     internal_file_entry->internal_volume,
+	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1662,9 +1691,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	if( libfsntfs_volume_get_mft_entry_by_index(
-	     internal_file_entry->internal_volume,
-	     mft_entry_index,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_file_entry->mft,
+	     internal_file_entry->file_io_handle,
+	     (uint64_t) mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -1698,9 +1728,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	     sub_file_entry,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     internal_file_entry->internal_volume,
+	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1803,9 +1834,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	if( libfsntfs_volume_get_mft_entry_by_index(
-	     internal_file_entry->internal_volume,
-	     mft_entry_index,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_file_entry->mft,
+	     internal_file_entry->file_io_handle,
+	     (uint64_t) mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -1851,9 +1883,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	     sub_file_entry,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     internal_file_entry->internal_volume,
+	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

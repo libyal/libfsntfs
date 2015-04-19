@@ -29,8 +29,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
-#include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_types.h"
 
@@ -58,13 +57,9 @@ struct libfsntfs_internal_volume
 	 */
 	uint8_t file_io_handle_opened_in_library;
 
-	/* The MFT entry vector
+	/* The MFT
 	 */
-	libfdata_vector_t *mft_entry_vector;
-
-	/* The MFT entry cache
-	 */
-	libfcache_cache_t *mft_entry_cache;
+	libfsntfs_mft_t *mft;
 };
 
 LIBFSNTFS_EXTERN \
@@ -113,12 +108,6 @@ int libfsntfs_volume_close(
 int libfsntfs_volume_open_read(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_volume_get_mft_entry_by_index(
-     libfsntfs_internal_volume_t *internal_volume,
-     int mft_entry_index,
-     libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

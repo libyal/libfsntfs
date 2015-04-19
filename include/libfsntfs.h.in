@@ -1113,6 +1113,83 @@ int libfsntfs_data_stream_get_extent(
      uint32_t *extent_flags,
      libfsntfs_error_t **error );
 
+/* -------------------------------------------------------------------------
+ * MFT metadata file functions
+ * ------------------------------------------------------------------------- */
+
+/* Creates a MFT metadata file
+ * Make sure the value mft_metadata_file is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_initialize(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
+     libfsntfs_error_t **error );
+
+/* Frees a MFT metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_free(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
+     libfsntfs_error_t **error );
+
+/* Opens a MFT metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_open(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     const char *filename,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+#if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
+
+/* Opens a MFT metadata file
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_open_wide(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     const wchar_t *filename,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+#endif /* defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE ) */
+
+#if defined( LIBFSNTFS_HAVE_BFIO )
+
+/* Opens a MFT metadata file using a Basic File IO (bfio) handle
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_open_file_io_handle(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     libbfio_handle_t *file_io_handle,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+#endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
+
+/* Closes a MFT metadata file
+ * Returns 0 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_close(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file entry of a specific MFT entry index
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_get_file_entry_by_index(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint64_t mft_entry_index,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

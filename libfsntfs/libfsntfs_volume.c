@@ -747,28 +747,15 @@ int libfsntfs_volume_close(
 
 		result = -1;
 	}
-	if( libfdata_vector_free(
-	     &( internal_volume->mft_entry_vector ),
+	if( libfsntfs_mft_free(
+	     &( internal_volume->mft ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free MFT entry vector.",
-		 function );
-
-		result = -1;
-	}
-	if( libfcache_cache_free(
-	     &( internal_volume->mft_entry_cache ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free MFT entry cache.",
+		 "%s: unable to free MFT.",
 		 function );
 
 		result = -1;
@@ -784,14 +771,9 @@ int libfsntfs_volume_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_attribute_t *data_attribute = NULL;
-	libfsntfs_data_run_t *data_run                 = NULL;
-	libfsntfs_mft_entry_t *mft_entry               = NULL;
-	static char *function                          = "libfsntfs_volume_open_read";
-	size64_t mft_size                              = 0;
-	int data_run_index                             = 0;
-	int number_of_data_runs                        = 0;
-	int segment_index                              = 0;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	static char *function            = "libfsntfs_volume_open_read";
+	size64_t mft_size                = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -815,24 +797,13 @@ int libfsntfs_volume_open_read(
 
 		return( -1 );
 	}
-	if( internal_volume->mft_entry_vector != NULL )
+	if( internal_volume->mft != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal volume - MFT entry vector value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_volume->mft_entry_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal volume - MFT entry cache value already set.",
+		 "%s: invalid internal volume - MFT value already set.",
 		 function );
 
 		return( -1 );
@@ -865,29 +836,6 @@ int libfsntfs_volume_open_read(
 		 "Reading MFT entry: 0:\n" );
 	}
 #endif
-	/* Since MFT entry 0 can contain an attribute list
-	 * we define MFT entry vector before knowning all the data runs
-	 */
-	if( libfdata_vector_initialize(
-	     &( internal_volume->mft_entry_vector ),
-	     (size64_t) internal_volume->io_handle->mft_entry_size,
-	     (intptr_t *) internal_volume->io_handle,
-	     NULL,
-	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_mft_entry_read_element_data,
-	     NULL,
-	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry vector.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( internal_volume->io_handle->mft_offset < 0 )
 	 || ( (size64_t) internal_volume->io_handle->mft_offset >= internal_volume->io_handle->volume_size ) )
 	{
@@ -902,22 +850,23 @@ int libfsntfs_volume_open_read(
 	}
 	mft_size = internal_volume->io_handle->volume_size - internal_volume->io_handle->mft_offset;
 
-	if( libfdata_vector_append_segment(
-	     internal_volume->mft_entry_vector,
-	     &segment_index,
-	     0,
+	/* Since MFT entry 0 can contain an attribute list
+	 * we define MFT entry vector before knowning all the data runs
+	 */
+	if( libfsntfs_mft_initialize(
+	     &( internal_volume->mft ),
+	     internal_volume->io_handle,
 	     internal_volume->io_handle->mft_offset,
 	     mft_size,
-	     0,
+	     (size64_t) internal_volume->io_handle->mft_entry_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append segment: %d to MFT entry vector.",
-		 function,
-		 data_run_index );
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT.",
+		 function );
 
 		goto on_error;
 	}
@@ -934,13 +883,13 @@ int libfsntfs_volume_open_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_read(
-	     mft_entry,
+	if( libfsntfs_mft_read_mft_entry(
+	     internal_volume->mft,
 	     internal_volume->io_handle,
 	     file_io_handle,
-	     internal_volume->mft_entry_vector,
 	     internal_volume->io_handle->mft_offset,
 	     0,
+	     mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -959,160 +908,20 @@ int libfsntfs_volume_open_read(
 		 "Initializing MFT entry vector:\n" );
 	}
 #endif
-	if( mft_entry->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT entry: 0 - missing data attribute.",
-		 function );
-
-		goto on_error;
-	}
-	data_attribute = (libfsntfs_internal_attribute_t *) mft_entry->data_attribute;
-
-	while( data_attribute != NULL )
-	{
-		if( libfsntfs_attribute_get_number_of_data_runs(
-		     (libfsntfs_attribute_t *) data_attribute,
-		     &number_of_data_runs,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of data runs.",
-			 function );
-
-			goto on_error;
-		}
-		for( data_run_index = 0;
-		     data_run_index < number_of_data_runs;
-		     data_run_index++ )
-		{
-			if( libfsntfs_attribute_get_data_run_by_index(
-			     (libfsntfs_attribute_t *) data_attribute,
-			     data_run_index,
-			     &data_run,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve MFT entry: 0 data run: %d.",
-				 function,
-				 data_run_index );
-
-				goto on_error;
-			}
-			if( data_run == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing MFT entry: 0 data run: %d.",
-				 function );
-
-				goto on_error;
-			}
-			if( ( data_run_index == 0 )
-			 && ( data_attribute == (libfsntfs_internal_attribute_t *) mft_entry->data_attribute ) )
-			{
-				if( libfdata_vector_set_segment_by_index(
-				     internal_volume->mft_entry_vector,
-				     0,
-				     0,
-				     data_run->start_offset,
-				     data_run->size,
-				     0,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set segment: 0 to MFT entry vector.",
-					 function );
-
-					goto on_error;
-				}
-			}
-			else
-			{
-				if( libfdata_vector_append_segment(
-				     internal_volume->mft_entry_vector,
-				     &segment_index,
-				     0,
-				     data_run->start_offset,
-				     data_run->size,
-				     0,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append segment: %d to MFT entry vector.",
-					 function,
-					 data_run_index );
-
-					goto on_error;
-				}
-			}
-		}
-		data_attribute = (libfsntfs_internal_attribute_t *) data_attribute->next_attribute;
-	}
-#ifdef TODO
-	if( libfcache_cache_initialize(
-	     &( internal_volume->mft_entry_cache ),
-	     LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_MFT_ENTRIES,
+	if( libfsntfs_mft_set_data_runs(
+	     internal_volume->mft,
+	     mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set MFT data runs.",
 		 function );
 
 		goto on_error;
 	}
-#else
-	int number_of_mft_entries = 0;
-
-	if( libfdata_vector_get_number_of_elements(
-	     internal_volume->mft_entry_vector,
-	     &number_of_mft_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of element in MFT entry vector.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_volume->mft_entry_cache ),
-	     number_of_mft_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
-		 function );
-
-		goto on_error;
-	}
-#endif
 	if( libfsntfs_mft_entry_free(
 	     &mft_entry,
 	     error ) != 1 )
@@ -1152,16 +961,10 @@ int libfsntfs_volume_open_read(
 	return( 1 );
 
 on_error:
-	if( internal_volume->mft_entry_cache != NULL )
+	if( internal_volume->mft != NULL )
 	{
-		libfcache_cache_free(
-		 &( internal_volume->mft_entry_cache ),
-		 NULL );
-	}
-	if( internal_volume->mft_entry_vector != NULL )
-	{
-		libfdata_vector_free(
-		 &( internal_volume->mft_entry_vector ),
+		libfsntfs_mft_free(
+		 &( internal_volume->mft ),
 		 NULL );
 	}
 	if( mft_entry != NULL )
@@ -1171,50 +974,6 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
-}
-
-/* Retrieves the MFT entry for a specific index
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_volume_get_mft_entry_by_index(
-     libfsntfs_internal_volume_t *internal_volume,
-     int mft_entry_index,
-     libfsntfs_mft_entry_t **mft_entry,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_volume_get_mft_entry_by_index";
-
-	if( internal_volume == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal volume.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
-	     mft_entry_index,
-	     (intptr_t **) mft_entry,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
-	return( 1 );
 }
 
 /* Retrieves the cluster block size
@@ -1295,13 +1054,11 @@ int libfsntfs_volume_get_utf8_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1369,13 +1126,11 @@ int libfsntfs_volume_get_utf8_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1443,13 +1198,11 @@ int libfsntfs_volume_get_utf16_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1517,13 +1270,11 @@ int libfsntfs_volume_get_utf16_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1590,13 +1341,11 @@ int libfsntfs_volume_get_version(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1663,17 +1412,6 @@ int libfsntfs_volume_get_file_entry_by_index(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( mft_entry_index > (uint64_t) INT_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid MFT entry index value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	if( file_entry == NULL )
 	{
 		libcerror_error_set(
@@ -1696,20 +1434,18 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     mft_entry_index,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
+		 "%s: unable to retrieve MFT entry: %" PRIi64 ".",
 		 function,
 		 mft_entry_index );
 
@@ -1725,7 +1461,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %d directory entries tree.",
+		 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
 		 function,
 		 mft_entry_index );
 
@@ -1735,9 +1471,10 @@ int libfsntfs_volume_get_file_entry_by_index(
 	     file_entry,
 	     internal_volume->file_io_handle,
 	     internal_volume->io_handle,
-	     internal_volume,
+	     internal_volume->mft,
 	     mft_entry,
 	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1799,13 +1536,11 @@ int libfsntfs_volume_get_root_directory(
 
 		return( -1 );
 	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1836,9 +1571,10 @@ int libfsntfs_volume_get_root_directory(
 	     file_entry,
 	     internal_volume->file_io_handle,
 	     internal_volume->io_handle,
-	     internal_volume,
+	     internal_volume->mft,
 	     mft_entry,
 	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1918,13 +1654,11 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			utf8_string_index++;
 		}
 	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2031,9 +1765,10 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 
 			return( -1 );
 		}
-		if( libfsntfs_volume_get_mft_entry_by_index(
-		     internal_volume,
-		     mft_entry_index,
+		if( libfsntfs_mft_get_mft_entry_by_index(
+		     internal_volume->mft,
+		     internal_volume->file_io_handle,
+		     (uint64_t) mft_entry_index,
 		     &mft_entry,
 		     error ) != 1 )
 		{
@@ -2054,9 +1789,10 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		     file_entry,
 		     internal_volume->file_io_handle,
 		     internal_volume->io_handle,
-		     internal_volume,
+		     internal_volume->mft,
 		     mft_entry,
 		     NULL,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2137,13 +1873,11 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			utf16_string_index++;
 		}
 	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) internal_volume->file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     internal_volume->file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2250,9 +1984,10 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 
 			return( -1 );
 		}
-		if( libfsntfs_volume_get_mft_entry_by_index(
-		     internal_volume,
-		     mft_entry_index,
+		if( libfsntfs_mft_get_mft_entry_by_index(
+		     internal_volume->mft,
+		     internal_volume->file_io_handle,
+		     (uint64_t) mft_entry_index,
 		     &mft_entry,
 		     error ) != 1 )
 		{
@@ -2273,9 +2008,10 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		     file_entry,
 		     internal_volume->file_io_handle,
 		     internal_volume->io_handle,
-		     internal_volume,
+		     internal_volume->mft,
 		     mft_entry,
 		     NULL,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2334,13 +2070,11 @@ int libfsntfs_volume_read_bitmap(
 
 		return( -1 );
 	}
-	if( libfdata_vector_get_element_value_by_index(
-	     internal_volume->mft_entry_vector,
-	     (intptr_t *) file_io_handle,
-	     internal_volume->mft_entry_cache,
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     file_io_handle,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP,
-	     (intptr_t **) &mft_entry,
-	     0,
+	     &mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

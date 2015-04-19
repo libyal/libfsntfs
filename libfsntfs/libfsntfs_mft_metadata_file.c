@@ -1,5 +1,5 @@
 /*
- * MFT file functions
+ * $MFT metadata file functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,77 +25,78 @@
 
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_file_entry.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libcstring.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
-#include "libfsntfs_mft_file.h"
+#include "libfsntfs_mft_metadata_file.h"
 
-/* Creates a MFT file
- * Make sure the value mft_file is referencing, is set to NULL
+/* Creates a MFT metadata file
+ * Make sure the value mft_metadata_file is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_initialize(
-     libfsntfs_mft_file_t **mft_file,
+int libfsntfs_mft_metadata_file_initialize(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_initialize";
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_initialize";
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	if( *mft_file != NULL )
+	if( *mft_metadata_file != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid MFT file value already set.",
+		 "%s: invalid MFT metadata file value already set.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = memory_allocate_structure(
-	                     libfsntfs_internal_mft_file_t );
+	internal_mft_metadata_file = memory_allocate_structure(
+	                              libfsntfs_internal_mft_metadata_file_t );
 
-	if( internal_mft_file == NULL )
+	if( internal_mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create MFT file.",
+		 "%s: unable to create MFT metadata file.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     internal_mft_file,
+	     internal_mft_metadata_file,
 	     0,
-	     sizeof( libfsntfs_internal_mft_file_t ) ) == NULL )
+	     sizeof( libfsntfs_internal_mft_metadata_file_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear MFT file.",
+		 "%s: unable to clear MFT metadata file.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfsntfs_io_handle_initialize(
-	     &( internal_mft_file->io_handle ),
+	     &( internal_mft_metadata_file->io_handle ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -107,65 +108,65 @@ int libfsntfs_mft_file_initialize(
 
 		goto on_error;
 	}
-	*mft_file = (libfsntfs_mft_file_t *) internal_mft_file;
+	*mft_metadata_file = (libfsntfs_mft_metadata_file_t *) internal_mft_metadata_file;
 
 	return( 1 );
 
 on_error:
-	if( internal_mft_file != NULL )
+	if( internal_mft_metadata_file != NULL )
 	{
 		memory_free(
-		 internal_mft_file );
+		 internal_mft_metadata_file );
 	}
 	return( -1 );
 }
 
-/* Frees a MFT file
+/* Frees a MFT metadata file
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_free(
-     libfsntfs_mft_file_t **mft_file,
+int libfsntfs_mft_metadata_file_free(
+     libfsntfs_mft_metadata_file_t **mft_metadata_file,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_free";
-	int result                                       = 1;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_free";
+	int result                                                         = 1;
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	if( *mft_file != NULL )
+	if( *mft_metadata_file != NULL )
 	{
-		internal_mft_file = (libfsntfs_internal_mft_file_t *) *mft_file;
+		internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) *mft_metadata_file;
 
-		if( internal_mft_file->file_io_handle != NULL )
+		if( internal_mft_metadata_file->file_io_handle != NULL )
 		{
-			if( libfsntfs_mft_file_close(
-			     *mft_file,
+			if( libfsntfs_mft_metadata_file_close(
+			     *mft_metadata_file,
 			     error ) != 0 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-				 "%s: unable to close MFT file.",
+				 "%s: unable to close MFT metadata file.",
 				 function );
 
 				result = -1;
 			}
 		}
-		*mft_file = NULL;
+		*mft_metadata_file = NULL;
 
 		if( libfsntfs_io_handle_free(
-		     &( internal_mft_file->io_handle ),
+		     &( internal_mft_metadata_file->io_handle ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -178,75 +179,75 @@ int libfsntfs_mft_file_free(
 			result = -1;
 		}
 		memory_free(
-		 internal_mft_file );
+		 internal_mft_metadata_file );
 	}
 	return( result );
 }
 
-/* Signals the mft_file to abort its current activity
+/* Signals the mft_metadata_file to abort its current activity
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_signal_abort(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_signal_abort(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_signal_abort";
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_signal_abort";
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = (libfsntfs_internal_mft_file_t *) mft_file;
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( internal_mft_file->io_handle == NULL )
+	if( internal_mft_metadata_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT file - missing IO handle.",
+		 "%s: invalid MFT metadata file - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file->io_handle->abort = 1;
+	internal_mft_metadata_file->io_handle->abort = 1;
 
 	return( 1 );
 }
 
-/* Opens a MFT file
+/* Opens a MFT metadata file
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_open(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      const char *filename,
      int access_flags,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle                 = NULL;
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_open";
+	libbfio_handle_t *file_io_handle                                   = NULL;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_open";
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = (libfsntfs_internal_mft_file_t *) mft_file;
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
 	if( filename == NULL )
 	{
@@ -327,8 +328,8 @@ int libfsntfs_mft_file_open(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_file_open_file_io_handle(
-	     mft_file,
+	if( libfsntfs_mft_metadata_file_open_file_io_handle(
+	     mft_metadata_file,
 	     file_io_handle,
 	     access_flags,
 	     error ) != 1 )
@@ -337,13 +338,13 @@ int libfsntfs_mft_file_open(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open mft_file: %s.",
+		 "%s: unable to open MFT metadata file: %s.",
 		 function,
 		 filename );
 
 		goto on_error;
 	}
-	internal_mft_file->file_io_handle_created_in_library = 1;
+	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
 	return( 1 );
 
@@ -359,31 +360,31 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-/* Opens a MFT file
+/* Opens a MFT metadata file
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_open_wide(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open_wide(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error )
 {
-	libbfio_handle_t *file_io_handle                 = NULL;
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_open_wide";
+	libbfio_handle_t *file_io_handle                                   = NULL;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_open_wide";
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = (libfsntfs_internal_mft_file_t *) mft_file;
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
 	if( filename == NULL )
 	{
@@ -464,8 +465,8 @@ int libfsntfs_mft_file_open_wide(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_file_open_file_io_handle(
-	     mft_file,
+	if( libfsntfs_mft_metadata_file_open_file_io_handle(
+	     mft_metadata_file,
 	     file_io_handle,
 	     access_flags,
 	     error ) != 1 )
@@ -474,13 +475,13 @@ int libfsntfs_mft_file_open_wide(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open mft_file: %ls.",
+		 "%s: unable to open MFT metadata file: %ls.",
 		 function,
 		 filename );
 
 		goto on_error;
 	}
-	internal_mft_file->file_io_handle_created_in_library = 1;
+	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
 	return( 1 );
 
@@ -496,40 +497,40 @@ on_error:
 
 #endif
 
-/* Opens a MFT file using a Basic File IO (bfio) handle
+/* Opens a MFT metadata file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_open_file_io_handle(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_open_file_io_handle(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_open_file_io_handle";
-	int bfio_access_flags                            = 0;
-	int file_io_handle_is_open                       = 0;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_open_file_io_handle";
+	int bfio_access_flags                                              = 0;
+	int file_io_handle_is_open                                         = 0;
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = (libfsntfs_internal_mft_file_t *) mft_file;
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( internal_mft_file->file_io_handle != NULL )
+	if( internal_mft_metadata_file->file_io_handle != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid MFT file - file IO handle already set.",
+		 "%s: invalid MFT metadata file - file IO handle already set.",
 		 function );
 
 		return( -1 );
@@ -603,10 +604,10 @@ int libfsntfs_mft_file_open_file_io_handle(
 
 			goto on_error;
 		}
-		internal_mft_file->file_io_handle_opened_in_library = 1;
+		internal_mft_metadata_file->file_io_handle_opened_in_library = 1;
 	}
-	if( libfsntfs_mft_file_open_read(
-	     internal_mft_file,
+	if( libfsntfs_mft_metadata_file_open_read(
+	     internal_mft_metadata_file,
 	     file_io_handle,
 	     error ) != 1 )
 	{
@@ -619,56 +620,56 @@ int libfsntfs_mft_file_open_file_io_handle(
 
 		goto on_error;
 	}
-	internal_mft_file->file_io_handle = file_io_handle;
+	internal_mft_metadata_file->file_io_handle = file_io_handle;
 
 	return( 1 );
 
 on_error:
 	if( ( file_io_handle_is_open == 0 )
-	 && ( internal_mft_file->file_io_handle_opened_in_library != 0 ) )
+	 && ( internal_mft_metadata_file->file_io_handle_opened_in_library != 0 ) )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
 		 error );
 
-		internal_mft_file->file_io_handle_opened_in_library = 0;
+		internal_mft_metadata_file->file_io_handle_opened_in_library = 0;
 	}
-	internal_mft_file->file_io_handle = NULL;
+	internal_mft_metadata_file->file_io_handle = NULL;
 
 	return( -1 );
 }
 
-/* Closes a MFT file
+/* Closes a MFT metadata file
  * Returns 0 if successful or -1 on error
  */
-int libfsntfs_mft_file_close(
-     libfsntfs_mft_file_t *mft_file,
+int libfsntfs_mft_metadata_file_close(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_mft_file_t *internal_mft_file = NULL;
-	static char *function                            = "libfsntfs_mft_file_close";
-	int result                                       = 0;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_close";
+	int result                                                         = 0;
 
-	if( mft_file == NULL )
+	if( mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	internal_mft_file = (libfsntfs_internal_mft_file_t *) mft_file;
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( internal_mft_file->io_handle == NULL )
+	if( internal_mft_metadata_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT file - missing IO handle.",
+		 "%s: invalid MFT metadata file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -676,10 +677,10 @@ int libfsntfs_mft_file_close(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( internal_mft_file->file_io_handle_created_in_library != 0 )
+		if( internal_mft_metadata_file->file_io_handle_created_in_library != 0 )
 		{
 			if( libfsntfs_debug_print_read_offsets(
-			     internal_mft_file->file_io_handle,
+			     internal_mft_metadata_file->file_io_handle,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -694,10 +695,10 @@ int libfsntfs_mft_file_close(
 		}
 	}
 #endif
-	if( internal_mft_file->file_io_handle_opened_in_library != 0 )
+	if( internal_mft_metadata_file->file_io_handle_opened_in_library != 0 )
 	{
 		if( libbfio_handle_close(
-		     internal_mft_file->file_io_handle,
+		     internal_mft_metadata_file->file_io_handle,
 		     error ) != 0 )
 		{
 			libcerror_error_set(
@@ -709,12 +710,12 @@ int libfsntfs_mft_file_close(
 
 			result = -1;
 		}
-		internal_mft_file->file_io_handle_opened_in_library = 0;
+		internal_mft_metadata_file->file_io_handle_opened_in_library = 0;
 	}
-	if( internal_mft_file->file_io_handle_created_in_library != 0 )
+	if( internal_mft_metadata_file->file_io_handle_created_in_library != 0 )
 	{
 		if( libbfio_handle_free(
-		     &( internal_mft_file->file_io_handle ),
+		     &( internal_mft_metadata_file->file_io_handle ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -726,12 +727,12 @@ int libfsntfs_mft_file_close(
 
 			result = -1;
 		}
-		internal_mft_file->file_io_handle_created_in_library = 0;
+		internal_mft_metadata_file->file_io_handle_created_in_library = 0;
 	}
-	internal_mft_file->file_io_handle = NULL;
+	internal_mft_metadata_file->file_io_handle = NULL;
 
 	if( libfsntfs_io_handle_clear(
-	     internal_mft_file->io_handle,
+	     internal_mft_metadata_file->io_handle,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -743,28 +744,15 @@ int libfsntfs_mft_file_close(
 
 		result = -1;
 	}
-	if( libfdata_vector_free(
-	     &( internal_mft_file->mft_entry_vector ),
+	if( libfsntfs_mft_free(
+	     &( internal_mft_metadata_file->mft ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free MFT entry vector.",
-		 function );
-
-		result = -1;
-	}
-	if( libfcache_cache_free(
-	     &( internal_mft_file->mft_entry_cache ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free MFT entry cache.",
+		 "%s: unable to free MFT.",
 		 function );
 
 		result = -1;
@@ -772,60 +760,47 @@ int libfsntfs_mft_file_close(
 	return( result );
 }
 
-/* Opens a MFT file for reading
+/* Opens a MFT metadata file for reading
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_file_open_read(
-     libfsntfs_internal_mft_file_t *internal_mft_file,
+int libfsntfs_mft_metadata_file_open_read(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_mft_file_open_read";
+	static char *function            = "libfsntfs_mft_metadata_file_open_read";
 	size64_t file_size               = 0;
-	int data_run_index               = 0;
-	int segment_index                = 0;
 
-	if( internal_mft_file == NULL )
+	if( internal_mft_metadata_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal MFT file.",
+		 "%s: invalid internal MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_mft_file->io_handle == NULL )
+	if( internal_mft_metadata_file->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal MFT file - missing IO handle.",
+		 "%s: invalid internal MFT metadata file - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_mft_file->mft_entry_vector != NULL )
+	if( internal_mft_metadata_file->mft != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal MFT file - MFT entry vector value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_mft_file->mft_entry_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal MFT file - MFT entry cache value already set.",
+		 "%s: invalid internal MFT metadata file - MFT value already set.",
 		 function );
 
 		return( -1 );
@@ -846,8 +821,11 @@ int libfsntfs_mft_file_open_read(
 	}
 /* TODO allow to set the values */
 /* TODO scan for signature to determine MFT entry size */
-	internal_mft_file->io_handle->mft_offset     = 0;
-	internal_mft_file->io_handle->mft_entry_size = 1024;
+	internal_mft_metadata_file->io_handle->mft_offset       = 0;
+/* TODO if not set FILE signature try scan? */
+	internal_mft_metadata_file->io_handle->mft_entry_size   = 1024;
+/* TODO if not set INDX signature try scan? */
+	internal_mft_metadata_file->io_handle->index_entry_size = 4096;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -856,6 +834,23 @@ int libfsntfs_mft_file_open_read(
 		 "Reading MFT entry: 0:\n" );
 	}
 #endif
+	if( libfsntfs_mft_initialize(
+	     &( internal_mft_metadata_file->mft ),
+	     internal_mft_metadata_file->io_handle,
+	     internal_mft_metadata_file->io_handle->mft_offset,
+	     file_size,
+	     (size64_t) internal_mft_metadata_file->io_handle->mft_entry_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT.",
+		 function );
+
+		goto on_error;
+	}
 	if( libfsntfs_mft_entry_initialize(
 	     &mft_entry,
 	     error ) != 1 )
@@ -869,13 +864,13 @@ int libfsntfs_mft_file_open_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_read(
-	     mft_entry,
-	     internal_mft_file->io_handle,
-	     internal_mft_file->file_io_handle,
-	     NULL,
-	     internal_mft_file->io_handle->mft_offset,
+	if( libfsntfs_mft_read_mft_entry(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->io_handle,
+	     file_io_handle,
+	     internal_mft_metadata_file->io_handle->mft_offset,
 	     0,
+	     mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -898,59 +893,6 @@ int libfsntfs_mft_file_open_read(
 
 		goto on_error;
 	}
-	if( libfdata_vector_initialize(
-	     &( internal_mft_file->mft_entry_vector ),
-	     (size64_t) internal_mft_file->io_handle->mft_entry_size,
-	     (intptr_t *) internal_mft_file->io_handle,
-	     NULL,
-	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_mft_entry_read_element_data,
-	     NULL,
-	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry vector.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfdata_vector_append_segment(
-	     internal_mft_file->mft_entry_vector,
-	     &segment_index,
-	     0,
-	     internal_mft_file->io_handle->mft_offset,
-	     file_size,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append segment: %d to MFT entry vector.",
-		 function,
-		 data_run_index );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &( internal_mft_file->mft_entry_cache ),
-	     LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_MFT_ENTRIES,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
-		 function );
-
-		goto on_error;
-	}
 	if( libfsntfs_mft_entry_free(
 	     &mft_entry,
 	     error ) != 1 )
@@ -964,19 +906,15 @@ int libfsntfs_mft_file_open_read(
 
 		goto on_error;
 	}
+	internal_mft_metadata_file->file_io_handle = file_io_handle;
+
 	return( 1 );
 
 on_error:
-	if( internal_mft_file->mft_entry_cache != NULL )
+	if( internal_mft_metadata_file->mft != NULL )
 	{
-		libfcache_cache_free(
-		 &( internal_mft_file->mft_entry_cache ),
-		 NULL );
-	}
-	if( internal_mft_file->mft_entry_vector != NULL )
-	{
-		libfdata_vector_free(
-		 &( internal_mft_file->mft_entry_vector ),
+		libfsntfs_mft_free(
+		 &( internal_mft_metadata_file->mft ),
 		 NULL );
 	}
 	if( mft_entry != NULL )
@@ -986,5 +924,110 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Retrieves the file entry of a specific MFT entry index
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_file_entry_by_index(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint64_t mft_entry_index,
+     libfsntfs_file_entry_t **file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	libfsntfs_mft_entry_t *mft_entry                                   = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_file_entry_by_index";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *file_entry != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     mft_entry_index,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
+
+		return( -1 );
+	}
+#ifdef TODO
+	if( libfsntfs_mft_entry_read_directory_entries_tree(
+	     mft_entry,
+	     internal_mft_metadata_file->io_handle,
+	     internal_mft_metadata_file->file_io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
+		 function,
+		 mft_entry_index );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_file_entry_initialize(
+	     file_entry,
+	     internal_mft_metadata_file->file_io_handle,
+	     internal_mft_metadata_file->io_handle,
+	     internal_mft_metadata_file->mft,
+	     mft_entry,
+	     NULL,
+	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file entry.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 

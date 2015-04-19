@@ -303,7 +303,7 @@ int libfsntfs_mft_entry_free(
 	return( result );
 }
 
-/* Reads the MFT entry
+/* Reads a specifi MFT entry
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_mft_entry_read(

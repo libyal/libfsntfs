@@ -37,8 +37,20 @@
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 extern \
+int libfsntfs_check_volume_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+extern \
 int libfsntfs_volume_open_file_io_handle(
      libfsntfs_volume_t *volume,
+     libbfio_handle_t *file_io_handle,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+extern \
+int libfsntfs_mft_metadata_file_open_file_io_handle(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
@@ -280,19 +292,6 @@ int info_handle_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_volume_initialize(
-	     &( ( *info_handle )->input_volume ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize input volume.",
-		 function );
-
-		goto on_error;
-	}
 	( *info_handle )->notify_stream = INFO_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
@@ -337,18 +336,37 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
-		if( libfsntfs_volume_free(
-		     &( ( *info_handle )->input_volume ),
-		     error ) != 1 )
+		if( ( *info_handle )->input_volume != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input volume.",
-			 function );
+			if( libfsntfs_volume_free(
+			     &( ( *info_handle )->input_volume ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free input volume.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
+		}
+		if( ( *info_handle )->input_mft_metadata_file != NULL )
+		{
+			if( libfsntfs_mft_metadata_file_free(
+			     &( ( *info_handle )->input_mft_metadata_file ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free input MFT metadata file.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( libbfio_handle_free(
 		     &( ( *info_handle )->input_file_io_handle ),
@@ -468,6 +486,7 @@ int info_handle_open_input(
 {
 	static char *function  = "info_handle_open_input";
 	size_t filename_length = 0;
+	int result             = 0;
 
 	if( info_handle == NULL )
 	{
@@ -504,7 +523,7 @@ int info_handle_open_input(
 		 "%s: unable to set file name.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libbfio_file_range_set(
 	     info_handle->input_file_io_handle,
@@ -516,27 +535,119 @@ int info_handle_open_input(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set volume offset.",
+		 "%s: unable to set range.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( libfsntfs_volume_open_file_io_handle(
-	     info_handle->input_volume,
-	     info_handle->input_file_io_handle,
-	     LIBFSNTFS_OPEN_READ,
-	     error ) != 1 )
+	result = libfsntfs_check_volume_signature_file_io_handle(
+	          info_handle->input_file_io_handle,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open input volume.",
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to check volume signature.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+	if( result != 0 )
+	{
+		if( libfsntfs_volume_initialize(
+		     &( info_handle->input_volume ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize input volume.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_volume_open_file_io_handle(
+		     info_handle->input_volume,
+		     info_handle->input_file_io_handle,
+		     LIBFSNTFS_OPEN_READ,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open input volume.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		if( libbfio_file_range_set(
+		     info_handle->input_file_io_handle,
+		     0,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set range.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_mft_metadata_file_initialize(
+		     &( info_handle->input_mft_metadata_file ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize input MFT metadata file.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_mft_metadata_file_open_file_io_handle(
+		     info_handle->input_mft_metadata_file,
+		     info_handle->input_file_io_handle,
+		     LIBFSNTFS_OPEN_READ,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open input MFT metadata file.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
+
+on_error:
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+		libfsntfs_mft_metadata_file_free(
+		 &( info_handle->input_mft_metadata_file ),
+		 NULL );
+	}
+	if( info_handle->input_volume != NULL )
+	{
+		libfsntfs_volume_free(
+		 &( info_handle->input_volume ),
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Closes the input
@@ -559,18 +670,37 @@ int info_handle_close_input(
 
 		return( -1 );
 	}
-	if( libfsntfs_volume_close(
-	     info_handle->input_volume,
-	     error ) != 0 )
+	if( info_handle->input_volume != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input volume.",
-		 function );
+		if( libfsntfs_volume_close(
+		     info_handle->input_volume,
+		     error ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close input volume.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+	}
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+		if( libfsntfs_mft_metadata_file_close(
+		     info_handle->input_mft_metadata_file,
+		     error ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close input MFT metadata file.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 0 );
 }
@@ -2540,6 +2670,7 @@ int info_handle_mft_entry_fprint(
 	int attribute_index                = 0;
 	int is_allocated                   = 0;
 	int number_of_attributes           = 0;
+	int result                         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2561,11 +2692,23 @@ int info_handle_mft_entry_fprint(
 	 "MFT entry: %" PRIu64 " information:\n",
 	 mft_entry_index );
 
-	if( libfsntfs_volume_get_file_entry_by_index(
-	     info_handle->input_volume,
-	     mft_entry_index,
-	     &file_entry,
-	     error ) != 1 )
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+		result = libfsntfs_mft_metadata_file_get_file_entry_by_index(
+		          info_handle->input_mft_metadata_file,
+		          mft_entry_index,
+		          &file_entry,
+		          error );
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_file_entry_by_index(
+		          info_handle->input_volume,
+		          mft_entry_index,
+		          &file_entry,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,

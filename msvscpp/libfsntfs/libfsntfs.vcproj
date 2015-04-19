@@ -258,11 +258,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft_entry.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_mft_file.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_metadata_file.c"
 				>
 			</File>
 			<File
@@ -516,11 +520,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft_entry.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_mft_file.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_metadata_file.h"
 				>
 			</File>
 			<File

@@ -31,6 +31,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
@@ -51,9 +52,9 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_io_handle_t *io_handle;
 
-	/* The internal volume
+	/* The MFT
 	 */
-	libfsntfs_internal_volume_t *internal_volume;
+	libfsntfs_mft_t *mft;
 
 	/* The MFT entry
 	 */
@@ -66,15 +67,20 @@ struct libfsntfs_internal_file_entry
 	/* The default (nameless) $DATA attribute cluster block stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
+
+	/* The flags
+	 */
+	uint8_t flags;
 };
 
 int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
      libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_internal_volume_t *internal_volume,
+     libfsntfs_mft_t *mft,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
+     uint8_t flags,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
