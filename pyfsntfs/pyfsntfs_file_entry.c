@@ -104,58 +104,58 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	{ "get_creation_time",
 	  (PyCFunction) pyfsntfs_file_entry_get_creation_time,
 	  METH_NOARGS,
-	  "get_creation_time() -> Datetime\n"
+	  "get_creation_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the creation date and time of the file entry." },
 
 	{ "get_creation_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_creation_time_as_integer,
 	  METH_NOARGS,
-	  "get_creation_time_as_integer() -> Integer\n"
+	  "get_creation_time_as_integer() -> Integer or None\n"
 	  "\n"
-	  "Returns the creation date and time as a 32-bit integer containing a POSIX timestamp value." },
+	  "Returns the creation date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_modification_time",
 	  (PyCFunction) pyfsntfs_file_entry_get_modification_time,
 	  METH_NOARGS,
-	  "get_modification_time() -> Datetime\n"
+	  "get_modification_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the modification date and time of the file entry." },
 
 	{ "get_modification_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_modification_time_as_integer,
 	  METH_NOARGS,
-	  "get_modification_time_as_integer() -> Integer\n"
+	  "get_modification_time_as_integer() -> Integer or None\n"
 	  "\n"
-	  "Returns the modification date and time as a 32-bit integer containing a POSIX timestamp value." },
+	  "Returns the modification date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_access_time",
 	  (PyCFunction) pyfsntfs_file_entry_get_access_time,
 	  METH_NOARGS,
-	  "get_access_time() -> Datetime\n"
+	  "get_access_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the access date and time of the file entry." },
 
 	{ "get_access_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_access_time_as_integer,
 	  METH_NOARGS,
-	  "get_access_time_as_integer() -> Integer\n"
+	  "get_access_time_as_integer() -> Integer or None\n"
 	  "\n"
-	  "Returns the access date and time as a 32-bit integer containing a POSIX timestamp value." },
+	  "Returns the access date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_entry_modification_time",
 	  (PyCFunction) pyfsntfs_file_entry_get_entry_modification_time,
 	  METH_NOARGS,
-	  "get_entry_modification_time() -> Datetime\n"
+	  "get_entry_modification_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the entry modification date and time of the file entry." },
 
 	{ "get_entry_modification_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_entry_modification_time_as_integer,
 	  METH_NOARGS,
-	  "get_entry_modification_time_as_integer() -> Integer\n"
+	  "get_entry_modification_time_as_integer() -> Integer or None\n"
 	  "\n"
-	  "Returns the entry modification date and time as a 32-bit integer containing a POSIX timestamp value." },
+	  "Returns the entry modification date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_file_entry_get_name,
@@ -963,7 +963,7 @@ PyObject *pyfsntfs_file_entry_get_creation_time(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -975,6 +975,13 @@ PyObject *pyfsntfs_file_entry_get_creation_time(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	date_time_object = pyfsntfs_datetime_new_from_filetime(
 	                    filetime );
@@ -1015,7 +1022,7 @@ PyObject *pyfsntfs_file_entry_get_creation_time_as_integer(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1027,6 +1034,13 @@ PyObject *pyfsntfs_file_entry_get_creation_time_as_integer(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  filetime );
@@ -1067,7 +1081,7 @@ PyObject *pyfsntfs_file_entry_get_modification_time(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1079,6 +1093,13 @@ PyObject *pyfsntfs_file_entry_get_modification_time(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	date_time_object = pyfsntfs_datetime_new_from_filetime(
 	                    filetime );
@@ -1119,7 +1140,7 @@ PyObject *pyfsntfs_file_entry_get_modification_time_as_integer(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1131,6 +1152,13 @@ PyObject *pyfsntfs_file_entry_get_modification_time_as_integer(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  filetime );
@@ -1171,7 +1199,7 @@ PyObject *pyfsntfs_file_entry_get_access_time(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1183,6 +1211,13 @@ PyObject *pyfsntfs_file_entry_get_access_time(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	date_time_object = pyfsntfs_datetime_new_from_filetime(
 	                    filetime );
@@ -1223,7 +1258,7 @@ PyObject *pyfsntfs_file_entry_get_access_time_as_integer(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1235,6 +1270,13 @@ PyObject *pyfsntfs_file_entry_get_access_time_as_integer(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  filetime );
@@ -1275,7 +1317,7 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1287,6 +1329,13 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	date_time_object = pyfsntfs_datetime_new_from_filetime(
 	                    filetime );
@@ -1327,7 +1376,7 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time_as_integer(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -1339,6 +1388,13 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time_as_integer(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_signed_new_from_64bit(
 	                  filetime );

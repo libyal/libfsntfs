@@ -277,7 +277,7 @@ int libfsntfs_file_entry_is_allocated(
 
 /* Retrieves the creation date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
@@ -318,6 +318,10 @@ int libfsntfs_file_entry_get_creation_time(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -352,7 +356,7 @@ int libfsntfs_file_entry_get_creation_time(
 
 /* Retrieves the (file) modification (last written) date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_modification_time(
      libfsntfs_file_entry_t *file_entry,
@@ -393,6 +397,10 @@ int libfsntfs_file_entry_get_modification_time(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -427,7 +435,7 @@ int libfsntfs_file_entry_get_modification_time(
 
 /* Retrieves the access date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_access_time(
      libfsntfs_file_entry_t *file_entry,
@@ -468,6 +476,10 @@ int libfsntfs_file_entry_get_access_time(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -502,7 +514,7 @@ int libfsntfs_file_entry_get_access_time(
 
 /* Retrieves the (file system entry) modification date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_entry_modification_time(
      libfsntfs_file_entry_t *file_entry,
@@ -543,6 +555,10 @@ int libfsntfs_file_entry_get_entry_modification_time(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -577,7 +593,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 
 /* Retrieves the file attribute flags
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_file_attribute_flags(
      libfsntfs_file_entry_t *file_entry,
@@ -618,6 +634,10 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -653,7 +673,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_file_entry_t *file_entry,
@@ -694,6 +714,10 @@ int libfsntfs_file_entry_get_utf8_name_size(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -729,7 +753,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 /* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_utf8_name(
      libfsntfs_file_entry_t *file_entry,
@@ -771,6 +795,10 @@ int libfsntfs_file_entry_get_utf8_name(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -807,7 +835,7 @@ int libfsntfs_file_entry_get_utf8_name(
 /* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_utf16_name_size(
      libfsntfs_file_entry_t *file_entry,
@@ -848,6 +876,10 @@ int libfsntfs_file_entry_get_utf16_name_size(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,
@@ -883,7 +915,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 /* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_utf16_name(
      libfsntfs_file_entry_t *file_entry,
@@ -925,6 +957,10 @@ int libfsntfs_file_entry_get_utf16_name(
 	}
 	if( file_name_values == NULL )
 	{
+		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
+		{
+			return( 0 );
+		}
 		if( libfsntfs_attribute_get_value(
 		     internal_file_entry->mft_entry->file_name_attribute,
 		     (intptr_t **) &file_name_values,

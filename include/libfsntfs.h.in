@@ -397,7 +397,7 @@ int libfsntfs_file_entry_is_allocated(
 
 /* Retrieves the creation date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_creation_time(
@@ -407,7 +407,7 @@ int libfsntfs_file_entry_get_creation_time(
 
 /* Retrieves the modification date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_modification_time(
@@ -417,7 +417,7 @@ int libfsntfs_file_entry_get_modification_time(
 
 /* Retrieves the access date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_access_time(
@@ -427,7 +427,7 @@ int libfsntfs_file_entry_get_access_time(
 
 /* Retrieves the entry modification date and time
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_entry_modification_time(
@@ -437,7 +437,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 
 /* Retrieves the file attribute flags
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_file_attribute_flags(
@@ -448,7 +448,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size(
@@ -459,7 +459,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 /* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name(
@@ -471,7 +471,7 @@ int libfsntfs_file_entry_get_utf8_name(
 /* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_size(
@@ -482,7 +482,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 /* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $FILE_NAME attribute
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name(
