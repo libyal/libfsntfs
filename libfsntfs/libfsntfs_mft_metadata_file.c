@@ -926,6 +926,271 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the size of the UTF-8 encoded volume name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     size_t *utf8_volume_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf8_volume_name_size";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_utf8_volume_name_size(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     utf8_volume_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-8 volume name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded volume name
+ * The size should include the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_utf8_volume_name(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint8_t *utf8_volume_name,
+     size_t utf8_volume_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf8_volume_name";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_utf8_volume_name(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     utf8_volume_name,
+	     utf8_volume_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 volume name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded volume name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     size_t *utf16_volume_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf16_volume_name_size";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_utf16_volume_name_size(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     utf16_volume_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-16 volume name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded volume name
+ * The size should include the end of string character
+ * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_utf16_volume_name(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint16_t *utf16_volume_name,
+     size_t utf16_volume_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf16_volume_name";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_utf16_volume_name(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     utf16_volume_name,
+	     utf16_volume_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 volume name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the volume version
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_volume_version(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_volume_version";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_volume_version(
+	     internal_mft_metadata_file->mft,
+	     internal_mft_metadata_file->file_io_handle,
+	     major_version,
+	     minor_version,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume version.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of file entries (MFT entries)
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_number_of_file_entries(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint64_t *number_of_file_entries,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_number_of_file_entries";
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+	if( libfsntfs_mft_get_number_of_entries(
+	     internal_mft_metadata_file->mft,
+	     number_of_file_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of MFT entries.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the file entry of a specific MFT entry index
  * Returns 1 if successful or -1 on error
  */
@@ -991,24 +1256,6 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 
 		return( -1 );
 	}
-#ifdef TODO
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_mft_metadata_file->io_handle,
-	     internal_mft_metadata_file->file_io_handle,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
-#endif
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_mft_metadata_file->file_io_handle,

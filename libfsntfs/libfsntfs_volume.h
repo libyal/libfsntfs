@@ -143,17 +143,23 @@ int libfsntfs_volume_get_utf16_name(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_file_entry_by_index(
-     libfsntfs_volume_t *volume,
-     uint64_t mft_entry_index,
-     libfsntfs_file_entry_t **file_entry,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_version(
      libfsntfs_volume_t *volume,
      uint8_t *major_version,
      uint8_t *minor_version,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_number_of_file_entries(
+     libfsntfs_volume_t *volume,
+     uint64_t *number_of_file_entries,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_file_entry_by_index(
+     libfsntfs_volume_t *volume,
+     uint64_t mft_entry_index,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

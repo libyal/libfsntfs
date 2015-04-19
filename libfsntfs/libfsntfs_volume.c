@@ -37,8 +37,6 @@
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_volume.h"
-#include "libfsntfs_volume_information_attribute.h"
-#include "libfsntfs_volume_name_attribute.h"
 
 /* Creates a volume
  * Make sure the value volume is referencing, is set to NULL
@@ -1038,7 +1036,6 @@ int libfsntfs_volume_get_utf8_name_size(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf8_name_size";
 
 	if( volume == NULL )
@@ -1054,35 +1051,9 @@ int libfsntfs_volume_get_utf8_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_utf8_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_name_attribute_get_utf8_name_size(
-	     mft_entry->volume_name_attibute,
 	     utf8_name_size,
 	     error ) != 1 )
 	{
@@ -1090,7 +1061,7 @@ int libfsntfs_volume_get_utf8_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-8 name from volume name attribute.",
+		 "%s: unable to retrieve size of UTF-8 volume name.",
 		 function );
 
 		return( -1 );
@@ -1110,7 +1081,6 @@ int libfsntfs_volume_get_utf8_name(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf8_name";
 
 	if( volume == NULL )
@@ -1126,35 +1096,9 @@ int libfsntfs_volume_get_utf8_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_utf8_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_name_attribute_get_utf8_name(
-	     mft_entry->volume_name_attibute,
 	     utf8_name,
 	     utf8_name_size,
 	     error ) != 1 )
@@ -1163,7 +1107,7 @@ int libfsntfs_volume_get_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name from volume name attribute.",
+		 "%s: unable to retrieve UTF-8 volume name.",
 		 function );
 
 		return( -1 );
@@ -1182,7 +1126,6 @@ int libfsntfs_volume_get_utf16_name_size(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf16_name_size";
 
 	if( volume == NULL )
@@ -1198,35 +1141,9 @@ int libfsntfs_volume_get_utf16_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_utf16_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_name_attribute_get_utf16_name_size(
-	     mft_entry->volume_name_attibute,
 	     utf16_name_size,
 	     error ) != 1 )
 	{
@@ -1234,7 +1151,7 @@ int libfsntfs_volume_get_utf16_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-16 name from volume name attribute.",
+		 "%s: unable to retrieve size of UTF-16 volune name.",
 		 function );
 
 		return( -1 );
@@ -1254,7 +1171,6 @@ int libfsntfs_volume_get_utf16_name(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf16_name";
 
 	if( volume == NULL )
@@ -1270,35 +1186,9 @@ int libfsntfs_volume_get_utf16_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_utf16_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_name_attribute_get_utf16_name(
-	     mft_entry->volume_name_attibute,
 	     utf16_name,
 	     utf16_name_size,
 	     error ) != 1 )
@@ -1307,7 +1197,7 @@ int libfsntfs_volume_get_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 name from volume name attribute.",
+		 "%s: unable to retrieve UTF-16 volume name.",
 		 function );
 
 		return( -1 );
@@ -1325,7 +1215,6 @@ int libfsntfs_volume_get_version(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_version";
 
 	if( volume == NULL )
@@ -1341,35 +1230,9 @@ int libfsntfs_volume_get_version(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_volume_version(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 3.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_information_attribute_get_version(
-	     mft_entry->volume_information_attribute,
 	     major_version,
 	     minor_version,
 	     error ) != 1 )
@@ -1378,7 +1241,48 @@ int libfsntfs_volume_get_version(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve verson from volume information attribute.",
+		 "%s: unable to retrieve volume version.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of file entries (MFT entries)
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_number_of_file_entries(
+     libfsntfs_volume_t *volume,
+     uint64_t *number_of_file_entries,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_number_of_file_entries";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( libfsntfs_mft_get_number_of_entries(
+	     internal_volume->mft,
+	     number_of_file_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of MFT entries.",
 		 function );
 
 		return( -1 );

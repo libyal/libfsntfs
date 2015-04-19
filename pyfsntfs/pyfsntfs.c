@@ -30,10 +30,11 @@
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
 #include "pyfsntfs_file_entry.h"
+#include "pyfsntfs_file_object_io_handle.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
-#include "pyfsntfs_file_object_io_handle.h"
+#include "pyfsntfs_mft_metadata_file.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume.h"
@@ -454,11 +455,12 @@ PyMODINIT_FUNC initpyfsntfs(
                 void )
 #endif
 {
-	PyObject *module                       = NULL;
-	PyTypeObject *file_entries_type_object = NULL;
-	PyTypeObject *file_entry_type_object   = NULL;
-	PyTypeObject *volume_type_object       = NULL;
-	PyGILState_STATE gil_state             = 0;
+	PyObject *module                            = NULL;
+	PyTypeObject *file_entries_type_object      = NULL;
+	PyTypeObject *file_entry_type_object        = NULL;
+	PyTypeObject *mft_metadata_file_type_object = NULL;
+	PyTypeObject *volume_type_object            = NULL;
+	PyGILState_STATE gil_state                  = 0;
 
 	/* Create the module
 	 * This function must be called before grabbing the GIL
@@ -503,6 +505,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "volume",
 	 (PyObject *) volume_type_object );
+
+	/* Setup the MFT metadata file type object
+	 */
+	pyfsntfs_mft_metadata_file_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_mft_metadata_file_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_mft_metadata_file_type_object );
+
+	mft_metadata_file_type_object = &pyfsntfs_mft_metadata_file_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "mft_metadata_file",
+	 (PyObject *) mft_metadata_file_type_object );
 
 	/* Setup the file entry type object
 	 */

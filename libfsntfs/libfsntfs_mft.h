@@ -67,13 +67,6 @@ int libfsntfs_mft_set_data_runs(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
-int libfsntfs_mft_get_mft_entry_by_index(
-     libfsntfs_mft_t *mft,
-     libbfio_handle_t *file_io_handle,
-     uint64_t mft_entry_index,
-     libfsntfs_mft_entry_t **mft_entry,
-     libcerror_error_t **error );
-
 int libfsntfs_mft_read_mft_entry(
      libfsntfs_mft_t *mft,
      libfsntfs_io_handle_t *io_handle,
@@ -81,6 +74,51 @@ int libfsntfs_mft_read_mft_entry(
      off64_t file_offset,
      uint32_t mft_entry_index,
      libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_utf8_volume_name_size(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     size_t *utf8_volume_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_utf8_volume_name(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     uint8_t *utf8_volume_name,
+     size_t utf8_volume_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_utf16_volume_name_size(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     size_t *utf16_volume_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_utf16_volume_name(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     uint16_t *utf16_volume_name,
+     size_t utf16_volume_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_volume_version(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     uint8_t *major_version,
+     uint8_t *minor_version,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_number_of_entries(
+     libfsntfs_mft_t *mft,
+     uint64_t *number_of_entries,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_get_mft_entry_by_index(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
+     uint64_t mft_entry_index,
+     libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

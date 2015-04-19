@@ -3944,17 +3944,34 @@ int info_handle_volume_fprint(
 	 info_handle->notify_stream,
 	 "\tName\t\t\t\t: " );
 
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_volume_get_utf16_name_size(
-	          info_handle->input_volume,
-	          &volume_name_size,
-	          error );
+		result = libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
+		          info_handle->input_mft_metadata_file,
+		          &volume_name_size,
+		          error );
 #else
-	result = libfsntfs_volume_get_utf8_name_size(
-	          info_handle->input_volume,
-	          &volume_name_size,
-	          error );
+		result = libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+		          info_handle->input_mft_metadata_file,
+		          &volume_name_size,
+		          error );
 #endif
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_volume_get_utf16_name_size(
+		          info_handle->input_volume,
+		          &volume_name_size,
+		          error );
+#else
+		result = libfsntfs_volume_get_utf8_name_size(
+		          info_handle->input_volume,
+		          &volume_name_size,
+		          error );
+#endif
+	}
 	if( result != 1 )
 	{
 		libcerror_error_set(
@@ -3982,19 +3999,38 @@ int info_handle_volume_fprint(
 
 			goto on_error;
 		}
+		if( info_handle->input_mft_metadata_file != NULL )
+		{
 #if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfsntfs_volume_get_utf16_name(
-		          info_handle->input_volume,
-		          (uint16_t *) volume_name,
-		          volume_name_size,
-		          error );
+			result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+			          info_handle->input_mft_metadata_file,
+			          (uint16_t *) volume_name,
+			          volume_name_size,
+			          error );
 #else
-		result = libfsntfs_volume_get_utf8_name(
-		          info_handle->input_volume,
-		          (uint8_t *) volume_name,
-		          volume_name_size,
-		          error );
+			result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+			          info_handle->input_mft_metadata_file,
+			          (uint8_t *) volume_name,
+			          volume_name_size,
+			          error );
 #endif
+		}
+		else if( info_handle->input_volume != NULL )
+		{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfsntfs_volume_get_utf16_name(
+			          info_handle->input_volume,
+			          (uint16_t *) volume_name,
+			          volume_name_size,
+			          error );
+#else
+			result = libfsntfs_volume_get_utf8_name(
+			          info_handle->input_volume,
+			          (uint8_t *) volume_name,
+			          volume_name_size,
+			          error );
+#endif
+		}
 		if( result != 1 )
 		{
 			libcerror_error_set(
@@ -4020,11 +4056,23 @@ int info_handle_volume_fprint(
 	 info_handle->notify_stream,
 	 "\n" );
 
-	if( libfsntfs_volume_get_version(
-	     info_handle->input_volume,
-	     &major_version,
-	     &minor_version,
-	     error ) != 1 )
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+		result = libfsntfs_mft_metadata_file_get_volume_version(
+		          info_handle->input_mft_metadata_file,
+		          &major_version,
+		          &minor_version,
+		          error );
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_version(
+		          info_handle->input_volume,
+		          &major_version,
+		          &minor_version,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -4041,10 +4089,18 @@ int info_handle_volume_fprint(
 	 major_version,
 	 minor_version );
 
-	if( libfsntfs_volume_get_cluster_block_size(
-	     info_handle->input_volume,
-	     &cluster_block_size,
-	     error ) != 1 )
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+/* TODO */
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_cluster_block_size(
+		          info_handle->input_volume,
+		          &cluster_block_size,
+		          error );
+	}
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,

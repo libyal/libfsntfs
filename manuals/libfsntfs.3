@@ -75,6 +75,8 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_get_version "libfsntfs_volume_t *volume, uint8_t *major_version, uint8_t *minor_version, libfsntfs_error_t **error"
 .Ft int
+.Fn libfsntfs_volume_get_number_of_file_entries "libfsntfs_volume_t *volume, uint64_t *number_of_file_entries, libfsntfs_error_t **error"
+.Ft int
 .Fn libfsntfs_volume_get_file_entry_by_index "libfsntfs_volume_t *volume, uint64_t mft_entry_index, libfsntfs_file_entry_t **file_entry, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_root_directory "libfsntfs_volume_t *volume, libfsntfs_file_entry_t **file_entry, libfsntfs_error_t **error"
@@ -254,6 +256,18 @@ MFT metadata file functions
 .Fn libfsntfs_mft_metadata_file_open "libfsntfs_mft_metadata_file_t *mft_metadata_file, const char *filename, int access_flags, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_mft_metadata_file_close "libfsntfs_mft_metadata_file_t *mft_metadata_file, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file, size_t *utf8_volume_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint8_t *utf8_volume_name, size_t utf8_volume_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file, size_t *utf16_volume_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint16_t *utf16_volume_name, size_t utf16_volume_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_volume_version "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint8_t *major_version, uint8_t *minor_version, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_number_of_file_entries "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint64_t *number_of_file_entries, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_mft_metadata_file_get_file_entry_by_index "libfsntfs_mft_metadata_file_t *mft_metadata_file, uint64_t mft_entry_index, libfsntfs_file_entry_t **file_entry, libfsntfs_error_t **error"
 .Pp

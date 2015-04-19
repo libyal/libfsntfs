@@ -28,7 +28,6 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
-#include "pyfsntfs_volume.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -46,9 +45,9 @@ struct pyfsntfs_file_entry
 	 */
 	libfsntfs_file_entry_t *file_entry;
 
-	/* The volume object
+	/* The parent object
 	 */
-	pyfsntfs_volume_t *volume_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyfsntfs_file_entry_object_methods[];
@@ -56,7 +55,7 @@ extern PyTypeObject pyfsntfs_file_entry_type_object;
 
 PyObject *pyfsntfs_file_entry_new(
            libfsntfs_file_entry_t *file_entry,
-           pyfsntfs_volume_t *volume_object );
+           PyObject *parent_object );
 
 int pyfsntfs_file_entry_init(
      pyfsntfs_file_entry_t *pyfsntfs_file_entry );

@@ -30,6 +30,7 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_libcstring.h \
 	pyfsntfs_libfguid.h \
 	pyfsntfs_libfsntfs.h \
+	pyfsntfs_mft_metadata_file.c pyfsntfs_mft_metadata_file.h \
 	pyfsntfs_python.h \
 	pyfsntfs_unused.h \
 	pyfsntfs_volume.c pyfsntfs_volume.h

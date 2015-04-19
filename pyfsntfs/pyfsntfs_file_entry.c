@@ -36,7 +36,6 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
-#include "pyfsntfs_volume.h"
 
 PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 
@@ -339,7 +338,7 @@ PyTypeObject pyfsntfs_file_entry_type_object = {
  */
 PyObject *pyfsntfs_file_entry_new(
            libfsntfs_file_entry_t *file_entry,
-           pyfsntfs_volume_t *volume_object )
+           PyObject *parent_object )
 {
 	pyfsntfs_file_entry_t *pyfsntfs_file_entry = NULL;
 	static char *function                      = "pyfsntfs_file_entry_new";
@@ -377,10 +376,10 @@ PyObject *pyfsntfs_file_entry_new(
 		goto on_error;
 	}
 	pyfsntfs_file_entry->file_entry    = file_entry;
-	pyfsntfs_file_entry->volume_object = volume_object;
+	pyfsntfs_file_entry->parent_object = parent_object;
 
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_file_entry->volume_object );
+	 pyfsntfs_file_entry->parent_object );
 
 	return( (PyObject *) pyfsntfs_file_entry );
 
@@ -485,10 +484,10 @@ void pyfsntfs_file_entry_free(
 		libcerror_error_free(
 		 &error );
 	}
-	if( pyfsntfs_file_entry->volume_object != NULL )
+	if( pyfsntfs_file_entry->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_file_entry->volume_object );
+		 pyfsntfs_file_entry->parent_object );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_file_entry );
@@ -1565,7 +1564,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
 	}
 	file_entry_object = pyfsntfs_file_entry_new(
 	                     sub_file_entry,
-	                     pyfsntfs_file_entry->volume_object );
+	                     pyfsntfs_file_entry->parent_object );
 
 	if( file_entry_object == NULL )
 	{

@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs volume
+ * Python object definition of the libfsntfs MFT metadata file
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -34,97 +34,83 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
+#include "pyfsntfs_mft_metadata_file.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
-#include "pyfsntfs_volume.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 LIBFSNTFS_EXTERN \
-int libfsntfs_volume_open_file_io_handle(
-     libfsntfs_volume_t *volume,
+int libfsntfs_mft_metadata_file_open_file_io_handle(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
 #endif
 
-PyMethodDef pyfsntfs_volume_object_methods[] = {
+PyMethodDef pyfsntfs_mft_metadata_file_object_methods[] = {
 
-	{ "signal_abort",
-	  (PyCFunction) pyfsntfs_volume_signal_abort,
-	  METH_NOARGS,
-	  "signal_abort() -> None\n"
-	  "\n"
-	  "Signals the volume to abort the current activity." },
-
-	/* Functions to access the volume */
+	/* Functions to access the MFT metadata file */
 
 	{ "open",
-	  (PyCFunction) pyfsntfs_volume_open,
+	  (PyCFunction) pyfsntfs_mft_metadata_file_open,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open(filename, mode='r') -> None\n"
 	  "\n"
-	  "Opens a volume." },
+	  "Opens a MFT metadata file." },
 
 	{ "open_file_object",
-	  (PyCFunction) pyfsntfs_volume_open_file_object,
+	  (PyCFunction) pyfsntfs_mft_metadata_file_open_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open_file_object(file_object, mode='r') -> None\n"
 	  "\n"
-	  "Opens a volume using a file-like object." },
+	  "Opens a MFT metadata file using a file-like object." },
 
 	{ "close",
-	  (PyCFunction) pyfsntfs_volume_close,
+	  (PyCFunction) pyfsntfs_mft_metadata_file_close,
 	  METH_NOARGS,
 	  "close() -> None\n"
 	  "\n"
-	  "Closes a volume." },
+	  "Closes a MFT metadata file." },
 
-	/* Functions to access the volume values */
+	/* Functions to access the MFT metadata file values */
 
-	{ "get_name",
-	  (PyCFunction) pyfsntfs_volume_get_name,
+	{ "get_volume_name",
+	  (PyCFunction) pyfsntfs_mft_metadata_file_get_volume_name,
 	  METH_NOARGS,
-	  "get_name() -> Unicode string or None\n"
+	  "get_volume_name() -> Unicode string or None\n"
 	  "\n"
-	  "Retrieves the name." },
+	  "Retrieves the volume name." },
 
 	/* Functions to access the file entries */
 
 	{ "get_number_of_file_entries",
-	  (PyCFunction) pyfsntfs_volume_get_number_of_file_entries,
+	  (PyCFunction) pyfsntfs_mft_metadata_file_get_number_of_file_entries,
 	  METH_NOARGS,
 	  "get_number_of_file_entries() -> Integer\n"
 	  "\n"
 	  "Retrieves the number of file entries." },
 
 	{ "get_file_entry",
-	  (PyCFunction) pyfsntfs_volume_get_file_entry,
+	  (PyCFunction) pyfsntfs_mft_metadata_file_get_file_entry,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "get_file_entry(file_entry_index) -> Object\n"
 	  "\n"
 	  "Retrieves a specific file entry." },
 
-	{ "get_root_directory",
-	  (PyCFunction) pyfsntfs_volume_get_root_directory,
-	  METH_NOARGS,
-	  "get_root_directory() -> Object\n"
-	  "\n"
-	  "Retrieves the root directory." },
-
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
 
-PyGetSetDef pyfsntfs_volume_object_get_set_definitions[] = {
+PyGetSetDef pyfsntfs_mft_metadata_file_object_get_set_definitions[] = {
 
-	{ "name",
-	  (getter) pyfsntfs_volume_get_name,
+	{ "volume_name",
+	  (getter) pyfsntfs_mft_metadata_file_get_volume_name,
 	  (setter) 0,
-	  "The name.",
+	  "The volume name.",
 	  NULL },
 
 	{ "number_of_file_entries",
-	  (getter) pyfsntfs_volume_get_number_of_file_entries,
+	  (getter) pyfsntfs_mft_metadata_file_get_number_of_file_entries,
 	  (setter) 0,
 	  "The number of file entries.",
 	  NULL },
@@ -133,17 +119,17 @@ PyGetSetDef pyfsntfs_volume_object_get_set_definitions[] = {
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
-PyTypeObject pyfsntfs_volume_type_object = {
+PyTypeObject pyfsntfs_mft_metadata_file_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs.volume",
+	"pyfsntfs.mft_metadata_file",
 	/* tp_basicsize */
-	sizeof( pyfsntfs_volume_t ),
+	sizeof( pyfsntfs_mft_metadata_file_t ),
 	/* tp_itemsize */
 	0,
 	/* tp_dealloc */
-	(destructor) pyfsntfs_volume_free,
+	(destructor) pyfsntfs_mft_metadata_file_free,
 	/* tp_print */
 	0,
 	/* tp_getattr */
@@ -175,7 +161,7 @@ PyTypeObject pyfsntfs_volume_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyfsntfs volume object (wraps libfsntfs_volume_t)",
+	"pyfsntfs MFT metadata file object (wraps libfsntfs_mft_metadata_file_t)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -189,11 +175,11 @@ PyTypeObject pyfsntfs_volume_type_object = {
 	/* tp_iternext */
 	0,
 	/* tp_methods */
-	pyfsntfs_volume_object_methods,
+	pyfsntfs_mft_metadata_file_object_methods,
 	/* tp_members */
 	0,
 	/* tp_getset */
-	pyfsntfs_volume_object_get_set_definitions,
+	pyfsntfs_mft_metadata_file_object_get_set_definitions,
 	/* tp_base */
 	0,
 	/* tp_dict */
@@ -205,7 +191,7 @@ PyTypeObject pyfsntfs_volume_type_object = {
 	/* tp_dictoffset */
 	0,
 	/* tp_init */
-	(initproc) pyfsntfs_volume_init,
+	(initproc) pyfsntfs_mft_metadata_file_init,
 	/* tp_alloc */
 	0,
 	/* tp_new */
@@ -228,122 +214,78 @@ PyTypeObject pyfsntfs_volume_type_object = {
 	0
 };
 
-/* Creates a new volume object
+/* Creates a new MFT metadata file object
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_new(
+PyObject *pyfsntfs_mft_metadata_file_new(
            void )
 {
-	pyfsntfs_volume_t *pyfsntfs_volume = NULL;
-	static char *function              = "pyfsntfs_volume_new";
+	pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file = NULL;
+	static char *function                                    = "pyfsntfs_mft_metadata_file_new";
 
-	pyfsntfs_volume = PyObject_New(
-	                   struct pyfsntfs_volume,
-	                   &pyfsntfs_volume_type_object );
+	pyfsntfs_mft_metadata_file = PyObject_New(
+	                              struct pyfsntfs_mft_metadata_file,
+	                              &pyfsntfs_mft_metadata_file_type_object );
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize volume.",
+		 "%s: unable to initialize MFT metadata file.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyfsntfs_volume_init(
-	     pyfsntfs_volume ) != 0 )
+	if( pyfsntfs_mft_metadata_file_init(
+	     pyfsntfs_mft_metadata_file ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize volume.",
+		 "%s: unable to initialize MFT metadata file.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyfsntfs_volume );
+	return( (PyObject *) pyfsntfs_mft_metadata_file );
 
 on_error:
-	if( pyfsntfs_volume != NULL )
+	if( pyfsntfs_mft_metadata_file != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_volume );
+		 (PyObject *) pyfsntfs_mft_metadata_file );
 	}
 	return( NULL );
 }
 
-/* Creates a new volume object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_new_open(
-           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyfsntfs_volume = NULL;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( self )
-
-	pyfsntfs_volume = pyfsntfs_volume_new();
-
-	pyfsntfs_volume_open(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
-
-	return( pyfsntfs_volume );
-}
-
-/* Creates a new volume object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_new_open_file_object(
-           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyfsntfs_volume = NULL;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( self )
-
-	pyfsntfs_volume = pyfsntfs_volume_new();
-
-	pyfsntfs_volume_open_file_object(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
-
-	return( pyfsntfs_volume );
-}
-
-/* Intializes a volume object
+/* Intializes a MFT metadata file object
  * Returns 0 if successful or -1 on error
  */
-int pyfsntfs_volume_init(
-     pyfsntfs_volume_t *pyfsntfs_volume )
+int pyfsntfs_mft_metadata_file_init(
+     pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file )
 {
-	static char *function    = "pyfsntfs_volume_init";
+	static char *function    = "pyfsntfs_mft_metadata_file_init";
 	libcerror_error_t *error = NULL;
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	pyfsntfs_volume->volume         = NULL;
-	pyfsntfs_volume->file_io_handle = NULL;
+	pyfsntfs_mft_metadata_file->mft_metadata_file = NULL;
+	pyfsntfs_mft_metadata_file->file_io_handle    = NULL;
 
-	if( libfsntfs_volume_initialize(
-	     &( pyfsntfs_volume->volume ),
+	if( libfsntfs_mft_metadata_file_initialize(
+	     &( pyfsntfs_mft_metadata_file->mft_metadata_file ),
 	     &error ) != 1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_MemoryError,
-		 "%s: unable to initialize volume.",
+		 "%s: unable to initialize MFT metadata file.",
 		 function );
 
 		libcerror_error_free(
@@ -354,36 +296,36 @@ int pyfsntfs_volume_init(
 	return( 0 );
 }
 
-/* Frees a volume object
+/* Frees a MFT metadata file object
  */
-void pyfsntfs_volume_free(
-      pyfsntfs_volume_t *pyfsntfs_volume )
+void pyfsntfs_mft_metadata_file_free(
+      pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file )
 {
 	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
-	static char *function       = "pyfsntfs_volume_free";
+	static char *function       = "pyfsntfs_mft_metadata_file_free";
 	int result                  = 0;
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return;
 	}
-	if( pyfsntfs_volume->volume == NULL )
+	if( pyfsntfs_mft_metadata_file->mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume - missing libfsntfs volume.",
+		 "%s: invalid MFT metadata file - missing libfsntfs MFT metadata file.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyfsntfs_volume );
+	           pyfsntfs_mft_metadata_file );
 
 	if( ob_type == NULL )
 	{
@@ -405,8 +347,8 @@ void pyfsntfs_volume_free(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_free(
-	          &( pyfsntfs_volume->volume ),
+	result = libfsntfs_mft_metadata_file_free(
+	          &( pyfsntfs_mft_metadata_file->mft_metadata_file ),
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -416,76 +358,27 @@ void pyfsntfs_volume_free(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_MemoryError,
-		 "%s: unable to free libfsntfs volume.",
+		 "%s: unable to free libfsntfs MFT metadata file.",
 		 function );
 
 		libcerror_error_free(
 		 &error );
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyfsntfs_volume );
+	 (PyObject*) pyfsntfs_mft_metadata_file );
 }
 
-/* Signals the volume to abort the current activity
+/* Opens a MFT metadata file
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_signal_abort(
-           pyfsntfs_volume_t *pyfsntfs_volume,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyfsntfs_volume_signal_abort";
-	int result               = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_volume == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid volume.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_volume_signal_abort(
-	          pyfsntfs_volume->volume,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to signal abort.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	Py_IncRef(
-	 Py_None );
-
-	return( Py_None );
-}
-
-/* Opens a volume
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_open(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_open(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments,
            PyObject *keywords )
 {
 	PyObject *string_object      = NULL;
 	libcerror_error_t *error     = NULL;
-	static char *function        = "pyfsntfs_volume_open";
+	static char *function        = "pyfsntfs_mft_metadata_file_open";
 	static char *keyword_list[]  = { "filename", "mode", NULL };
 	const char *filename_narrow  = NULL;
 	char *mode                   = NULL;
@@ -497,11 +390,11 @@ PyObject *pyfsntfs_volume_open(
 	PyObject *utf8_string_object = NULL;
 #endif
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
@@ -556,8 +449,8 @@ PyObject *pyfsntfs_volume_open(
 		                             string_object );
 		Py_BEGIN_ALLOW_THREADS
 
-		result = libfsntfs_volume_open_wide(
-		          pyfsntfs_volume->volume,
+		result = libfsntfs_mft_metadata_file_open_wide(
+		          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	                  filename_wide,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
@@ -585,8 +478,8 @@ PyObject *pyfsntfs_volume_open(
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
-		result = libfsntfs_volume_open(
-		          pyfsntfs_volume->volume,
+		result = libfsntfs_mft_metadata_file_open(
+		          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	                  filename_narrow,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
@@ -601,7 +494,7 @@ PyObject *pyfsntfs_volume_open(
 			pyfsntfs_error_raise(
 			 error,
 			 PyExc_IOError,
-			 "%s: unable to open volume.",
+			 "%s: unable to open MFT metadata file.",
 			 function );
 
 			libcerror_error_free(
@@ -647,8 +540,8 @@ PyObject *pyfsntfs_volume_open(
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
-		result = libfsntfs_volume_open(
-		          pyfsntfs_volume->volume,
+		result = libfsntfs_mft_metadata_file_open(
+		          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	                  filename_narrow,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
@@ -660,7 +553,7 @@ PyObject *pyfsntfs_volume_open(
 			pyfsntfs_error_raise(
 			 error,
 			 PyExc_IOError,
-			 "%s: unable to open volume.",
+			 "%s: unable to open MFT metadata file.",
 			 function );
 
 			libcerror_error_free(
@@ -681,11 +574,11 @@ PyObject *pyfsntfs_volume_open(
 	return( NULL );
 }
 
-/* Opens a volume using a file-like object
+/* Opens a MFT metadata file using a file-like object
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_open_file_object(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_open_file_object(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments,
            PyObject *keywords )
 {
@@ -693,14 +586,14 @@ PyObject *pyfsntfs_volume_open_file_object(
 	libcerror_error_t *error    = NULL;
 	char *mode                  = NULL;
 	static char *keyword_list[] = { "file_object", "mode", NULL };
-	static char *function       = "pyfsntfs_volume_open_file_object";
+	static char *function       = "pyfsntfs_mft_metadata_file_open_file_object";
 	int result                  = 0;
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
@@ -727,7 +620,7 @@ PyObject *pyfsntfs_volume_open_file_object(
 		return( NULL );
 	}
 	if( pyfsntfs_file_object_initialize(
-	     &( pyfsntfs_volume->file_io_handle ),
+	     &( pyfsntfs_mft_metadata_file->file_io_handle ),
 	     file_object,
 	     &error ) != 1 )
 	{
@@ -744,9 +637,9 @@ PyObject *pyfsntfs_volume_open_file_object(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_open_file_io_handle(
-	          pyfsntfs_volume->volume,
-	          pyfsntfs_volume->file_io_handle,
+	result = libfsntfs_mft_metadata_file_open_file_io_handle(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
+	          pyfsntfs_mft_metadata_file->file_io_handle,
 	          LIBFSNTFS_OPEN_READ,
 	          &error );
 
@@ -757,7 +650,7 @@ PyObject *pyfsntfs_volume_open_file_object(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to open volume.",
+		 "%s: unable to open MFT metadata file.",
 		 function );
 
 		libcerror_error_free(
@@ -771,41 +664,41 @@ PyObject *pyfsntfs_volume_open_file_object(
 	return( Py_None );
 
 on_error:
-	if( pyfsntfs_volume->file_io_handle != NULL )
+	if( pyfsntfs_mft_metadata_file->file_io_handle != NULL )
 	{
 		libbfio_handle_free(
-		 &( pyfsntfs_volume->file_io_handle ),
+		 &( pyfsntfs_mft_metadata_file->file_io_handle ),
 		 NULL );
 	}
 	return( NULL );
 }
 
-/* Closes a volume
+/* Closes a MFT metadata file
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_close(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_close(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function    = "pyfsntfs_volume_close";
+	static char *function    = "pyfsntfs_mft_metadata_file_close";
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_close(
-	          pyfsntfs_volume->volume,
+	result = libfsntfs_mft_metadata_file_close(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -815,7 +708,7 @@ PyObject *pyfsntfs_volume_close(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to close volume.",
+		 "%s: unable to close MFT metadata file.",
 		 function );
 
 		libcerror_error_free(
@@ -823,12 +716,12 @@ PyObject *pyfsntfs_volume_close(
 
 		return( NULL );
 	}
-	if( pyfsntfs_volume->file_io_handle != NULL )
+	if( pyfsntfs_mft_metadata_file->file_io_handle != NULL )
 	{
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libbfio_handle_free(
-		          &( pyfsntfs_volume->file_io_handle ),
+		          &( pyfsntfs_mft_metadata_file->file_io_handle ),
 		          &error );
 
 		Py_END_ALLOW_THREADS
@@ -853,37 +746,37 @@ PyObject *pyfsntfs_volume_close(
 	return( Py_None );
 }
 
-/* Retrieves the name
+/* Retrieves the volume name
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_name(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_get_volume_name(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
 	const char *errors       = NULL;
-	uint8_t *name            = NULL;
-	static char *function    = "pyfsntfs_volume_get_name";
-	size_t name_size         = 0;
+	uint8_t *volume_name     = NULL;
+	static char *function    = "pyfsntfs_mft_metadata_file_get_volume_name";
+	size_t volume_name_size  = 0;
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_utf8_name_size(
-	          pyfsntfs_volume->volume,
-	          &name_size,
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
+	          &volume_name_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -893,7 +786,7 @@ PyObject *pyfsntfs_volume_get_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to retrieve volume name size.",
 		 function );
 
 		libcerror_error_free(
@@ -902,31 +795,31 @@ PyObject *pyfsntfs_volume_get_name(
 		goto on_error;
 	}
 	else if( ( result == 0 )
-	      || ( name_size == 0 ) )
+	      || ( volume_name_size == 0 ) )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
+	volume_name = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * volume_name_size );
 
-	if( name == NULL )
+	if( volume_name == NULL )
 	{
 		PyErr_Format(
 		 PyExc_IOError,
-		 "%s: unable to create name.",
+		 "%s: unable to create volume name.",
 		 function );
 
 		goto on_error;
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_utf8_name(
-		  pyfsntfs_volume->volume,
-		  name,
-		  name_size,
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+		  pyfsntfs_mft_metadata_file->mft_metadata_file,
+		  volume_name,
+		  volume_name_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -936,7 +829,7 @@ PyObject *pyfsntfs_volume_get_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name.",
+		 "%s: unable to retrieve volume name.",
 		 function );
 
 		libcerror_error_free(
@@ -949,20 +842,20 @@ PyObject *pyfsntfs_volume_get_name(
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
+			 (char *) volume_name,
+			 (Py_ssize_t) volume_name_size - 1,
 			 errors );
 
 	PyMem_Free(
-	 name );
+	 volume_name );
 
 	return( string_object );
 
 on_error:
-	if( name != NULL )
+	if( volume_name != NULL )
 	{
 		PyMem_Free(
-		 name );
+		 volume_name );
 	}
 	return( NULL );
 }
@@ -970,31 +863,31 @@ on_error:
 /* Retrieves the number of file entries
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_number_of_file_entries(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_get_number_of_file_entries(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error        = NULL;
 	PyObject *integer_object        = NULL;
-	static char *function           = "pyfsntfs_volume_get_number_of_file_entries";
+	static char *function           = "pyfsntfs_mft_metadata_file_get_number_of_file_entries";
 	uint64_t number_of_file_entries = 0;
 	int result                      = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_number_of_file_entries(
-	          pyfsntfs_volume->volume,
+	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	          &number_of_file_entries,
 	          &error );
 
@@ -1022,29 +915,29 @@ PyObject *pyfsntfs_volume_get_number_of_file_entries(
 /* Retrieves a specific file entry by index
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_file_entry_by_index(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_get_file_entry_by_index(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            int file_entry_index )
 {
 	libcerror_error_t *error           = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
 	PyObject *file_entry_object        = NULL;
-	static char *function              = "pyfsntfs_volume_get_file_entry_by_index";
+	static char *function              = "pyfsntfs_mft_metadata_file_get_file_entry_by_index";
 	int result                         = 0;
 
-	if( pyfsntfs_volume == NULL )
+	if( pyfsntfs_mft_metadata_file == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid volume.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( NULL );
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_file_entry_by_index(
-	          pyfsntfs_volume->volume,
+	result = libfsntfs_mft_metadata_file_get_file_entry_by_index(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
 	          file_entry_index,
 	          &file_entry,
 	          &error );
@@ -1067,7 +960,7 @@ PyObject *pyfsntfs_volume_get_file_entry_by_index(
 	}
 	file_entry_object = pyfsntfs_file_entry_new(
 	                     file_entry,
-	                     (PyObject *) pyfsntfs_volume );
+	                     (PyObject *) pyfsntfs_mft_metadata_file );
 
 	if( file_entry_object == NULL )
 	{
@@ -1093,8 +986,8 @@ on_error:
 /* Retrieves a specific file entry
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_file_entry(
-           pyfsntfs_volume_t *pyfsntfs_volume,
+PyObject *pyfsntfs_mft_metadata_file_get_file_entry(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments,
            PyObject *keywords )
 {
@@ -1111,81 +1004,10 @@ PyObject *pyfsntfs_volume_get_file_entry(
 	{
 		return( NULL );
 	}
-	file_entry_object = pyfsntfs_volume_get_file_entry_by_index(
-	                     pyfsntfs_volume,
+	file_entry_object = pyfsntfs_mft_metadata_file_get_file_entry_by_index(
+	                     pyfsntfs_mft_metadata_file,
 	                     file_entry_index );
 
 	return( file_entry_object );
-}
-
-/* Retrieves the root directory
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_get_root_directory(
-           pyfsntfs_volume_t *pyfsntfs_volume,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error               = NULL;
-	libfsntfs_file_entry_t *root_directory = NULL;
-	PyObject *file_entry_object            = NULL;
-	static char *function                  = "pyfsntfs_volume_get_root_directory";
-	int result                             = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_volume == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid volume.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_volume_get_root_directory(
-	          pyfsntfs_volume->volume,
-	          &root_directory,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve root directory.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		goto on_error;
-	}
-	file_entry_object = pyfsntfs_file_entry_new(
-	                     root_directory,
-	                     (PyObject *) pyfsntfs_volume );
-
-	if( file_entry_object == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to create file entry object.",
-		 function );
-
-		goto on_error;
-	}
-	return( file_entry_object );
-
-on_error:
-	if( root_directory != NULL )
-	{
-		libfsntfs_file_entry_free(
-		 &root_directory,
-		 NULL );
-	}
-	return( NULL );
 }
 
