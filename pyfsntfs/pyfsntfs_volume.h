@@ -100,7 +100,7 @@ PyObject *pyfsntfs_volume_get_number_of_file_entries(
 
 PyObject *pyfsntfs_volume_get_file_entry_by_index(
            pyfsntfs_volume_t *pyfsntfs_volume,
-           int file_entry_index );
+           uint64_t file_entry_index );
 
 PyObject *pyfsntfs_volume_get_file_entry(
            pyfsntfs_volume_t *pyfsntfs_volume,
@@ -108,6 +108,10 @@ PyObject *pyfsntfs_volume_get_file_entry(
            PyObject *keywords );
 
 PyObject *pyfsntfs_volume_get_root_directory(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_file_entries(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 

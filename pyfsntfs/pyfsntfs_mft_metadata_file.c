@@ -35,6 +35,7 @@
 #include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_mft_metadata_file.h"
+#include "pyfsntfs_mft_metadata_file_entries.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
 
@@ -113,6 +114,12 @@ PyGetSetDef pyfsntfs_mft_metadata_file_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_mft_metadata_file_get_number_of_file_entries,
 	  (setter) 0,
 	  "The number of file entries.",
+	  NULL },
+
+	{ "file_entries",
+	  (getter) pyfsntfs_mft_metadata_file_get_file_entries,
+	  (setter) 0,
+	  "The file entries",
 	  NULL },
 
 	/* Sentinel */
@@ -917,7 +924,7 @@ PyObject *pyfsntfs_mft_metadata_file_get_number_of_file_entries(
  */
 PyObject *pyfsntfs_mft_metadata_file_get_file_entry_by_index(
            pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
-           int file_entry_index )
+           uint64_t file_entry_index )
 {
 	libcerror_error_t *error           = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
@@ -949,7 +956,7 @@ PyObject *pyfsntfs_mft_metadata_file_get_file_entry_by_index(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve file entry: %d.",
+		 "%s: unable to retrieve file entry: %" PRIu64 ".",
 		 function,
 		 file_entry_index );
 
@@ -1009,5 +1016,68 @@ PyObject *pyfsntfs_mft_metadata_file_get_file_entry(
 	                     file_entry_index );
 
 	return( file_entry_object );
+}
+
+/* Retrieves a file entries sequence and iterator object for the MFT metadata file entries
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_mft_metadata_file_get_file_entries(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error                   = NULL;
+	PyObject *mft_metadata_file_entries_object = NULL;
+	static char *function                      = "pyfsntfs_mft_metadata_file_get_file_entries";
+	uint64_t number_of_file_entries            = 0;
+	int result                                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_mft_metadata_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+	          pyfsntfs_mft_metadata_file->mft_metadata_file,
+	          &number_of_file_entries,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of file entries.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	mft_metadata_file_entries_object = pyfsntfs_mft_metadata_file_entries_new(
+	                                    pyfsntfs_mft_metadata_file,
+	                                    &pyfsntfs_mft_metadata_file_get_file_entry_by_index,
+	                                    number_of_file_entries );
+
+	if( mft_metadata_file_entries_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create MFT metadata file entries object.",
+		 function );
+
+		return( NULL );
+	}
+	return( mft_metadata_file_entries_object );
 }
 

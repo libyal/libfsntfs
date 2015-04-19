@@ -35,9 +35,11 @@
 #include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_mft_metadata_file.h"
+#include "pyfsntfs_mft_metadata_file_entries.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume.h"
+#include "pyfsntfs_volume_file_entries.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 LIBFSNTFS_EXTERN \
@@ -455,12 +457,14 @@ PyMODINIT_FUNC initpyfsntfs(
                 void )
 #endif
 {
-	PyObject *module                            = NULL;
-	PyTypeObject *file_entries_type_object      = NULL;
-	PyTypeObject *file_entry_type_object        = NULL;
-	PyTypeObject *mft_metadata_file_type_object = NULL;
-	PyTypeObject *volume_type_object            = NULL;
-	PyGILState_STATE gil_state                  = 0;
+	PyObject *module                                    = NULL;
+	PyTypeObject *file_entries_type_object              = NULL;
+	PyTypeObject *file_entry_type_object                = NULL;
+	PyTypeObject *mft_metadata_file_type_object         = NULL;
+	PyTypeObject *mft_metadata_file_entries_type_object = NULL;
+	PyTypeObject *volume_type_object                    = NULL;
+	PyTypeObject *volume_file_entries_type_object       = NULL;
+	PyGILState_STATE gil_state                          = 0;
 
 	/* Create the module
 	 * This function must be called before grabbing the GIL
@@ -562,6 +566,44 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	"_file_entries",
 	(PyObject *) file_entries_type_object );
+
+	/* Setup the MFT metadata file entries type object
+	 */
+	pyfsntfs_mft_metadata_file_entries_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_mft_metadata_file_entries_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_mft_metadata_file_entries_type_object );
+
+	mft_metadata_file_entries_type_object = &pyfsntfs_mft_metadata_file_entries_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"_mft_metadata_file_entries",
+	(PyObject *) mft_metadata_file_entries_type_object );
+
+	/* Setup the volume file entries type object
+	 */
+	pyfsntfs_volume_file_entries_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_file_entries_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_file_entries_type_object );
+
+	volume_file_entries_type_object = &pyfsntfs_volume_file_entries_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"_volume_file_entries",
+	(PyObject *) volume_file_entries_type_object );
 
 	PyGILState_Release(
 	 gil_state );

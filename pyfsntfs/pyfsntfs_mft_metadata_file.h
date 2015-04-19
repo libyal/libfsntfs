@@ -86,12 +86,16 @@ PyObject *pyfsntfs_mft_metadata_file_get_number_of_file_entries(
 
 PyObject *pyfsntfs_mft_metadata_file_get_file_entry_by_index(
            pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
-           int file_entry_index );
+           uint64_t file_entry_index );
 
 PyObject *pyfsntfs_mft_metadata_file_get_file_entry(
            pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
            PyObject *arguments,
            PyObject *keywords );
+
+PyObject *pyfsntfs_mft_metadata_file_get_file_entries(
+           pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file,
+           PyObject *arguments );
 
 #if defined( __cplusplus )
 }

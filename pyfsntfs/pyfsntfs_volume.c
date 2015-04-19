@@ -37,6 +37,7 @@
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume.h"
+#include "pyfsntfs_volume_file_entries.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 LIBFSNTFS_EXTERN \
@@ -127,6 +128,12 @@ PyGetSetDef pyfsntfs_volume_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_volume_get_number_of_file_entries,
 	  (setter) 0,
 	  "The number of file entries.",
+	  NULL },
+
+	{ "file_entries",
+	  (getter) pyfsntfs_volume_get_file_entries,
+	  (setter) 0,
+	  "The file entries",
 	  NULL },
 
 	/* Sentinel */
@@ -1024,7 +1031,7 @@ PyObject *pyfsntfs_volume_get_number_of_file_entries(
  */
 PyObject *pyfsntfs_volume_get_file_entry_by_index(
            pyfsntfs_volume_t *pyfsntfs_volume,
-           int file_entry_index )
+           uint64_t file_entry_index )
 {
 	libcerror_error_t *error           = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
@@ -1056,7 +1063,7 @@ PyObject *pyfsntfs_volume_get_file_entry_by_index(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve file entry: %d.",
+		 "%s: unable to retrieve file entry: %" PRIu64 ".",
 		 function,
 		 file_entry_index );
 
@@ -1187,5 +1194,68 @@ on_error:
 		 NULL );
 	}
 	return( NULL );
+}
+
+/* Retrieves a file entries sequence and iterator object for the volume file entries
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_file_entries(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error             = NULL;
+	PyObject *volume_file_entries_object = NULL;
+	static char *function                = "pyfsntfs_volume_get_file_entries";
+	uint64_t number_of_file_entries      = 0;
+	int result                           = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_number_of_file_entries(
+	          pyfsntfs_volume->volume,
+	          &number_of_file_entries,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of file entries.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	volume_file_entries_object = pyfsntfs_volume_file_entries_new(
+	                              pyfsntfs_volume,
+	                              &pyfsntfs_volume_get_file_entry_by_index,
+	                              number_of_file_entries );
+
+	if( volume_file_entries_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create volume file entries object.",
+		 function );
+
+		return( NULL );
+	}
+	return( volume_file_entries_object );
 }
 

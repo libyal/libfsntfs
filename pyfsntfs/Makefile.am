@@ -31,9 +31,11 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_libfguid.h \
 	pyfsntfs_libfsntfs.h \
 	pyfsntfs_mft_metadata_file.c pyfsntfs_mft_metadata_file.h \
+	pyfsntfs_mft_metadata_file_entries.c pyfsntfs_mft_metadata_file_entries.h \
 	pyfsntfs_python.h \
 	pyfsntfs_unused.h \
-	pyfsntfs_volume.c pyfsntfs_volume.h
+	pyfsntfs_volume.c pyfsntfs_volume.h \
+	pyfsntfs_volume_file_entries.c pyfsntfs_volume_file_entries.h
 
 pyfsntfs_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
