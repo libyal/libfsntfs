@@ -196,7 +196,6 @@ int libfsntfs_cluster_block_read_element_data(
 	static char *function                    = "libfsntfs_cluster_block_read_element_data";
 	ssize_t read_count                       = 0;
 
-	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )

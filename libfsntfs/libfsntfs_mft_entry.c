@@ -896,6 +896,7 @@ int libfsntfs_mft_entry_read_attributes(
 			      mft_entry->data,
 			      mft_entry->data_size,
 			      attributes_data_offset,
+			      flags,
 			      error );
 
 		if( read_count < 0 )
@@ -941,21 +942,25 @@ int libfsntfs_mft_entry_read_attributes(
 
 				goto on_error;
 			}
-			if( libfsntfs_attribute_list_read_from_attribute(
-			     attribute_list,
-			     io_handle,
-			     file_io_handle,
-			     attribute,
-			     error ) != 1 )
+/* TODO if flag is set mark file entry as in complete ? */
+			if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read attribute list.",
-				 function );
+				if( libfsntfs_attribute_list_read_from_attribute(
+				     attribute_list,
+				     io_handle,
+				     file_io_handle,
+				     attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read attribute list.",
+					 function );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
 		}
 		if( libfsntfs_mft_entry_append_attribute(
@@ -3522,7 +3527,7 @@ int libfsntfs_mft_entry_read_element_data(
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t element_data_offset,
      size64_t element_data_size LIBFSNTFS_ATTRIBUTE_UNUSED,
-     uint32_t element_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+     uint32_t element_flags,
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
@@ -3532,7 +3537,6 @@ int libfsntfs_mft_entry_read_element_data(
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_size )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_flags )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
 	if( (uint64_t) element_index > (uint64_t) UINT32_MAX )
@@ -3559,7 +3563,10 @@ int libfsntfs_mft_entry_read_element_data(
 
 		goto on_error;
 	}
-/* TODO set MFT only flag using element flags */
+	if( ( element_flags & LIBFSNTFS_MFT_ENTRY_FLAG_MFT_ONLY ) != 0 )
+	{
+		flags = LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY;
+	}
 	if( libfsntfs_mft_entry_read(
 	     mft_entry,
 	     io_handle,

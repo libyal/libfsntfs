@@ -301,6 +301,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
          uint8_t *mft_entry_data,
          size_t mft_entry_data_size,
          size_t mft_attribute_data_offset,
+         uint8_t flags,
          libcerror_error_t **error )
 {
 	libfsntfs_data_run_t *data_run                     = NULL;
@@ -1012,14 +1013,19 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				/* Determine the number of cluster blocks value */
 				if( data_run_value_size == 0 )
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: number of cluster blocks value size value out of bounds.",
-					 function );
-
-					goto on_error;
+					/* A empty number of cluster blocks value size seems to also
+					 * depict the end of the data runs. The data runs after do not
+					 * seem to make sense.
+					 */
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: detected empty number of cluster blocks value size.\n",
+						 function );
+					}
+#endif
+					break;
                                 }
 				if( ( mft_attribute_data_offset + data_run_value_size ) > mft_entry_data_size )
 				{
@@ -1157,20 +1163,23 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				data_run->size         = data_run_size;
 				data_run->range_flags  = range_flags;
 
-				if( libcdata_array_append_entry(
-				     internal_attribute->data_runs_array,
-				     &entry_index,
-				     (intptr_t *) data_run,
-				     error ) != 1 )
+				if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append data run to array.",
-					 function );
+					if( libcdata_array_append_entry(
+					     internal_attribute->data_runs_array,
+					     &entry_index,
+					     (intptr_t *) data_run,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+						 "%s: unable to append data run to array.",
+						 function );
 
-					goto on_error;
+						goto on_error;
+					}
 				}
 				data_run = NULL;
 

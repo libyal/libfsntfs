@@ -621,11 +621,14 @@ to the 64-bit value 0xffffffffffffdbc8.
 The first data run offset contains the absolute cluster block number where 
 successive data run offsets are relative to the last data run offset.
 
-Note that the cluster block number byte size is the first nibble when reading 
-the byte stream, but here it is represented as the upper nibble of the first 
-byte.
+[NOTE]
+The cluster block number byte size is the first nibble when reading the byte 
+stream, but here it is represented as the upper nibble of the first byte.
 
 The last runlist element is an empty value size tuple; in other words a 0 byte.
+
+[yellow-background]*Does a data run with a "number of cluster blocks value size"
+of 0 represent this as well?*
 
 For [yellow-background]*compressed* or sparse data runs, the size of the offset 
 is value 0, representing there is no offset. The attribute data flag indicates 
@@ -659,7 +662,7 @@ See `[CARRIER05]` and/or `[RUSSON05]` for examples on reading the runlist.
 | 0x00000020 | $ATTRIBUTE_LIST | Attributes list
 | 0x00000030 | $FILE_NAME | The file or directory name
 | 0x00000040 | $VOLUME_VERSION | Volume version +
-Removed in NTFS version 3.0_
+Removed in NTFS version 3.0
 | 0x00000040 | $OBJECT_ID | Object identifier +
 Introduced in NTFS version 3.0
 | 0x00000050 | $SECURITY_DESCRIPTOR | Security descriptor
@@ -2140,6 +2143,14 @@ FILE_VOLUME_QUOTAS
 
 The specified volume supports disk quotas.
 ....
+
+=== $MFT metadata file only parsing
+
+What file system metadata is missing:
+
+* Attribute lists are stored outside the $MFT
+* $I30 indexes are stored outside the $MFT
+* How to map MFT entry to parent? what if parent MFT entry has changed?
 
 :numbered!:
 [appendix]

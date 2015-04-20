@@ -48,10 +48,12 @@ int libfsntfs_mft_initialize(
      off64_t file_offset,
      size64_t file_size,
      size64_t mft_entry_size,
+     uint8_t flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_mft_initialize";
-	int segment_index     = 0;
+	static char *function  = "libfsntfs_mft_initialize";
+	int segment_index      = 0;
+	uint32_t segment_flags = 0;
 
 	if( mft == NULL )
 	{
@@ -134,13 +136,17 @@ int libfsntfs_mft_initialize(
 
 		goto on_error;
 	}
+	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) != 0 )
+	{
+		segment_flags = LIBFSNTFS_MFT_ENTRY_FLAG_MFT_ONLY;
+	}
 	if( libfdata_vector_append_segment(
 	     ( *mft )->mft_entry_vector,
 	     &segment_index,
 	     0,
 	     file_offset,
 	     file_size,
-	     0,
+	     segment_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

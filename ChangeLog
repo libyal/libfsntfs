@@ -3,6 +3,8 @@ TODO
 * pyfsntfs add is in use function for file entry
 * libfsntfs_mft_entry_read_element_data set MFT only flag using element flags
 * libfsntfs_attribute_read_from_mft handle attribute size out of bounds
+* mft metadata file parsing mark file entry as in complete if data is stored
+  outside the $MFT
 
 * fsntfsinfo
   - move UsnJrnl to separate tool?

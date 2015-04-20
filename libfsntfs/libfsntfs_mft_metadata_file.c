@@ -841,6 +841,7 @@ int libfsntfs_mft_metadata_file_open_read(
 	     internal_mft_metadata_file->io_handle->mft_offset,
 	     file_size,
 	     (size64_t) internal_mft_metadata_file->io_handle->mft_entry_size,
+	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

@@ -56,6 +56,7 @@ int libfsntfs_mft_initialize(
      off64_t file_offset,
      size64_t file_size,
      size64_t mft_entry_size,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_free(

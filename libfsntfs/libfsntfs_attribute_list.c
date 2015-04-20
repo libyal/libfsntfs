@@ -26,6 +26,7 @@
 #include "libfsntfs_attribute_list.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"

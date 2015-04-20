@@ -857,6 +857,7 @@ int libfsntfs_volume_open_read(
 	     internal_volume->io_handle->mft_offset,
 	     mft_size,
 	     (size64_t) internal_volume->io_handle->mft_entry_size,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
