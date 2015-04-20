@@ -1,5 +1,5 @@
 /*
- * File name attribute ($FILE_NAME) functions
+ * Object identifier attribute ($OBJECT_ID) functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -55,7 +55,7 @@ int libfsntfs_object_identifier_attribute_get_droid_file_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
 	{
 		libcerror_error_set(
 		 error,
@@ -155,7 +155,7 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
 	{
 		libcerror_error_set(
 		 error,
@@ -259,7 +259,7 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
 	{
 		libcerror_error_set(
 		 error,
@@ -363,7 +363,7 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
 	{
 		libcerror_error_set(
 		 error,

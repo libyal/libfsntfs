@@ -154,6 +154,7 @@ int libfsntfs_attribute_read_value(
      libfsntfs_attribute_t *attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

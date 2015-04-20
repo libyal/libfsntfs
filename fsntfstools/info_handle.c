@@ -1694,10 +1694,6 @@ int info_handle_object_identifier_attribute_fprint(
 		 "\tBirth droid domain identifier\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
 		 guid_string );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
-
 	return( 1 );
 
 on_error:

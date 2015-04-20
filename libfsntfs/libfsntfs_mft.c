@@ -415,6 +415,7 @@ int libfsntfs_mft_read_mft_entry(
      off64_t file_offset,
      uint32_t mft_entry_index,
      libfsntfs_mft_entry_t *mft_entry,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_read_mft_entry";
@@ -437,6 +438,7 @@ int libfsntfs_mft_read_mft_entry(
 	     mft->mft_entry_vector,
 	     file_offset,
 	     mft_entry_index,
+	     flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

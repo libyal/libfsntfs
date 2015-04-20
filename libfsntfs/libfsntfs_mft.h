@@ -74,6 +74,7 @@ int libfsntfs_mft_read_mft_entry(
      off64_t file_offset,
      uint32_t mft_entry_index,
      libfsntfs_mft_entry_t *mft_entry,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_utf8_volume_name_size(

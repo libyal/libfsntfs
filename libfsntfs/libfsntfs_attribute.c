@@ -511,6 +511,9 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			 "\n" );
 		}
 #endif
+/* TODO handle this more elegant */
+		internal_attribute->size &= 0x0000ffffUL;
+
 		if( ( mft_attribute_data_offset + internal_attribute->size ) > mft_entry_data_size )
 		{
 			libcerror_error_set(
@@ -1673,6 +1676,7 @@ int libfsntfs_attribute_read_value(
      libfsntfs_attribute_t *attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	libfcache_cache_t *cluster_block_cache                             = NULL;
@@ -1687,7 +1691,6 @@ int libfsntfs_attribute_read_value(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libfsntfs_bitmap_values_t *bitmap_values                           = NULL;
-	libfsntfs_file_name_values_t *file_name_values                     = NULL;
 	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
 #endif
 
@@ -2143,7 +2146,8 @@ int libfsntfs_attribute_read_value(
 			default:
 				break;
 		}
-		if( internal_attribute->value != NULL )
+		if( ( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
+		 && ( internal_attribute->value != NULL ) )
 		{
 			if( libcdata_array_get_number_of_entries(
 			     internal_attribute->data_runs_array,

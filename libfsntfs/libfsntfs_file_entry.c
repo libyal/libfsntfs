@@ -1604,6 +1604,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	     mft_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1748,6 +1749,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	     mft_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1903,6 +1905,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	     mft_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
+	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

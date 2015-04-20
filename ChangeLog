@@ -1,4 +1,9 @@
 TODO
+* pyfsntfs add is empty function for file entry
+* pyfsntfs add is in use function for file entry
+* libfsntfs_mft_entry_read_element_data set MFT only flag using element flags
+* libfsntfs_attribute_read_from_mft handle attribute size out of bounds
+
 * fsntfsinfo
   - move UsnJrnl to separate tool?
   - fix remnant data in buffer and remove work around

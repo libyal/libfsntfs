@@ -127,6 +127,7 @@ int libfsntfs_mft_entry_read(
      libfdata_vector_t *mft_entry_vector,
      off64_t file_offset,
      uint32_t mft_entry_index,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_header(
@@ -142,6 +143,7 @@ int libfsntfs_mft_entry_read_attributes(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_attributes_from_attribute_list(
@@ -150,12 +152,14 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
      libcdata_array_t *attribute_list,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_directory_entries_tree(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_number_of_attributes(
@@ -213,6 +217,7 @@ int libfsntfs_mft_entry_append_attribute(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_attribute_t *attribute,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_data_attribute(

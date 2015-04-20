@@ -417,6 +417,7 @@ int libfsntfs_index_read(
      libfsntfs_index_t *index,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_index_read";
@@ -515,6 +516,7 @@ int libfsntfs_index_read(
 		     index,
 		     io_handle,
 		     file_io_handle,
+		     flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -985,6 +987,7 @@ int libfsntfs_index_read_bitmap(
      libfsntfs_index_t *index,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error )
 {
 	libfsntfs_bitmap_values_t *bitmap_values = NULL;
@@ -1021,6 +1024,7 @@ int libfsntfs_index_read_bitmap(
 		     index->bitmap_attribute,
 		     io_handle,
 		     file_io_handle,
+		     flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

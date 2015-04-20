@@ -821,11 +821,12 @@ int libfsntfs_mft_metadata_file_open_read(
 	}
 /* TODO allow to set the values */
 /* TODO scan for signature to determine MFT entry size */
-	internal_mft_metadata_file->io_handle->mft_offset       = 0;
+	internal_mft_metadata_file->io_handle->mft_offset         = 0;
 /* TODO if not set FILE signature try scan? */
-	internal_mft_metadata_file->io_handle->mft_entry_size   = 1024;
+	internal_mft_metadata_file->io_handle->mft_entry_size     = 1024;
 /* TODO if not set INDX signature try scan? */
-	internal_mft_metadata_file->io_handle->index_entry_size = 4096;
+	internal_mft_metadata_file->io_handle->index_entry_size   = 4096;
+	internal_mft_metadata_file->io_handle->cluster_block_size = 4096;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -871,6 +872,7 @@ int libfsntfs_mft_metadata_file_open_read(
 	     internal_mft_metadata_file->io_handle->mft_offset,
 	     0,
 	     mft_entry,
+	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

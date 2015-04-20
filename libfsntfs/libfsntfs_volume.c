@@ -888,6 +888,7 @@ int libfsntfs_volume_open_read(
 	     internal_volume->io_handle->mft_offset,
 	     0,
 	     mft_entry,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1359,6 +1360,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 	     mft_entry,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1460,6 +1462,7 @@ int libfsntfs_volume_get_root_directory(
 	     mft_entry,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1585,6 +1588,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		     mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1804,6 +1808,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		     mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

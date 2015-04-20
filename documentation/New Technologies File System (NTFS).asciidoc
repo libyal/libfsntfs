@@ -511,6 +511,19 @@ See section: <<mft_attribute_data_flags,MFT attribute data flags>>
 [yellow-background]*An unique identifier to distinguish between attributes that contain segmented data.*
 |===
 
+===== Notes
+[yellow-background]*Size (or record length) upper 2 bytes overloaded or remnant data?*
+....
+type					: 0x000000a0 ($INDEX_ALLOCATION)
+size					: 458832 (0x70050)
+non resident flag			: 0x01
+name size				: 4
+name offset				: 64
+data flags				: 0x0000
+
+identifier				: 4
+....
+
 ===== [[mft_attribute_data_flags]]MFT attribute data flags
 
 [cols="1,1,5",options="header"]

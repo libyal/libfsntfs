@@ -510,7 +510,7 @@ int libfsntfs_standard_information_values_read(
 			 standard_information_values->owner_identifier );
 
 			libcnotify_printf(
-			 "%s: security identifier\t\t: %" PRIu32 "\n",
+			 "%s: security identifier\t\t\t: %" PRIu32 "\n",
 			 function,
 			 standard_information_values->security_identifier );
 
