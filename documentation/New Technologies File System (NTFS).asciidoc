@@ -659,7 +659,7 @@ See `[CARRIER05]` and/or `[RUSSON05]` for examples on reading the runlist.
 | 0x00000020 | $ATTRIBUTE_LIST | Attributes list
 | 0x00000030 | $FILE_NAME | The file or directory name
 | 0x00000040 | $VOLUME_VERSION | Volume version +
-_Removed in NTFS version 3.0
+Removed in NTFS version 3.0_
 | 0x00000040 | $OBJECT_ID | Object identifier +
 Introduced in NTFS version 3.0
 | 0x00000050 | $SECURITY_DESCRIPTOR | Security descriptor
