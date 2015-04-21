@@ -101,6 +101,27 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the size of the file entry data." },
 
+	{ "get_file_reference",
+	  (PyCFunction) pyfsntfs_file_entry_get_file_reference,
+	  METH_NOARGS,
+	  "get_file_reference() -> Integer\n"
+	  "\n"
+	  "Returns the file reference, a combination of MFT entry index and sequence number." },
+
+	{ "get_base_record_file_reference",
+	  (PyCFunction) pyfsntfs_file_entry_get_base_record_file_reference,
+	  METH_NOARGS,
+	  "get_base_record_file_reference() -> Integer\n"
+	  "\n"
+	  "Returns the base record file reference, a combination of MFT entry index and sequence number." },
+
+	{ "get_journal_sequence_number",
+	  (PyCFunction) pyfsntfs_file_entry_get_journal_sequence_number,
+	  METH_NOARGS,
+	  "get_journal_sequence_number() -> Integer\n"
+	  "\n"
+	  "Returns the journal sequence number." },
+
 	{ "get_creation_time",
 	  (PyCFunction) pyfsntfs_file_entry_get_creation_time,
 	  METH_NOARGS,
@@ -190,6 +211,24 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_size,
 	  (setter) 0,
 	  "The size of the file entry data.",
+	  NULL },
+
+	{ "file_reference",
+	  (getter) pyfsntfs_file_entry_get_file_reference,
+	  (setter) 0,
+	  "The reference, a combination of MFT entry index and sequence number.",
+	  NULL },
+
+	{ "base_record_file_reference",
+	  (getter) pyfsntfs_file_entry_get_base_record_file_reference,
+	  (setter) 0,
+	  "The base record reference, a combination of MFT entry index and sequence number.",
+	  NULL },
+
+	{ "journal_sequence_number",
+	  (getter) pyfsntfs_file_entry_get_journal_sequence_number,
+	  (setter) 0,
+	  "The journal sequence number.",
 	  NULL },
 
 	{ "creation_time",
@@ -926,6 +965,162 @@ PyObject *pyfsntfs_file_entry_get_size(
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  (uint64_t) size );
+
+	return( integer_object );
+}
+
+/* Retrieves the file reference
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_file_reference";
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_file_reference(
+	          pyfsntfs_file_entry->file_entry,
+	          &file_reference,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  file_reference );
+
+	return( integer_object );
+}
+
+/* Retrieves the base record file reference
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_base_record_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_base_record_file_reference";
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_base_record_file_reference(
+	          pyfsntfs_file_entry->file_entry,
+	          &file_reference,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve base record file reference.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  file_reference );
+
+	return( integer_object );
+}
+
+/* Retrieves the journal sequence number
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_journal_sequence_number(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error         = NULL;
+	PyObject *integer_object         = NULL;
+	static char *function            = "pyfsntfs_file_entry_get_journal_sequence_number";
+	uint64_t journal_sequence_number = 0;
+	int result                       = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_journal_sequence_number(
+	          pyfsntfs_file_entry->file_entry,
+	          &journal_sequence_number,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve journal sequence number.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  journal_sequence_number );
 
 	return( integer_object );
 }

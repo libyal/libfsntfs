@@ -1,9 +1,6 @@
 TODO
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
-  - add support for index and sequence
-  - add support for journal sequence number
-  - add support for base record file reference
   - add is empty function
   - add in use function
   - add support for data streams

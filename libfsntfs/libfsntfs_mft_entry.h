@@ -182,6 +182,16 @@ int libfsntfs_mft_entry_is_allocated(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_get_file_reference(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_get_base_record_file_reference(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_get_journal_sequence_number(
      libfsntfs_mft_entry_t *mft_entry,
      uint64_t *journal_sequence_number,

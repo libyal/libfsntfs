@@ -86,6 +86,18 @@ PyObject *pyfsntfs_file_entry_get_size(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_base_record_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_journal_sequence_number(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_creation_time(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

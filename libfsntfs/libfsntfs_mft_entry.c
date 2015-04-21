@@ -1766,6 +1766,81 @@ int libfsntfs_mft_entry_is_allocated(
 	return( 0 );
 }
 
+/* Retrieves the file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_get_file_reference(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_file_reference";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+	*file_reference  = (uint64_t) mft_entry->sequence << 48;
+	*file_reference |= mft_entry->index;
+
+	return( 1 );
+}
+
+/* Retrieves the base record file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_get_base_record_file_reference(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_base_record_file_reference";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+	*file_reference = mft_entry->base_record_file_reference;
+
+	return( 1 );
+}
+
 /* Retrieves the journal sequence number
  * Returns 1 if successful or -1 on error
  */
