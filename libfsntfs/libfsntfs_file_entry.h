@@ -94,6 +94,12 @@ int libfsntfs_file_entry_is_allocated(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_journal_sequence_number(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *journal_sequence_number,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
      uint64_t *creation_time,

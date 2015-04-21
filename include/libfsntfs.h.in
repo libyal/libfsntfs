@@ -388,11 +388,20 @@ int libfsntfs_file_entry_free(
      libfsntfs_error_t **error );
 
 /* Determines if the file entry is allocated
- * Returns 1 if allocated, 0 if not  or -1 on error
+ * Returns 1 if allocated, 0 if not or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the journal sequence number
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_journal_sequence_number(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *journal_sequence_number,
      libfsntfs_error_t **error );
 
 /* Retrieves the creation date and time

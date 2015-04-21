@@ -59,6 +59,22 @@ struct libfsntfs_mft_entry
 	 */
 	uint32_t index;
 
+	/* The sequence
+	 */
+	uint16_t sequence;
+
+	/* The journal sequence number
+	 */
+	uint64_t journal_sequence_number;
+
+	/* The reference count
+	 */
+	uint16_t reference_count;
+
+	/* The base record file reference
+	 */
+	uint64_t base_record_file_reference;
+
 	/* The used entry size 
 	 */
 	uint16_t used_entry_size;
@@ -160,6 +176,15 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_is_allocated(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_get_journal_sequence_number(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *journal_sequence_number,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_number_of_attributes(

@@ -234,7 +234,7 @@ int libfsntfs_file_entry_free(
 }
 
 /* Determines if the file entry is allocated
- * Returns 1 if allocated, 0 if not  or -1 on error
+ * Returns 1 if allocated, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
@@ -242,6 +242,7 @@ int libfsntfs_file_entry_is_allocated(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_is_allocated";
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -256,23 +257,63 @@ int libfsntfs_file_entry_is_allocated(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
+	result = libfsntfs_mft_entry_is_allocated(
+	          internal_file_entry->mft_entry,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry is allocated.",
 		 function );
 
 		return( -1 );
 	}
-/* TODO change 0x0001 to definition */
-	if( ( internal_file_entry->mft_entry->flags & 0x0001 ) != 0 )
+	return( result );
+}
+
+/* Retrieves the journal sequence number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_entry_get_journal_sequence_number(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *journal_sequence_number,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_journal_sequence_number";
+
+	if( file_entry == NULL )
 	{
-		return( 1 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
 	}
-	return( 0 );
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( libfsntfs_mft_entry_get_journal_sequence_number(
+	     internal_file_entry->mft_entry,
+	     journal_sequence_number,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve journal sequence number from MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Retrieves the creation date and time

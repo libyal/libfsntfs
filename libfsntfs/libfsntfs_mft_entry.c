@@ -496,6 +496,18 @@ int libfsntfs_mft_entry_read_header(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->number_of_fixup_values,
 	 number_of_fixup_values );
 
+	byte_stream_copy_to_uint64_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->journal_sequence_number,
+	 mft_entry->journal_sequence_number );
+
+	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->sequence,
+	 mft_entry->sequence );
+
+	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->reference_count,
+	 mft_entry->reference_count );
+
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->attributes_offset,
 	 mft_entry->attributes_offset );
@@ -511,6 +523,10 @@ int libfsntfs_mft_entry_read_header(
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->total_entry_size,
 	 total_entry_size );
+
+	byte_stream_copy_to_uint64_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->base_record_file_reference,
+	 mft_entry->base_record_file_reference );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->index,
@@ -537,29 +553,20 @@ int libfsntfs_mft_entry_read_header(
 		 function,
 		 number_of_fixup_values );
 
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->journal_sequence_number,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: journal sequence number\t\t\t: %" PRIu64 "\n",
 		 function,
-		 value_64bit );
+		 mft_entry->journal_sequence_number );
 
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->sequence,
-		 value_16bit );
 		libcnotify_printf(
 		 "%s: sequence\t\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 value_16bit );
+		 mft_entry->sequence );
 
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->reference_count,
-		 value_16bit );
 		libcnotify_printf(
 		 "%s: reference count\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 value_16bit );
+		 mft_entry->reference_count );
 
 		libcnotify_printf(
 		 "%s: attributes offset\t\t\t\t: %" PRIu16 "\n",
@@ -585,14 +592,11 @@ int libfsntfs_mft_entry_read_header(
 		 function,
 		 total_entry_size );
 
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->base_record_file_reference,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: base record file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
-		 value_64bit & 0xffffffffffffUL,
-		 value_64bit >> 48 );
+		 mft_entry->base_record_file_reference & 0xffffffffffffUL,
+		 mft_entry->base_record_file_reference >> 48 );
 
 		byte_stream_copy_to_uint16_little_endian(
 		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->first_available_attribute_identifier,
@@ -1732,6 +1736,71 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Determines if the MFT entry is allocated
+ * Returns 1 if allocated, 0 if not or -1 on error
+ */
+int libfsntfs_mft_entry_is_allocated(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_is_allocated";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO change 0x0001 to definition */
+	if( ( mft_entry->flags & 0x0001 ) != 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Retrieves the journal sequence number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_get_journal_sequence_number(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t *journal_sequence_number,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_journal_sequence_number";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( journal_sequence_number == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid journal sequence number.",
+		 function );
+
+		return( -1 );
+	}
+	*journal_sequence_number = mft_entry->journal_sequence_number;
+
+	return( 1 );
 }
 
 /* Retrieves the number of attributes
