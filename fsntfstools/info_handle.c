@@ -2856,6 +2856,77 @@ on_error:
 	return( -1 );
 }
 
+/* Prints the MFT entries information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_mft_entries_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_error_t **error )
+{
+	static char *function           = "info_handle_mft_entries_fprint";
+	uint64_t file_entry_index       = 0;
+	uint64_t number_of_file_entries = 0;
+	int result                      = 0;
+
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+		result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+		          info_handle->input_mft_metadata_file,
+		          &number_of_file_entries,
+		          error );
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_number_of_file_entries(
+		          info_handle->input_volume,
+		          &number_of_file_entries,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of file entries.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_file_entries > (uint64_t) INT64_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid nubmer of file entries value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	for( file_entry_index = 0;
+	     file_entry_index < number_of_file_entries;
+	     file_entry_index++ )
+	{
+		if( info_handle_mft_entry_fprint(
+		     info_handle,
+		     file_entry_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print MFT entry: %" PRIu64 ".",
+			 function,
+			 file_entry_index );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* Prints the system hierarchy entry information
  * Returns 1 if successful or -1 on error
  */

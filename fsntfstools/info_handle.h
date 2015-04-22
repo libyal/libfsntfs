@@ -137,6 +137,10 @@ int info_handle_mft_entry_fprint(
      uint64_t mft_entry_index,
      libfsntfs_error_t **error );
 
+int info_handle_mft_entries_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_error_t **error );
+
 int info_handle_file_system_hierarchy_fprint(
      info_handle_t *info_handle,
      libfsntfs_error_t **error );

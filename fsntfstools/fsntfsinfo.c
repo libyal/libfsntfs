@@ -68,7 +68,8 @@ void usage_fprint(
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
-	fprintf( stream, "\t-E:     show information about a specific MFT entry index\n" );
+	fprintf( stream, "\t-E:     show information about a specific MFT entry index\n"
+	                 "\t        or \"all\"." );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-H:     shows the file system hierarcy\n" );
 	fprintf( stream, "\t-o:     specify the volume offset\n" );
@@ -311,27 +312,47 @@ int main( int argc, char * const argv[] )
 			string_length = libcstring_system_string_length(
 					 option_mft_entry_index );
 
-			if( libcsystem_string_decimal_copy_to_64_bit(
-			     option_mft_entry_index,
-			     string_length + 1,
-			     &mft_entry_index,
-			     &error ) != 1 )
+			if( ( string_length == 3 )
+			 && ( libcstring_system_string_compare(
+			       option_mft_entry_index,
+			       _LIBCSTRING_SYSTEM_STRING( "all" ),
+			       3 ) == 0 ) )
+			{
+				if( info_handle_mft_entries_fprint(
+				     fsntfsinfo_info_handle,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to print MFT entries.\n" );
+
+					goto on_error;
+				}
+			}
+			else if( libcsystem_string_decimal_copy_to_64_bit(
+			          option_mft_entry_index,
+			          string_length + 1,
+			          &mft_entry_index,
+			          &error ) == 1 )
+			{
+				if( info_handle_mft_entry_fprint(
+				     fsntfsinfo_info_handle,
+				     mft_entry_index,
+				     &error ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unable to print MFT entry: %" PRIu64 ".\n",
+					 mft_entry_index );
+
+					goto on_error;
+				}
+			}
+			else
 			{
 				fprintf(
 				 stderr,
 				 "Unable to copy MFT entry index string to 64-bit decimal.\n" );
-
-				goto on_error;
-			}
-			if( info_handle_mft_entry_fprint(
-			     fsntfsinfo_info_handle,
-			     mft_entry_index,
-			     &error ) != 1 )
-			{
-				fprintf(
-				 stderr,
-				 "Unable to print MFT entry: %" PRIu64 ".\n",
-				 mft_entry_index );
 
 				goto on_error;
 			}

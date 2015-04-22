@@ -1,4 +1,8 @@
 TODO
+* file entry $MFT scan
+  - mark ignored attribute list
+  - mark ignored data stream
+  - mark ignored index
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
@@ -148,6 +152,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20150422
+* worked on fsntfsinfo
 
 20150420
 * worked on format support
