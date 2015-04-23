@@ -27,6 +27,7 @@
 #endif
 
 #include "pyfsntfs.h"
+#include "pyfsntfs_attribute.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
 #include "pyfsntfs_file_entry.h"
@@ -458,6 +459,7 @@ PyMODINIT_FUNC initpyfsntfs(
 #endif
 {
 	PyObject *module                                    = NULL;
+	PyTypeObject *attribute_type_object                 = NULL;
 	PyTypeObject *file_entries_type_object              = NULL;
 	PyTypeObject *file_entry_type_object                = NULL;
 	PyTypeObject *mft_metadata_file_type_object         = NULL;
@@ -547,6 +549,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	"file_entry",
 	(PyObject *) file_entry_type_object );
+
+	/* Setup the attribute type object
+	 */
+	pyfsntfs_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"attribute",
+	(PyObject *) attribute_type_object );
 
 	/* Setup the file entries type object
 	 */

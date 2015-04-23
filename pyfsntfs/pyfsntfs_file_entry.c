@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #endif
 
+#include "pyfsntfs_attribute.h"
 #include "pyfsntfs_datetime.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
@@ -192,6 +193,22 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the name of the file entry." },
 
+	/* Functions to access the attributes */
+
+	{ "get_number_of_attributes",
+	  (PyCFunction) pyfsntfs_file_entry_get_number_of_attributes,
+	  METH_NOARGS,
+	  "get_number_of_attributes() -> Integer\n"
+	  "\n"
+	  "Retrieves the number of attributes." },
+
+	{ "get_attribute",
+	  (PyCFunction) pyfsntfs_file_entry_get_attribute,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_attribute(attribute_index) -> Object\n"
+	  "\n"
+	  "Retrieves a specific attribute." },
+
 	/* Functions to access the sub file entries */
 
 	{ "get_number_of_sub_file_entries",
@@ -266,6 +283,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_name,
 	  (setter) 0,
 	  "The name of the file entry.",
+	  NULL },
+
+	{ "number_of_attributes",
+	  (getter) pyfsntfs_file_entry_get_number_of_attributes,
+	  (setter) 0,
+	  "The number of attributes.",
 	  NULL },
 
 	{ "number_of_sub_file_entries",
@@ -379,7 +402,7 @@ PyTypeObject pyfsntfs_file_entry_type_object = {
 	0
 };
 
-/* Creates a new pyfsntfs file_entry object
+/* Creates a new pyfsntfs file entry object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_new(
@@ -438,7 +461,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a file_entry object
+/* Intializes a file entry object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_file_entry_init(
@@ -455,14 +478,14 @@ int pyfsntfs_file_entry_init(
 
 		return( -1 );
 	}
-	/* Make sure libfsntfs file_entry is set to NULL
+	/* Make sure libfsntfs file entry is set to NULL
 	 */
 	pyfsntfs_file_entry->file_entry = NULL;
 
 	return( 0 );
 }
 
-/* Frees a file_entry object
+/* Frees a file entry object
  */
 void pyfsntfs_file_entry_free(
       pyfsntfs_file_entry_t *pyfsntfs_file_entry )
@@ -485,7 +508,7 @@ void pyfsntfs_file_entry_free(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid file_entry - missing libfsntfs file_entry.",
+		 "%s: invalid file entry - missing libfsntfs file_entry.",
 		 function );
 
 		return;
@@ -693,7 +716,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry - missing libfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry - missing libfsntfs file_entry.",
 		 function );
 
 		return( NULL );
@@ -828,7 +851,7 @@ PyObject *pyfsntfs_file_entry_seek_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry - missing libfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry - missing libfsntfs file_entry.",
 		 function );
 
 		return( NULL );
@@ -1772,6 +1795,185 @@ on_error:
 		 name );
 	}
 	return( NULL );
+}
+
+/* Retrieves the number of attributes
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_number_of_attributes(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_number_of_attributes";
+	int number_of_attributes = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          pyfsntfs_file_entry->file_entry,
+	          &number_of_attributes,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of attributes.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_attributes );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_attributes );
+#endif
+	return( integer_object );
+}
+
+/* Retrieves a specific attribute by index
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_attribute_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int attribute_index )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_attribute_t *attribute = NULL;
+	PyObject *attribute_object       = NULL;
+	static char *function            = "pyfsntfs_file_entry_get_attribute_by_index";
+	uint32_t attribute_type          = 0;
+	int result                       = 0;
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          pyfsntfs_file_entry->file_entry,
+	          attribute_index,
+	          &attribute,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_attribute_get_type(
+	          attribute,
+	          &attribute_type,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve type.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+/* TODO create attribute specific object types */
+	attribute_object = pyfsntfs_attribute_new(
+	                    attribute,
+	                    pyfsntfs_file_entry );
+
+	if( attribute_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create attribute object.",
+		 function );
+
+		goto on_error;
+	}
+	return( attribute_object );
+
+on_error:
+	if( attribute != NULL )
+	{
+		libfsntfs_attribute_free(
+		 &attribute,
+		 NULL );
+	}
+	return( NULL );
+}
+
+/* Retrieves a specific attribute
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_attribute(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *attribute_object  = NULL;
+	static char *keyword_list[] = { "attribute_index", NULL };
+	int attribute_index         = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i",
+	     keyword_list,
+	     &attribute_index ) == 0 )
+	{
+		return( NULL );
+	}
+	attribute_object = pyfsntfs_file_entry_get_attribute_by_index(
+	                    pyfsntfs_file_entry,
+	                    attribute_index );
+
+	return( attribute_object );
 }
 
 /* Retrieves the number of sub file entries

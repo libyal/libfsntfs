@@ -138,6 +138,19 @@ PyObject *pyfsntfs_file_entry_get_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_number_of_attributes(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_attribute_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int attribute_index );
+
+PyObject *pyfsntfs_file_entry_get_attribute(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
