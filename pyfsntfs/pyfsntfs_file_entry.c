@@ -101,6 +101,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the size of the file entry data." },
 
+	{ "has_default_data_stream",
+	  (PyCFunction) pyfsntfs_file_entry_has_default_data_stream,
+	  METH_NOARGS,
+	  "has_default_data_stream() -> Boolean\n"
+	  "\n"
+	  "Determines if the file entry has a default data stream." },
+
 	{ "get_file_reference",
 	  (PyCFunction) pyfsntfs_file_entry_get_file_reference,
 	  METH_NOARGS,
@@ -967,6 +974,62 @@ PyObject *pyfsntfs_file_entry_get_size(
 	                  (uint64_t) size );
 
 	return( integer_object );
+}
+
+/* Determines if the file entry has the default data stream
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_has_default_data_stream(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_file_entry_has_default_data_stream";
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          pyfsntfs_file_entry->file_entry,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if file entry has default data stream.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
 }
 
 /* Retrieves the file reference

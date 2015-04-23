@@ -3,9 +3,15 @@ TODO
   - mark ignored attribute list
   - mark ignored data stream
   - mark ignored index
+* pyfsntfs volume
+  - add get file entry by path (get_file_entry_by_path)
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
+  - add has_i30_index_stream function
+  - add has_reparse_point function
+  - add has_symbolic_link function
+  - add is_in_use function
   - add in use function
   - add support for data streams
   - how to handle file-like object functions for non-data file entry
@@ -19,6 +25,7 @@ TODO
   - fix remnant data in buffer and remove work around
 * implement UsnJrnl parsing
   - move UsnJrnl parsing into library ?
+  - add support for $UsnJrnl:$J file parsing
 * data streams return the offset ranges?
 * add stand-alone MTF parsing support
 * change MFT entry flags value checks to named definitions
@@ -152,6 +159,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20150423
+* worked on Python bindings
 
 20150422
 * worked on fsntfsinfo

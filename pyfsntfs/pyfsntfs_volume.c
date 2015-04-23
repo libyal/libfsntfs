@@ -112,6 +112,13 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 	  "\n"
 	  "Retrieves the root directory." },
 
+	{ "get_file_entry_by_path",
+	  (PyCFunction) pyfsntfs_volume_get_file_entry_by_path,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_file_entry_by_path(path) -> Object or None\n"
+	  "\n"
+	  "Retrieves a file entry specified by the path." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -1257,5 +1264,101 @@ PyObject *pyfsntfs_volume_get_file_entries(
 		return( NULL );
 	}
 	return( volume_file_entries_object );
+}
+
+/* Retrieves the file entry specified by the path
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_file_entry_by_path(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	libcerror_error_t *error           = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	PyObject *file_entry_object        = NULL;
+	char *path                         = NULL;
+	static char *keyword_list[]        = { "path", NULL };
+	static char *function              = "pyfsntfs_volume_get_file_entry_by_path";
+	size_t path_length                 = 0;
+	int result                         = 0;
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "s",
+	     keyword_list,
+	     &path ) == 0 )
+	{
+		goto on_error;
+	}
+	path_length = libcstring_narrow_string_length(
+	               path );
+
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	           pyfsntfs_volume->volume,
+	           (uint8_t *) path,
+	           path_length,
+	           &file_entry,
+	           &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file entry.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	/* Check if the file entry is present
+	 */
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	file_entry_object = pyfsntfs_file_entry_new(
+	                     file_entry,
+	                     (PyObject *) pyfsntfs_volume );
+
+	if( file_entry_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file entry object.",
+		 function );
+
+		goto on_error;
+	}
+	return( file_entry_object );
+
+on_error:
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( NULL );
 }
 
