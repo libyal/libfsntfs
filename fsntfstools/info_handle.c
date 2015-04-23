@@ -2663,6 +2663,7 @@ int info_handle_mft_entry_fprint(
 	libfsntfs_attribute_t *attribute   = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
 	static char *function              = "info_handle_mft_entry_fprint";
+	uint64_t value_64bit               = 0;
 	int attribute_index                = 0;
 	int is_allocated                   = 0;
 	int number_of_attributes           = 0;
@@ -2750,6 +2751,65 @@ int info_handle_mft_entry_fprint(
 	fprintf(
 	 info_handle->notify_stream,
 	 "\n" );
+
+	if( libfsntfs_file_entry_get_file_reference(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+	 value_64bit & 0xffffffffffffUL,
+	 value_64bit >> 48 );
+
+	if( libfsntfs_file_entry_get_base_record_file_reference(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve base record_file reference.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tBase record file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+	 value_64bit & 0xffffffffffffUL,
+	 value_64bit >> 48 );
+
+	if( libfsntfs_file_entry_get_journal_sequence_number(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve journal sequence number.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tJournal sequence number\t\t: %" PRIu64 "\n",
+	 value_64bit );
 
 	if( libfsntfs_file_entry_get_number_of_attributes(
 	     file_entry,
