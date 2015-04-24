@@ -233,6 +233,10 @@
 				RelativePath="..\..\pyfsntfs\pyfsntfs_volume_file_entries.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_volume_name_attribute.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -333,6 +337,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_volume_file_entries.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_volume_name_attribute.h"
 				>
 			</File>
 		</Filter>

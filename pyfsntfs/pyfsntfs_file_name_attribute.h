@@ -36,7 +36,7 @@ extern "C" {
 extern PyMethodDef pyfsntfs_file_name_attribute_object_methods[];
 extern PyTypeObject pyfsntfs_file_name_attribute_type_object;
 
-PyObject *pyfsntfs_file_name_attribute_get_cached_file_size(
+PyObject *pyfsntfs_file_name_attribute_get_parent_file_reference(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
@@ -69,6 +69,10 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time(
            PyObject *arguments );
 
 PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_name_attribute_get_name(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 

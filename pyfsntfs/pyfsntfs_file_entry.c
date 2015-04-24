@@ -38,6 +38,7 @@
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
+#include "pyfsntfs_volume_name_attribute.h"
 
 PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 
@@ -241,13 +242,13 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	{ "file_reference",
 	  (getter) pyfsntfs_file_entry_get_file_reference,
 	  (setter) 0,
-	  "The reference, a combination of MFT entry index and sequence number.",
+	  "The file reference, a combination of MFT entry index and sequence number.",
 	  NULL },
 
 	{ "base_record_file_reference",
 	  (getter) pyfsntfs_file_entry_get_base_record_file_reference,
 	  (setter) 0,
-	  "The base record reference, a combination of MFT entry index and sequence number.",
+	  "The base record file reference, a combination of MFT entry index and sequence number.",
 	  NULL },
 
 	{ "journal_sequence_number",
@@ -1932,6 +1933,10 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
 			type_object = &pyfsntfs_standard_information_attribute_type_object;
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME:
+			type_object = &pyfsntfs_volume_name_attribute_type_object;
 			break;
 
 		default:

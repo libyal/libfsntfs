@@ -44,6 +44,7 @@
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume.h"
 #include "pyfsntfs_volume_file_entries.h"
+#include "pyfsntfs_volume_name_attribute.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 LIBFSNTFS_EXTERN \
@@ -472,6 +473,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyTypeObject *standard_information_attribute_type_object = NULL;
 	PyTypeObject *volume_type_object                         = NULL;
 	PyTypeObject *volume_file_entries_type_object            = NULL;
+	PyTypeObject *volume_name_attribute_type_object          = NULL;
 	PyGILState_STATE gil_state                               = 0;
 
 	/* Create the module
@@ -553,8 +555,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"file_entry",
-	(PyObject *) file_entry_type_object );
+	 "file_entry",
+	 (PyObject *) file_entry_type_object );
 
 	/* Setup the attribute type object
 	 */
@@ -572,8 +574,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"attribute",
-	(PyObject *) attribute_type_object );
+	 "attribute",
+	 (PyObject *) attribute_type_object );
 
 	/* Setup the $FILE_NAME attribute type object
 	 */
@@ -591,8 +593,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"file_name_attribute",
-	(PyObject *) file_name_attribute_type_object );
+	 "file_name_attribute",
+	 (PyObject *) file_name_attribute_type_object );
 
 	/* Setup the $STANDARD_INFORMATION attribute type object
 	 */
@@ -610,8 +612,27 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"standard_information_attribute",
-	(PyObject *) standard_information_attribute_type_object );
+	 "standard_information_attribute",
+	 (PyObject *) standard_information_attribute_type_object );
+
+	/* Setup the $VOLUME_NAME attribute type object
+	 */
+	pyfsntfs_volume_name_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_name_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_name_attribute_type_object );
+
+	volume_name_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "volume_name_attribute",
+	 (PyObject *) volume_name_attribute_type_object );
 
 	/* Setup the attributes type object
 	 */
@@ -629,8 +650,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"_attributes",
-	(PyObject *) attributes_type_object );
+	 "_attributes",
+	 (PyObject *) attributes_type_object );
 
 	/* Setup the file entries type object
 	 */
@@ -648,8 +669,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"_file_entries",
-	(PyObject *) file_entries_type_object );
+	 "_file_entries",
+	 (PyObject *) file_entries_type_object );
 
 	/* Setup the MFT metadata file entries type object
 	 */
@@ -667,8 +688,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"_mft_metadata_file_entries",
-	(PyObject *) mft_metadata_file_entries_type_object );
+	 "_mft_metadata_file_entries",
+	 (PyObject *) mft_metadata_file_entries_type_object );
 
 	/* Setup the volume file entries type object
 	 */
@@ -686,8 +707,8 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	"_volume_file_entries",
-	(PyObject *) volume_file_entries_type_object );
+	 "_volume_file_entries",
+	 (PyObject *) volume_file_entries_type_object );
 
 	PyGILState_Release(
 	 gil_state );

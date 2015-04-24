@@ -38,17 +38,17 @@ PyMethodDef pyfsntfs_attribute_object_methods[] = {
 
 	/* Functions to access the attribute values */
 
-	{ "get_type",
+	{ "get_attribute_type",
 	  (PyCFunction) pyfsntfs_attribute_get_type,
 	  METH_NOARGS,
-	  "get_type() -> Integer\n"
+	  "get_attribute_type() -> Integer\n"
 	  "\n"
-	  "Retrieves the type." },
+	  "Retrieves the attribute type." },
 
-	{ "get_name",
+	{ "get_attribute_name",
 	  (PyCFunction) pyfsntfs_attribute_get_name,
 	  METH_NOARGS,
-	  "get_name() -> Unicode string or None\n"
+	  "get_attribute_name() -> Unicode string or None\n"
 	  "\n"
 	  "Returns the name of the attribute." },
 
@@ -58,13 +58,13 @@ PyMethodDef pyfsntfs_attribute_object_methods[] = {
 
 PyGetSetDef pyfsntfs_attribute_object_get_set_definitions[] = {
 
-	{ "type",
+	{ "attribute_type",
 	  (getter) pyfsntfs_attribute_get_type,
 	  (setter) 0,
 	  "The attribute type.",
 	  NULL },
 
-	{ "name",
+	{ "attribute_name",
 	  (getter) pyfsntfs_attribute_get_name,
 	  (setter) 0,
 	  "The name of the attribute.",

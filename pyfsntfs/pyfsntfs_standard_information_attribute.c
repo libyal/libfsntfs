@@ -96,6 +96,27 @@ PyMethodDef pyfsntfs_standard_information_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the entry modification date and time as a 64-bit integer containing a FILETIME value." },
 
+	{ "get_owner_identifier",
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_owner_identifier,
+	  METH_NOARGS,
+	  "get_owner_identifier() -> Integer\n"
+	  "\n"
+	  "Returns the owner identifier." },
+
+	{ "get_security_identifier",
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_security_identifier,
+	  METH_NOARGS,
+	  "get_security_identifier() -> Integer\n"
+	  "\n"
+	  "Returns the security identifier." },
+
+	{ "get_update_sequence_number",
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_update_sequence_number,
+	  METH_NOARGS,
+	  "get_update_sequence_number() -> Integer\n"
+	  "\n"
+	  "Returns the update sequence number." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -124,6 +145,24 @@ PyGetSetDef pyfsntfs_standard_information_attribute_object_get_set_definitions[]
 	  (getter) pyfsntfs_standard_information_attribute_get_entry_modification_time,
 	  (setter) 0,
 	  "The entry modification date and time.",
+	  NULL },
+
+	{ "owner_identifier",
+	  (getter) pyfsntfs_standard_information_attribute_get_owner_identifier,
+	  (setter) 0,
+	  "The owner identifier.",
+	  NULL },
+
+	{ "security_identifier",
+	  (getter) pyfsntfs_standard_information_attribute_get_security_identifier,
+	  (setter) 0,
+	  "The security identifier.",
+	  NULL },
+
+	{ "update_sequence_number",
+	  (getter) pyfsntfs_standard_information_attribute_get_update_sequence_number,
+	  (setter) 0,
+	  "The update sequence number.",
 	  NULL },
 
 	/* Sentinel */
@@ -693,6 +732,162 @@ PyObject *pyfsntfs_standard_information_attribute_get_entry_modification_time_as
 	}
 	integer_object = pyfsntfs_integer_signed_new_from_64bit(
 	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the owner identifier
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error  = NULL;
+	PyObject *integer_object  = NULL;
+	static char *function     = "pyfsntfs_standard_information_attribute_get_owner_identifier";
+	uint32_t owner_identifier = 0;
+	int result                = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_standard_information_attribute_get_owner_identifier(
+	          pyfsntfs_attribute->attribute,
+	          &owner_identifier,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve owner identifier.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) owner_identifier );
+
+	return( integer_object );
+}
+
+/* Retrieves the security identifier
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error     = NULL;
+	PyObject *integer_object     = NULL;
+	static char *function        = "pyfsntfs_standard_information_attribute_get_security_identifier";
+	uint32_t security_identifier = 0;
+	int result                   = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_standard_information_attribute_get_security_identifier(
+	          pyfsntfs_attribute->attribute,
+	          &security_identifier,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve security identifier.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) security_identifier );
+
+	return( integer_object );
+}
+
+/* Retrieves the update sequence number
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_standard_information_attribute_get_update_sequence_number(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error        = NULL;
+	PyObject *integer_object        = NULL;
+	static char *function           = "pyfsntfs_standard_information_attribute_get_update_sequence_number";
+	uint64_t update_sequence_number = 0;
+	int result                      = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_standard_information_attribute_get_update_sequence_number(
+	          pyfsntfs_attribute->attribute,
+	          &update_sequence_number,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve update sequence number.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  update_sequence_number );
 
 	return( integer_object );
 }

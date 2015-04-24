@@ -39,7 +39,8 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_standard_information_attribute.c pyfsntfs_standard_information_attribute.h \
 	pyfsntfs_unused.h \
 	pyfsntfs_volume.c pyfsntfs_volume.h \
-	pyfsntfs_volume_file_entries.c pyfsntfs_volume_file_entries.h
+	pyfsntfs_volume_file_entries.c pyfsntfs_volume_file_entries.h \
+	pyfsntfs_volume_name_attribute.c pyfsntfs_volume_name_attribute.h
 
 pyfsntfs_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \

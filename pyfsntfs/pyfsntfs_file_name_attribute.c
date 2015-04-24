@@ -40,6 +40,13 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 
 	/* Functions to access the attribute values */
 
+	{ "get_parent_file_reference",
+	  (PyCFunction) pyfsntfs_file_name_attribute_get_parent_file_reference,
+	  METH_NOARGS,
+	  "get_parent_file_reference() -> Integer\n"
+	  "\n"
+	  "Returns the parent file reference, a combination of MFT entry index and sequence number." },
+
 	{ "get_creation_time",
 	  (PyCFunction) pyfsntfs_file_name_attribute_get_creation_time,
 	  METH_NOARGS,
@@ -96,11 +103,24 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the entry modification date and time as a 64-bit integer containing a FILETIME value." },
 
+	{ "get_name",
+	  (PyCFunction) pyfsntfs_file_name_attribute_get_name,
+	  METH_NOARGS,
+	  "get_name() -> Unicode string or None\n"
+	  "\n"
+	  "Returns the name." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
 
 PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
+
+	{ "parent_file_reference",
+	  (getter) pyfsntfs_file_name_attribute_get_parent_file_reference,
+	  (setter) 0,
+	  "The parent file reference, a combination of MFT entry index and sequence number.",
+	  NULL },
 
 	{ "creation_time",
 	  (getter) pyfsntfs_file_name_attribute_get_creation_time,
@@ -124,6 +144,12 @@ PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_name_attribute_get_entry_modification_time,
 	  (setter) 0,
 	  "The entry modification date and time.",
+	  NULL },
+
+	{ "name",
+	  (getter) pyfsntfs_file_name_attribute_get_name,
+	  (setter) 0,
+	  "The name.",
 	  NULL },
 
 	/* Sentinel */
@@ -224,6 +250,58 @@ PyTypeObject pyfsntfs_file_name_attribute_type_object = {
 	/* tp_del */
 	0
 };
+
+/* Retrieves the parent file reference
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_name_attribute_get_parent_file_reference(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_name_attribute_get_parent_file_reference";
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_name_attribute_get_parent_file_reference(
+	          pyfsntfs_attribute->attribute,
+	          &file_reference,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve parent file reference.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  file_reference );
+
+	return( integer_object );
+}
 
 /* Retrieves the creation date and time
  * Returns a Python object if successful or NULL on error
@@ -695,5 +773,119 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
 	                  filetime );
 
 	return( integer_object );
+}
+
+/* Retrieves the name
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_name_attribute_get_name(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *string_object  = NULL;
+	const char *errors       = NULL;
+	uint8_t *name            = NULL;
+	static char *function    = "pyfsntfs_file_name_attribute_get_name";
+	size_t name_size         = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_name_attribute_get_utf8_name_size(
+	          pyfsntfs_attribute->attribute,
+	          &name_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve name size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( ( result == 0 )
+	      || ( name_size == 0 ) )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	name = (uint8_t *) PyMem_Malloc(
+	                    sizeof( uint8_t ) * name_size );
+
+	if( name == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create name.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_name_attribute_get_utf8_name(
+		  pyfsntfs_attribute->attribute,
+		  name,
+		  name_size,
+		  &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve name.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) name,
+			 (Py_ssize_t) name_size - 1,
+			 errors );
+
+	PyMem_Free(
+	 name );
+
+	return( string_object );
+
+on_error:
+	if( name != NULL )
+	{
+		PyMem_Free(
+		 name );
+	}
+	return( NULL );
 }
 
