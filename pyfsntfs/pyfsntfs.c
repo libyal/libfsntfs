@@ -28,9 +28,11 @@
 
 #include "pyfsntfs.h"
 #include "pyfsntfs_attribute.h"
+#include "pyfsntfs_attributes.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
 #include "pyfsntfs_file_entry.h"
+#include "pyfsntfs_file_name_attribute.h"
 #include "pyfsntfs_file_object_io_handle.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libcstring.h"
@@ -460,8 +462,10 @@ PyMODINIT_FUNC initpyfsntfs(
 {
 	PyObject *module                                    = NULL;
 	PyTypeObject *attribute_type_object                 = NULL;
+	PyTypeObject *attributes_type_object                = NULL;
 	PyTypeObject *file_entries_type_object              = NULL;
 	PyTypeObject *file_entry_type_object                = NULL;
+	PyTypeObject *file_name_attribute_type_object       = NULL;
 	PyTypeObject *mft_metadata_file_type_object         = NULL;
 	PyTypeObject *mft_metadata_file_entries_type_object = NULL;
 	PyTypeObject *volume_type_object                    = NULL;
@@ -568,6 +572,44 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	"attribute",
 	(PyObject *) attribute_type_object );
+
+	/* Setup the $FILE_NAME attribute type object
+	 */
+	pyfsntfs_file_name_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_file_name_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_file_name_attribute_type_object );
+
+	file_name_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"file_name_attribute",
+	(PyObject *) file_name_attribute_type_object );
+
+	/* Setup the attributes type object
+	 */
+	pyfsntfs_attributes_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_attributes_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_attributes_type_object );
+
+	attributes_type_object = &pyfsntfs_attributes_type_object;
+
+	PyModule_AddObject(
+	 module,
+	"_attributes",
+	(PyObject *) attributes_type_object );
 
 	/* Setup the file entries type object
 	 */

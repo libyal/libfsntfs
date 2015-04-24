@@ -55,6 +55,7 @@ extern PyMethodDef pyfsntfs_attribute_object_methods[];
 extern PyTypeObject pyfsntfs_attribute_type_object;
 
 PyObject *pyfsntfs_attribute_new(
+           PyTypeObject *type_object,
            libfsntfs_attribute_t *attribute,
            pyfsntfs_file_entry_t *file_entry_object );
 
@@ -65,6 +66,10 @@ void pyfsntfs_attribute_free(
       pyfsntfs_attribute_t *pyfsntfs_attribute );
 
 PyObject *pyfsntfs_attribute_get_type(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_attribute_get_name(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 

@@ -18,10 +18,12 @@ pyexec_LTLIBRARIES = pyfsntfs.la
 pyfsntfs_la_SOURCES = \
 	pyfsntfs.c pyfsntfs.h \
 	pyfsntfs_attribute.c pyfsntfs_attribute.h \
+	pyfsntfs_attributes.c pyfsntfs_attributes.h \
 	pyfsntfs_datetime.c pyfsntfs_datetime.h \
 	pyfsntfs_error.c pyfsntfs_error.h \
 	pyfsntfs_file_entries.c pyfsntfs_file_entries.h \
 	pyfsntfs_file_entry.c pyfsntfs_file_entry.h \
+	pyfsntfs_file_name_attribute.c pyfsntfs_file_name_attribute.h \
 	pyfsntfs_file_object_io_handle.c pyfsntfs_file_object_io_handle.h \
 	pyfsntfs_guid.c pyfsntfs_guid.h \
 	pyfsntfs_integer.c pyfsntfs_integer.h \

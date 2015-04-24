@@ -31,9 +31,9 @@
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
 #include "pyfsntfs_file_entry.h"
+#include "pyfsntfs_file_name_attribute.h"
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
@@ -100,7 +100,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_size() -> Integer\n"
 	  "\n"
-	  "Returns the size of the file entry data." },
+	  "Returns the size data." },
 
 	{ "has_default_data_stream",
 	  (PyCFunction) pyfsntfs_file_entry_has_default_data_stream,
@@ -135,7 +135,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_creation_time() -> Datetime or None\n"
 	  "\n"
-	  "Returns the creation date and time of the file entry." },
+	  "Returns the creation date and time." },
 
 	{ "get_creation_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_creation_time_as_integer,
@@ -149,7 +149,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_modification_time() -> Datetime or None\n"
 	  "\n"
-	  "Returns the modification date and time of the file entry." },
+	  "Returns the modification date and time." },
 
 	{ "get_modification_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_modification_time_as_integer,
@@ -163,7 +163,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_access_time() -> Datetime or None\n"
 	  "\n"
-	  "Returns the access date and time of the file entry." },
+	  "Returns the access date and time." },
 
 	{ "get_access_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_access_time_as_integer,
@@ -177,7 +177,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_entry_modification_time() -> Datetime or None\n"
 	  "\n"
-	  "Returns the entry modification date and time of the file entry." },
+	  "Returns the entry modification date and time." },
 
 	{ "get_entry_modification_time_as_integer",
 	  (PyCFunction) pyfsntfs_file_entry_get_entry_modification_time_as_integer,
@@ -191,7 +191,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  METH_NOARGS,
 	  "get_name() -> Unicode string or None\n"
 	  "\n"
-	  "Returns the name of the file entry." },
+	  "Returns the name." },
 
 	/* Functions to access the attributes */
 
@@ -234,7 +234,7 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	{ "size",
 	  (getter) pyfsntfs_file_entry_get_size,
 	  (setter) 0,
-	  "The size of the file entry data.",
+	  "The size of the data.",
 	  NULL },
 
 	{ "file_reference",
@@ -258,31 +258,31 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	{ "creation_time",
 	  (getter) pyfsntfs_file_entry_get_creation_time,
 	  (setter) 0,
-	  "The creation date and time of the file entry.",
+	  "The creation date and time.",
 	  NULL },
 
 	{ "modification_time",
 	  (getter) pyfsntfs_file_entry_get_modification_time,
 	  (setter) 0,
-	  "The modification date and time of the file entry.",
+	  "The modification date and time.",
 	  NULL },
 
 	{ "access_time",
 	  (getter) pyfsntfs_file_entry_get_access_time,
 	  (setter) 0,
-	  "The access date and time of the file entry.",
+	  "The access date and time.",
 	  NULL },
 
 	{ "entry_modification_time",
 	  (getter) pyfsntfs_file_entry_get_entry_modification_time,
 	  (setter) 0,
-	  "The entry modification date and time of the file entry.",
+	  "The entry modification date and time.",
 	  NULL },
 
 	{ "name",
 	  (getter) pyfsntfs_file_entry_get_name,
 	  (setter) 0,
-	  "The name of the file entry.",
+	  "The name.",
 	  NULL },
 
 	{ "number_of_attributes",
@@ -1863,6 +1863,7 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 	libcerror_error_t *error         = NULL;
 	libfsntfs_attribute_t *attribute = NULL;
 	PyObject *attribute_object       = NULL;
+	PyTypeObject *type_object        = NULL;
 	static char *function            = "pyfsntfs_file_entry_get_attribute_by_index";
 	uint32_t attribute_type          = 0;
 	int result                       = 0;
@@ -1922,8 +1923,18 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 
 		return( NULL );
 	}
-/* TODO create attribute specific object types */
+	switch( attribute_type )
+	{
+		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
+			type_object = &pyfsntfs_file_name_attribute_type_object;
+			break;
+
+		default:
+			type_object = &pyfsntfs_attribute_type_object;
+			break;
+	}
 	attribute_object = pyfsntfs_attribute_new(
+	                    type_object,
 	                    attribute,
 	                    pyfsntfs_file_entry );
 

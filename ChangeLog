@@ -160,6 +160,9 @@ Deployment
 * check configure test of sub library included functions
 * write man pages
 
+20150424
+* worked on Python bindings
+
 20150423
 * worked on Python bindings
 * worked on fsntfsinfo

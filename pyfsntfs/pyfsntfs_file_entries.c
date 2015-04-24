@@ -167,7 +167,7 @@ PyObject *pyfsntfs_file_entries_new(
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file enry object.",
+		 "%s: invalid file entry object.",
 		 function );
 
 		return( NULL );
