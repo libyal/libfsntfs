@@ -36,6 +36,7 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
 
 PyMethodDef pyfsntfs_file_entry_object_methods[] = {
@@ -1927,6 +1928,10 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 	{
 		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
 			type_object = &pyfsntfs_file_name_attribute_type_object;
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
+			type_object = &pyfsntfs_standard_information_attribute_type_object;
 			break;
 
 		default:

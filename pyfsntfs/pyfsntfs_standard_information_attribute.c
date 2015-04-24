@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs file name attribute
+ * Python object definition of the libfsntfs standard information attribute
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -29,68 +29,68 @@
 #include "pyfsntfs_attribute.h"
 #include "pyfsntfs_datetime.h"
 #include "pyfsntfs_error.h"
-#include "pyfsntfs_file_name_attribute.h"
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
 
-PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
+PyMethodDef pyfsntfs_standard_information_attribute_object_methods[] = {
 
 	/* Functions to access the attribute values */
 
 	{ "get_creation_time",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_creation_time,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_creation_time,
 	  METH_NOARGS,
 	  "get_creation_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the creation date and time." },
 
 	{ "get_creation_time_as_integer",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_creation_time_as_integer,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_creation_time_as_integer,
 	  METH_NOARGS,
 	  "get_creation_time_as_integer() -> Integer or None\n"
 	  "\n"
 	  "Returns the creation date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_modification_time",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_modification_time,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_modification_time,
 	  METH_NOARGS,
 	  "get_modification_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the modification date and time." },
 
 	{ "get_modification_time_as_integer",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_modification_time_as_integer,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_modification_time_as_integer,
 	  METH_NOARGS,
 	  "get_modification_time_as_integer() -> Integer or None\n"
 	  "\n"
 	  "Returns the modification date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_access_time",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_access_time,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_access_time,
 	  METH_NOARGS,
 	  "get_access_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the access date and time." },
 
 	{ "get_access_time_as_integer",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_access_time_as_integer,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_access_time_as_integer,
 	  METH_NOARGS,
 	  "get_access_time_as_integer() -> Integer or None\n"
 	  "\n"
 	  "Returns the access date and time as a 64-bit integer containing a FILETIME value." },
 
 	{ "get_entry_modification_time",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_entry_modification_time,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_entry_modification_time,
 	  METH_NOARGS,
 	  "get_entry_modification_time() -> Datetime or None\n"
 	  "\n"
 	  "Returns the entry modification date and time." },
 
 	{ "get_entry_modification_time_as_integer",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer,
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_entry_modification_time_as_integer,
 	  METH_NOARGS,
 	  "get_entry_modification_time_as_integer() -> Integer or None\n"
 	  "\n"
@@ -100,28 +100,28 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 	{ NULL, NULL, 0, NULL }
 };
 
-PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
+PyGetSetDef pyfsntfs_standard_information_attribute_object_get_set_definitions[] = {
 
 	{ "creation_time",
-	  (getter) pyfsntfs_file_name_attribute_get_creation_time,
+	  (getter) pyfsntfs_standard_information_attribute_get_creation_time,
 	  (setter) 0,
 	  "The creation date and time.",
 	  NULL },
 
 	{ "modification_time",
-	  (getter) pyfsntfs_file_name_attribute_get_modification_time,
+	  (getter) pyfsntfs_standard_information_attribute_get_modification_time,
 	  (setter) 0,
 	  "The modification date and time.",
 	  NULL },
 
 	{ "access_time",
-	  (getter) pyfsntfs_file_name_attribute_get_access_time,
+	  (getter) pyfsntfs_standard_information_attribute_get_access_time,
 	  (setter) 0,
 	  "The access date and time.",
 	  NULL },
 
 	{ "entry_modification_time",
-	  (getter) pyfsntfs_file_name_attribute_get_entry_modification_time,
+	  (getter) pyfsntfs_standard_information_attribute_get_entry_modification_time,
 	  (setter) 0,
 	  "The entry modification date and time.",
 	  NULL },
@@ -130,11 +130,11 @@ PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
-PyTypeObject pyfsntfs_file_name_attribute_type_object = {
+PyTypeObject pyfsntfs_standard_information_attribute_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs.file_name_attribute",
+	"pyfsntfs.standard_information_attribute",
 	/* tp_basicsize */
 	sizeof( pyfsntfs_attribute_t ),
 	/* tp_itemsize */
@@ -172,7 +172,7 @@ PyTypeObject pyfsntfs_file_name_attribute_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyfsntfs file name attribute object (wraps libfsntfs_attribute_t type LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME)",
+	"pyfsntfs standard information attribute object (wraps libfsntfs_attribute_t type LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -186,11 +186,11 @@ PyTypeObject pyfsntfs_file_name_attribute_type_object = {
 	/* tp_iternext */
 	0,
 	/* tp_methods */
-	pyfsntfs_file_name_attribute_object_methods,
+	pyfsntfs_standard_information_attribute_object_methods,
 	/* tp_members */
 	0,
 	/* tp_getset */
-	pyfsntfs_file_name_attribute_object_get_set_definitions,
+	pyfsntfs_standard_information_attribute_object_get_set_definitions,
 	/* tp_base */
 	&pyfsntfs_attribute_type_object,
 	/* tp_dict */
@@ -228,13 +228,13 @@ PyTypeObject pyfsntfs_file_name_attribute_type_object = {
 /* Retrieves the creation date and time
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_creation_time(
+PyObject *pyfsntfs_standard_information_attribute_get_creation_time(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
-	static char *function      = "pyfsntfs_file_name_attribute_get_creation_time";
+	static char *function      = "pyfsntfs_standard_information_attribute_get_creation_time";
 	uint64_t filetime          = 0;
 	int result                 = 0;
 
@@ -251,7 +251,7 @@ PyObject *pyfsntfs_file_name_attribute_get_creation_time(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_creation_time(
+	result = libfsntfs_standard_information_attribute_get_creation_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -287,13 +287,13 @@ PyObject *pyfsntfs_file_name_attribute_get_creation_time(
 /* Retrieves the creation date and time as an integer
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_creation_time_as_integer(
+PyObject *pyfsntfs_standard_information_attribute_get_creation_time_as_integer(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
-	static char *function    = "pyfsntfs_file_name_attribute_get_creation_time_as_integer";
+	static char *function    = "pyfsntfs_standard_information_attribute_get_creation_time_as_integer";
 	uint64_t filetime        = 0;
 	int result               = 0;
 
@@ -310,7 +310,7 @@ PyObject *pyfsntfs_file_name_attribute_get_creation_time_as_integer(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_creation_time(
+	result = libfsntfs_standard_information_attribute_get_creation_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -346,13 +346,13 @@ PyObject *pyfsntfs_file_name_attribute_get_creation_time_as_integer(
 /* Retrieves the modification date and time
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_modification_time(
+PyObject *pyfsntfs_standard_information_attribute_get_modification_time(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
-	static char *function      = "pyfsntfs_file_name_attribute_get_modification_time";
+	static char *function      = "pyfsntfs_standard_information_attribute_get_modification_time";
 	uint64_t filetime          = 0;
 	int result                 = 0;
 
@@ -369,7 +369,7 @@ PyObject *pyfsntfs_file_name_attribute_get_modification_time(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_modification_time(
+	result = libfsntfs_standard_information_attribute_get_modification_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -405,13 +405,13 @@ PyObject *pyfsntfs_file_name_attribute_get_modification_time(
 /* Retrieves the modification date and time as an integer
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_modification_time_as_integer(
+PyObject *pyfsntfs_standard_information_attribute_get_modification_time_as_integer(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
-	static char *function    = "pyfsntfs_file_name_attribute_get_modification_time_as_integer";
+	static char *function    = "pyfsntfs_standard_information_attribute_get_modification_time_as_integer";
 	uint64_t filetime        = 0;
 	int result               = 0;
 
@@ -428,7 +428,7 @@ PyObject *pyfsntfs_file_name_attribute_get_modification_time_as_integer(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_modification_time(
+	result = libfsntfs_standard_information_attribute_get_modification_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -464,13 +464,13 @@ PyObject *pyfsntfs_file_name_attribute_get_modification_time_as_integer(
 /* Retrieves the access date and time
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_access_time(
+PyObject *pyfsntfs_standard_information_attribute_get_access_time(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
-	static char *function      = "pyfsntfs_file_name_attribute_get_access_time";
+	static char *function      = "pyfsntfs_standard_information_attribute_get_access_time";
 	uint64_t filetime          = 0;
 	int result                 = 0;
 
@@ -487,7 +487,7 @@ PyObject *pyfsntfs_file_name_attribute_get_access_time(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_access_time(
+	result = libfsntfs_standard_information_attribute_get_access_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -523,13 +523,13 @@ PyObject *pyfsntfs_file_name_attribute_get_access_time(
 /* Retrieves the access date and time as an integer
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_access_time_as_integer(
+PyObject *pyfsntfs_standard_information_attribute_get_access_time_as_integer(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
-	static char *function    = "pyfsntfs_file_name_attribute_get_access_time_as_integer";
+	static char *function    = "pyfsntfs_standard_information_attribute_get_access_time_as_integer";
 	uint64_t filetime        = 0;
 	int result               = 0;
 
@@ -546,7 +546,7 @@ PyObject *pyfsntfs_file_name_attribute_get_access_time_as_integer(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_access_time(
+	result = libfsntfs_standard_information_attribute_get_access_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -582,13 +582,13 @@ PyObject *pyfsntfs_file_name_attribute_get_access_time_as_integer(
 /* Retrieves the entry modification date and time
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time(
+PyObject *pyfsntfs_standard_information_attribute_get_entry_modification_time(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error   = NULL;
 	PyObject *date_time_object = NULL;
-	static char *function      = "pyfsntfs_file_name_attribute_get_entry_modification_time";
+	static char *function      = "pyfsntfs_standard_information_attribute_get_entry_modification_time";
 	uint64_t filetime          = 0;
 	int result                 = 0;
 
@@ -605,7 +605,7 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_entry_modification_time(
+	result = libfsntfs_standard_information_attribute_get_entry_modification_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
@@ -641,13 +641,13 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time(
 /* Retrieves the entry modification date and time as an integer
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
+PyObject *pyfsntfs_standard_information_attribute_get_entry_modification_time_as_integer(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
-	static char *function    = "pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer";
+	static char *function    = "pyfsntfs_standard_information_attribute_get_entry_modification_time_as_integer";
 	uint64_t filetime        = 0;
 	int result               = 0;
 
@@ -664,7 +664,7 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_entry_modification_time(
+	result = libfsntfs_standard_information_attribute_get_entry_modification_time(
 	          pyfsntfs_attribute->attribute,
 	          &filetime,
 	          &error );
