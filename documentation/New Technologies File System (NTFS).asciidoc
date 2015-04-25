@@ -1919,6 +1919,7 @@ Contains a CLFS LSN of directory index transaction records
 [yellow-background]*Note there can be more than 1 per MTF entry*
 
 == Windows definitions
+=== [[file_attribute_flags]]File attribute flags
 The file attribute flags consist of the following values:
 
 [cols="1,1,5",options="header"]
