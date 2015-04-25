@@ -1515,7 +1515,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 	libuna_unicode_character_t unicode_character = 0;
 	size_t utf8_string_index                     = 0;
 	size_t utf8_string_segment_length            = 0;
-	int mft_entry_index                          = 0;
+	uint64_t mft_entry_index                     = 0;
 	int result                                   = 0;
 
 	if( volume == NULL )
@@ -1677,7 +1677,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		if( libfsntfs_mft_get_mft_entry_by_index(
 		     internal_volume->mft,
 		     internal_volume->file_io_handle,
-		     (uint64_t) mft_entry_index,
+		     mft_entry_index,
 		     &mft_entry,
 		     error ) != 1 )
 		{
@@ -1685,7 +1685,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: %d.",
+			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 			 function,
 			 mft_entry_index );
 
@@ -1735,7 +1735,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	libuna_unicode_character_t unicode_character = 0;
 	size_t utf16_string_index                    = 0;
 	size_t utf16_string_segment_length           = 0;
-	int mft_entry_index                          = 0;
+	uint64_t mft_entry_index                     = 0;
 	int result                                   = 0;
 
 	if( volume == NULL )
@@ -1897,7 +1897,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		if( libfsntfs_mft_get_mft_entry_by_index(
 		     internal_volume->mft,
 		     internal_volume->file_io_handle,
-		     (uint64_t) mft_entry_index,
+		     mft_entry_index,
 		     &mft_entry,
 		     error ) != 1 )
 		{
@@ -1905,7 +1905,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: %d.",
+			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 			 function,
 			 mft_entry_index );
 

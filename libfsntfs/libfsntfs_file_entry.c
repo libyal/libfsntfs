@@ -1638,7 +1638,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_index";
-	int mft_entry_index                                  = 0;
+	uint64_t mft_entry_index                             = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1708,7 +1708,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
 	     internal_file_entry->file_io_handle,
-	     (uint64_t) mft_entry_index,
+	     mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -1716,7 +1716,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 		 function,
 		 mft_entry_index );
 
@@ -1728,9 +1728,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
+		 "%s: missing MFT entry: %" PRIu64 ".",
 		 function,
-		 mft_entry );
+		 mft_entry_index );
 
 		return( -1 );
 	}
@@ -1745,9 +1745,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %d directory entries tree.",
+		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
 		 function,
-		 mft_entry );
+		 mft_entry_index );
 
 		return( -1 );
 	}
@@ -1788,7 +1788,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf8_name";
-	int mft_entry_index                                  = 0;
+	uint64_t mft_entry_index                             = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -1865,7 +1865,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
 	     internal_file_entry->file_io_handle,
-	     (uint64_t) mft_entry_index,
+	     mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -1873,7 +1873,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 		 function,
 		 mft_entry_index );
 
@@ -1890,9 +1890,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %d directory entries tree.",
+		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
 		 function,
-		 mft_entry );
+		 mft_entry_index );
 
 		return( -1 );
 	}
@@ -1932,7 +1932,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf16_name";
-	int mft_entry_index                                  = 0;
+	uint64_t mft_entry_index                             = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -2009,7 +2009,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
 	     internal_file_entry->file_io_handle,
-	     (uint64_t) mft_entry_index,
+	     mft_entry_index,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -2017,7 +2017,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 		 function,
 		 mft_entry_index );
 
@@ -2029,9 +2029,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
+		 "%s: missing MFT entry: %" PRIu64 ".",
 		 function,
-		 mft_entry );
+		 mft_entry_index );
 
 		return( -1 );
 	}
@@ -2046,9 +2046,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %d directory entries tree.",
+		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
 		 function,
-		 mft_entry );
+		 mft_entry_index );
 
 		return( -1 );
 	}

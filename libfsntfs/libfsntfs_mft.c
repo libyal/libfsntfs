@@ -918,7 +918,7 @@ int libfsntfs_mft_get_mft_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 		 function,
 		 mft_entry_index );
 

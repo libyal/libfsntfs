@@ -305,6 +305,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The entry modification date and time.",
 	  NULL },
 
+	{ "file_attribute_flags",
+	  (getter) pyfsntfs_file_entry_get_file_attribute_flags,
+	  (setter) 0,
+	  "The file attribute flags.",
+	  NULL },
+
 	{ "name",
 	  (getter) pyfsntfs_file_entry_get_name,
 	  (setter) 0,

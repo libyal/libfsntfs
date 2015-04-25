@@ -233,7 +233,7 @@ int libfsntfs_directory_entry_compare(
  */
 int libfsntfs_directory_entry_get_mft_entry_index(
      libfsntfs_directory_entry_t *directory_entry,
-     int *mft_entry_index,
+     uint64_t *mft_entry_index,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_directory_entry_get_mft_entry_index";

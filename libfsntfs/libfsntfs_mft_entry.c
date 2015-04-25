@@ -1257,7 +1257,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve list MFT entry: %d.",
+			 "%s: unable to retrieve list attribute: %d.",
 			 function,
 			 list_attribute_index );
 
@@ -1273,7 +1273,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve list MFT entry: %d file reference.",
+			 "%s: unable to retrieve list attribute: %d file reference.",
 			 function,
 			 list_attribute_index );
 
@@ -1495,6 +1495,10 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
 		return( -1 );
 	}
 	if( mft_entry->i30_index == NULL )
+	{
+		return( 1 );
+	}
+	if( mft_entry->directory_entries_tree_is_read != 0 )
 	{
 		return( 1 );
 	}
@@ -1730,6 +1734,8 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
 		}
 		directory_entry = NULL;
 	}
+	mft_entry->directory_entries_tree_is_read = 1;
+
 	return( 1 );
 
 on_error:

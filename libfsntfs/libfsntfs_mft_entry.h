@@ -127,6 +127,10 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_btree_t *directory_entries_tree;
 
+	/* Value to indicate the directory entries tree was read
+	 */
+	uint8_t directory_entries_tree_is_read;
+
 	/* Value to indicate the MFT entry is corrupted
 	 */
 	uint8_t is_corrupted;
