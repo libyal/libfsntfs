@@ -886,6 +886,21 @@ int info_handle_attribute_fprint(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
+			if( info_handle_reparse_point_attribute_fprint(
+			     info_handle,
+			     attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print reparse point attribute: %d information.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
@@ -1704,6 +1719,50 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Prints $REPARSE_POINT attribute information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_reparse_point_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error )
+{
+	static char *function = "info_handle_reparse_point_attribute_fprint";
+	uint32_t value_32bit  = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_type_and_flags(
+	     attribute,
+	     &value_32bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type and flags.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tType and flags\t\t: 0x%08" PRIx32 "\n",
+	 value_32bit );
+
+	return( 1 );
 }
 
 /* Prints $STANDARD_INFORMATION attribute information

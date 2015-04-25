@@ -36,17 +36,42 @@ struct fsntfs_reparse_point
 	/* The type and flags
 	 * Consists of 4 bytes
 	 */
-	uint8_t type[ 4 ];
+	uint8_t type_and_flags[ 4 ];
 
-	/* The data size
+	/* The reparse data size
 	 * Consists of 2 bytes
 	 */
-	uint8_t data_size[ 2 ];
+	uint8_t reparse_data_size[ 2 ];
 
 	/* Padding
 	 * Consists of 2 bytes
 	 */
 	uint8_t padding1[ 2 ];
+};
+
+typedef struct fsntfs_mount_point_reparse_data fsntfs_mount_point_reparse_data_t;
+
+struct fsntfs_mount_point_reparse_data
+{
+	/* The substitute name offset
+	 * Consists of 2 bytes
+	 */
+	uint8_t substitute_name_offset[ 2 ];
+
+	/* The substitute name size
+	 * Consists of 2 bytes
+	 */
+	uint8_t substitute_name_size[ 2 ];
+
+	/* The print name offset
+	 * Consists of 2 bytes
+	 */
+	uint8_t print_name_offset[ 2 ];
+
+	/* The print name size
+	 * Consists of 2 bytes
+	 */
+	uint8_t print_name_size[ 2 ];
 };
 
 #if defined( __cplusplus )

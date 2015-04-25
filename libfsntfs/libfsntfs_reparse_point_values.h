@@ -35,9 +35,17 @@ typedef struct libfsntfs_reparse_point_values libfsntfs_reparse_point_values_t;
 
 struct libfsntfs_reparse_point_values
 {
-	/* Dummy
+	/* The type and flags
 	 */
-	int dummy;
+	uint32_t type_and_flags;
+
+	/* The reparse data
+	 */
+	uint8_t *reparse_data;
+
+	/* The reparse data size
+	 */
+	size_t reparse_data_size;
 };
 
 int libfsntfs_reparse_point_values_initialize(
@@ -52,6 +60,11 @@ int libfsntfs_reparse_point_values_read(
      libfsntfs_reparse_point_values_t *reparse_point_values,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_type_and_flags(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint32_t *type_and_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

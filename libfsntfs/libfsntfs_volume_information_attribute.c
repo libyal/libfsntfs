@@ -1,5 +1,5 @@
 /*
- * Volume information attribute ($VOLUME_INFORAMTION) functions
+ * Volume information attribute ($VOLUME_INFORMATION) functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -28,7 +28,6 @@
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume_information_attribute.h"
 #include "libfsntfs_volume_information_values.h"
-
 
 /* Retrieves the version
  * Returns 1 if successful or -1 on error

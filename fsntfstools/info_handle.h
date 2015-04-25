@@ -111,6 +111,11 @@ int info_handle_object_identifier_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error );
 
+int info_handle_reparse_point_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error );
+
 int info_handle_standard_information_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,

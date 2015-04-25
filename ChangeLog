@@ -1,17 +1,21 @@
 TODO
+* file entry
+  - only retrieve file name from the directory entry?
+    or make clear in function documentation that first
+    non-short filename is the fallback?
 * file entry $MFT scan
   - mark ignored attribute list
   - mark ignored data stream
   - mark ignored index
+  - handle corrupt MFT entries (e.g. missing FILE signature)
 * pyfsntfs volume
   - add get file entry by path (get_file_entry_by_path)
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
-  - add has_i30_index_stream function
   - add has_reparse_point function
   - add has_symbolic_link function
-  - add is_in_use function
+  - add is_corrupt function?
   - add in use function
   - add support for data streams
   - how to handle file-like object functions for non-data file entry
@@ -41,10 +45,6 @@ TODO
   - expose reparse point attribute
   - expose logged utility stream attribute
 
-* pyfsntfs: add sub file entries iterator to file entry
-
-* attribute list
-  - check if multiple $DATA attributes with the same name are merged
 * attribute data parsing
   - add SSIZE_MAX check for attribute->data_size before (size_t) cast
 * MFT entry
@@ -165,6 +165,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20150425
+* worked on Python bindings
 
 20150424
 * worked on Python bindings

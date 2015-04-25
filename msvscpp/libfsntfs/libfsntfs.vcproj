@@ -282,6 +282,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_reparse_point_attribute.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_reparse_point_values.c"
 				>
 			</File>
@@ -541,6 +545,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_object_identifier_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_reparse_point_attribute.h"
 				>
 			</File>
 			<File

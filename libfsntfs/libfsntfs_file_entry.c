@@ -233,7 +233,7 @@ int libfsntfs_file_entry_free(
 	return( result );
 }
 
-/* Determines if the file entry is allocated
+/* Determines if the file entry is allocated (MFT entry in use flag is set)
  * Returns 1 if allocated, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_is_allocated(
@@ -1224,8 +1224,49 @@ int libfsntfs_file_entry_get_attribute_by_index(
 	return( 1 );
 }
 
-/* Determines if the file entry has the default data stream
- * Defined by the default (nameless) $DATA attribute
+/* Determines if the file entry has the directory entries ($I30) index
+ * Returns 1 if the default data stream, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_has_directory_entries_index(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_has_directory_entries_index";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	result = libfsntfs_mft_entry_has_directory_entries_index(
+	          internal_file_entry->mft_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry has an directory entries index.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Determines if the file entry has the default data stream (nameless $DATA attribute)
  * Returns 1 if the default data stream, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_has_default_data_stream(

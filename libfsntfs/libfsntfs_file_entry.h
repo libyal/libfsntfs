@@ -181,6 +181,11 @@ int libfsntfs_file_entry_get_attribute_by_index(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_directory_entries_index(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_has_default_data_stream(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );

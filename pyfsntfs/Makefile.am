@@ -35,6 +35,7 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_libfsntfs.h \
 	pyfsntfs_mft_metadata_file.c pyfsntfs_mft_metadata_file.h \
 	pyfsntfs_mft_metadata_file_entries.c pyfsntfs_mft_metadata_file_entries.h \
+	pyfsntfs_object_identifier_attribute.c pyfsntfs_object_identifier_attribute.h \
 	pyfsntfs_python.h \
 	pyfsntfs_standard_information_attribute.c pyfsntfs_standard_information_attribute.h \
 	pyfsntfs_unused.h \

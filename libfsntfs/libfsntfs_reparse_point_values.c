@@ -24,8 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_debug.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libuna.h"
 #include "libfsntfs_reparse_point_values.h"
 
 #include "fsntfs_reparse_point.h"
@@ -125,6 +127,11 @@ int libfsntfs_reparse_point_values_free(
 	}
 	if( *reparse_point_values != NULL )
 	{
+		if( ( *reparse_point_values )->reparse_data != NULL )
+		{
+			memory_free(
+			 ( *reparse_point_values )->reparse_data );
+		}
 		memory_free(
 		 *reparse_point_values );
 
@@ -142,11 +149,16 @@ int libfsntfs_reparse_point_values_read(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_reparse_point_values_read";
+	static char *function                       = "libfsntfs_reparse_point_values_read";
+	uint16_t print_name_offset                  = 0;
+	uint16_t print_name_size                    = 0;
+	uint16_t substitute_name_offset             = 0;
+	uint16_t substitute_name_size               = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit  = 0;
-	uint16_t value_16bit  = 0;
+	libcstring_system_character_t *value_string = NULL;
+	size_t value_string_size                    = 0;
+	int result                                  = 0;
 #endif
 
 	if( reparse_point_values == NULL )
@@ -194,29 +206,303 @@ int libfsntfs_reparse_point_values_read(
 		 0 );
 	}
 #endif
+	byte_stream_copy_to_uint32_little_endian(
+	 ( (fsntfs_reparse_point_t *) data )->type_and_flags,
+	 reparse_point_values->type_and_flags );
+
+	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_reparse_point_t *) data )->reparse_data_size,
+	 reparse_point_values->reparse_data_size );
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_reparse_point_t *) data )->type,
-		 value_32bit );
 		libcnotify_printf(
-		 "%s: type and flags\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: type and flags\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 value_32bit );
+		 reparse_point_values->type_and_flags );
+		libfsntfs_debug_print_reparse_point_type_and_flags(
+		 reparse_point_values->type_and_flags );
+		libcnotify_printf(
+		 "\n" );
 
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_reparse_point_t *) data )->data_size,
-		 value_16bit );
 		libcnotify_printf(
-		 "%s: data size\t\t\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: reparse data size\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
-		 value_16bit );
+		 reparse_point_values->reparse_data_size );
 
 		libcnotify_printf(
 		 "\n" );
 	}
 #endif
+	if( (size_t) reparse_point_values->reparse_data_size > data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid reparse data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( reparse_point_values->reparse_data_size > 0 )
+	{
+		reparse_point_values->reparse_data = (uint8_t *) memory_allocate(
+		                                                  sizeof( uint8_t ) * reparse_point_values->reparse_data_size );
+
+		if( reparse_point_values->reparse_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create reparse data.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     reparse_point_values->reparse_data,
+		     &( data[ sizeof( fsntfs_reparse_point_t ) ] ),
+		     (size_t) reparse_point_values->reparse_data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy reparse data.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( reparse_point_values->type_and_flags == 0xa0000003 )
+	{
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mount_point_reparse_data_t *) reparse_point_values->reparse_data )->substitute_name_offset,
+		 substitute_name_offset );
+
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mount_point_reparse_data_t *) reparse_point_values->reparse_data )->substitute_name_size,
+		 substitute_name_size );
+
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mount_point_reparse_data_t *) reparse_point_values->reparse_data )->print_name_offset,
+		 print_name_offset );
+
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mount_point_reparse_data_t *) reparse_point_values->reparse_data )->print_name_size,
+		 print_name_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: substitute name offset\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 substitute_name_offset );
+
+			libcnotify_printf(
+			 "%s: substitute name size\t\t: %" PRIu16 "\n",
+			 function,
+			 substitute_name_size );
+
+			libcnotify_printf(
+			 "%s: print name offset\t\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 print_name_offset );
+
+			libcnotify_printf(
+			 "%s: print name size\t\t\t: %" PRIu16 "\n",
+			 function,
+			 print_name_size );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+		if( substitute_name_size > 0 )
+		{
+			substitute_name_offset += sizeof( fsntfs_mount_point_reparse_data_t );
+
+			if( substitute_name_offset >= reparse_point_values->reparse_data_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid substitute name offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			if( substitute_name_size > ( reparse_point_values->reparse_data_size - substitute_name_offset ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid substitute name size value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libuna_utf16_string_size_from_utf16_stream(
+					  &( reparse_point_values->reparse_data[ substitute_name_offset ] ),
+					  (size_t) substitute_name_size,
+					  LIBUNA_ENDIAN_LITTLE,
+					  &value_string_size,
+					  error );
+#else
+				result = libuna_utf8_string_size_from_utf16_stream(
+					  &( reparse_point_values->reparse_data[ substitute_name_offset ] ),
+					  (size_t) substitute_name_size,
+					  LIBUNA_ENDIAN_LITTLE,
+					  &value_string_size,
+					  error );
+#endif
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to determine size of substitute name string.",
+					 function );
+
+					goto on_error;
+				}
+				value_string = libcstring_system_string_allocate(
+						value_string_size );
+
+				if( value_string == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create substitute name string.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libuna_utf16_string_copy_from_utf16_stream(
+					  (libuna_utf16_character_t *) value_string,
+					  value_string_size,
+					  &( reparse_point_values->reparse_data[ substitute_name_offset ] ),
+					  (size_t) substitute_name_size,
+					  LIBUNA_ENDIAN_LITTLE,
+					  error );
+#else
+				result = libuna_utf8_string_copy_from_utf16_stream(
+					  (libuna_utf8_character_t *) value_string,
+					  value_string_size,
+					  &( reparse_point_values->reparse_data[ substitute_name_offset ] ),
+					  (size_t) substitute_name_size,
+					  LIBUNA_ENDIAN_LITTLE,
+					  error );
+#endif
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set substitute name string.",
+					 function );
+
+					goto on_error;
+				}
+				libcnotify_printf(
+				 "%s: substitute name\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 function,
+				 value_string );
+
+				memory_free(
+				 value_string );
+
+				value_string = NULL;
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif
+		}
+	}
+	else if( reparse_point_values->type_and_flags == 0xa000000c )
+	{
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	else if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: unusupported reparse point type and flags: 0x%08" PRIx32 "\n",
+		 function,
+		 reparse_point_values->type_and_flags );
+	}
+#endif
+	return( 1 );
+
+on_error:
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
+#endif
+	if( reparse_point_values->reparse_data != NULL )
+	{
+		memory_free(
+		 reparse_point_values->reparse_data );
+
+		reparse_point_values->reparse_data = NULL;
+	}
+	reparse_point_values->reparse_data_size = 0;
+
+	return( -1 );
+}
+
+/* Retrieves the type and flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_reparse_point_values_get_type_and_flags(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint32_t *type_and_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_reparse_point_values_get_type_and_flags";
+
+	if( reparse_point_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid reparse point values.",
+		 function );
+
+		return( -1 );
+	}
+	if( type_and_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid type and flags.",
+		 function );
+
+		return( -1 );
+	}
+	*type_and_flags = reparse_point_values->type_and_flags;
+
 	return( 1 );
 }
 

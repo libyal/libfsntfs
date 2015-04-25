@@ -86,6 +86,14 @@ PyObject *pyfsntfs_file_entry_get_size(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_is_allocated(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_has_directory_entries_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_has_default_data_stream(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

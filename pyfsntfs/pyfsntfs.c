@@ -39,6 +39,7 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_mft_metadata_file.h"
 #include "pyfsntfs_mft_metadata_file_entries.h"
+#include "pyfsntfs_object_identifier_attribute.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
@@ -470,6 +471,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyTypeObject *file_name_attribute_type_object            = NULL;
 	PyTypeObject *mft_metadata_file_type_object              = NULL;
 	PyTypeObject *mft_metadata_file_entries_type_object      = NULL;
+	PyTypeObject *object_identifier_attribute_type_object    = NULL;
 	PyTypeObject *standard_information_attribute_type_object = NULL;
 	PyTypeObject *volume_type_object                         = NULL;
 	PyTypeObject *volume_file_entries_type_object            = NULL;
@@ -595,6 +597,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "file_name_attribute",
 	 (PyObject *) file_name_attribute_type_object );
+
+	/* Setup the $OBJECT_IDENTIFIER attribute type object
+	 */
+	pyfsntfs_object_identifier_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_object_identifier_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_object_identifier_attribute_type_object );
+
+	object_identifier_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "object_identifier_attribute",
+	 (PyObject *) object_identifier_attribute_type_object );
 
 	/* Setup the $STANDARD_INFORMATION attribute type object
 	 */

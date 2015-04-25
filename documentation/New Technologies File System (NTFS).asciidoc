@@ -1511,7 +1511,7 @@ Predefined reparse point tag values according to `[MSDN]`:
 | 0x80000007 | IO_REPARSE_TAG_SIS | Used by single-instance storage (SIS) filter driver
 | | | 
 | 0x8000000a | IO_REPARSE_TAG_DFS | Used by the Distributed File System (DFS)
-| 0x8000000b | IO_REPARSE_TAG_FILTER_MANAGER | Used by filter manager test harnes
+| 0x8000000b | IO_REPARSE_TAG_FILTER_MANAGER | Used by filter manager test harness
 | | | 
 | 0x80000012 | IO_REPARSE_TAG_DFSR | Used by the Distributed File System (DFS)
 | | | 
@@ -1521,6 +1521,11 @@ Predefined reparse point tag values according to `[MSDN]`:
 | | | 
 | 0xc0000004 | IO_REPARSE_TAG_HSM | Used by Hierarchical Storage Manager Product
 |===
+
+[yellow-background]*single-instance storage (SIS): An NTFS feature that 
+implements links with the semantics of copies for files stored on an 
+NTFSvolume. SIS uses copy-on-close to implement the copy semantics of its 
+links.*
 
 ==== Reparse point tag flags
 
@@ -1556,6 +1561,14 @@ UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 | ... | ... | | Print name +
 UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 |===
+
+[yellow-background]*TODO: what do byte values like 0x02 represent in the substitute name?*
+....
+00000010: 5c 00 3f 00 3f 00 02 00  43 00 3a 00 5c 00 55 00   \.?.?... C.:.\.U.
+00000020: 73 00 65 00 72 00 73 00  5c 00 74 00 65 00 73 00   s.e.r.s. \.t.e.s.
+00000030: 74 00 5c 00 44 00 6f 00  63 00 75 00 6d 00 65 00   t.\.D.o. c.u.m.e.
+00000040: 6e 00 74 00 73 00 00 00                            n.t.s...
+....
 
 === Symbolic link reparse data
 The symbolic link reparse data is variable of size and consists of:

@@ -59,12 +59,12 @@ void libfsntfs_debug_print_mft_attribute_data_flags(
 void libfsntfs_debug_print_mft_entry_flags(
       uint16_t mft_entry_flags )
 {
-	if( ( mft_entry_flags & 0x0001 ) != 0 )
+	if( ( mft_entry_flags & LIBFSNTFS_MFT_ENTRY_FLAG_IN_USE ) != 0 )
 	{
 		libcnotify_printf(
 		 "\tIn use (FILE_RECORD_SEGMENT_IN_USE)\n" );
 	}
-	if( ( mft_entry_flags & 0x0002 ) != 0 )
+	if( ( mft_entry_flags & LIBFSNTFS_MFT_ENTRY_FLAG_INDEX_PRESENT ) != 0 )
 	{
 		libcnotify_printf(
 		 "\tHas file name index (FILE_FILE_NAME_INDEX_PRESENT)\n" );
@@ -202,6 +202,74 @@ void libfsntfs_debug_print_index_value_flags(
 	{
 		libcnotify_printf(
 		 "\tIs last\n" );
+	}
+}
+
+/* Prints the reparse point type and flags
+ */
+void libfsntfs_debug_print_reparse_point_type_and_flags(
+      uint32_t type_and_flags )
+{
+	if( type_and_flags == 0x00000000 )
+	{
+		libcnotify_printf(
+		 "\tReserved (IO_REPARSE_TAG_RESERVED_ZERO)\n" );
+	}
+	if( type_and_flags == 0x00000001 )
+	{
+		libcnotify_printf(
+		 "\tReserved (IO_REPARSE_TAG_RESERVED_ONE)\n" );
+	}
+
+	if( type_and_flags == 0x80000005 )
+	{
+		libcnotify_printf(
+		 "\tHome server drive extender (IO_REPARSE_TAG_DRIVER_EXTENDER)\n" );
+	}
+	if( type_and_flags == 0x80000006 )
+	{
+		libcnotify_printf(
+		 "\tHierarchical Storage Manager (IO_REPARSE_TAG_HSM2)\n" );
+	}
+	if( type_and_flags == 0x80000007 )
+	{
+		libcnotify_printf(
+		 "\tSingle-instance storage (SIS) (IO_REPARSE_TAG_SIS)\n" );
+	}
+
+	if( type_and_flags == 0x8000000a )
+	{
+		libcnotify_printf(
+		 "\tDistributed File System (DFS) (IO_REPARSE_TAG_DFS)\n" );
+	}
+	if( type_and_flags == 0x8000000b )
+	{
+		libcnotify_printf(
+		 "\tFilter manager test harness (IO_REPARSE_TAG_FILTER_MANAGER)\n" );
+	}
+
+	if( type_and_flags == 0x80000012 )
+	{
+		libcnotify_printf(
+		 "\tDistributed File System (DFS) (IO_REPARSE_TAG_DFSR)\n" );
+	}
+
+	if( type_and_flags == 0xa0000003 )
+	{
+		libcnotify_printf(
+		 "\tMount point (IO_REPARSE_TAG_MOUNT_POINT)\n" );
+	}
+
+	if( type_and_flags == 0xa000000c )
+	{
+		libcnotify_printf(
+		 "\tSymbolic link (IO_REPARSE_TAG_SYMLINK)\n" );
+	}
+
+	if( type_and_flags == 0xc0000004 )
+	{
+		libcnotify_printf(
+		 "\tHierarchical Storage Manager (IO_REPARSE_TAG_HSM)\n" );
 	}
 }
 

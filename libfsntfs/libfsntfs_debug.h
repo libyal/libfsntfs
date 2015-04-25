@@ -49,6 +49,9 @@ void libfsntfs_debug_print_index_node_flags(
 void libfsntfs_debug_print_index_value_flags(
       uint32_t index_value_flags );
 
+void libfsntfs_debug_print_reparse_point_type_and_flags(
+      uint32_t type_and_flags );
+
 const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );
 

@@ -27,7 +27,6 @@
 #endif
 
 #include "pyfsntfs_attribute.h"
-#include "pyfsntfs_datetime.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libcerror.h"

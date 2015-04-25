@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_object_identifier_attribute.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_standard_information_attribute.c"
 				>
 			</File>
@@ -317,6 +321,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_mft_metadata_file_entries.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_object_identifier_attribute.h"
 				>
 			</File>
 			<File

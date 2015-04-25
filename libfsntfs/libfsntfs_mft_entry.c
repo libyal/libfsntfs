@@ -479,6 +479,17 @@ int libfsntfs_mft_entry_read_header(
 	     fsntfs_mft_entry_signature,
 	     4 ) != 0 )
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: invalid MFT entry signature.\n",
+			 function );
+		}
+#endif
+		mft_entry->is_corrupted = 1;
+
+/* TODO handle corruption */
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
@@ -1737,7 +1748,7 @@ on_error:
 	return( -1 );
 }
 
-/* Determines if the MFT entry is allocated
+/* Determines if the MFT entry is allocated (in use)
  * Returns 1 if allocated, 0 if not or -1 on error
  */
 int libfsntfs_mft_entry_is_allocated(
@@ -1757,8 +1768,7 @@ int libfsntfs_mft_entry_is_allocated(
 
 		return( -1 );
 	}
-/* TODO change 0x0001 to definition */
-	if( ( mft_entry->flags & 0x0001 ) != 0 )
+	if( ( mft_entry->flags & LIBFSNTFS_MFT_ENTRY_FLAG_IN_USE ) != 0 )
 	{
 		return( 1 );
 	}
@@ -3280,6 +3290,33 @@ int libfsntfs_mft_entry_get_number_of_directory_entries(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Determines if the file entry has the directory entries ($I30) index
+ * Returns 1 if the default data stream, 0 if not or -1 on error
+ */
+int libfsntfs_mft_entry_has_directory_entries_index(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_has_directory_entries_index";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->i30_index != NULL )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Retrieves a specific directory entry

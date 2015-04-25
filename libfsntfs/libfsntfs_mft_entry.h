@@ -126,6 +126,10 @@ struct libfsntfs_mft_entry
 	/* The directory entries tree
 	 */
 	libcdata_btree_t *directory_entries_tree;
+
+	/* Value to indicate the MFT entry is corrupted
+	 */
+	uint8_t is_corrupted;
 };
 
 int libfsntfs_mft_entry_initialize(
@@ -275,6 +279,10 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 int libfsntfs_mft_entry_append_index_root_attribute(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_attribute_t *attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_has_directory_entries_index(
+     libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_number_of_directory_entries(
