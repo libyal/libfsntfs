@@ -72,7 +72,7 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
-PyObject *pyfsntfs_file_name_attribute_get_file_attribute(
+PyObject *pyfsntfs_file_name_attribute_get_file_attribute_flags(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
