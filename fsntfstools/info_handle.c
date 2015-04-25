@@ -1729,8 +1729,11 @@ int info_handle_reparse_point_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	static char *function = "info_handle_reparse_point_attribute_fprint";
-	uint32_t value_32bit  = 0;
+	libcstring_system_character_t *value_string = NULL;
+	static char *function                       = "info_handle_reparse_point_attribute_fprint";
+	size_t value_string_size                    = 0;
+	uint32_t value_32bit                        = 0;
+	int result                                  = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1743,7 +1746,7 @@ int info_handle_reparse_point_attribute_fprint(
 
 		return( -1 );
 	}
-	if( libfsntfs_reparse_point_attribute_get_type_and_flags(
+	if( libfsntfs_reparse_point_attribute_get_tag(
 	     attribute,
 	     &value_32bit,
 	     error ) != 1 )
@@ -1752,17 +1755,100 @@ int info_handle_reparse_point_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve type and flags.",
+		 "%s: unable to retrieve tag.",
 		 function );
 
 		return( -1 );
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tType and flags\t\t: 0x%08" PRIx32 "\n",
+	 "\tTag\t\t\t\t: 0x%08" PRIx32 "\n",
 	 value_32bit );
 
+/* TODO print sanitized substitute name */
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#else
+	result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve print name size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result != 0 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = libcstring_system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create print name string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+		          attribute,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+		          attribute,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve print name.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tPrint name\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
 	return( 1 );
+
+on_error:
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
+	return( -1 );
 }
 
 /* Prints $STANDARD_INFORMATION attribute information

@@ -1522,10 +1522,24 @@ Predefined reparse point tag values according to `[MSDN]`:
 | 0xc0000004 | IO_REPARSE_TAG_HSM | Used by Hierarchical Storage Manager Product
 |===
 
+==== Notes
 [yellow-background]*single-instance storage (SIS): An NTFS feature that 
 implements links with the semantics of copies for files stored on an 
 NTFSvolume. SIS uses copy-on-close to implement the copy semantics of its 
 links.*
+
+....
+Is this documentation wrong or are these alternative values?
+
+Flag	Description
+0x68000005	NSS
+0x68000006	NSS recover
+0x68000007	SIS
+0x68000008	DFS
+0x88000003	Mount point
+0xA8000004	HSM
+0xE8000000	Symbolic link
+....
 
 ==== Reparse point tag flags
 
@@ -1533,10 +1547,10 @@ links.*
 |===
 | Value | Identifier | Description
 | 0x1 | | Reserved according to `[MSDN]`
-| 0x2 | | Name surrogate bit +
+| 0x2 | | Is alias (Name surrogate bit) +
 If this bit is set, the file or directory represents another named entity in the system.
-| 0x4 | | Reserved according to `[MSDN]` +
-[yellow-background]*According to `[RUSSON05]` this is high-latency media.*
+| 0x4 | | Is high-latency media +
+Reserved according to `[MSDN]` +
 | 0x8 | | Is native (Microsoft-bit) +
 [yellow-background]*Does this flag influence the reparse point GUID?*
 |===

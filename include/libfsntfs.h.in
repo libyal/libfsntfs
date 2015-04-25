@@ -892,12 +892,89 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
  * ------------------------------------------------------------------------- */
 
 /* Retrieves the type and flags
+ * The tag is a combination of the type and flags
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_reparse_point_attribute_get_type_and_flags(
+int libfsntfs_reparse_point_attribute_get_tag(
      libfsntfs_attribute_t *attribute,
-     uint32_t *type_and_flags,
+     uint32_t *tag,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded substitute name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded substitute name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded substitute name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded substitute name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded print name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded print name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf8_print_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded print name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded print name
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_utf16_print_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------

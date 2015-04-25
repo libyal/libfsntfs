@@ -207,66 +207,66 @@ void libfsntfs_debug_print_index_value_flags(
 
 /* Prints the reparse point type and flags
  */
-void libfsntfs_debug_print_reparse_point_type_and_flags(
-      uint32_t type_and_flags )
+void libfsntfs_debug_print_reparse_point_tag(
+      uint32_t tag )
 {
-	if( type_and_flags == 0x00000000 )
+	if( tag == 0x00000000 )
 	{
 		libcnotify_printf(
 		 "\tReserved (IO_REPARSE_TAG_RESERVED_ZERO)\n" );
 	}
-	if( type_and_flags == 0x00000001 )
+	if( tag == 0x00000001 )
 	{
 		libcnotify_printf(
 		 "\tReserved (IO_REPARSE_TAG_RESERVED_ONE)\n" );
 	}
 
-	if( type_and_flags == 0x80000005 )
+	if( tag == 0x80000005 )
 	{
 		libcnotify_printf(
 		 "\tHome server drive extender (IO_REPARSE_TAG_DRIVER_EXTENDER)\n" );
 	}
-	if( type_and_flags == 0x80000006 )
+	if( tag == 0x80000006 )
 	{
 		libcnotify_printf(
 		 "\tHierarchical Storage Manager (IO_REPARSE_TAG_HSM2)\n" );
 	}
-	if( type_and_flags == 0x80000007 )
+	if( tag == 0x80000007 )
 	{
 		libcnotify_printf(
 		 "\tSingle-instance storage (SIS) (IO_REPARSE_TAG_SIS)\n" );
 	}
 
-	if( type_and_flags == 0x8000000a )
+	if( tag == 0x8000000a )
 	{
 		libcnotify_printf(
 		 "\tDistributed File System (DFS) (IO_REPARSE_TAG_DFS)\n" );
 	}
-	if( type_and_flags == 0x8000000b )
+	if( tag == 0x8000000b )
 	{
 		libcnotify_printf(
 		 "\tFilter manager test harness (IO_REPARSE_TAG_FILTER_MANAGER)\n" );
 	}
 
-	if( type_and_flags == 0x80000012 )
+	if( tag == 0x80000012 )
 	{
 		libcnotify_printf(
 		 "\tDistributed File System (DFS) (IO_REPARSE_TAG_DFSR)\n" );
 	}
 
-	if( type_and_flags == 0xa0000003 )
+	if( tag == 0xa0000003 )
 	{
 		libcnotify_printf(
 		 "\tMount point (IO_REPARSE_TAG_MOUNT_POINT)\n" );
 	}
 
-	if( type_and_flags == 0xa000000c )
+	if( tag == 0xa000000c )
 	{
 		libcnotify_printf(
 		 "\tSymbolic link (IO_REPARSE_TAG_SYMLINK)\n" );
 	}
 
-	if( type_and_flags == 0xc0000004 )
+	if( tag == 0xc0000004 )
 	{
 		libcnotify_printf(
 		 "\tHierarchical Storage Manager (IO_REPARSE_TAG_HSM)\n" );

@@ -41,10 +41,12 @@
 #include "pyfsntfs_mft_metadata_file_entries.h"
 #include "pyfsntfs_object_identifier_attribute.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_reparse_point_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume.h"
 #include "pyfsntfs_volume_file_entries.h"
+#include "pyfsntfs_volume_information_attribute.h"
 #include "pyfsntfs_volume_name_attribute.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
@@ -472,9 +474,11 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyTypeObject *mft_metadata_file_type_object              = NULL;
 	PyTypeObject *mft_metadata_file_entries_type_object      = NULL;
 	PyTypeObject *object_identifier_attribute_type_object    = NULL;
+	PyTypeObject *reparse_point_attribute_type_object        = NULL;
 	PyTypeObject *standard_information_attribute_type_object = NULL;
 	PyTypeObject *volume_type_object                         = NULL;
 	PyTypeObject *volume_file_entries_type_object            = NULL;
+	PyTypeObject *volume_information_attribute_type_object   = NULL;
 	PyTypeObject *volume_name_attribute_type_object          = NULL;
 	PyGILState_STATE gil_state                               = 0;
 
@@ -617,6 +621,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 "object_identifier_attribute",
 	 (PyObject *) object_identifier_attribute_type_object );
 
+	/* Setup the $REPARSE_POINT attribute type object
+	 */
+	pyfsntfs_reparse_point_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_reparse_point_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_reparse_point_attribute_type_object );
+
+	reparse_point_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "reparse_point_attribute",
+	 (PyObject *) reparse_point_attribute_type_object );
+
 	/* Setup the $STANDARD_INFORMATION attribute type object
 	 */
 	pyfsntfs_standard_information_attribute_type_object.tp_new = PyType_GenericNew;
@@ -635,6 +658,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "standard_information_attribute",
 	 (PyObject *) standard_information_attribute_type_object );
+
+	/* Setup the $VOLUME_INFORMATION attribute type object
+	 */
+	pyfsntfs_volume_information_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_information_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_information_attribute_type_object );
+
+	volume_information_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "volume_information_attribute",
+	 (PyObject *) volume_information_attribute_type_object );
 
 	/* Setup the $VOLUME_NAME attribute type object
 	 */

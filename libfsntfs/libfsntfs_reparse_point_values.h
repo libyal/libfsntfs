@@ -35,9 +35,25 @@ typedef struct libfsntfs_reparse_point_values libfsntfs_reparse_point_values_t;
 
 struct libfsntfs_reparse_point_values
 {
-	/* The type and flags
+	/* The tag
 	 */
-	uint32_t type_and_flags;
+	uint32_t tag;
+
+	/* The substitute name offset
+	 */
+	uint16_t substitute_name_offset;
+
+	/* The substitute name size
+	 */
+	uint16_t substitute_name_size;
+
+	/* The print name offset
+	 */
+	uint16_t print_name_offset;
+
+	/* The print name size
+	 */
+	uint16_t print_name_size;
 
 	/* The reparse data
 	 */
@@ -62,9 +78,53 @@ int libfsntfs_reparse_point_values_read(
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_reparse_point_values_get_type_and_flags(
+int libfsntfs_reparse_point_values_get_tag(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     uint32_t *type_and_flags,
+     uint32_t *tag,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf8_substitute_name_size(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     size_t *utf8_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf8_substitute_name(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf16_substitute_name_size(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     size_t *utf16_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf16_substitute_name(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf8_print_name_size(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     size_t *utf8_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf8_print_name(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf16_print_name_size(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     size_t *utf16_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_utf16_print_name(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

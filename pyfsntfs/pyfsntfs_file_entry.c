@@ -37,8 +37,10 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_object_identifier_attribute.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_reparse_point_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
+#include "pyfsntfs_volume_information_attribute.h"
 #include "pyfsntfs_volume_name_attribute.h"
 
 PyMethodDef pyfsntfs_file_entry_object_methods[] = {
@@ -2062,8 +2064,16 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 			type_object = &pyfsntfs_object_identifier_attribute_type_object;
 			break;
 
+		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
+			type_object = &pyfsntfs_reparse_point_attribute_type_object;
+			break;
+
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
 			type_object = &pyfsntfs_standard_information_attribute_type_object;
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION:
+			type_object = &pyfsntfs_volume_information_attribute_type_object;
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME:

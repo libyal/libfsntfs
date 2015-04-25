@@ -33,9 +33,61 @@ extern "C" {
 #endif
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_reparse_point_attribute_get_type_and_flags(
+int libfsntfs_reparse_point_attribute_get_tag(
      libfsntfs_attribute_t *attribute,
-     uint32_t *type_and_flags,
+     uint32_t *tag,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf8_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf8_print_name(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *utf16_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_utf16_print_name(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
