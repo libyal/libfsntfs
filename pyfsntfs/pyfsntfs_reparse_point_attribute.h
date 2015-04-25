@@ -40,6 +40,14 @@ PyObject *pyfsntfs_reparse_point_attribute_get_tag(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
+PyObject *pyfsntfs_reparse_point_attribute_get_substitute_name(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_reparse_point_attribute_get_print_name(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif
