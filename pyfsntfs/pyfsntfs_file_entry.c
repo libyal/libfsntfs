@@ -1939,22 +1939,22 @@ on_error:
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
-           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error      = NULL;
 	PyObject *integer_object      = NULL;
-	static char *function         = "pyfsntfs_file_entry_get_file_attribute_flags";
+	static char *function         = "pyfsntfs_file_entry_get_file_file_entry_flags";
 	uint32_t file_attribute_flags = 0;
 	int result                    = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
-	if( pyfsntfs_attribute == NULL )
+	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid attribute.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( NULL );
@@ -1962,7 +1962,7 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_file_entry_get_file_attribute_flags(
-	          pyfsntfs_attribute->attribute,
+	          pyfsntfs_file_entry->file_entry,
 	          &file_attribute_flags,
 	          &error );
 
