@@ -142,6 +142,10 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time_as_integer(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

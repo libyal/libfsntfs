@@ -30,6 +30,7 @@
 #include "pyfsntfs_attribute.h"
 #include "pyfsntfs_attributes.h"
 #include "pyfsntfs_error.h"
+#include "pyfsntfs_file_attribute_flags.h"
 #include "pyfsntfs_file_entries.h"
 #include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_file_name_attribute.h"
@@ -468,6 +469,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyObject *module                                         = NULL;
 	PyTypeObject *attribute_type_object                      = NULL;
 	PyTypeObject *attributes_type_object                     = NULL;
+	PyTypeObject *file_attribute_flags_type_object           = NULL;
 	PyTypeObject *file_entries_type_object                   = NULL;
 	PyTypeObject *file_entry_type_object                     = NULL;
 	PyTypeObject *file_name_attribute_type_object            = NULL;
@@ -772,6 +774,30 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "_volume_file_entries",
 	 (PyObject *) volume_file_entries_type_object );
+
+	/* Setup the file attribute flags type object
+	 */
+	pyfsntfs_file_attribute_flags_type_object.tp_new = PyType_GenericNew;
+
+	if( pyfsntfs_file_attribute_flags_init_type(
+	     &pyfsntfs_file_attribute_flags_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyfsntfs_file_attribute_flags_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_file_attribute_flags_type_object );
+
+	file_attribute_flags_type_object = &pyfsntfs_file_attribute_flags_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "file_attribute_flags",
+	 (PyObject *) file_attribute_flags_type_object );
 
 	PyGILState_Release(
 	 gil_state );

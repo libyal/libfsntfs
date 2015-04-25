@@ -550,3 +550,188 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the creation date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_creation_time(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *creation_time,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_creation_time";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( creation_time == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid creation time.",
+		 function );
+
+		return( -1 );
+	}
+	*creation_time = standard_information_values->creation_time;
+
+	return( 1 );
+}
+
+/* Retrieves the (file) modification (last written) date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_modification_time(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *modification_time,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_modification_time";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( modification_time == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid modification time.",
+		 function );
+
+		return( -1 );
+	}
+	*modification_time = standard_information_values->modification_time;
+
+	return( 1 );
+}
+
+/* Retrieves the access date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_access_time(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *access_time,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_access_time";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( access_time == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid access time.",
+		 function );
+
+		return( -1 );
+	}
+	*access_time = standard_information_values->access_time;
+
+	return( 1 );
+}
+
+/* Retrieves the (file system entry) modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_entry_modification_time(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *entry_modification_time,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_entry_modification_time";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( entry_modification_time == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid entry modification time.",
+		 function );
+
+		return( -1 );
+	}
+	*entry_modification_time = standard_information_values->entry_modification_time;
+
+	return( 1 );
+}
+
+/* Retrieves the file attribute flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_file_attribute_flags(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint32_t *file_attribute_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_file_attribute_flags";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_attribute_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file attribute flags.",
+		 function );
+
+		return( -1 );
+	}
+	*file_attribute_flags = standard_information_values->file_attribute_flags;
+
+	return( 1 );
+}
+

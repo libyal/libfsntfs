@@ -212,6 +212,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the name." },
 
+	{ "get_file_attribute_flags",
+	  (PyCFunction) pyfsntfs_file_entry_get_file_attribute_flags,
+	  METH_NOARGS,
+	  "get_file_attribute_flags() -> Integer or None\n"
+	  "\n"
+	  "Returns the file attribute flags." },
+
 	/* Functions to access the attributes */
 
 	{ "get_number_of_attributes",
@@ -1926,6 +1933,58 @@ on_error:
 		 name );
 	}
 	return( NULL );
+}
+
+/* Retrieves the file attribute flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error      = NULL;
+	PyObject *integer_object      = NULL;
+	static char *function         = "pyfsntfs_file_entry_get_file_attribute_flags";
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_file_attribute_flags(
+	          pyfsntfs_attribute->attribute,
+	          &file_attribute_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) file_attribute_flags );
+
+	return( integer_object );
 }
 
 /* Retrieves the number of attributes

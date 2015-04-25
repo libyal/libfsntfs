@@ -1,5 +1,7 @@
 TODO
 * file entry
+  - add API function for owner
+  - add API function for security identifier
   - only retrieve file name from the directory entry?
     or make clear in function documentation that first
     non-short filename is the fallback?
@@ -16,13 +18,8 @@ TODO
   - add has_reparse_point function
   - add has_symbolic_link function
   - add is_corrupt function?
-  - add in use function
   - add support for data streams
   - how to handle file-like object functions for non-data file entry
-* pyfsntfs standard information attribute
-  - add file_attribute_flags
-* add pyfsntfs volume information attribute
-* add pyfsntfs object identifier attribute
 * libfsntfs/pyfsntfs attribute
   - expose attribute data?
 * libfsntfs_mft_entry_read_element_data set MFT only flag using element flags

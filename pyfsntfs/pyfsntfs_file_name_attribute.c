@@ -103,6 +103,13 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the entry modification date and time as a 64-bit integer containing a FILETIME value." },
 
+	{ "get_file_attribute_flags",
+	  (PyCFunction) pyfsntfs_file_name_attribute_get_file_attribute_flags,
+	  METH_NOARGS,
+	  "get_file_attribute_flags() -> Integer\n"
+	  "\n"
+	  "Returns the file attribute flags." },
+
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_file_name_attribute_get_name,
 	  METH_NOARGS,
@@ -144,6 +151,12 @@ PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_name_attribute_get_entry_modification_time,
 	  (setter) 0,
 	  "The entry modification date and time.",
+	  NULL },
+
+	{ "file_attribute_flags",
+	  (getter) pyfsntfs_file_name_attribute_get_file_attribute_flags,
+	  (setter) 0,
+	  "The file attribute flags.",
 	  NULL },
 
 	{ "name",
@@ -771,6 +784,58 @@ PyObject *pyfsntfs_file_name_attribute_get_entry_modification_time_as_integer(
 	}
 	integer_object = pyfsntfs_integer_signed_new_from_64bit(
 	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the file attribute flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_name_attribute_get_file_attribute_flags(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error      = NULL;
+	PyObject *integer_object      = NULL;
+	static char *function         = "pyfsntfs_file_name_attribute_get_file_attribute_flags";
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_name_attribute_get_file_attribute_flags(
+	          pyfsntfs_attribute->attribute,
+	          &file_attribute_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) file_attribute_flags );
 
 	return( integer_object );
 }

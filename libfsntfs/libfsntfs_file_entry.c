@@ -35,6 +35,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
 
@@ -399,7 +400,7 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 }
 
 /* Retrieves the creation date and time
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the $STANDARD_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_creation_time(
@@ -407,9 +408,9 @@ int libfsntfs_file_entry_get_creation_time(
      uint64_t *creation_time,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_file_name_values_t *file_name_values       = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_creation_time";
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_creation_time";
 
 	if( file_entry == NULL )
 	{
@@ -435,33 +436,26 @@ int libfsntfs_file_entry_get_creation_time(
 
 		return( -1 );
 	}
-	if( internal_file_entry->directory_entry != NULL )
+	if( internal_file_entry->mft_entry->standard_information_attribute == NULL )
 	{
-		file_name_values = internal_file_entry->directory_entry->file_name_values;
+		return( 0 );
 	}
-	if( file_name_values == NULL )
+	if( libfsntfs_attribute_get_value(
+	     internal_file_entry->mft_entry->standard_information_attribute,
+	     (intptr_t **) &standard_information_values,
+	     error ) != 1 )
 	{
-		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
-		{
-			return( 0 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     internal_file_entry->mft_entry->file_name_attribute,
-		     (intptr_t **) &file_name_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute value.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_creation_time(
-	     file_name_values,
+	if( libfsntfs_standard_information_values_get_creation_time(
+	     standard_information_values,
 	     creation_time,
 	     error ) != 1 )
 	{
@@ -469,7 +463,7 @@ int libfsntfs_file_entry_get_creation_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve creation time from file name attribute.",
+		 "%s: unable to retrieve creation time from standard information attribute.",
 		 function );
 
 		return( -1 );
@@ -478,7 +472,7 @@ int libfsntfs_file_entry_get_creation_time(
 }
 
 /* Retrieves the (file) modification (last written) date and time
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the $STANDARD_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_modification_time(
@@ -486,9 +480,9 @@ int libfsntfs_file_entry_get_modification_time(
      uint64_t *modification_time,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_file_name_values_t *file_name_values       = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_modification_time";
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_modification_time";
 
 	if( file_entry == NULL )
 	{
@@ -514,33 +508,26 @@ int libfsntfs_file_entry_get_modification_time(
 
 		return( -1 );
 	}
-	if( internal_file_entry->directory_entry != NULL )
+	if( internal_file_entry->mft_entry->standard_information_attribute == NULL )
 	{
-		file_name_values = internal_file_entry->directory_entry->file_name_values;
+		return( 0 );
 	}
-	if( file_name_values == NULL )
+	if( libfsntfs_attribute_get_value(
+	     internal_file_entry->mft_entry->standard_information_attribute,
+	     (intptr_t **) &standard_information_values,
+	     error ) != 1 )
 	{
-		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
-		{
-			return( 0 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     internal_file_entry->mft_entry->file_name_attribute,
-		     (intptr_t **) &file_name_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute value.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_modification_time(
-	     file_name_values,
+	if( libfsntfs_standard_information_values_get_modification_time(
+	     standard_information_values,
 	     modification_time,
 	     error ) != 1 )
 	{
@@ -548,7 +535,7 @@ int libfsntfs_file_entry_get_modification_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve modification time from file name attribute.",
+		 "%s: unable to retrieve modification time from standard information attribute.",
 		 function );
 
 		return( -1 );
@@ -557,7 +544,7 @@ int libfsntfs_file_entry_get_modification_time(
 }
 
 /* Retrieves the access date and time
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the $STANDARD_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_access_time(
@@ -565,9 +552,9 @@ int libfsntfs_file_entry_get_access_time(
      uint64_t *access_time,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_file_name_values_t *file_name_values       = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_access_time";
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_access_time";
 
 	if( file_entry == NULL )
 	{
@@ -593,33 +580,26 @@ int libfsntfs_file_entry_get_access_time(
 
 		return( -1 );
 	}
-	if( internal_file_entry->directory_entry != NULL )
+	if( internal_file_entry->mft_entry->file_name_attribute == NULL )
 	{
-		file_name_values = internal_file_entry->directory_entry->file_name_values;
+		return( 0 );
 	}
-	if( file_name_values == NULL )
+	if( libfsntfs_attribute_get_value(
+	     internal_file_entry->mft_entry->standard_information_attribute,
+	     (intptr_t **) &standard_information_values,
+	     error ) != 1 )
 	{
-		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
-		{
-			return( 0 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     internal_file_entry->mft_entry->file_name_attribute,
-		     (intptr_t **) &file_name_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute value.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_access_time(
-	     file_name_values,
+	if( libfsntfs_standard_information_values_get_access_time(
+	     standard_information_values,
 	     access_time,
 	     error ) != 1 )
 	{
@@ -627,7 +607,7 @@ int libfsntfs_file_entry_get_access_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve access time from file name attribute.",
+		 "%s: unable to retrieve access time from standard information attribute.",
 		 function );
 
 		return( -1 );
@@ -636,7 +616,7 @@ int libfsntfs_file_entry_get_access_time(
 }
 
 /* Retrieves the (file system entry) modification date and time
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the $STANDARD_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_entry_modification_time(
@@ -644,9 +624,9 @@ int libfsntfs_file_entry_get_entry_modification_time(
      uint64_t *entry_modification_time,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_file_name_values_t *file_name_values       = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_entry_modification_time";
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_entry_modification_time";
 
 	if( file_entry == NULL )
 	{
@@ -672,33 +652,26 @@ int libfsntfs_file_entry_get_entry_modification_time(
 
 		return( -1 );
 	}
-	if( internal_file_entry->directory_entry != NULL )
+	if( internal_file_entry->mft_entry->standard_information_attribute == NULL )
 	{
-		file_name_values = internal_file_entry->directory_entry->file_name_values;
+		return( 0 );
 	}
-	if( file_name_values == NULL )
+	if( libfsntfs_attribute_get_value(
+	     internal_file_entry->mft_entry->standard_information_attribute,
+	     (intptr_t **) &standard_information_values,
+	     error ) != 1 )
 	{
-		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
-		{
-			return( 0 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     internal_file_entry->mft_entry->file_name_attribute,
-		     (intptr_t **) &file_name_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute value.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_entry_modification_time(
-	     file_name_values,
+	if( libfsntfs_standard_information_values_get_entry_modification_time(
+	     standard_information_values,
 	     entry_modification_time,
 	     error ) != 1 )
 	{
@@ -706,7 +679,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry modification time from file name attribute.",
+		 "%s: unable to retrieve entry modification time from standard information attribute.",
 		 function );
 
 		return( -1 );
@@ -715,7 +688,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 }
 
 /* Retrieves the file attribute flags
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the $STANDARD_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_file_attribute_flags(
@@ -723,9 +696,9 @@ int libfsntfs_file_entry_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_file_name_values_t *file_name_values       = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_file_attribute_flags";
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_file_attribute_flags";
 
 	if( file_entry == NULL )
 	{
@@ -751,33 +724,26 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 
 		return( -1 );
 	}
-	if( internal_file_entry->directory_entry != NULL )
+	if( internal_file_entry->mft_entry->standard_information_attribute == NULL )
 	{
-		file_name_values = internal_file_entry->directory_entry->file_name_values;
+		return( 0 );
 	}
-	if( file_name_values == NULL )
+	if( libfsntfs_attribute_get_value(
+	     internal_file_entry->mft_entry->standard_information_attribute,
+	     (intptr_t **) &standard_information_values,
+	     error ) != 1 )
 	{
-		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
-		{
-			return( 0 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     internal_file_entry->mft_entry->file_name_attribute,
-		     (intptr_t **) &file_name_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute value.",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_file_attribute_flags(
-	     file_name_values,
+	if( libfsntfs_standard_information_values_get_file_attribute_flags(
+	     standard_information_values,
 	     file_attribute_flags,
 	     error ) != 1 )
 	{
@@ -785,7 +751,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file attribute flags from file name attribute.",
+		 "%s: unable to retrieve file attribute flags from standard information attribute.",
 		 function );
 
 		return( -1 );
@@ -837,6 +803,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 	}
 	if( file_name_values == NULL )
 	{
+/* TODO file name attribute index ? */
 		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
 		{
 			return( 0 );
@@ -918,6 +885,7 @@ int libfsntfs_file_entry_get_utf8_name(
 	}
 	if( file_name_values == NULL )
 	{
+/* TODO file name attribute index ? */
 		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
 		{
 			return( 0 );
@@ -999,6 +967,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 	}
 	if( file_name_values == NULL )
 	{
+/* TODO file name attribute index ? */
 		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
 		{
 			return( 0 );
@@ -1080,6 +1049,7 @@ int libfsntfs_file_entry_get_utf16_name(
 	}
 	if( file_name_values == NULL )
 	{
+/* TODO file name attribute index ? */
 		if( internal_file_entry->mft_entry->file_name_attribute == NULL )
 		{
 			return( 0 );

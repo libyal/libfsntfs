@@ -156,6 +156,19 @@ void info_handle_file_attribute_flags_fprint(
 		 notify_stream,
 		 "\t\tIs virtual (FILE_ATTRIBUTE_VIRTUAL)\n" );
 	}
+
+	if( ( file_attribute_flags & 0x10000000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\tUnknown: 0x10000000\n" );
+	}
+	if( ( file_attribute_flags & 0x20000000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\tUnknown: 0x20000000\n" );
+	}
 }
 
 /* Retrieves the attribute type description
