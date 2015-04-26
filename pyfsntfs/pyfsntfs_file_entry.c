@@ -2210,7 +2210,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != -1 )
+	if( result != 1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
