@@ -226,6 +226,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the name." },
 
+	{ "get_name_attribute_index",
+	  (PyCFunction) pyfsntfs_file_entry_get_name_attribute_index,
+	  METH_NOARGS,
+	  "get_name_attribute_index() -> Integer or None\n"
+	  "\n"
+	  "Returns the attribute index corresponding to the name." },
+
 	{ "get_name_by_attribute_index",
 	  (PyCFunction) pyfsntfs_file_entry_get_name_by_attribute_index,
 	  METH_VARARGS | METH_KEYWORDS,
@@ -340,6 +347,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 
 	{ "name",
 	  (getter) pyfsntfs_file_entry_get_name,
+	  (setter) 0,
+	  "The name.",
+	  NULL },
+
+	{ "name_attribute_index",
+	  (getter) pyfsntfs_file_entry_get_name_attribute_index,
 	  (setter) 0,
 	  "The name.",
 	  NULL },
@@ -2091,6 +2104,62 @@ on_error:
 		 name );
 	}
 	return( NULL );
+}
+
+/* Retrieves the name attribute index
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_name_attribute_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_name_attribute_index";
+	int attribute_index      = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_name_attribute_index(
+	          pyfsntfs_file_entry->file_entry,
+	          &attribute_index,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve name attribute index.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) attribute_index );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) attribute_index );
+#endif
+	return( integer_object );
 }
 
 /* Retrieves the name for a specific $FILE_NAME attribute

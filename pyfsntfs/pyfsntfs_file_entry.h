@@ -159,6 +159,10 @@ PyObject *pyfsntfs_file_entry_get_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_name_attribute_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments,

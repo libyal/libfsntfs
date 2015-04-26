@@ -181,6 +181,12 @@ int libfsntfs_file_entry_get_utf16_name(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_name_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int *attribute_index,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,

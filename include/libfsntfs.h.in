@@ -538,6 +538,15 @@ int libfsntfs_file_entry_get_utf16_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the name attribute index
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_name_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int *attribute_index,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name for a specific $FILE_NAME attribute
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
