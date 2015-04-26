@@ -413,6 +413,26 @@ int libfsntfs_file_entry_get_base_record_file_reference(
      uint64_t *file_reference,
      libfsntfs_error_t **error );
 
+/* Retrieves the parent file reference
+ * This value is retrieved from the directory entry $FILE_NAME attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_parent_file_reference(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *file_reference,
+     libfsntfs_error_t **error );
+
+/* Retrieves the parent file reference for a specific $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint64_t *file_reference,
+     libfsntfs_error_t **error );
+
 /* Retrieves the journal sequence number
  * Returns 1 if successful or -1 on error
  */
@@ -474,7 +494,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -485,7 +505,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 
 /* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -497,7 +517,7 @@ int libfsntfs_file_entry_get_utf8_name(
 
 /* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -508,12 +528,58 @@ int libfsntfs_file_entry_get_utf16_name_size(
 
 /* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
- * This value is retrieved from the $FILE_NAME attribute
+ * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name(
      libfsntfs_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name for a specific $FILE_NAME attribute
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name for a specific $FILE_NAME attribute
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name for a specific $FILE_NAME attribute
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf16_name_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name for a specific $FILE_NAME attribute
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
      uint16_t *utf16_name,
      size_t utf16_name_size,
      libfsntfs_error_t **error );

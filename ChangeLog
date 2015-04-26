@@ -1,5 +1,7 @@
 TODO
 * file entry
+  - add API get file name by attribute index functions?
+  - add API get parent file_reference name by attribute index functions?
   - add API function for owner
   - add API function for security identifier
   - only retrieve file name from the directory entry?
@@ -13,6 +15,7 @@ TODO
 * pyfsntfs volume
   - add get file entry by path (get_file_entry_by_path)
 * pyfsntfs file entry
+  - add data stream support
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
   - add has_reparse_point function
@@ -162,6 +165,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20150426
+* worked on Python bindings
 
 20150425
 * worked on Python bindings

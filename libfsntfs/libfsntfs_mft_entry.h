@@ -95,15 +95,11 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
 
-	/* The default (nameless) standard information attribute
+	/* The standard information attribute
 	 */
 	libfsntfs_attribute_t *standard_information_attribute;
 
-	/* The default (nameless) file name attribute
-	 */
-	libfsntfs_attribute_t *file_name_attribute;
-
-	/* The default (nameless) object identifier attribute
+	/* The object identifier attribute
 	 */
 	libfsntfs_attribute_t *object_identifier_attribute;
 

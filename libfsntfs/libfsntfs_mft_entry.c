@@ -263,7 +263,7 @@ int libfsntfs_mft_entry_free(
 
 			result = -1;
 		}
-		/* The file_name_attribute, standard_information_attribute, object_identifier_attribute,
+		/* The standard_information_attribute, object_identifier_attribute,
 		 * volume_information_attribute and volume_name_attibute references
 		 * are managed by the attributes_array
 		 */
@@ -2548,13 +2548,12 @@ int libfsntfs_mft_entry_append_attribute(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfsntfs_file_name_values_t *file_name_values = NULL;
-	libfsntfs_index_t *index                       = NULL;
-	static char *function                          = "libfsntfs_mft_entry_append_attribute";
-	uint32_t attribute_type                        = 0;
-	int attribute_has_name                         = 0;
-	int entry_index                                = 0;
-	int result                                     = 0;
+	libfsntfs_index_t *index = NULL;
+	static char *function    = "libfsntfs_mft_entry_append_attribute";
+	uint32_t attribute_type  = 0;
+	int attribute_has_name   = 0;
+	int entry_index          = 0;
+	int result               = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -2769,37 +2768,6 @@ int libfsntfs_mft_entry_append_attribute(
 	}
 	switch( attribute_type )
 	{
-		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
-			if( attribute_has_name == 0 )
-			{
-				if( mft_entry->file_name_attribute == NULL )
-				{
-					mft_entry->file_name_attribute = attribute;
-				}
-				else
-				{
-					if( libfsntfs_attribute_get_value(
-					     mft_entry->file_name_attribute,
-					     (intptr_t **) &file_name_values,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve attribute value.",
-						 function );
-
-						return( -1 );
-					}
-					if( file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
-					{
-						mft_entry->file_name_attribute = attribute;
-					}
-				}
-			}
-			break;
-
 		case LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER:
 			if( ( mft_entry->object_identifier_attribute == NULL )
 			 && ( attribute_has_name == 0 ) )
