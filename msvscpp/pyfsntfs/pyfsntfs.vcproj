@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_data_stream.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_datetime.c"
 				>
 			</File>
@@ -269,6 +273,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_attributes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_data_stream.h"
 				>
 			</File>
 			<File

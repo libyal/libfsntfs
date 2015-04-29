@@ -181,6 +181,25 @@ PyObject *pyfsntfs_file_entry_get_attribute(
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyfsntfs_file_entry_get_attributes(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_number_of_alternate_data_streams(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int alternate_data_stream_index );
+
+PyObject *pyfsntfs_file_entry_get_alternate_data_stream(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords );
+
+/* TODO get alternate_data_streams */
+
 PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

@@ -16,12 +16,13 @@ TODO
   - add get file entry by path (get_file_entry_by_path)
 * pyfsntfs file entry
   - add data stream support
+  - add get data stream by name support
+  - add data streams support
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
   - add has_reparse_point function
   - add has_symbolic_link function
   - add is_corrupt function?
-  - add support for data streams
   - how to handle file-like object functions for non-data file entry
 * libfsntfs/pyfsntfs attribute
   - expose attribute data?
@@ -165,6 +166,9 @@ Debug:
 Deployment
 * check configure test of sub library included functions
 * write man pages
+
+20150429
+* worked on Python bindings
 
 20150426
 * worked on Python bindings

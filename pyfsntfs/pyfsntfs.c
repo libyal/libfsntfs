@@ -29,6 +29,7 @@
 #include "pyfsntfs.h"
 #include "pyfsntfs_attribute.h"
 #include "pyfsntfs_attributes.h"
+#include "pyfsntfs_data_stream.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_attribute_flags.h"
 #include "pyfsntfs_file_entries.h"
@@ -469,6 +470,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyObject *module                                         = NULL;
 	PyTypeObject *attribute_type_object                      = NULL;
 	PyTypeObject *attributes_type_object                     = NULL;
+	PyTypeObject *data_stream_type_object                    = NULL;
 	PyTypeObject *file_attribute_flags_type_object           = NULL;
 	PyTypeObject *file_entries_type_object                   = NULL;
 	PyTypeObject *file_entry_type_object                     = NULL;
@@ -565,6 +567,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "file_entry",
 	 (PyObject *) file_entry_type_object );
+
+	/* Setup the data stream type object
+	 */
+	pyfsntfs_data_stream_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_data_stream_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_data_stream_type_object );
+
+	data_stream_type_object = &pyfsntfs_data_stream_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "data_stream",
+	 (PyObject *) data_stream_type_object );
 
 	/* Setup the attribute type object
 	 */

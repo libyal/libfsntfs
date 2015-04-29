@@ -27,6 +27,8 @@
 #endif
 
 #include "pyfsntfs_attribute.h"
+#include "pyfsntfs_attributes.h"
+#include "pyfsntfs_data_stream.h"
 #include "pyfsntfs_datetime.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
@@ -263,6 +265,22 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Retrieves a specific attribute." },
 
+	/* Functions to access the alternate data streams */
+
+	{ "get_number_of_alternate_data_streams",
+	  (PyCFunction) pyfsntfs_file_entry_get_number_of_alternate_data_streams,
+	  METH_NOARGS,
+	  "get_number_of_alternate_data_streams() -> Integer\n"
+	  "\n"
+	  "Retrieves the number of alternate data streams." },
+
+	{ "get_alternate_data_stream",
+	  (PyCFunction) pyfsntfs_file_entry_get_alternate_data_stream,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_alternate_data_stream(alternate_data_stream_index) -> Object\n"
+	  "\n"
+	  "Retrieves a specific alternate data stream." },
+
 	/* Functions to access the sub file entries */
 
 	{ "get_number_of_sub_file_entries",
@@ -361,6 +379,18 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_number_of_attributes,
 	  (setter) 0,
 	  "The number of attributes.",
+	  NULL },
+
+	{ "attributes",
+	  (getter) pyfsntfs_file_entry_get_attributes,
+	  (setter) 0,
+	  "The attributes",
+	  NULL },
+
+	{ "number_of_alternate_data_streams",
+	  (getter) pyfsntfs_file_entry_get_number_of_alternate_data_streams,
+	  (setter) 0,
+	  "The number of alternate data streams.",
 	  NULL },
 
 	{ "number_of_sub_file_entries",
@@ -501,7 +531,7 @@ PyObject *pyfsntfs_file_entry_new(
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize file_entry.",
+		 "%s: unable to initialize file entry.",
 		 function );
 
 		goto on_error;
@@ -511,7 +541,7 @@ PyObject *pyfsntfs_file_entry_new(
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize file_entry.",
+		 "%s: unable to initialize file entry.",
 		 function );
 
 		goto on_error;
@@ -545,7 +575,7 @@ int pyfsntfs_file_entry_init(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid file_entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return( -1 );
@@ -571,7 +601,7 @@ void pyfsntfs_file_entry_free(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid file_entry.",
+		 "%s: invalid file entry.",
 		 function );
 
 		return;
@@ -580,7 +610,7 @@ void pyfsntfs_file_entry_free(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid file entry - missing libfsntfs file_entry.",
+		 "%s: invalid file entry - missing libfsntfs file entry.",
 		 function );
 
 		return;
@@ -619,7 +649,7 @@ void pyfsntfs_file_entry_free(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_MemoryError,
-		 "%s: unable to free file_entry.",
+		 "%s: unable to free file entry.",
 		 function );
 
 		libcerror_error_free(
@@ -634,7 +664,7 @@ void pyfsntfs_file_entry_free(
 	 (PyObject*) pyfsntfs_file_entry );
 }
 
-/* Reads a buffer of file entry data from FSNTFS file(s)
+/* Reads a buffer of data from the file entry
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_read_buffer(
@@ -654,7 +684,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -663,7 +693,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry - missing libfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -758,7 +788,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	return( string_object );
 }
 
-/* Reads a buffer of file entry data at a specific offset from FSNTFS file(s)
+/* Reads a buffer of data at a specific foffset from the file entry
  * Returns a Python object holding the data if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
@@ -779,7 +809,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -788,7 +818,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file entry - missing libfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -914,7 +944,7 @@ PyObject *pyfsntfs_file_entry_seek_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -923,7 +953,7 @@ PyObject *pyfsntfs_file_entry_seek_offset(
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid pyfsntfs file entry - missing libfsntfs file_entry.",
+		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
 		return( NULL );
@@ -2549,6 +2579,224 @@ PyObject *pyfsntfs_file_entry_get_attribute(
 	                    attribute_index );
 
 	return( attribute_object );
+}
+
+/* Retrieves an attributes sequence and iterator object for the attributes
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_attributes(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error    = NULL;
+	PyObject *attributes_object = NULL;
+	static char *function       = "pyfsntfs_file_entry_get_attributes";
+	int number_of_attributes    = 0;
+	int result                  = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          pyfsntfs_file_entry->file_entry,
+	          &number_of_attributes,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of attributes.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	attributes_object = pyfsntfs_attributes_new(
+	                     pyfsntfs_file_entry,
+	                     &pyfsntfs_file_entry_get_attribute_by_index,
+	                     number_of_attributes );
+
+	if( attributes_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create attributes object.",
+		 function );
+
+		return( NULL );
+	}
+	return( attributes_object );
+}
+
+/* Retrieves the number of alternate data streams
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_number_of_alternate_data_streams(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error             = NULL;
+	PyObject *integer_object             = NULL;
+	static char *function                = "pyfsntfs_file_entry_get_number_of_alternate_data_streams";
+	int number_of_alternate_data_streams = 0;
+	int result                           = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          pyfsntfs_file_entry->file_entry,
+	          &number_of_alternate_data_streams,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of alternate data streams.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_alternate_data_streams );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_alternate_data_streams );
+#endif
+	return( integer_object );
+}
+
+/* Retrieves a specific alternate data stream by index
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int alternate_data_stream_index )
+{
+	libcerror_error_t *error             = NULL;
+	libfsntfs_data_stream_t *data_stream = NULL;
+	PyObject *data_stream_object         = NULL;
+	static char *function                = "pyfsntfs_file_entry_get_alternate_data_stream_by_index";
+	int result                           = 0;
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_alternate_data_stream_by_index(
+	          pyfsntfs_file_entry->file_entry,
+	          alternate_data_stream_index,
+	          &data_stream,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve alternate data stream: %d.",
+		 function,
+		 alternate_data_stream_index );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	data_stream_object = pyfsntfs_data_stream_new(
+	                      data_stream,
+	                      pyfsntfs_file_entry );
+
+	if( data_stream_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create alternate data stream object.",
+		 function );
+
+		goto on_error;
+	}
+	return( data_stream_object );
+
+on_error:
+	if( data_stream != NULL )
+	{
+		libfsntfs_data_stream_free(
+		 &data_stream,
+		 NULL );
+	}
+	return( NULL );
+}
+
+/* Retrieves a specific alternate data stream
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_alternate_data_stream(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *data_stream_object    = NULL;
+	static char *keyword_list[]     = { "alternate_data_stream_index", NULL };
+	int alternate_data_stream_index = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i",
+	     keyword_list,
+	     &alternate_data_stream_index ) == 0 )
+	{
+		return( NULL );
+	}
+	data_stream_object = pyfsntfs_file_entry_get_alternate_data_stream_by_index(
+	                      pyfsntfs_file_entry,
+	                      alternate_data_stream_index );
+
+	return( data_stream_object );
 }
 
 /* Retrieves the number of sub file entries
