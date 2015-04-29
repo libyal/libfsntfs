@@ -7,58 +7,34 @@ TODO
   - only retrieve file name from the directory entry?
     or make clear in function documentation that first
     non-short filename is the fallback?
-* file entry $MFT scan
-  - mark ignored attribute list
-  - mark ignored data stream
-  - mark ignored index
-  - handle corrupt MFT entries (e.g. missing FILE signature)
-* pyfsntfs volume
-  - add get file entry by path (get_file_entry_by_path)
 * pyfsntfs file entry
-  - add data stream support
-  - add get data stream by name support
-  - add data streams support
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
   - add has_reparse_point function
   - add has_symbolic_link function
   - add is_corrupt function?
   - how to handle file-like object functions for non-data file entry
+* pyfsntfs data stream
+  - get extents
 * libfsntfs/pyfsntfs attribute
-  - expose attribute data?
+  - expose raw attribute data?
+* libfsntfs/pyfsntfs file entry
+  - expose default data stream
+  - get extents default data stream?
+  - add support for short file name
+  - fallback to short file name if no long
 * libfsntfs_mft_entry_read_element_data set MFT only flag using element flags
 * libfsntfs_attribute_read_from_mft handle attribute size out of bounds
 * mft metadata file parsing mark file entry as in complete if data is stored
   outside the $MFT
-
-* fsntfsinfo
-  - move UsnJrnl to separate tool?
-  - fix remnant data in buffer and remove work around
-* implement UsnJrnl parsing
-  - move UsnJrnl parsing into library ?
-  - add support for $UsnJrnl:$J file parsing
-* data streams return the offset ranges?
-* add stand-alone MTF parsing support
 * change MFT entry flags value checks to named definitions
-
-* API
-  - expose object identifier attribute
-  - expose reparse point attribute
-  - expose logged utility stream attribute
-
 * attribute data parsing
   - add SSIZE_MAX check for attribute->data_size before (size_t) cast
-* MFT entry
-  - add support for short file name
-  - add support for multiple $FILE_NAME entries
-* file entry fallback to short file name if no long
 * move directory entry btree into index ?
 * merge i30_index and alternate_index_array
 
-* fsntfsinfo sanitize control characters in filenames
 * cached approach of reading attributes ?
 
-* fsntfsinfo: add detection of BDE and VSS
 * add support for other values of sectors_per_cluster_block, seen 8, 128
 * add support for other values of index_entry_size, seen 1, 244
 * complete libcdata integration
@@ -67,17 +43,10 @@ TODO
   - determine MFT entry index based on offset
     do not rely on value in structure
 
-* update libfsntfs.c
-* MFT entry create get data segment function
-  for internal usage
+* MFT entry create get data segment function for internal usage
 
 * how to handle named index roots e.g. $ObjId:$O, $Quota:$O
-* fsntfs
-  - add offset option
-* code clean up
-  - goto on error
 * fix issue with bounded MFT entry cache
-* analyze MARKER
 * support MFT entry 0 consisting of multiple $DATA attributes
   - add segment support to ntfs attribute data reference
 
@@ -99,11 +68,20 @@ TODO
 * move get mft entry to file entry initialize ?
   - clone mft entry in file entry initialize (for now the mft entry cache
   contains a slot for every entry)
-* implement file entry
-  - add functions to include file
-  - add functions to manual
 
 * move volume header from io handle to separate object ?
+
+* $MFT scan
+  - mark ignored attribute list
+  - mark ignored data stream
+  - mark ignored index
+  - handle corrupt MFT entries (e.g. missing FILE signature)
+* $UsnJrnl:$J parsing
+  - move UsnJrnl parsing into library ?
+  - add support for $UsnJrnl:$J file parsing
+
+* API
+  - expose logged utility stream attribute
 
 Format:
 * index
@@ -114,57 +92,28 @@ Format:
   - add a check to see if data run sizes add up
   - add support for compressed and/or sparse data runs
 * add support for attributes:
-  - attribute list (ATTRIBUTE_LIST) (partial)
-  - volume name (VOLUME_NAME) (partial)
-  - volume information (VOLUME_INFORMATION) (partial)
-  - add index support (INDEX_ROOT, INDEX_ALLOCATION) (partial)
-  - add bitmap support (BITMAP) (partial)
-  - reparse point (REPARSE_POINT) (partial)
   - logged utillity stream (LOGGED_UTILITY_STREAM) (partial)
-* file entry
-  - add data support (DATA)
-    - add sparse data range support to libfdata
-  - add directory entry support (requires index support)
-  - add STANDARD_INFORMATION support (partial)
-  - add FILE_NAME support (partial)
-  - add OBJECT_ID support
 * pre NTFS 3.0 attribute types
   - volume version
 * filenames
-  - ignoring DOS filenames for now
-
-Runtime index:
-* name
-* attribute type
-* node/value tree
-* bitmap ?
-
-API:
-* expose file (MFT) attribute
-  - add function to retrieve attribute based on attribute type
-* add functions
-  - to retrieve volume name
-  - to retrieve (volume) file system version
-  - to retrieve reparse point data
-  - to retrieve MFT entry by index
+  - ignoring short filenames for now?
 
 Tools:
 * fsntfsinfo
   - print ADS
-  - add option to print update journal entries
+  - move UsnJrnl to separate tool?
+  - fix remnant data in buffer and remove work around
+  - sanitize control characters in filenames
+  - add detection of BDE and VSS
+  - add support for $LogFile
 
 Performance:
-* compact attribute union data/file reference (use type to distinguish between
-  them)
+* compact attribute union data/file reference (use type to distinguish between them)
 
 Debug:
-* print mft entry flags
 * print volume information flags description
-* print reparse point tag description
-* print reparse point data
 
 Deployment
-* check configure test of sub library included functions
 * write man pages
 
 20150429
