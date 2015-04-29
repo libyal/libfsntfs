@@ -29,6 +29,7 @@
 #include "pyfsntfs_attribute.h"
 #include "pyfsntfs_attributes.h"
 #include "pyfsntfs_data_stream.h"
+#include "pyfsntfs_data_streams.h"
 #include "pyfsntfs_datetime.h"
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_file_entries.h"
@@ -391,6 +392,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_number_of_alternate_data_streams,
 	  (setter) 0,
 	  "The number of alternate data streams.",
+	  NULL },
+
+	{ "alternate_data_streams",
+	  (getter) pyfsntfs_file_entry_get_alternate_data_streams,
+	  (setter) 0,
+	  "The alternate data streams",
 	  NULL },
 
 	{ "number_of_sub_file_entries",
@@ -2797,6 +2804,69 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream(
 	                      alternate_data_stream_index );
 
 	return( data_stream_object );
+}
+
+/* Retrieves a data streams sequence and iterator object for the alternate data streams
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_alternate_data_streams(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error             = NULL;
+	PyObject *data_streams_object        = NULL;
+	static char *function                = "pyfsntfs_file_entry_get_alternate_data_streams";
+	int number_of_alternate_data_streams = 0;
+	int result                           = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          pyfsntfs_file_entry->file_entry,
+	          &number_of_alternate_data_streams,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of alternate data streams.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	data_streams_object = pyfsntfs_data_streams_new(
+	                       pyfsntfs_file_entry,
+	                       &pyfsntfs_file_entry_get_alternate_data_stream_by_index,
+	                       number_of_alternate_data_streams );
+
+	if( data_streams_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create data streams object.",
+		 function );
+
+		return( NULL );
+	}
+	return( data_streams_object );
 }
 
 /* Retrieves the number of sub file entries

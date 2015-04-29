@@ -20,6 +20,7 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_attribute.c pyfsntfs_attribute.h \
 	pyfsntfs_attributes.c pyfsntfs_attributes.h \
 	pyfsntfs_data_stream.c pyfsntfs_data_stream.h \
+	pyfsntfs_data_streams.c pyfsntfs_data_streams.h \
 	pyfsntfs_datetime.c pyfsntfs_datetime.h \
 	pyfsntfs_error.c pyfsntfs_error.h \
 	pyfsntfs_file_attribute_flags.c pyfsntfs_file_attribute_flags.h \
