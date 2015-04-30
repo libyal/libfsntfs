@@ -629,7 +629,7 @@ int libfsntfs_data_stream_get_number_of_extents(
 /* Retrieves a specific extent (decoded data run)
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_data_stream_get_extent(
+int libfsntfs_data_stream_get_extent_by_index(
      libfsntfs_data_stream_t *data_stream,
      int extent_index,
      off64_t *extent_offset,
@@ -638,7 +638,7 @@ int libfsntfs_data_stream_get_extent(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
-	static char *function                                  = "libfsntfs_data_stream_get_extent";
+	static char *function                                  = "libfsntfs_data_stream_get_extent_by_index";
 	size64_t data_size                                     = 0;
 	uint32_t range_flags                                   = 0;
 	int segment_file_index                                 = 0;

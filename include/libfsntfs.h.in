@@ -710,7 +710,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
      libfsntfs_file_entry_t **sub_file_entry,
      libfsntfs_error_t **error );
 
-/* Reads data at the current offset
+/* Reads data at the current offset from the default data stream (nameless $DATA attribute)
  * Returns the number of bytes read or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -720,7 +720,7 @@ ssize_t libfsntfs_file_entry_read_buffer(
          size_t buffer_size,
          libfsntfs_error_t **error );
 
-/* Reads data at a specific offset
+/* Reads data at a specific offset from the default data stream (nameless $DATA attribute)
  * Returns the number of bytes read or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -731,7 +731,7 @@ ssize_t libfsntfs_file_entry_read_buffer_at_offset(
          off64_t offset,
          libfsntfs_error_t **error );
 
-/* Seeks a certain offset of the data
+/* Seeks a certain offset of in the default data stream (nameless $DATA attribute)
  * Returns the offset if seek is successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -741,7 +741,7 @@ off64_t libfsntfs_file_entry_seek_offset(
          int whence,
          libfsntfs_error_t **error );
 
-/* Retrieves the current offset of the data
+/* Retrieves the current offset of the default data stream (nameless $DATA attribute)
  * Returns the offset if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -750,13 +750,34 @@ int libfsntfs_file_entry_get_offset(
      off64_t *offset,
      libfsntfs_error_t **error );
 
-/* Retrieves the size
+/* Retrieves the size of the default data stream (nameless $DATA attribute)
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_size(
      libfsntfs_file_entry_t *file_entry,
      size64_t *size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the number of extents (decoded data runs) of the default data stream (nameless $DATA attribute)
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_number_of_extents(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_extents,
+     libfsntfs_error_t **error );
+
+/* Retrieves a specific extent (decoded data run) of the default data stream (nameless $DATA attribute)
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_extent_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int extent_index,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1313,7 +1334,7 @@ int libfsntfs_data_stream_get_number_of_extents(
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_data_stream_get_extent(
+int libfsntfs_data_stream_get_extent_by_index(
      libfsntfs_data_stream_t *data_stream,
      int extent_index,
      off64_t *extent_offset,

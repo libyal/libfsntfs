@@ -91,6 +91,19 @@ PyObject *pyfsntfs_data_stream_get_name(
            pyfsntfs_data_stream_t *pyfsntfs_data_stream,
            PyObject *arguments );
 
+PyObject *pyfsntfs_data_stream_get_number_of_extents(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_data_stream_get_extent_by_index(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           int extent_index );
+
+PyObject *pyfsntfs_data_stream_get_extent(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           PyObject *arguments,
+           PyObject *keywords );
+
 #if defined( __cplusplus )
 }
 #endif

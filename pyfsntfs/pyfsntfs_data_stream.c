@@ -105,6 +105,23 @@ PyMethodDef pyfsntfs_data_stream_object_methods[] = {
 	  "\n"
 	  "Returns the name." },
 
+	/* Functions to access the extents */
+
+	{ "get_number_of_extents",
+	  (PyCFunction) pyfsntfs_data_stream_get_number_of_extents,
+	  METH_NOARGS,
+	  "get_number_of_extents() -> Integer\n"
+	  "\n"
+	  "Retrieves the number of extents." },
+
+	{ "get_extent",
+	  (PyCFunction) pyfsntfs_data_stream_get_extent,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_extent(extent_index) -> Tuple( Integer, Integer, Integer )\n"
+	  "\n"
+	  "Retrieves a specific extent.\t"
+          "The extent is a tuple of offset, size and flags." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -121,6 +138,12 @@ PyGetSetDef pyfsntfs_data_stream_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_data_stream_get_name,
 	  (setter) 0,
 	  "The name.",
+	  NULL },
+
+	{ "number_of_extents",
+	  (getter) pyfsntfs_data_stream_get_number_of_extents,
+	  (setter) 0,
+	  "The number of extents.",
 	  NULL },
 
 	/* Sentinel */
@@ -931,5 +954,195 @@ on_error:
 		 name );
 	}
 	return( NULL );
+}
+
+/* Retrieves the number of extents
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_data_stream_get_number_of_extents(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_data_stream_get_number_of_extents";
+	int number_of_extents    = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_data_stream == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid data stream.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_data_stream_get_number_of_extents(
+	          pyfsntfs_data_stream->data_stream,
+	          &number_of_extents,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of extents.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_extents );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_extents );
+#endif
+	return( integer_object );
+}
+
+/* Retrieves a specific extent by index
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_data_stream_get_extent_by_index(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           int extent_index )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	PyObject *tuple_object   = NULL;
+	static char *function    = "pyfsntfs_data_stream_get_extent_by_index";
+	off64_t extent_offset    = 0;
+	size64_t extent_size     = 0;
+	uint32_t extent_flags    = 0;
+	int result               = 0;
+
+	if( pyfsntfs_data_stream == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid data stream.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_data_stream_get_extent_by_index(
+	          pyfsntfs_data_stream->data_stream,
+	          extent_index,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve extent: %d.",
+		 function,
+		 extent_index );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	tuple_object = PyTuple_New(
+                        3 );
+
+	integer_object = pyfsntfs_integer_signed_new_from_64bit(
+	                  (int64_t) extent_offset );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     0,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) extent_size );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     1,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) extent_flags );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     2,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	return( tuple_object );
+
+on_error:
+	if( integer_object != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) integer_object );
+	}
+	if( tuple_object != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) tuple_object );
+	}
+	return( NULL );
+}
+
+/* Retrieves a specific extent
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_data_stream_get_extent(
+           pyfsntfs_data_stream_t *pyfsntfs_data_stream,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *sequence_object   = NULL;
+	static char *keyword_list[] = { "extent_index", NULL };
+	int extent_index            = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i",
+	     keyword_list,
+	     &extent_index ) == 0 )
+	{
+		return( NULL );
+	}
+	sequence_object = pyfsntfs_data_stream_get_extent_by_index(
+	                   pyfsntfs_data_stream,
+	                   extent_index );
+
+	return( sequence_object );
 }
 

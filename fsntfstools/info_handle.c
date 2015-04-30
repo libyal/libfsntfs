@@ -3951,7 +3951,7 @@ int info_handle_user_journal_fprint(
 	     extent_index < number_of_extents;
 	     extent_index++ )
 	{
-		if( libfsntfs_data_stream_get_extent(
+		if( libfsntfs_data_stream_get_extent_by_index(
 		     alternate_data_stream,
 		     extent_index,
 		     &extent_offset,

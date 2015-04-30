@@ -2467,7 +2467,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	return( 1 );
 }
 
-/* Reads data at the current offset
+/* Reads data at the current offset from the default data stream (nameless $DATA attribute)
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libfsntfs_file_entry_read_buffer(
@@ -2526,7 +2526,7 @@ ssize_t libfsntfs_file_entry_read_buffer(
 	return( read_count );
 }
 
-/* Reads data at a specific offset
+/* Reads data at a specific offset from the default data stream (nameless $DATA attribute)
  * Returns the number of bytes read or -1 on error
  */
 ssize_t libfsntfs_file_entry_read_buffer_at_offset(
@@ -2574,7 +2574,7 @@ ssize_t libfsntfs_file_entry_read_buffer_at_offset(
 	return( read_count );
 }
 
-/* Seeks a certain offset
+/* Seeks a certain offset in the default data stream (nameless $DATA attribute)
  * Returns the offset if seek is successful or -1 on error
  */
 off64_t libfsntfs_file_entry_seek_offset(
@@ -2630,7 +2630,7 @@ off64_t libfsntfs_file_entry_seek_offset(
 	return( offset );
 }
 
-/* Retrieves the current offset
+/* Retrieves the current offset of the default data stream (nameless $DATA attribute)
  * Returns the offset if successful or -1 on error
  */
 int libfsntfs_file_entry_get_offset(
@@ -2682,7 +2682,7 @@ int libfsntfs_file_entry_get_offset(
 	return( 1 );
 }
 
-/* Retrieves the size
+/* Retrieves the size of the default data stream (nameless $DATA attribute)
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_file_entry_get_size(
@@ -2737,6 +2737,203 @@ int libfsntfs_file_entry_get_size(
 
 			return( -1 );
 		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of extents (decoded data runs) of the default data stream (nameless $DATA attribute)
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_entry_get_number_of_extents(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_number_of_extents";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->data_cluster_block_stream == NULL )
+	{
+		if( number_of_extents == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of extents.",
+			 function );
+
+			return( -1 );
+		}
+		*number_of_extents = 0;
+	}
+	else
+	{
+		if( libfdata_stream_get_number_of_segments(
+		     internal_file_entry->data_cluster_block_stream,
+		     number_of_extents,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data cluster block stream number of segments.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific extent (decoded data run) of the default data stream (nameless $DATA attribute)
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_entry_get_extent_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int extent_index,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_extent_by_index";
+	size64_t data_size                                   = 0;
+	uint32_t range_flags                                 = 0;
+	int segment_file_index                               = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent size.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent flags.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_size(
+	     internal_file_entry->mft_entry->data_attribute,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data attribute data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_stream_get_segment_by_index(
+	     internal_file_entry->data_cluster_block_stream,
+	     extent_index,
+	     &segment_file_index,
+	     extent_offset,
+	     extent_size,
+	     &range_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data cluster block stream segment: %d.",
+		 function,
+		 extent_index );
+
+		return( -1 );
+	}
+	if( ( *extent_offset < 0 )
+	 || ( (size64_t) *extent_offset >= data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid extent offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	data_size -= *extent_offset;
+
+	if( *extent_size > data_size )
+	{
+		*extent_size = data_size;
+	}
+	*extent_flags = 0;
+
+	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	{
+		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_SPARSE;
+	}
+	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+	{
+		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_COMPRESSED;
 	}
 	return( 1 );
 }

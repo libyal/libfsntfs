@@ -14,13 +14,12 @@ TODO
   - add has_symbolic_link function
   - add is_corrupt function?
   - how to handle file-like object functions for non-data file entry
-* pyfsntfs data stream
-  - get extents
+* pyfsntfs file entry/data stream
+  - add extents iterator?
 * libfsntfs/pyfsntfs attribute
   - expose raw attribute data?
 * libfsntfs/pyfsntfs file entry
   - expose default data stream
-  - get extents default data stream?
   - add support for short file name
   - fallback to short file name if no long
 * libfsntfs_mft_entry_read_element_data set MFT only flag using element flags
@@ -115,6 +114,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150430
+* worked on Python bindings
 
 20150429
 * worked on Python bindings

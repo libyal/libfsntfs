@@ -133,7 +133,7 @@ int libfsntfs_data_stream_get_number_of_extents(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_data_stream_get_extent(
+int libfsntfs_data_stream_get_extent_by_index(
      libfsntfs_data_stream_t *data_stream,
      int extent_index,
      off64_t *extent_offset,

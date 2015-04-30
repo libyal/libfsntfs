@@ -331,6 +331,21 @@ int libfsntfs_file_entry_get_size(
      size64_t *size,
      libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_number_of_extents(
+     libfsntfs_file_entry_t *file_entry,
+     int *number_of_extents,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_extent_by_index(
+     libfsntfs_file_entry_t *file_entry,
+     int extent_index,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

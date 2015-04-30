@@ -168,6 +168,19 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyfsntfs_file_entry_get_number_of_extents(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_extent_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int extent_index );
+
+PyObject *pyfsntfs_file_entry_get_extent(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyfsntfs_file_entry_get_number_of_attributes(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
