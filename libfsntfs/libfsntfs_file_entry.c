@@ -427,7 +427,7 @@ int libfsntfs_file_entry_get_parent_file_reference(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve parent reference from directory entry file name value.",
 		 function );
 
 		return( -1 );
@@ -945,7 +945,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-8 name from file name attribute.",
+		 "%s: unable to retrieve size of UTF-8 name from directory entry file name value.",
 		 function );
 
 		return( -1 );
@@ -1005,7 +1005,7 @@ int libfsntfs_file_entry_get_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name from file name attribute.",
+		 "%s: unable to retrieve UTF-8 name from directory entry file name value.",
 		 function );
 
 		return( -1 );
@@ -1063,7 +1063,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-16 name from file name attribute.",
+		 "%s: unable to retrieve size of UTF-16 name from directory entry file name value.",
 		 function );
 
 		return( -1 );
@@ -1123,7 +1123,7 @@ int libfsntfs_file_entry_get_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 name from file name attribute.",
+		 "%s: unable to retrieve UTF-16 name from directory entry file name value.",
 		 function );
 
 		return( -1 );

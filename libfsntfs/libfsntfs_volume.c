@@ -1793,7 +1793,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		     internal_volume->io_handle,
 		     internal_volume->mft,
 		     mft_entry,
-		     NULL,
+		     directory_entry,
 		     0,
 		     error ) != 1 )
 		{
@@ -2030,7 +2030,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		     internal_volume->io_handle,
 		     internal_volume->mft,
 		     mft_entry,
-		     NULL,
+		     directory_entry,
 		     0,
 		     error ) != 1 )
 		{
