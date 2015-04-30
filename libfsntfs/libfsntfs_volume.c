@@ -976,6 +976,82 @@ on_error:
 	return( -1 );
 }
 
+/* Determines if the volume has BitLocker Drive Encryption (BDE)
+ * Returns 1 if the volume has BitLocker Drive Encryption, 0 if not or -1 on error
+ */
+int libfsntfs_volume_has_bitlocker_drive_encryption(
+     libfsntfs_volume_t *volume,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_has_bitlocker_drive_encryption";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO */
+	return( 0 );
+}
+
+/* Determines if the volume has Volume Shadow Snapshots (VSS)
+ * Returns 1 if the volume has Volume Shadow Snapshots, 0 if not or -1 on error
+ */
+int libfsntfs_volume_has_volume_shadow_snapshots(
+     libfsntfs_volume_t *volume,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_has_volume_shadow_snapshots";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO */
+	return( 0 );
+}
+
 /* Retrieves the cluster block size
  * Returns 1 if successful or -1 on error
  */

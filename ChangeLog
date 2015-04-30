@@ -1,4 +1,10 @@
 TODO
+* data runs block
+  - add a check to see if data run sizes add up
+  - handle compressed blocks
+* volume
+  - complete libfsntfs_volume_has_bitlocker_drvie_encryption
+  - complete libfsntfs_volume_has_volume_shadow_snapshots
 * file entry
   - add API get file name by attribute index functions?
   - add API get parent file_reference name by attribute index functions?
@@ -59,11 +65,6 @@ TODO
 * check if check_signature function uses the right offset
 * refactor: libfsnt_array_append_entry in index ?
 
-* data runs block
-  - create libfdata block IO handle
-  - separate segment size and data size ?
-  - what about sparse and compressed blocks ?
-
 * move get mft entry to file entry initialize ?
   - clone mft entry in file entry initialize (for now the mft entry cache
   contains a slot for every entry)
@@ -87,9 +88,6 @@ Format:
   - group equivalent index data values
 * boot block
   - remove value restriction add sanity check
-* data runs
-  - add a check to see if data run sizes add up
-  - add support for compressed and/or sparse data runs
 * add support for attributes:
   - logged utillity stream (LOGGED_UTILITY_STREAM) (partial)
 * pre NTFS 3.0 attribute types

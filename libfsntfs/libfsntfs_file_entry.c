@@ -1588,7 +1588,7 @@ int libfsntfs_file_entry_get_attribute_by_index(
 }
 
 /* Determines if the file entry has the directory entries ($I30) index
- * Returns 1 if the default data stream, 0 if not or -1 on error
+ * Returns 1 if the file entry has a directory entries index, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_has_directory_entries_index(
      libfsntfs_file_entry_t *file_entry,
@@ -1630,7 +1630,7 @@ int libfsntfs_file_entry_has_directory_entries_index(
 }
 
 /* Determines if the file entry has the default data stream (nameless $DATA attribute)
- * Returns 1 if the default data stream, 0 if not or -1 on error
+ * Returns 1 if the file entry has a default data stream, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_has_default_data_stream(
      libfsntfs_file_entry_t *file_entry,

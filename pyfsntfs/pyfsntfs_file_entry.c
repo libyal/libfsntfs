@@ -710,12 +710,13 @@ PyObject *pyfsntfs_file_entry_read_buffer(
            PyObject *keywords )
 {
 	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyfsntfs_file_entry_read_buffer";
 	static char *keyword_list[] = { "size", NULL };
 	char *buffer                = NULL;
+	size64_t read_size          = 0;
 	ssize_t read_count          = 0;
-	int read_size               = 0;
 	int result                  = 0;
 
 	if( pyfsntfs_file_entry == NULL )
@@ -739,32 +740,14 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|i",
+	     "|O",
 	     keyword_list,
-	     &read_size ) == 0 )
+	     &integer_object ) == 0 )
 	{
 		return( NULL );
 	}
-	if( read_size < 0 )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value less than zero.",
-		 function );
+	PyErr_Clear();
 
-		return( NULL );
-	}
-	/* Make sure the data fits into a memory buffer
-	 */
-	if( read_size > INT_MAX )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_file_entry_has_default_data_stream(
@@ -795,6 +778,119 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 
 		return( NULL );
 	}
+	if( integer_object != NULL )
+	{
+		result = PyObject_IsInstance(
+		          integer_object,
+		          (PyObject *) &PyLong_Type );
+
+		if( result == -1 )
+		{
+			pyfsntfs_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to determine if integer object is of type long.",
+			 function );
+
+			return( NULL );
+		}
+#if PY_MAJOR_VERSION < 3
+		else if( result == 0 )
+		{
+			PyErr_Clear();
+
+			result = PyObject_IsInstance(
+				  integer_object,
+				  (PyObject *) &PyInt_Type );
+
+			if( result == -1 )
+			{
+				pyfsntfs_error_fetch_and_raise(
+				 PyExc_RuntimeError,
+				 "%s: unable to determine if integer object is of type int.",
+				 function );
+
+				return( NULL );
+			}
+		}
+#endif
+	}
+	if( result != 0 )
+	{
+		if( pyfsntfs_integer_unsigned_copy_to_64bit(
+		     integer_object,
+		     (uint64_t *) &read_size,
+		     &error ) != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to convert integer object into read size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else if( ( integer_object == NULL )
+	      || ( integer_object == Py_None ) )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libfsntfs_file_entry_get_size(
+			  pyfsntfs_file_entry->file_entry,
+			  &read_size,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: unsupported integer object type.",
+		 function );
+
+		return( NULL );
+	}
+	if( read_size == 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		string_object = PyBytes_FromString(
+		                 "" );
+#else
+		string_object = PyString_FromString(
+		                 "" );
+#endif
+		return( string_object );
+	}
+	/* Make sure the data fits into a memory buffer
+	 */
+	if( ( read_size > (size64_t) INT_MAX )
+	 || ( read_size > (size64_t) SSIZE_MAX ) )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument read size value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
 #if PY_MAJOR_VERSION >= 3
 	string_object = PyBytes_FromStringAndSize(
 	                 NULL,
@@ -803,6 +899,8 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	buffer = PyBytes_AsString(
 	          string_object );
 #else
+	/* Note that a size of 0 is not supported
+	 */
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );
@@ -865,13 +963,14 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
            PyObject *keywords )
 {
 	libcerror_error_t *error    = NULL;
+	PyObject *integer_object    = NULL;
 	PyObject *string_object     = NULL;
 	static char *function       = "pyfsntfs_file_entry_read_buffer_at_offset";
 	static char *keyword_list[] = { "size", "offset", NULL };
 	char *buffer                = NULL;
 	off64_t read_offset         = 0;
+	size64_t read_size          = 0;
 	ssize_t read_count          = 0;
-	int read_size               = 0;
 	int result                  = 0;
 
 	if( pyfsntfs_file_entry == NULL )
@@ -895,40 +994,11 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "i|L",
+	     "OL",
 	     keyword_list,
-	     &read_size,
+	     &integer_object,
 	     &read_offset ) == 0 )
 	{
-		return( NULL );
-	}
-	if( read_size < 0 )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value less than zero.",
-		 function );
-
-		return( NULL );
-	}
-	/* Make sure the data fits into a memory buffer
-	 */
-	if( read_size > INT_MAX )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read size value exceeds maximum.",
-		 function );
-
-		return( NULL );
-	}
-	if( read_offset < 0 )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid argument read offset value less than zero.",
-		 function );
-
 		return( NULL );
 	}
 	Py_BEGIN_ALLOW_THREADS
@@ -961,8 +1031,115 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 
 		return( NULL );
 	}
+	result = PyObject_IsInstance(
+	          integer_object,
+	          (PyObject *) &PyLong_Type );
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if integer object is of type long.",
+		 function );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION < 3
+	else if( result == 0 )
+	{
+		PyErr_Clear();
+
+		result = PyObject_IsInstance(
+		          integer_object,
+		          (PyObject *) &PyInt_Type );
+
+		if( result == -1 )
+		{
+			pyfsntfs_error_fetch_and_raise(
+		         PyExc_RuntimeError,
+			 "%s: unable to determine if integer object is of type int.",
+			 function );
+
+			return( NULL );
+		}
+	}
+#endif
+	if( result != 0 )
+	{
+		if( pyfsntfs_integer_unsigned_copy_to_64bit(
+		     integer_object,
+		     (uint64_t *) &read_size,
+		     &error ) != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to convert integer object into read size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else if( integer_object == Py_None )
+	{
+		Py_BEGIN_ALLOW_THREADS
+
+		result = libfsntfs_file_entry_get_size(
+			  pyfsntfs_file_entry->file_entry,
+			  &read_size,
+			  &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_IOError,
+			 "%s: unable to retrieve size.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			return( NULL );
+		}
+	}
+	else
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: unsupported integer object type.",
+		 function );
+
+		return( NULL );
+	}
+	if( read_size == 0 )
+	{
+#if PY_MAJOR_VERSION >= 3
+		string_object = PyBytes_FromString(
+		                 "" );
+#else
+		string_object = PyString_FromString(
+		                 "" );
+#endif
+		return( string_object );
+	}
 	/* Make sure the data fits into a memory buffer
 	 */
+	if( ( read_size > (size64_t) INT_MAX )
+	 || ( read_size > (size64_t) SSIZE_MAX ) )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid argument read size value exceeds maximum.",
+		 function );
+
+		return( NULL );
+	}
 #if PY_MAJOR_VERSION >= 3
 	string_object = PyBytes_FromStringAndSize(
 	                 NULL,
@@ -971,6 +1148,8 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	buffer = PyBytes_AsString(
 	          string_object );
 #else
+	/* Note that a size of 0 is not supported
+	 */
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
 	                 read_size );

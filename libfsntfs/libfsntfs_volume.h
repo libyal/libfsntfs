@@ -111,6 +111,16 @@ int libfsntfs_volume_open_read(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_has_bitlocker_drive_encryption(
+     libfsntfs_volume_t *volume,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_has_volume_shadow_snapshots(
+     libfsntfs_volume_t *volume,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_cluster_block_size(
      libfsntfs_volume_t *volume,
      size_t *cluster_block_size,
