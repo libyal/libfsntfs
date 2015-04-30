@@ -64,9 +64,21 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
+	/* The default (nameless) $DATA attribute
+	 */
+	libfsntfs_attribute_t *data_attribute;
+
 	/* The default (nameless) $DATA attribute cluster block stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
+
+	/* The current offset
+	 */
+	off64_t current_offset;
+
+	/* The size
+	 */
+	size64_t size;
 
 	/* The flags
 	 */

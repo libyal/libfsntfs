@@ -104,6 +104,12 @@ Tools:
   - add detection of BDE and VSS
   - add support for $LogFile
 
+Tests:
+* file with resident data
+* file with non-resident data
+* file with sparse data
+* file with compressed data
+
 Performance:
 * compact attribute union data/file reference (use type to distinguish between them)
 

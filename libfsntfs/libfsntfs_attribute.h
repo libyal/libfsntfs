@@ -231,6 +231,13 @@ int libfsntfs_attribute_get_data(
      size64_t *data_size,
      libcerror_error_t **error );
 
+ssize_t libfsntfs_attribute_copy_data(
+         libfsntfs_attribute_t *attribute,
+         uint8_t *buffer,
+         size_t buffer_size,
+         off64_t data_offset,
+         libcerror_error_t **error );
+
 int libfsntfs_attribute_get_number_of_data_runs(
      libfsntfs_attribute_t *attribute,
      int *number_of_data_runs,

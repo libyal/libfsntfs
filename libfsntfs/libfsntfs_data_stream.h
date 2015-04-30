@@ -52,6 +52,14 @@ struct libfsntfs_internal_data_stream
 	/* The $DATA attribute cluster block stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
+
+	/* The current offset
+	 */
+	off64_t current_offset;
+
+	/* The size
+	 */
+	size64_t size;
 };
 
 int libfsntfs_data_stream_initialize(

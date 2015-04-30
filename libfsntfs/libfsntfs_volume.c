@@ -1770,6 +1770,23 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 	}
 	if( result != 0 )
 	{
+		if( libfsntfs_mft_entry_read_directory_entries_tree(
+		     mft_entry,
+		     internal_volume->io_handle,
+		     internal_volume->file_io_handle,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
+			 function,
+			 mft_entry_index );
+
+			return( -1 );
+		}
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
 		     internal_volume->file_io_handle,
@@ -1990,6 +2007,23 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	}
 	if( result != 0 )
 	{
+		if( libfsntfs_mft_entry_read_directory_entries_tree(
+		     mft_entry,
+		     internal_volume->io_handle,
+		     internal_volume->file_io_handle,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
+			 function,
+			 mft_entry_index );
+
+			return( -1 );
+		}
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
 		     internal_volume->file_io_handle,

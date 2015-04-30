@@ -2939,12 +2939,11 @@ int libfsntfs_attribute_get_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data size.",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
 	}
-
 	if( data_size == NULL )
 	{
 		libcerror_error_set(
@@ -2960,6 +2959,102 @@ int libfsntfs_attribute_get_data(
 	*data_size = internal_attribute->data_size;
 
 	return( 1 );
+}
+
+/* Copies the data at a specific offset to the buffer
+ * Returns the number of bytes copied if successful or -1 on error
+ */
+ssize_t libfsntfs_attribute_copy_data(
+         libfsntfs_attribute_t *attribute,
+         uint8_t *buffer,
+         size_t buffer_size,
+         off64_t data_offset,
+         libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_copy_data";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( internal_attribute->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute - missing data.",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( data_offset < 0 )
+	 || ( data_offset > (off64_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( (size64_t) data_offset >= internal_attribute->data_size )
+	{
+		return( 0 );
+	}
+	if( (size64_t) buffer_size > ( internal_attribute->data_size - (size64_t) data_offset ) )
+	{
+		buffer_size = (size_t) ( internal_attribute->data_size - (size64_t) data_offset );
+	}
+	if( memory_copy(
+	     buffer,
+	     &( internal_attribute->data[ data_offset ] ),
+	     buffer_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy attribute data.",
+		 function );
+
+		return( -1 );
+	}
+	return( (ssize_t) buffer_size );
 }
 
 /* Retrieves the number of data runs
