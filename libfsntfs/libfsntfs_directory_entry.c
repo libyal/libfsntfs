@@ -167,6 +167,99 @@ int libfsntfs_directory_entry_free(
 	return( result );
 }
 
+/* Clones a directory entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_clone(
+     libfsntfs_directory_entry_t **destination_directory_entry,
+     libfsntfs_directory_entry_t *source_directory_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_clone";
+
+	if( destination_directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_directory_entry != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination directory entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_directory_entry == NULL )
+	{
+		*destination_directory_entry = source_directory_entry;
+
+		return( 1 );
+	}
+	if( libfsntfs_directory_entry_initialize(
+	     destination_directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination directory entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_name_values_clone(
+	     &( ( *destination_directory_entry )->file_name_values ),
+	     source_directory_entry->file_name_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination file name values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_name_values_clone(
+	     &( ( *destination_directory_entry )->short_file_name_values ),
+	     source_directory_entry->short_file_name_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination short file name values.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_directory_entry )->file_reference = source_directory_entry->file_reference;
+
+	return( 1 );
+
+on_error:
+	if( *destination_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 destination_directory_entry,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Compares 2 directory entries by the file reference
  * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  */

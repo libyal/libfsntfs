@@ -27,6 +27,7 @@
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_file_name_attribute.h"
@@ -46,8 +47,8 @@
  */
 int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
-     libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
      libfsntfs_mft_t *mft,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
@@ -125,7 +126,7 @@ int libfsntfs_file_entry_initialize(
 		 "%s: unable to create file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_set(
 	     internal_file_entry,
@@ -143,6 +144,55 @@ int libfsntfs_file_entry_initialize(
 		 internal_file_entry );
 
 		return( -1 );
+	}
+	if( libcdata_btree_initialize(
+	     &( internal_file_entry->directory_entries_tree ),
+	     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create directory entries tree.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_directory_entry_clone(
+	     &( internal_file_entry->directory_entry ),
+	     directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create directory entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( mft_entry->i30_index != NULL )
+	{
+		if( libfsntfs_mft_entry_read_directory_entries_tree(
+		     mft_entry,
+		     io_handle,
+		     file_io_handle,
+		     internal_file_entry->directory_entries_tree,
+		     flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read MFT entry: %" PRIu32 " directory entries tree.",
+			 function,
+			 mft_entry->index );
+
+			goto on_error;
+		}
 	}
 	if( mft_entry->data_attribute != NULL )
 	{
@@ -190,16 +240,15 @@ int libfsntfs_file_entry_initialize(
 			 "%s: unable to retrieve data attribute data size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
-	internal_file_entry->file_io_handle  = file_io_handle;
-	internal_file_entry->io_handle       = io_handle;
-	internal_file_entry->mft             = mft;
-	internal_file_entry->mft_entry       = mft_entry;
-	internal_file_entry->directory_entry = directory_entry;
-	internal_file_entry->data_attribute  = mft_entry->data_attribute;
-	internal_file_entry->flags           = flags;
+	internal_file_entry->file_io_handle = file_io_handle;
+	internal_file_entry->io_handle      = io_handle;
+	internal_file_entry->mft            = mft;
+	internal_file_entry->mft_entry      = mft_entry;
+	internal_file_entry->data_attribute = mft_entry->data_attribute;
+	internal_file_entry->flags          = flags;
 
 	*file_entry = (libfsntfs_file_entry_t *) internal_file_entry;
 
@@ -208,6 +257,13 @@ int libfsntfs_file_entry_initialize(
 on_error:
 	if( internal_file_entry != NULL )
 	{
+		if( internal_file_entry->directory_entries_tree != NULL )
+		{
+			libcdata_btree_free(
+			 &( internal_file_entry->directory_entries_tree ),
+			 NULL,
+			 NULL );
+		}
 		memory_free(
 		 internal_file_entry );
 	}
@@ -258,6 +314,33 @@ int libfsntfs_file_entry_free(
 
 				result = -1;
 			}
+		}
+		if( libcdata_btree_free(
+		     &( internal_file_entry->directory_entries_tree ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entries array.",
+			 function );
+
+			result = -1;
+		}
+		if( libfsntfs_directory_entry_free(
+		     &( internal_file_entry->directory_entry ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entry.",
+			 function );
+
+			result = -1;
 		}
 		memory_free(
 		 internal_file_entry );
@@ -2031,8 +2114,8 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( libfsntfs_mft_entry_get_number_of_directory_entries(
-	     internal_file_entry->mft_entry,
+	if( libcdata_btree_get_number_of_values(
+	     internal_file_entry->directory_entries_tree,
 	     number_of_sub_file_entries,
 	     error ) != 1 )
 	{
@@ -2040,13 +2123,14 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of sub file entries.",
+		 "%s: unable to retrieve number of directory entries from tree.",
 		 function );
 
 		return( -1 );
 	}
 	return( 1 );
 }
+
 
 /* Retrieves the sub file entry for the specific index
  * Returns 1 if successful or -1 on error
@@ -2098,17 +2182,17 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_get_directory_entry_by_index(
-	     internal_file_entry->mft_entry,
+	if( libcdata_btree_get_value_by_index(
+	     internal_file_entry->directory_entries_tree,
 	     sub_file_entry_index,
-	     &directory_entry,
+	     (intptr_t **) &directory_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve directory entry: %d.",
+		 "%s: unable to retrieve directory entry: %d from tree.",
 		 function,
 		 sub_file_entry_index );
 
@@ -2145,39 +2229,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
-	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
+	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,
@@ -2249,8 +2304,8 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_mft_entry_get_directory_entry_by_utf8_name(
-	          internal_file_entry->mft_entry,
+	result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
+	          internal_file_entry->directory_entries_tree,
 	          utf8_string,
 	          utf8_string_length,
 	          &directory_entry,
@@ -2302,27 +2357,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
-	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
+	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,
@@ -2393,8 +2431,8 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_mft_entry_get_directory_entry_by_utf16_name(
-	          internal_file_entry->mft_entry,
+	result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
+	          internal_file_entry->directory_entries_tree,
 	          utf16_string,
 	          utf16_string_length,
 	          &directory_entry,
@@ -2446,39 +2484,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %" PRIu64 " directory entries tree.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
-	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
+	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
 	     directory_entry,

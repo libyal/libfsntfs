@@ -29,6 +29,7 @@
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
@@ -44,13 +45,13 @@ typedef struct libfsntfs_internal_file_entry libfsntfs_internal_file_entry_t;
 
 struct libfsntfs_internal_file_entry
 {
-	/* The file IO handle
-	 */
-	libbfio_handle_t *file_io_handle;
-
 	/* The IO handle
 	 */
 	libfsntfs_io_handle_t *io_handle;
+
+	/* The file IO handle
+	 */
+	libbfio_handle_t *file_io_handle;
 
 	/* The MFT
 	 */
@@ -64,14 +65,6 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
-	/* The default (nameless) $DATA attribute
-	 */
-	libfsntfs_attribute_t *data_attribute;
-
-	/* The default (nameless) $DATA attribute cluster block stream
-	 */
-	libfdata_stream_t *data_cluster_block_stream;
-
 	/* The current offset
 	 */
 	off64_t current_offset;
@@ -80,6 +73,18 @@ struct libfsntfs_internal_file_entry
 	 */
 	size64_t size;
 
+	/* The default (nameless) $DATA attribute
+	 */
+	libfsntfs_attribute_t *data_attribute;
+
+	/* The default (nameless) $DATA attribute cluster block stream
+	 */
+	libfdata_stream_t *data_cluster_block_stream;
+
+	/* The directory entries tree
+	 */
+	libcdata_btree_t *directory_entries_tree;
+
 	/* The flags
 	 */
 	uint8_t flags;
@@ -87,8 +92,8 @@ struct libfsntfs_internal_file_entry
 
 int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
-     libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
      libfsntfs_mft_t *mft,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,

@@ -1,4 +1,7 @@
 TODO
+* handle cached out MFT entries
+  - copy directory entries in file entry
+  - copy directory index in file entry
 * data runs block
   - add a check to see if data run sizes add up
   - handle compressed blocks
@@ -13,6 +16,7 @@ TODO
   - only retrieve file name from the directory entry?
     or make clear in function documentation that first
     non-short filename is the fallback?
+  - add support to retrieve name of the root entry if directory entry is missing
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
@@ -76,6 +80,7 @@ TODO
   - mark ignored data stream
   - mark ignored index
   - handle corrupt MFT entries (e.g. missing FILE signature)
+  - allow to read data runs but do not allow to read data
 * $UsnJrnl:$J parsing
   - move UsnJrnl parsing into library ?
   - add support for $UsnJrnl:$J file parsing

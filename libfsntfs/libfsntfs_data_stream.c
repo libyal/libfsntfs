@@ -145,7 +145,7 @@ int libfsntfs_data_stream_initialize(
 		}
 	}
 	if( libfsntfs_attribute_get_data_size(
-	     internal_data_stream->data_attribute,
+	     data_attribute,
 	     &( internal_data_stream->size ),
 	     error ) != 1 )
 	{

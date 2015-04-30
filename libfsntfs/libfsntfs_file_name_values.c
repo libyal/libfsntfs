@@ -143,6 +143,100 @@ int libfsntfs_file_name_values_free(
 	return( 1 );
 }
 
+/* Clones file name values
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_clone(
+     libfsntfs_file_name_values_t **destination_file_name_values,
+     libfsntfs_file_name_values_t *source_file_name_values,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_file_name_values_clone";
+
+	if( destination_file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_file_name_values != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination file name values value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_file_name_values == NULL )
+	{
+		*destination_file_name_values = source_file_name_values;
+
+		return( 1 );
+	}
+	*destination_file_name_values = memory_allocate_structure(
+	                                 libfsntfs_file_name_values_t );
+
+	if( *destination_file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destination file name values.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_file_name_values,
+	     source_file_name_values,
+	     sizeof( libfsntfs_file_name_values_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to copy source file name values to destination.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_name_values_set_name(
+	     *destination_file_name_values,
+	     source_file_name_values->name,
+	     source_file_name_values->name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set destination name.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_file_name_values != NULL )
+	{
+		memory_free(
+		 *destination_file_name_values );
+
+		*destination_file_name_values = NULL;
+	}
+	return( -1 );
+}
+
 /* Reads the file name values
  * Returns 1 if successful or -1 on error
  */
@@ -154,6 +248,7 @@ int libfsntfs_file_name_values_read(
 {
 	static char *function                       = "libfsntfs_file_name_values_read";
 	size_t data_offset                          = 0;
+	uint16_t name_size                          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libcstring_system_character_t filetime_string[ 32 ];
@@ -235,7 +330,7 @@ int libfsntfs_file_name_values_read(
 	 ( (fsntfs_file_name_t *) data )->file_attribute_flags,
 	 file_name_values->file_attribute_flags );
 
-	file_name_values->name_size = (uint16_t) ( (fsntfs_file_name_t *) data )->name_size;
+	name_size = (uint16_t) ( (fsntfs_file_name_t *) data )->name_size;
 
 	file_name_values->name_namespace = ( (fsntfs_file_name_t *) data )->name_namespace;
 
@@ -485,7 +580,7 @@ int libfsntfs_file_name_values_read(
 		libcnotify_printf(
 		 "%s: name size\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 file_name_values->name_size );
+		 name_size );
 
 		libcnotify_printf(
 		 "%s: name namespace\t\t\t\t: %" PRIu8 " (%s)\n",
@@ -511,34 +606,21 @@ int libfsntfs_file_name_values_read(
 #endif
 	data_offset = sizeof( fsntfs_file_name_t );
 
-	if( file_name_values->name_size > 0 )
+	if( name_size > 0 )
 	{
-		file_name_values->name_size *= 2;
+		name_size *= 2;
 
-		file_name_values->name = (uint8_t *) memory_allocate(
-		                                      sizeof( uint8_t ) * (size_t) file_name_values->name_size );
-
-		if( file_name_values->name == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create name.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     file_name_values->name,
+		if( libfsntfs_file_name_values_set_name(
+		     file_name_values,
 		     &( data[ data_offset ] ),
-		     (size_t) file_name_values->name_size ) == NULL )
+		     name_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy name.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set name.",
 			 function );
 
 			goto on_error;
@@ -1061,6 +1143,74 @@ int libfsntfs_file_name_values_get_utf16_name(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Sets the name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_set_name(
+     libfsntfs_file_name_values_t *file_name_values,
+     const uint8_t *name,
+     uint16_t name_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_file_name_values_set_name";
+
+	if( file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	file_name_values->name = (uint8_t *) memory_allocate(
+	                                      sizeof( uint8_t ) * (size_t) name_size );
+
+	if( file_name_values->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create name.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     file_name_values->name,
+	     name,
+	     (size_t) name_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy name.",
+		 function );
+
+		goto on_error;
+	}
+	file_name_values->name_size = name_size;
+
+	return( 1 );
+
+on_error:
+	if( file_name_values->name != NULL )
+	{
+		memory_free(
+		 file_name_values->name );
+
+		file_name_values->name = NULL;
+	}
+	file_name_values->name_size = 0;
+
+	return( -1 );
 }
 
 /* Compares a (long-named) file name values with a short-named file name values

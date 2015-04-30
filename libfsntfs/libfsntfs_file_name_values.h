@@ -80,6 +80,11 @@ int libfsntfs_file_name_values_free(
      libfsntfs_file_name_values_t **file_name_values,
      libcerror_error_t **error );
 
+int libfsntfs_file_name_values_clone(
+     libfsntfs_file_name_values_t **destination_file_name_values,
+     libfsntfs_file_name_values_t *source_file_name_values,
+     libcerror_error_t **error );
+
 int libfsntfs_file_name_values_read(
      libfsntfs_file_name_values_t *file_name_values,
      const uint8_t *data,
@@ -141,6 +146,12 @@ int libfsntfs_file_name_values_get_utf16_name(
      libfsntfs_file_name_values_t *file_name_values,
      uint16_t *utf16_name,
      size_t utf16_name_size,
+     libcerror_error_t **error );
+
+int libfsntfs_file_name_values_set_name(
+     libfsntfs_file_name_values_t *file_name_values,
+     const uint8_t *name,
+     uint16_t name_size,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_compare_short_name(

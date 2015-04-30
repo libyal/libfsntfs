@@ -2297,7 +2297,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tVersion\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
+	 "\tVersion\t\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
 	 major_version,
 	 minor_version );
 
@@ -2317,7 +2317,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFlags\t\t\t: 0x%04" PRIx16 "\n",
+	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
 	 value_16bit );
 
 	return( 1 );
@@ -2536,7 +2536,7 @@ int info_handle_file_entry_fprint(
 	          &file_entry_name_size,
 	          error );
 #endif
-	if( result != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2547,7 +2547,8 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-	if( file_entry_name_size > 0 )
+	if( ( result == 1 )
+	 && ( file_entry_name_size > 0 ) )
 	{
 		file_entry_name = libcstring_system_string_allocate(
 		                   file_entry_name_size );

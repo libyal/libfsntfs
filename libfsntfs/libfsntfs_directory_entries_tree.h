@@ -1,5 +1,5 @@
 /*
- * Directory entry functions
+ * Directory entries tree functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,57 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_DIRECTORY_ENTRY_H )
-#define _LIBFSNTFS_DIRECTORY_ENTRY_H
+#if !defined( _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H )
+#define _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_file_name_values.h"
+#include "libfsntfs_directory_entry.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libfsntfs_directory_entry libfsntfs_directory_entry_t;
-
-struct libfsntfs_directory_entry
-{
-	/* The file reference
-	 */
-	uint64_t file_reference;
-
-	/* The file name
-	 */
-	libfsntfs_file_name_values_t *file_name_values;
-
-	/* The short file name
-	 */
-	libfsntfs_file_name_values_t *short_file_name_values;
-};
-
-int libfsntfs_directory_entry_initialize(
+int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
+     libcdata_btree_t *directory_entries_tree,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error );
 
-int libfsntfs_directory_entry_free(
+int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
+     libcdata_btree_t *directory_entries_tree,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
      libfsntfs_directory_entry_t **directory_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_directory_entry_clone(
-     libfsntfs_directory_entry_t **destination_directory_entry,
-     libfsntfs_directory_entry_t *source_directory_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_directory_entry_compare(
-     libfsntfs_directory_entry_t *first_directory_entry,
-     libfsntfs_directory_entry_t *second_directory_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_directory_entry_get_mft_entry_index(
-     libfsntfs_directory_entry_t *directory_entry,
-     uint64_t *mft_entry_index,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

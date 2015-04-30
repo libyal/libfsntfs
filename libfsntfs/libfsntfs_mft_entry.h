@@ -119,14 +119,6 @@ struct libfsntfs_mft_entry
 	 */
 	libfsntfs_index_t *i30_index;
 
-	/* The directory entries tree
-	 */
-	libcdata_btree_t *directory_entries_tree;
-
-	/* Value to indicate the directory entries tree was read
-	 */
-	uint8_t directory_entries_tree_is_read;
-
 	/* Value to indicate the MFT entry is corrupted
 	 */
 	uint8_t is_corrupted;
@@ -179,6 +171,7 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     libcdata_btree_t *directory_entries_tree,
      uint8_t flags,
      libcerror_error_t **error );
 
@@ -283,31 +276,6 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 
 int libfsntfs_mft_entry_has_directory_entries_index(
      libfsntfs_mft_entry_t *mft_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_get_number_of_directory_entries(
-     libfsntfs_mft_entry_t *mft_entry,
-     int *number_of_directory_entries,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_get_directory_entry_by_index(
-     libfsntfs_mft_entry_t *mft_entry,
-     int directory_entry_index,
-     libfsntfs_directory_entry_t **directory_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_get_directory_entry_by_utf8_name(
-     libfsntfs_mft_entry_t *mft_entry,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libfsntfs_directory_entry_t **directory_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_get_directory_entry_by_utf16_name(
-     libfsntfs_mft_entry_t *mft_entry,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_element_data(

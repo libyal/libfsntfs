@@ -31,6 +31,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_cluster_block_vector.c libfsntfs_cluster_block_vector.h \
 	libfsntfs_debug.c libfsntfs_debug.h \
 	libfsntfs_definitions.h \
+	libfsntfs_directory_entries_tree.c libfsntfs_directory_entries_tree.h \
 	libfsntfs_directory_entry.c libfsntfs_directory_entry.h \
 	libfsntfs_error.c libfsntfs_error.h \
 	libfsntfs_extern.h \

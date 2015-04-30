@@ -172,24 +172,6 @@ int libfsntfs_mft_initialize(
 
 		goto on_error;
 	}
-#ifdef TODO
-	int number_of_mft_entries = 0;
-
-	if( libfcache_cache_initialize(
-	     &( mft->mft_entry_cache ),
-	     number_of_mft_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
-		 function );
-
-		goto on_error;
-	}
-#endif
 	return( 1 );
 
 on_error:

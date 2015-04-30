@@ -29,8 +29,10 @@
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_io_handle.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libcstring.h"
@@ -935,7 +937,7 @@ int libfsntfs_volume_open_read(
 
 		goto on_error;
 	}
-	/* TODO what about the mirror MFT ? */
+/* TODO what about the mirror MFT ? */
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1433,27 +1435,10 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_volume->io_handle,
-	     internal_volume->file_io_handle,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
-		 function,
-		 mft_entry_index );
-
-		return( -1 );
-	}
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
-	     internal_volume->file_io_handle,
 	     internal_volume->io_handle,
+	     internal_volume->file_io_handle,
 	     internal_volume->mft,
 	     mft_entry,
 	     NULL,
@@ -1535,26 +1520,10 @@ int libfsntfs_volume_get_root_directory(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
-	     mft_entry,
-	     internal_volume->io_handle,
-	     internal_volume->file_io_handle,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: 5 directory entries tree.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
-	     internal_volume->file_io_handle,
 	     internal_volume->io_handle,
+	     internal_volume->file_io_handle,
 	     internal_volume->mft,
 	     mft_entry,
 	     NULL,
@@ -1583,6 +1552,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
      libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
+	libcdata_btree_t *directory_entries_tree     = NULL;
 	libfsntfs_directory_entry_t *directory_entry = NULL;
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	libfsntfs_mft_entry_t *mft_entry             = NULL;
@@ -1652,7 +1622,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		 "%s: unable to retrieve MFT entry: 5.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( utf8_string_length == 0 )
 	 || ( utf8_string_length == 1 ) )
@@ -1661,10 +1631,42 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 	}
 	else while( utf8_string_index < utf8_string_length )
 	{
+		if( directory_entries_tree != NULL )
+		{
+			if( libcdata_btree_free(
+			     &directory_entries_tree,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free directory entries array.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( libcdata_btree_initialize(
+		     &directory_entries_tree,
+		     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create directory entries tree.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_mft_entry_read_directory_entries_tree(
 		     mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     directory_entries_tree,
 		     0,
 		     error ) != 1 )
 		{
@@ -1672,10 +1674,10 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT entry directory entries tree.",
+			 "%s: unable to read directory entries tree.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		utf8_string_segment        = (uint8_t *) &( utf8_string[ utf8_string_index ] );
 		utf8_string_segment_length = utf8_string_index;
@@ -1696,7 +1698,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 				 "%s: unable to copy UTF-8 string to Unicode character.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			if( ( unicode_character == (libuna_unicode_character_t) LIBFSNTFS_SEPARATOR )
 			 || ( unicode_character == 0 ) )
@@ -1714,8 +1716,8 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		}
 		else
 		{
-			result = libfsntfs_mft_entry_get_directory_entry_by_utf8_name(
-			          mft_entry,
+			result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
+			          directory_entries_tree,
 				  utf8_string_segment,
 				  utf8_string_segment_length,
 			          &directory_entry,
@@ -1730,7 +1732,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 "%s: unable to retrieve directory entry by name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -1748,7 +1750,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 "%s: unable to retrieve MFT entry index.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libfsntfs_mft_get_mft_entry_by_index(
 		     internal_volume->mft,
@@ -1765,32 +1767,15 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 function,
 			 mft_entry_index );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( result != 0 )
 	{
-		if( libfsntfs_mft_entry_read_directory_entries_tree(
-		     mft_entry,
-		     internal_volume->io_handle,
-		     internal_volume->file_io_handle,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
-			 function,
-			 mft_entry_index );
-
-			return( -1 );
-		}
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
-		     internal_volume->file_io_handle,
 		     internal_volume->io_handle,
+		     internal_volume->file_io_handle,
 		     internal_volume->mft,
 		     mft_entry,
 		     directory_entry,
@@ -1804,10 +1789,37 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 "%s: unable to create file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
+		}
+	}
+	if( directory_entries_tree != NULL )
+	{
+		if( libcdata_btree_free(
+		     &directory_entries_tree,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entries array.",
+			 function );
+
+			goto on_error;
 		}
 	}
 	return( result );
+
+on_error:
+	if( directory_entries_tree != NULL )
+	{
+		libcdata_btree_free(
+		 &directory_entries_tree,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the file entry for an UTF-16 encoded path
@@ -1820,6 +1832,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
+	libcdata_btree_t *directory_entries_tree     = NULL;
 	libfsntfs_directory_entry_t *directory_entry = NULL;
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	libfsntfs_mft_entry_t *mft_entry             = NULL;
@@ -1898,10 +1911,42 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	}
 	else while( utf16_string_index < utf16_string_length )
 	{
+		if( directory_entries_tree != NULL )
+		{
+			if( libcdata_btree_free(
+			     &directory_entries_tree,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free directory entries array.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( libcdata_btree_initialize(
+		     &directory_entries_tree,
+		     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create directory entries tree.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_mft_entry_read_directory_entries_tree(
 		     mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     directory_entries_tree,
 		     0,
 		     error ) != 1 )
 		{
@@ -1909,7 +1954,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT entry directory entries tree.",
+			 "%s: unable to read directory entries tree.",
 			 function );
 
 			return( -1 );
@@ -1951,8 +1996,8 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		}
 		else
 		{
-			result = libfsntfs_mft_entry_get_directory_entry_by_utf16_name(
-			          mft_entry,
+			result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
+			          directory_entries_tree,
 				  utf16_string_segment,
 				  utf16_string_segment_length,
 			          &directory_entry,
@@ -2007,27 +2052,10 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	}
 	if( result != 0 )
 	{
-		if( libfsntfs_mft_entry_read_directory_entries_tree(
-		     mft_entry,
-		     internal_volume->io_handle,
-		     internal_volume->file_io_handle,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT entry: %" PRIi64 " directory entries tree.",
-			 function,
-			 mft_entry_index );
-
-			return( -1 );
-		}
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
-		     internal_volume->file_io_handle,
 		     internal_volume->io_handle,
+		     internal_volume->file_io_handle,
 		     internal_volume->mft,
 		     mft_entry,
 		     directory_entry,
@@ -2044,7 +2072,34 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			return( -1 );
 		}
 	}
+	if( directory_entries_tree != NULL )
+	{
+		if( libcdata_btree_free(
+		     &directory_entries_tree,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entries array.",
+			 function );
+
+			goto on_error;
+		}
+	}
 	return( result );
+
+on_error:
+	if( directory_entries_tree != NULL )
+	{
+		libcdata_btree_free(
+		 &directory_entries_tree,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Reads the bitmap file entry
