@@ -464,8 +464,8 @@ int libfsntfs_io_handle_read_volume_header(
 
 		return( -1 );
 	}
-	if( ( volume_header_data.sectors_per_cluster_block != 1 )
-	 && ( volume_header_data.sectors_per_cluster_block != 8 ) )
+	if( ( volume_header_data.sectors_per_cluster_block < 1 )
+	 || ( volume_header_data.sectors_per_cluster_block > 8 ) )
 	{
 		libcerror_error_set(
 		 error,

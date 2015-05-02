@@ -219,7 +219,7 @@ This is a jump instruction to the bootcode at offset 84 followed by a no-operati
 4+| _DOS version 2.0 BIOS parameter block (BPB)_
 | 11 | 2 | | Bytes per sector
 | 13 | 1 | | Sectors per cluster block +
-[yellow-background]*Values seen 1, 8*
+[yellow-background]*Values seen 1, 2, 8*
 | 14 | 2 | 0x00 | Reserved Sectors +
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
 | 16 | 1 | 0x00 | Number of File Allocation Tables (FATs) +

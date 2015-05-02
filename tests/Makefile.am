@@ -5,9 +5,11 @@ AM_CPPFLAGS = \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
-TESTS =
+TESTS = \
+	test_fsntfsinfo.sh
 
 check_SCRIPTS = \
+	test_fsntfsinfo.sh \
 	test_runner.sh
 
 EXTRA_DIST = \
