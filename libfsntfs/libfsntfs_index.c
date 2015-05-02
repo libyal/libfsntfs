@@ -433,6 +433,10 @@ int libfsntfs_index_read(
 
 		return( -1 );
 	}
+	if( index->is_read != 0 )
+	{
+		return( 1 );
+	}
 	if( index->index_value_list != NULL )
 	{
 		libcerror_error_set(
@@ -580,6 +584,8 @@ int libfsntfs_index_read(
 
 		goto on_error;
 	}
+	index->is_read = 1;
+
 	return( 1 );
 
 on_error:

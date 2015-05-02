@@ -89,6 +89,10 @@ struct libfsntfs_index
 	/* The index value cache
 	 */
 	libfcache_cache_t *index_value_cache;
+
+	/* Value to indicate the index was read
+	 */
+	uint8_t is_read;
 };
 
 int libfsntfs_index_initialize(

@@ -1,4 +1,6 @@
 TODO
+* fix get file entry by name
+* cached indexes?
 * handle cached out MFT entries
   - copy directory entries in file entry
   - copy directory index in file entry
@@ -123,6 +125,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150502
+* worked on Python bindings
 
 20150430
 * worked on Python bindings
