@@ -22,12 +22,12 @@ Requires: libfsntfs = %{version}-%{release}
 Header files and libraries for developing applications for libfsntfs.
 
 %package tools
-Summary: Several tools for reading Windows NT File System (NTFS)
+Summary: Several tools for reading Windows NT File System (NTFS) volumes
 Group: Applications/System
 Requires: libfsntfs = %{version}-%{release}
 
 %description tools
-Several tools for reading the Windows NT File System (NTFS)
+Several tools for reading the Windows NT File System (NTFS) volumes
 
 %prep
 %setup -q

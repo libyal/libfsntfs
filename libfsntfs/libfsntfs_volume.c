@@ -827,7 +827,7 @@ int libfsntfs_volume_open_read(
 		 "%s: unable to read volume header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

@@ -32,7 +32,7 @@ Section: utils
 Architecture: any
 Depends: libfsntfs (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading Windows NT File System (NTFS) volumes
- Several tools for reading Windows NT File System (NTFS) volumes
+ Several tools for reading Windows NT File System (NTFS) volumes.
 
 Package: libfsntfs-python
 Section: python

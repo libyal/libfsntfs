@@ -110,6 +110,7 @@ Tools:
   - sanitize control characters in filenames
   - add detection of BDE and VSS
   - add support for $LogFile
+  - print $DATA attribute size
 
 Tests:
 * file with resident data
@@ -125,6 +126,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150504
+* code clean up
 
 20150502
 * worked on Python bindings

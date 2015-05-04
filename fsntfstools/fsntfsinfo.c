@@ -1,5 +1,5 @@
 /*
- * Shows information obtained from a Windows NT File System (NTFS)
+ * Shows information obtained from a Windows NT File System (NTFS) volume
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -61,10 +61,10 @@ void usage_fprint(
 		return;
 	}
 	fprintf( stream, "Use fsntfsinfo to determine information about a Windows NT\n"
-	                 " File System (NTFS).\n\n" );
+	                 " File System (NTFS) volume.\n\n" );
 
-	fprintf( stream, "Usage: fsntfsinfo [ -e mft_entry_index ] [ -o offset ]\n"
-	                 "                  [ -hvV ] source\n\n" );
+	fprintf( stream, "Usage: fsntfsinfo [ -E mft_entry_index ] [ -o offset ]\n"
+	                 "                  [ -hHUvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 

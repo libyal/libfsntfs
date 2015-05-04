@@ -20,6 +20,18 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libfsntfs.la
 
 libfsntfs_la_SOURCES = \
+	fsntfs_attribute_list.h \
+	fsntfs_file_name.h \
+	fsntfs_index.h \
+	fsntfs_logged_utility_stream.h \
+	fsntfs_mft_attribute.h \
+	fsntfs_mft_entry.h \
+	fsntfs_object_identifier.h \
+	fsntfs_reparse_point.h \
+	fsntfs_standard_information.h \
+	fsntfs_txf_data.h \
+	fsntfs_volume_header.h \
+	fsntfs_volume_information.h \
 	libfsntfs.c \
 	libfsntfs_attribute.c libfsntfs_attribute.h \
 	libfsntfs_attribute_list.c libfsntfs_attribute_list.h \
@@ -76,19 +88,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_volume_information_attribute.c libfsntfs_volume_information_attribute.h \
 	libfsntfs_volume_information_values.c libfsntfs_volume_information_values.h \
 	libfsntfs_volume_name_attribute.c libfsntfs_volume_name_attribute.h \
-	libfsntfs_volume_name_values.c libfsntfs_volume_name_values.h \
-	fsntfs_attribute_list.h \
-	fsntfs_file_name.h \
-	fsntfs_index.h \
-	fsntfs_logged_utility_stream.h \
-	fsntfs_mft_attribute.h \
-	fsntfs_mft_entry.h \
-	fsntfs_object_identifier.h \
-	fsntfs_reparse_point.h \
-	fsntfs_standard_information.h \
-	fsntfs_txf_data.h \
-	fsntfs_volume_header.h \
-	fsntfs_volume_information.h
+	libfsntfs_volume_name_values.c libfsntfs_volume_name_values.h
 
 libfsntfs_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
