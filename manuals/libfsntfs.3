@@ -1,4 +1,4 @@
-.Dd April 26, 2015
+.Dd May 10, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -62,6 +62,10 @@ Volume functions
 .Fn libfsntfs_volume_open "libfsntfs_volume_t *volume, const char *filename, int access_flags, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_close "libfsntfs_volume_t *volume, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_has_bitlocker_drive_encryption "libfsntfs_volume_t *volume, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_has_volume_shadow_snapshots "libfsntfs_volume_t *volume, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_cluster_block_size "libfsntfs_volume_t *volume, size_t *cluster_block_size, libfsntfs_error_t **error"
 .Ft int
@@ -137,6 +141,22 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_utf16_name_by_attribute_index "libfsntfs_file_entry_t *file_entry, int attribute_index, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
 .Ft int
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry, size_t *utf8_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry, uint8_t *utf8_name, size_t utf8_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry, size_t *utf16_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry, size_t *utf8_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name "libfsntfs_file_entry_t *file_entry, uint8_t *utf8_name, size_t utf8_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry, size_t *utf16_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name "libfsntfs_file_entry_t *file_entry, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
+.Ft int
 .Fn libfsntfs_file_entry_get_number_of_attributes "libfsntfs_file_entry_t *file_entry, int *number_of_attributes, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_attribute_by_index "libfsntfs_file_entry_t *file_entry, int attribute_index, libfsntfs_attribute_t **attribute, libfsntfs_error_t **error"
@@ -170,6 +190,10 @@ File entry functions
 .Fn libfsntfs_file_entry_get_offset "libfsntfs_file_entry_t *file_entry, off64_t *offset, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_size "libfsntfs_file_entry_t *file_entry, size64_t *size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_number_of_extents "libfsntfs_file_entry_t *file_entry, int *number_of_extents, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_extent_by_index "libfsntfs_file_entry_t *file_entry, int extent_index, off64_t *extent_offset, size64_t *extent_size, uint32_t *extent_flags, libfsntfs_error_t **error"
 .Pp
 Attribute functions
 .Ft int
@@ -271,7 +295,7 @@ Data stream functions
 .Ft int
 .Fn libfsntfs_data_stream_get_number_of_extents "libfsntfs_data_stream_t *data_stream, int *number_of_extents, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_data_stream_get_extent "libfsntfs_data_stream_t *data_stream, int extent_index, off64_t *extent_offset, size64_t *extent_size, uint32_t *extent_flags, libfsntfs_error_t **error"
+.Fn libfsntfs_data_stream_get_extent_by_index "libfsntfs_data_stream_t *data_stream, int extent_index, off64_t *extent_offset, size64_t *extent_size, uint32_t *extent_flags, libfsntfs_error_t **error"
 .Pp
 MFT metadata file functions
 .Ft int

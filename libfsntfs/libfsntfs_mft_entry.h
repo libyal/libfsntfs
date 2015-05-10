@@ -103,6 +103,10 @@ struct libfsntfs_mft_entry
 	 */
 	libfsntfs_attribute_t *object_identifier_attribute;
 
+	/* The reparse point attribute
+	 */
+	libfsntfs_attribute_t *reparse_point_attribute;
+
 	/* The volume information attribute
 	 */
 	libfsntfs_attribute_t *volume_information_attribute;
@@ -270,6 +274,11 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_index_root_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_attribute_t *attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_set_reparse_point_attribute(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_attribute_t *attribute,
      libcerror_error_t **error );

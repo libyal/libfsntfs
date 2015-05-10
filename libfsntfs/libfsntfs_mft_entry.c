@@ -2743,6 +2743,14 @@ int libfsntfs_mft_entry_append_attribute(
 			}
 			break;
 
+		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
+			if( ( mft_entry->reparse_point_attribute == NULL )
+			 && ( attribute_has_name == 0 ) )
+			{
+				mft_entry->reparse_point_attribute = attribute;
+			}
+			break;
+
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
 			if( ( mft_entry->standard_information_attribute == NULL )
 			 && ( attribute_has_name == 0 ) )
@@ -3038,9 +3046,22 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_has_name(
-	     attribute,
-	     error ) != 1 )
+	result = libfsntfs_attribute_has_name(
+	          attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if the attribute has a name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3128,9 +3149,22 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_has_name(
-	     attribute,
-	     error ) != 1 )
+	result = libfsntfs_attribute_has_name(
+	          attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if the attribute has a name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
 	{
 		libcerror_error_set(
 		 error,

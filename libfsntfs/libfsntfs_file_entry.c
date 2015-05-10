@@ -37,6 +37,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_reparse_point_attribute.h"
 #include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
@@ -1586,6 +1587,478 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve UTF-16 name from file name attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded reparse point substitute name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf8_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-8 substitute name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded reparse point substitute name
+ * The size should include the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf8_name,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 substitute name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded reparse point substitute name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf16_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-16 substitute name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded reparse point substitute name
+ * The size should include the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf16_name,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 substitute name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded reparse point print name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf8_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_print_name_size";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-8 print name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded reparse point print name
+ * The size should include the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_print_name";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf8_print_name(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf8_name,
+	     utf8_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 print name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded reparse point print name
+ * The returned size includes the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *utf16_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_print_name_size";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-16 print name from reparse point attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded reparse point print name
+ * The size should include the end of string character
+ * This value is retrieved from the $REPARSE_POINT attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+     libfsntfs_file_entry_t *file_entry,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_print_name";
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file_entry->mft_entry->reparse_point_attribute == NULL )
+	{
+		return( 0 );
+	}
+	if( libfsntfs_reparse_point_attribute_get_utf16_print_name(
+	     internal_file_entry->mft_entry->reparse_point_attribute,
+	     utf16_name,
+	     utf16_name_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 print name from reparse point attribute.",
 		 function );
 
 		return( -1 );

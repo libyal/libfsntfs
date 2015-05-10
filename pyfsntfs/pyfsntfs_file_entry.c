@@ -110,6 +110,25 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the size data." },
 
+	/* Functions to access the extents */
+
+	{ "get_number_of_extents",
+	  (PyCFunction) pyfsntfs_file_entry_get_number_of_extents,
+	  METH_NOARGS,
+	  "get_number_of_extents() -> Integer\n"
+	  "\n"
+	  "Retrieves the number of extents." },
+
+	{ "get_extent",
+	  (PyCFunction) pyfsntfs_file_entry_get_extent,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_extent(extent_index) -> Tuple( Integer, Integer, Integer )\n"
+	  "\n"
+	  "Retrieves a specific extent.\t"
+          "The extent is a tuple of offset, size and flags." },
+
+	/* Functions to access the file entry data */
+
 	{ "is_allocated",
 	  (PyCFunction) pyfsntfs_file_entry_is_allocated,
 	  METH_NOARGS,
@@ -250,22 +269,19 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the file attribute flags." },
 
-	/* Functions to access the extents */
-
-	{ "get_number_of_extents",
-	  (PyCFunction) pyfsntfs_file_entry_get_number_of_extents,
+	{ "get_reparse_point_substitute_name",
+	  (PyCFunction) pyfsntfs_file_entry_get_reparse_point_substitute_name,
 	  METH_NOARGS,
-	  "get_number_of_extents() -> Integer\n"
+	  "get_reparse_point_substitute_name() -> Unicode string or None\n"
 	  "\n"
-	  "Retrieves the number of extents." },
+	  "Returns the reparse point substitute name." },
 
-	{ "get_extent",
-	  (PyCFunction) pyfsntfs_file_entry_get_extent,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "get_extent(extent_index) -> Tuple( Integer, Integer, Integer )\n"
+	{ "get_reparse_point_print_name",
+	  (PyCFunction) pyfsntfs_file_entry_get_reparse_point_print_name,
+	  METH_NOARGS,
+	  "get_reparse_point_print_name() -> Unicode string or None\n"
 	  "\n"
-	  "Retrieves a specific extent.\t"
-          "The extent is a tuple of offset, size and flags." },
+	  "Returns the reparse point print name." },
 
 	/* Functions to access the attributes */
 
@@ -334,6 +350,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The size of the data.",
 	  NULL },
 
+	{ "number_of_extents",
+	  (getter) pyfsntfs_file_entry_get_number_of_extents,
+	  (setter) 0,
+	  "The number of extents.",
+	  NULL },
+
 	{ "file_reference",
 	  (getter) pyfsntfs_file_entry_get_file_reference,
 	  (setter) 0,
@@ -382,12 +404,6 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The entry modification date and time.",
 	  NULL },
 
-	{ "file_attribute_flags",
-	  (getter) pyfsntfs_file_entry_get_file_attribute_flags,
-	  (setter) 0,
-	  "The file attribute flags.",
-	  NULL },
-
 	{ "name",
 	  (getter) pyfsntfs_file_entry_get_name,
 	  (setter) 0,
@@ -400,10 +416,22 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The name.",
 	  NULL },
 
-	{ "number_of_extents",
-	  (getter) pyfsntfs_file_entry_get_number_of_extents,
+	{ "file_attribute_flags",
+	  (getter) pyfsntfs_file_entry_get_file_attribute_flags,
 	  (setter) 0,
-	  "The number of extents.",
+	  "The file attribute flags.",
+	  NULL },
+
+	{ "reparse_point_substitute_name",
+	  (getter) pyfsntfs_file_entry_get_reparse_point_substitute_name,
+	  (setter) 0,
+	  "The reparse point substitute name.",
+	  NULL },
+
+	{ "reparse_point_print_name",
+	  (getter) pyfsntfs_file_entry_get_reparse_point_print_name,
+	  (setter) 0,
+	  "The reparse point print name.",
 	  NULL },
 
 	{ "number_of_attributes",
@@ -1468,6 +1496,196 @@ PyObject *pyfsntfs_file_entry_get_size(
 	                  (uint64_t) size );
 
 	return( integer_object );
+}
+
+/* Retrieves the number of extents
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_number_of_extents(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_number_of_extents";
+	int number_of_extents    = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          pyfsntfs_file_entry->file_entry,
+	          &number_of_extents,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve number of extents.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_extents );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_extents );
+#endif
+	return( integer_object );
+}
+
+/* Retrieves a specific extent by index
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_extent_by_index(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           int extent_index )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	PyObject *tuple_object   = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_extent_by_index";
+	off64_t extent_offset    = 0;
+	size64_t extent_size     = 0;
+	uint32_t extent_flags    = 0;
+	int result               = 0;
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          pyfsntfs_file_entry->file_entry,
+	          extent_index,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve extent: %d.",
+		 function,
+		 extent_index );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	tuple_object = PyTuple_New(
+                        3 );
+
+	integer_object = pyfsntfs_integer_signed_new_from_64bit(
+	                  (int64_t) extent_offset );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     0,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) extent_size );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     1,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) extent_flags );
+
+	/* Tuple set item does not increment the reference count of the integer object
+	 */
+	if( PyTuple_SetItem(
+	     tuple_object,
+	     2,
+	     integer_object ) != 0 )
+	{
+		goto on_error;
+	}
+	return( tuple_object );
+
+on_error:
+	if( integer_object != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) integer_object );
+	}
+	if( tuple_object != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) tuple_object );
+	}
+	return( NULL );
+}
+
+/* Retrieves a specific extent
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_extent(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *sequence_object   = NULL;
+	static char *keyword_list[] = { "extent_index", NULL };
+	int extent_index            = 0;
+
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i",
+	     keyword_list,
+	     &extent_index ) == 0 )
+	{
+		return( NULL );
+	}
+	sequence_object = pyfsntfs_file_entry_get_extent_by_index(
+	                   pyfsntfs_file_entry,
+	                   extent_index );
+
+	return( sequence_object );
 }
 
 /* Determines if the file entry is allocated (in use)
@@ -2740,17 +2958,19 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 	return( integer_object );
 }
 
-/* Retrieves the number of extents
+/* Retrieves the reparse point substitute name
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_entry_get_number_of_extents(
+PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	PyObject *integer_object = NULL;
-	static char *function    = "pyfsntfs_file_entry_get_number_of_extents";
-	int number_of_extents    = 0;
+	PyObject *string_object  = NULL;
+	const char *errors       = NULL;
+	uint8_t *name            = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_reparse_point_substitute_name";
+	size_t name_size         = 0;
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
@@ -2766,10 +2986,53 @@ PyObject *pyfsntfs_file_entry_get_number_of_extents(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_number_of_extents(
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 	          pyfsntfs_file_entry->file_entry,
-	          &number_of_extents,
+	          &name_size,
 	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve reparse point substitute name size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( ( result == 0 )
+	      || ( name_size == 0 ) )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	name = (uint8_t *) PyMem_Malloc(
+	                    sizeof( uint8_t ) * name_size );
+
+	if( name == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create name.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+		  pyfsntfs_file_entry->file_entry,
+		  name,
+		  name_size,
+		  &error );
 
 	Py_END_ALLOW_THREADS
 
@@ -2778,39 +3041,53 @@ PyObject *pyfsntfs_file_entry_get_number_of_extents(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve number of extents.",
+		 "%s: unable to retrieve reparse point substitute name.",
 		 function );
 
 		libcerror_error_free(
 		 &error );
 
-		return( NULL );
+		goto on_error;
 	}
-#if PY_MAJOR_VERSION >= 3
-	integer_object = PyLong_FromLong(
-	                  (long) number_of_extents );
-#else
-	integer_object = PyInt_FromLong(
-	                  (long) number_of_extents );
-#endif
-	return( integer_object );
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) name,
+			 (Py_ssize_t) name_size - 1,
+			 errors );
+
+	PyMem_Free(
+	 name );
+
+	return( string_object );
+
+on_error:
+	if( name != NULL )
+	{
+		PyMem_Free(
+		 name );
+	}
+	return( NULL );
 }
 
-/* Retrieves a specific extent by index
+/* Retrieves the reparse point print name
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_entry_get_extent_by_index(
+PyObject *pyfsntfs_file_entry_get_reparse_point_print_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           int extent_index )
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	PyObject *integer_object = NULL;
-	PyObject *tuple_object   = NULL;
-	static char *function    = "pyfsntfs_file_entry_get_extent_by_index";
-	off64_t extent_offset    = 0;
-	size64_t extent_size     = 0;
-	uint32_t extent_flags    = 0;
+	PyObject *string_object  = NULL;
+	const char *errors       = NULL;
+	uint8_t *name            = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_reparse_point_print_name";
+	size_t name_size         = 0;
 	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyfsntfs_file_entry == NULL )
 	{
@@ -2823,13 +3100,53 @@ PyObject *pyfsntfs_file_entry_get_extent_by_index(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_extent_by_index(
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
 	          pyfsntfs_file_entry->file_entry,
-	          extent_index,
-	          &extent_offset,
-	          &extent_size,
-	          &extent_flags,
+	          &name_size,
 	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve reparse point print name size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( ( result == 0 )
+	      || ( name_size == 0 ) )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	name = (uint8_t *) PyMem_Malloc(
+	                    sizeof( uint8_t ) * name_size );
+
+	if( name == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create name.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+		  pyfsntfs_file_entry->file_entry,
+		  name,
+		  name_size,
+		  &error );
 
 	Py_END_ALLOW_THREADS
 
@@ -2838,96 +3155,35 @@ PyObject *pyfsntfs_file_entry_get_extent_by_index(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve extent: %d.",
-		 function,
-		 extent_index );
+		 "%s: unable to retrieve reparse point print name.",
+		 function );
 
 		libcerror_error_free(
 		 &error );
 
 		goto on_error;
 	}
-	tuple_object = PyTuple_New(
-                        3 );
-
-	integer_object = pyfsntfs_integer_signed_new_from_64bit(
-	                  (int64_t) extent_offset );
-
-	/* Tuple set item does not increment the reference count of the integer object
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
 	 */
-	if( PyTuple_SetItem(
-	     tuple_object,
-	     0,
-	     integer_object ) != 0 )
-	{
-		goto on_error;
-	}
-	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) extent_size );
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) name,
+			 (Py_ssize_t) name_size - 1,
+			 errors );
 
-	/* Tuple set item does not increment the reference count of the integer object
-	 */
-	if( PyTuple_SetItem(
-	     tuple_object,
-	     1,
-	     integer_object ) != 0 )
-	{
-		goto on_error;
-	}
-	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) extent_flags );
+	PyMem_Free(
+	 name );
 
-	/* Tuple set item does not increment the reference count of the integer object
-	 */
-	if( PyTuple_SetItem(
-	     tuple_object,
-	     2,
-	     integer_object ) != 0 )
-	{
-		goto on_error;
-	}
-	return( tuple_object );
+	return( string_object );
 
 on_error:
-	if( integer_object != NULL )
+	if( name != NULL )
 	{
-		Py_DecRef(
-		 (PyObject *) integer_object );
-	}
-	if( tuple_object != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) tuple_object );
+		PyMem_Free(
+		 name );
 	}
 	return( NULL );
-}
-
-/* Retrieves a specific extent
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_file_entry_get_extent(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *sequence_object   = NULL;
-	static char *keyword_list[] = { "extent_index", NULL };
-	int extent_index            = 0;
-
-	if( PyArg_ParseTupleAndKeywords(
-	     arguments,
-	     keywords,
-	     "i",
-	     keyword_list,
-	     &extent_index ) == 0 )
-	{
-		return( NULL );
-	}
-	sequence_object = pyfsntfs_file_entry_get_extent_by_index(
-	                   pyfsntfs_file_entry,
-	                   extent_index );
-
-	return( sequence_object );
 }
 
 /* Retrieves the number of attributes
