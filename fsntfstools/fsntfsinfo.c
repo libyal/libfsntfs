@@ -69,7 +69,7 @@ void usage_fprint(
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
 	fprintf( stream, "\t-E:     show information about a specific MFT entry index\n"
-	                 "\t        or \"all\"." );
+	                 "\t        or \"all\".\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-H:     shows the file system hierarcy\n" );
 	fprintf( stream, "\t-o:     specify the volume offset\n" );
