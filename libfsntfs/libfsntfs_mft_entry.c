@@ -964,6 +964,9 @@ int libfsntfs_mft_entry_read_attributes(
 			 "%s: unable to append attribute.",
 			 function );
 
+			/* Prevent a double free of the attribute */
+			attribute = NULL;
+
 			goto on_error;
 		}
 		attribute = NULL;

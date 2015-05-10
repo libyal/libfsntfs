@@ -1722,6 +1722,19 @@ int info_handle_object_identifier_attribute_fprint(
 		 "\tBirth droid domain identifier\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
 		 guid_string );
 	}
+	if( libfguid_identifier_free(
+	     &guid,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free GUID.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:

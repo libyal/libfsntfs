@@ -224,7 +224,7 @@ int libfsntfs_reparse_point_values_read(
 		 "\n" );
 
 		libcnotify_printf(
-		 "%s: reparse data size\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: reparse data size\t\t\t: %" PRIu16 "\n",
 		 function,
 		 reparse_point_values->reparse_data_size );
 
@@ -318,7 +318,12 @@ int libfsntfs_reparse_point_values_read(
 		}
 #endif
 	}
-	if( reparse_point_values->tag == 0xa000000c )
+	if( reparse_point_values->tag == 0xa0000003 )
+	{
+		reparse_point_values->substitute_name_offset += sizeof( fsntfs_mount_point_reparse_data_t );
+		reparse_point_values->print_name_offset      += sizeof( fsntfs_mount_point_reparse_data_t );
+	}
+	else if( reparse_point_values->tag == 0xa000000c )
 	{
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (fsntfs_symbolic_link_reparse_data_t *) reparse_point_values->reparse_data )->flags,
@@ -333,6 +338,8 @@ int libfsntfs_reparse_point_values_read(
 			 flags );
 		}
 #endif
+		reparse_point_values->substitute_name_offset += sizeof( fsntfs_symbolic_link_reparse_data_t );
+		reparse_point_values->print_name_offset      += sizeof( fsntfs_symbolic_link_reparse_data_t );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -354,8 +361,6 @@ int libfsntfs_reparse_point_values_read(
 #endif
 	if( reparse_point_values->substitute_name_size > 0 )
 	{
-		reparse_point_values->substitute_name_offset += sizeof( fsntfs_symbolic_link_reparse_data_t );
-
 		if( reparse_point_values->substitute_name_offset >= reparse_point_values->reparse_data_size )
 		{
 			libcerror_error_set(
@@ -463,8 +468,6 @@ int libfsntfs_reparse_point_values_read(
 	}
 	if( reparse_point_values->print_name_size > 0 )
 	{
-		reparse_point_values->print_name_offset += sizeof( fsntfs_symbolic_link_reparse_data_t );
-
 		if( reparse_point_values->print_name_offset >= reparse_point_values->reparse_data_size )
 		{
 			libcerror_error_set(
