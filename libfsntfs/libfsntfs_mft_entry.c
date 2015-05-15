@@ -2635,21 +2635,24 @@ int libfsntfs_mft_entry_append_attribute(
 				}
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libfsntfs_attribute_read_value(
-			     attribute,
-			     io_handle,
-			     file_io_handle,
-			     flags,
-			     error ) != 1 )
+			if( libcnotify_verbose != 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read attribute value.",
-				 function );
+				if( libfsntfs_attribute_read_value(
+				     attribute,
+				     io_handle,
+				     file_io_handle,
+				     flags,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read attribute value.",
+					 function );
 
-				return( -1 );
+					return( -1 );
+				}
 			}
 #endif
 			break;

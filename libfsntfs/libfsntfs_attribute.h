@@ -80,7 +80,7 @@ struct libfsntfs_internal_attribute
 
 	/* The compression unit size
 	 */
-	uint16_t compression_unit_size;
+	size_t compression_unit_size;
 
 	/* The allocated data size
 	 */
@@ -210,6 +210,16 @@ int libfsntfs_attribute_compare_name_with_utf16_string(
      libfsntfs_attribute_t *attribute,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_get_data_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_get_compression_unit_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *compression_unit_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

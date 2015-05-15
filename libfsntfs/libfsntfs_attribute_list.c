@@ -193,6 +193,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 	static char *function                    = "libfsntfs_attribute_list_read_from_attribute";
 	size64_t data_size                       = 0;
 	size_t cluster_block_data_size           = 0;
+	uint16_t attribute_data_flags            = 0;
 	int cluster_block_index                  = 0;
 	int number_of_cluster_blocks             = 0;
 	int number_of_data_runs                  = 0;
@@ -279,6 +280,31 @@ int libfsntfs_attribute_list_read_from_attribute(
 	}
 	else
 	{
+		if( libfsntfs_attribute_get_data_flags(
+		     attribute,
+		     &attribute_data_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute data flags.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compressed attribute data.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_attribute_get_data_size(
 		     attribute,
 		     &data_size,

@@ -24,6 +24,7 @@
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_data_run.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_io_handle.h"
@@ -49,6 +50,7 @@ int libfsntfs_cluster_block_vector_initialize(
 	int entry_index                = 0;
 	int number_of_entries          = 0;
 	int segment_index              = 0;
+	uint16_t attribute_data_flags  = 0;
 
 	if( cluster_block_vector == NULL )
 	{
@@ -82,6 +84,31 @@ int libfsntfs_cluster_block_vector_initialize(
 		 function );
 
 		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_flags(
+	     attribute,
+	     &attribute_data_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute data flags.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported compressed attribute data.",
+		 function );
+
+		goto on_error;
 	}
 	if( libfdata_vector_initialize(
 	     cluster_block_vector,

@@ -1,4 +1,6 @@
 TODO
+* compressed files need fdata list with mapped sizes?
+  - compression_unit_size = io_handle->cluster_block_size * 16;
 * fix get file entry by name
 * cached indexes?
 * handle cached out MFT entries
@@ -101,6 +103,8 @@ Format:
   - volume version
 * filenames
   - ignoring short filenames for now?
+* ntfs3g indicates volume is hibernated, could this be stored in the volume flags?
+* Windows 10 different compression?
 
 Tools:
 * fsntfsinfo
@@ -111,6 +115,9 @@ Tools:
   - add detection of BDE and VSS
   - add support for $LogFile
   - print $DATA attribute size
+
+Error tolerance:
+* Support partial images/file systems
 
 Tests:
 * file with resident data
@@ -126,6 +133,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150514
+* worked on compression support
 
 20150504
 * code clean up

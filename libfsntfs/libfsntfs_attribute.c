@@ -324,6 +324,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	uint32_t range_flags                               = 0;
 	uint16_t attribute_data_offset                     = 0;
 	uint16_t attribute_name_offset                     = 0;
+	uint16_t compression_unit_size                     = 0;
 	uint16_t data_runs_offset                          = 0;
 	uint8_t data_run_value_index                       = 0;
 	uint8_t data_run_value_size                        = 0;
@@ -540,6 +541,34 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				goto on_error;
 			}
 		}
+		if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+		{
+			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0x0001 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported compression flags: 0x%04" PRIx16 ".",
+				 function,
+				 internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK );
+
+				goto on_error;
+			}
+			if( io_handle->cluster_block_size > 4096 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported compression flags: 0x%04" PRIx16 " for volume with cluster block size: %" PRIzd ".",
+				 function,
+				 internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK,
+				 io_handle->cluster_block_size );
+
+				goto on_error;
+			}
+		}
 		mft_attribute_data_offset += sizeof( fsntfs_mft_attribute_header_t );
 
 		if( ( non_resident_flag & 0x01 ) == 0 )
@@ -658,7 +687,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 			byte_stream_copy_to_uint16_little_endian(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->compression_unit_size,
-			 internal_attribute->compression_unit_size );
+			 compression_unit_size );
 
 			byte_stream_copy_to_uint64_little_endian(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->allocated_data_size,
@@ -668,13 +697,21 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->data_size,
 			 internal_attribute->data_size );
 
-			if( internal_attribute->compression_unit_size == 0 )
+			if( compression_unit_size == 0 )
 			{
 				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_t );
 			}
 			else
 			{
 				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
+			}
+			if( compression_unit_size != 0 )
+			{
+/* TODO add bounds checks */
+				/* The size is calculated as: 2 ^ value
+				 */
+				internal_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
+				internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -707,8 +744,9 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 data_runs_offset );
 
 				libcnotify_printf(
-				 "%s: compression unit size\t\t: %" PRIu16 "\n",
+				 "%s: compression unit size\t\t: %" PRIu16 " (%" PRIzd ")\n",
 				 function,
+				 compression_unit_size,
 				 internal_attribute->compression_unit_size );
 
 				byte_stream_copy_to_uint32_little_endian(
@@ -738,7 +776,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 value_64bit,
 				 value_64bit );
 
-				if( internal_attribute->compression_unit_size > 0 )
+				if( compression_unit_size > 0 )
 				{
 					byte_stream_copy_to_uint64_little_endian(
 					 ( (fsntfs_mft_attribute_non_resident_compressed_t *) mft_attribute_non_resident_data )->total_data_size,
@@ -770,7 +808,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				}
 				data_runs_offset += mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t );
 			}
-			if( internal_attribute->compression_unit_size == 0 )
+			if( compression_unit_size == 0 )
 			{
 				mft_attribute_data_offset += sizeof( fsntfs_mft_attribute_non_resident_t );
 			}
@@ -1027,7 +1065,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 #endif
 					break;
                                 }
-				if( ( mft_attribute_data_offset + data_run_value_size ) > mft_entry_data_size )
+				if( ( mft_attribute_data_offset >= mft_entry_data_size )
+				 || ( data_run_value_size > ( mft_entry_data_size - mft_attribute_data_offset ) ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1053,26 +1092,30 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 				if( data_run_value_size == 0 )
 				{
-/* TODO if compression unit size != 0 then compressed ? */
-					if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSED ) != 0 )
-					{
-						range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
-					}
-/* TODO error if flag is not sparse or compressed */
-					if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) != 0 )
-					{
-						range_flags = LIBFDATA_RANGE_FLAG_IS_SPARSE;
-					}
-				}
-				else
-				{
-					if( ( mft_attribute_data_offset + data_run_value_size ) > mft_entry_data_size )
+					if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+					 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
 					{
 						libcerror_error_set(
 						 error,
-						 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-						 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-						 "%s: MFT attribute data size value too small.",
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+						 "%s: MFT data run value size value out of bounds.",
+						 function );
+
+						goto on_error;
+					}
+					range_flags |= LIBFDATA_RANGE_FLAG_IS_SPARSE;
+				}
+				else
+				{
+					if( ( mft_attribute_data_offset >= mft_entry_data_size )
+					 || ( data_run_value_size > ( mft_entry_data_size - mft_attribute_data_offset ) ) )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+						 "%s: MFT data run value size value out of bounds.",
 						 function );
 
 						goto on_error;
@@ -1123,11 +1166,6 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					{
 						libcnotify_printf(
 						 "\tIs sparse\n" );
-					}
-					if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-					{
-						libcnotify_printf(
-						 "\tIs compressed\n" );
 					}
 					libcnotify_printf(
 					 "\n" );
@@ -2158,6 +2196,17 @@ int libfsntfs_attribute_read_value(
 		if( ( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
 		 && ( internal_attribute->value != NULL ) )
 		{
+			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: unsupported compressed attribute data.",
+				 function );
+
+				goto on_error;
+			}
 			if( libcdata_array_get_number_of_entries(
 			     internal_attribute->data_runs_array,
 			     &number_of_data_runs,
@@ -2715,6 +2764,86 @@ int libfsntfs_attribute_get_utf16_name(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Retrieves the data flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_get_data_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_get_data_flags";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( data_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data flags.",
+		 function );
+
+		return( -1 );
+	}
+	*data_flags = internal_attribute->data_flags;
+
+	return( 1 );
+}
+
+/* Retrieves the compression unit size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_get_compression_unit_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *compression_unit_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_get_compression_unit_size";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( compression_unit_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression unit size.",
+		 function );
+
+		return( -1 );
+	}
+	*compression_unit_size = internal_attribute->compression_unit_size;
+
 	return( 1 );
 }
 

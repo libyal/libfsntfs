@@ -564,7 +564,9 @@ set (1). The non-resident data is 48 or 56 bytes in size and consists of:
 | 16 | 2 | | Data runs offset (or mappings pairs offset) +
 Contains an offset relative from the start of the MFT attribute
 | 18 | 2 | | Compression unit size +
-Contains the compression unit size in number of cluster blocks. This value is used for compressed data in the data runs.
+Contains the compression unit size as `2^(n)` number of cluster blocks. +
+This value is used for compressed data in the data runs. +
+A value of 0 indicates the attribute data is uncompressed.
 | 20 | 4 | | Padding +
 Contains zero-bytes
 | 24 | 8 | | Allocated data size (or allocated length) +
@@ -630,20 +632,31 @@ The last runlist element is an empty value size tuple; in other words a 0 byte.
 [yellow-background]*Does a data run with a "number of cluster blocks value size"
 of 0 represent this as well?*
 
-For [yellow-background]*compressed* or sparse data runs, the size of the offset 
-is value 0, representing there is no offset. The attribute data flag indicates 
-if the data run is either compressed or sparse.
+The MFT attribute data flag (ATTRIBUTE_FLAG_SPARSE) indicates if the data 
+stream is sparse or not.
 
-A sparse data run should be filled with 0-byte values.
+A sparse data run has a "cluster block number value size" 0, representing there 
+is no offset (cluster block number). A sparse data run should be filled with 
+0-byte values.
 
-[yellow-background]*A compressed data run is read*
-[yellow-background]*For every compression unit block:*
+[NOTE]
+Compressed files also define sparse data runs without setting the sparse flag.
 
-* [yellow-background]*if the size is less than the compression unit size the previous data run is compressed (the size signifies the remaining unused data)*
-* [yellow-background]*if the size is equal to the compression unit size the data run is sparse*
+The MFT attribute data flags (0x00ff) indicate if the data stream is compressed
+or not. The currently known value for LZNT1 compression is 1.
 
-[yellow-background]*Note that the compression unit blocks must be aligned to 
-the virtual cluster blocks.*
+[yellow-background]*TODO: have a look at Windows 10 compression see if they use
+a different value.*
+
+The data is stored in compression unit blocks. A compression unit typically 
+consists of 16 cluster blocks. However the actual value is stored in the 
+non-resident MFT attribute. See <<compression,Compression>> for more 
+information on how to determine which data runs store the compressed and which 
+do not.
+
+[NOTE]
+Compression is supported upto NTFS file systems with a cluster block size of 
+4096 bytes or less.
 
 According to `[RUSSON05]` the size of the runlist is rounded up to the next 
 multitude of 4 bytes. The size of the trailing data can be even larger than 3 
@@ -1287,22 +1300,56 @@ value.
 
 [yellow-background]*Does the hard link always has POSIX namespace?*
 
-== Compression
-The NTFS compression groups 16 cluster blocks together. This group of 16 
-cluster blocks is either \'compressed' or raw data. The word compressed is 
-quoted because, as you will see below, the group of cluster blocks can also 
-contain uncompressed data. A group of cluster block is \'compressed' when it's 
-compressed size is smaller than its raw data size.
+== [[compression]]Compression
+Typically NTFS compression groups 16 cluster blocks together. This group of 16 
+cluster blocks also named a compression unit is either \'compressed' or 
+uncompressed data. The term compressed is quoted here because, as you will see 
+below, the group of cluster blocks can also contain uncompressed data. A group 
+of cluster blocks is \'compressed' when it is compressed size is smaller than 
+its uncompressed data size.
+
+[NOTE]
+The actual compression unit size is stored in the non-resident MFT attribute.
 
 Within a group of cluster blocks each of the 16 blocks is \'compressed' 
-individually. The maximum uncompressed data size is always the cluster size (in 
-most cases 4096). 
+individually see <<compression_block_based_storage,Block based storage>>.
+The maximum uncompressed data size is always the cluster size (in most cases
+4096). 
 
-The amount and offset of NTFS compressed and raw cluster block is maintained in 
-the NTFS Master File Table (MFT). This allows NTFS compression to be combined 
-with sparse cluster blocks.
+The data runs in the $DATA stream define cluster block ranges. A simple example:
+....
+21 02 35 52
+....
 
-=== Block based storage
+This data run defines 2 data blocks starting at block number 21045 followed by
+14 sparse blocks. The total number of blocks is 16 which is the size of the
+compression unit. The data is stored compressed in the first 2 blocks and the
+14 sparse blocks are only there to make sure the data runs add up to the
+compression unit size. They do not define actual sparse data.
+
+Another example:
+....
+21 40 37 52
+....
+
+This data run defines 64 data blocks starting at block number 21047. Since
+this data run is larger than the compression unit size the data is stored
+uncompressed.
+
+If the data run was e.g. 60 data blocks followed by 4 sparse blocks the first 3 
+compression units (blocks 1 to 48) would be uncompressed and the last 
+compression unit (blocks 49 to 64) would be compressed.
+
+Also "sparse data" and "sparse compression unit" data runs can be mixed. If in
+the previous example the 60 data blocks would be followed by 20 sparse blocks
+the last compression unit (blocks 65 to 80) would be sparse.
+
+[yellow-background]*Does the sparse flag needs to be set for sparse compressed
+files?*
+
+Also see `[RUSSON05]` for more detailed examples.
+
+=== [[compression_block_based_storage]]Block based storage
 NTFS compression stores the \'compressed' data in blocks. Each block has a 2 
 byte block header.
 
@@ -1328,7 +1375,7 @@ The upper 4 bits of the block size are used as flags.
 === LZNT1 compression method
 The LZNT1 compression method is based on LZ77 compression.
 
-Every compression block consists of tagged compression groups . A tagged group 
+Every compression block consists of tagged compression groups. A tagged group 
 consist of 8 values (not bytes) preceded by a tag byte:
 ....
 tag A B C D E F G H 
@@ -2323,6 +2370,12 @@ http://msdn.microsoft.com/en-us/library/dd541667%28PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232005%28v=PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232006%28v=PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232007%28v=PROT.13%29.aspx
+|===
+
+[cols="1,5",options="header"]
+|===
+| Subject | Understanding NTFS Compression
+| URL | http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx
 |===
 
 [cols="1,5",options="header"]

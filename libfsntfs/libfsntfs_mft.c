@@ -260,6 +260,7 @@ int libfsntfs_mft_set_data_runs(
 	int data_run_index                             = 0;
 	int number_of_data_runs                        = 0;
 	int segment_index                              = 0;
+	uint16_t attribute_data_flags                  = 0;
 
 	if( mft == NULL )
 	{
@@ -298,6 +299,31 @@ int libfsntfs_mft_set_data_runs(
 
 	while( data_attribute != NULL )
 	{
+		if( libfsntfs_attribute_get_data_flags(
+		     (libfsntfs_attribute_t *) data_attribute,
+		     &attribute_data_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute data flags.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compressed attribute data.",
+			 function );
+
+			return( -1 );
+		}
 		if( libfsntfs_attribute_get_number_of_data_runs(
 		     (libfsntfs_attribute_t *) data_attribute,
 		     &number_of_data_runs,

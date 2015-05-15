@@ -29,6 +29,7 @@
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_libfwnt.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 
@@ -193,8 +194,11 @@ int libfsntfs_cluster_block_read_element_data(
      libcerror_error_t **error )
 {
 	libfsntfs_cluster_block_t *cluster_block = NULL;
+	uint8_t *compressed_data                 = NULL;
+	uint8_t *cluster_block_data              = NULL;
 	static char *function                    = "libfsntfs_cluster_block_read_element_data";
 	ssize_t read_count                       = 0;
+	int result                               = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_file_index )
@@ -247,7 +251,6 @@ int libfsntfs_cluster_block_read_element_data(
 
 		goto on_error;
 	}
-/* TODO add support for compressed cluster blocks */
 	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
 		if( memory_set(
@@ -304,9 +307,31 @@ int libfsntfs_cluster_block_read_element_data(
 
 			goto on_error;
 		}
+		if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			compressed_data = (uint8_t *) memory_allocate(
+			                               sizeof( uint8_t ) * cluster_block->data_size );
+
+			if( compressed_data == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create compressed data.",
+				 function );
+
+				goto on_error;
+			}
+			cluster_block_data = compressed_data;
+		}
+		else
+		{
+			cluster_block_data = cluster_block->data;
+		}
 		read_count = libbfio_handle_read_buffer(
 		              file_io_handle,
-		              cluster_block->data,
+		              cluster_block_data,
 		              cluster_block->data_size,
 		              error );
 
@@ -320,6 +345,31 @@ int libfsntfs_cluster_block_read_element_data(
 			 function );
 
 			goto on_error;
+		}
+		if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+		{
+			result = libfwnt_lznt1_decompress(
+			          compressed_data,
+			          cluster_block->data_size,
+			          cluster_block->data,
+			          &( cluster_block->data_size ),
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+				 "%s: unable to decompress compressed data.",
+				 function );
+
+				goto on_error;
+			}
+			memory_free(
+			 compressed_data );
+
+			compressed_data = NULL;
 		}
 	}
 	if( libfdata_vector_set_element_value_by_index(
@@ -344,6 +394,11 @@ int libfsntfs_cluster_block_read_element_data(
 	return( 1 );
 
 on_error:
+	if( compressed_data != NULL )
+	{
+		memory_free(
+		 compressed_data );
+	}
 	if( cluster_block != NULL )
 	{
 		libfsntfs_cluster_block_free(
