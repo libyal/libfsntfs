@@ -43,17 +43,25 @@ struct libfsntfs_cluster_block_stream_data_handle
 	 */
 	size_t cluster_block_size;
 
+	/* The compression unit size
+	 */
+	size_t compression_unit_size;
+
 	/* The current offset
 	 */
 	off64_t current_offset;
+
+	/* The compression unit list
+	 */
+	libfdata_list_t *compression_unit_list;
 
 	/* The cluster block vector
 	 */
 	libfdata_vector_t *cluster_block_vector;
 
-	/* The cluster block cache
+	/* The cache
 	 */
-	libfcache_cache_t *cluster_block_cache;
+	libfcache_cache_t *cache;
 };
 
 int libfsntfs_cluster_block_stream_data_handle_initialize(

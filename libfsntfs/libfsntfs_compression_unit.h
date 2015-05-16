@@ -1,5 +1,5 @@
 /*
- * Cluster block functions
+ * Compression unit functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_CLUSTER_BLOCK_H )
-#define _LIBFSNTFS_CLUSTER_BLOCK_H
+#if !defined( _LIBFSNTFS_COMPRESSION_UNIT_H )
+#define _LIBFSNTFS_COMPRESSION_UNIT_H
 
 #include <common.h>
 #include <types.h>
@@ -35,9 +35,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_cluster_block libfsntfs_cluster_block_t;
+typedef struct libfsntfs_compression_unit libfsntfs_compression_unit_t;
 
-struct libfsntfs_cluster_block
+struct libfsntfs_compression_unit
 {
 	/* The data
 	 */
@@ -48,24 +48,23 @@ struct libfsntfs_cluster_block
 	size_t data_size;
 };
 
-int libfsntfs_cluster_block_initialize(
-     libfsntfs_cluster_block_t **cluster_block,
+int libfsntfs_compression_unit_initialize(
+     libfsntfs_compression_unit_t **compression_unit,
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_cluster_block_free(
-     libfsntfs_cluster_block_t **cluster_block,
+int libfsntfs_compression_unit_free(
+     libfsntfs_compression_unit_t **compression_unit,
      libcerror_error_t **error );
 
-int libfsntfs_cluster_block_read_element_data(
+int libfsntfs_compression_unit_read_element_data(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *vector,
+     libfdata_list_element_t *list_element,
      libfcache_cache_t *cache,
-     int element_index,
      int element_data_file_index,
-     off64_t cluster_block_offset,
-     size64_t cluster_block_size,
+     off64_t compression_unit_data_offset,
+     size64_t compression_unit_data_size,
      uint32_t range_flags,
      uint8_t read_flags,
      libcerror_error_t **error );

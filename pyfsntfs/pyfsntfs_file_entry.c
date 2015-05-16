@@ -806,7 +806,11 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 
 		return( NULL );
 	}
-	if( integer_object != NULL )
+	if( integer_object == NULL )
+	{
+		result = 0;
+	}
+	else
 	{
 		result = PyObject_IsInstance(
 		          integer_object,

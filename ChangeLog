@@ -134,6 +134,13 @@ Debug:
 Deployment
 * write man pages
 
+20150516
+* worked on compression support
+* fix for sparse data run support
+
+20150515
+* worked on compression support
+
 20150514
 * worked on compression support
 

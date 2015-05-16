@@ -1139,10 +1139,17 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					mft_attribute_data_run_data += data_run_value_size;
 					mft_attribute_data_offset   += data_run_value_size;
 				}
-				last_data_run_cluster_block_number += data_run_cluster_block_number;
+				if( data_run_value_size == 0 )
+				{
+					data_run_offset = 0;
+				}
+				else
+				{
+					last_data_run_cluster_block_number += data_run_cluster_block_number;
 
-				data_run_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
-				data_run_size   = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
+					data_run_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
+				}
+				data_run_size = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
