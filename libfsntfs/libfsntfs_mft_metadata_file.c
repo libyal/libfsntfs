@@ -821,6 +821,7 @@ int libfsntfs_mft_metadata_file_open_read(
 	}
 /* TODO allow to set the values */
 /* TODO scan for signature to determine MFT entry size */
+	internal_mft_metadata_file->io_handle->bytes_per_sector   = 512;
 	internal_mft_metadata_file->io_handle->mft_offset         = 0;
 /* TODO if not set FILE signature try scan? */
 	internal_mft_metadata_file->io_handle->mft_entry_size     = 1024;

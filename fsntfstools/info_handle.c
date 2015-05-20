@@ -157,17 +157,17 @@ void info_handle_file_attribute_flags_fprint(
 		 "\t\tIs virtual (FILE_ATTRIBUTE_VIRTUAL)\n" );
 	}
 
-	if( ( file_attribute_flags & 0x10000000 ) != 0 )
+	if( ( file_attribute_flags & 0x10000000UL ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t\tUnknown: 0x10000000\n" );
+		 "\tIs directory (0x10000000)\n" );
 	}
-	if( ( file_attribute_flags & 0x20000000 ) != 0 )
+	if( ( file_attribute_flags & 0x20000000UL ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\t\tUnknown: 0x20000000\n" );
+		 "\tIs index view (0x20000000)\n" );
 	}
 }
 

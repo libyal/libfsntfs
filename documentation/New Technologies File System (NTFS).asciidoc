@@ -642,6 +642,10 @@ is no offset (cluster block number). A sparse data run should be filled with
 [NOTE]
 Compressed files also define sparse data runs without setting the sparse flag.
 
+[yellow-background]*TODO: what about data runs with a cluster block number
+value size of 0 but without the necessary flags? Seen in ADS: $BadClus:$Bad.
+Assuming for now the data run is sparse.*
+
 The MFT attribute data flags (0x00ff) indicate if the data stream is compressed
 or not. The currently known value for LZNT1 compression is 1.
 

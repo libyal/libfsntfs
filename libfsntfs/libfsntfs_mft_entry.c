@@ -707,15 +707,12 @@ int libfsntfs_mft_entry_read_header(
 
 		mft_entry_data_offset += 2;
 
+		mft_entry_fixup_offset = io_handle->bytes_per_sector - 2;
+
 		for( fixup_value_index = 0;
 		     fixup_value_index < number_of_fixup_values;
 		     fixup_value_index++ )
 		{
-/* TODO optimize using addition of bytes per sector */
-			mft_entry_fixup_offset  = fixup_value_index + 1;
-			mft_entry_fixup_offset *= io_handle->bytes_per_sector;
-			mft_entry_fixup_offset -= 2;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
@@ -729,6 +726,7 @@ int libfsntfs_mft_entry_read_header(
 				 value_16bit );
 			}
 #endif
+fprintf( stderr, "X: %zd < %zd\n", mft_entry_fixup_offset, mft_entry->data_size );
 			if( mft_entry_fixup_offset < mft_entry->data_size )
 			{
 				if( ( mft_entry->data[ mft_entry_fixup_offset ] != mft_entry->data[ mft_entry_fixup_placeholder_offset ] )
@@ -749,10 +747,23 @@ int libfsntfs_mft_entry_read_header(
 #endif
 /* TODO handle error */
 				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: fix up: 0x%02" PRIx8 "%02" PRIx8 " => 0x%02" PRIx8 "%02" PRIx8 "\n",
+					 function,
+					 mft_entry->data[ mft_entry_fixup_offset + 1 ],
+					 mft_entry->data[ mft_entry_fixup_offset ],
+					 mft_entry->data[ mft_entry_data_offset + 1 ],
+					 mft_entry->data[ mft_entry_data_offset ] );
+				}
+#endif
 				mft_entry->data[ mft_entry_fixup_offset ]     = mft_entry->data[ mft_entry_data_offset ];
 				mft_entry->data[ mft_entry_fixup_offset + 1 ] = mft_entry->data[ mft_entry_data_offset + 1 ];
 			}
-			mft_entry_data_offset += 2;
+			mft_entry_data_offset  += 2;
+			mft_entry_fixup_offset += io_handle->bytes_per_sector;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1469,6 +1480,10 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
 		 function );
 
 		return( -1 );
+	}
+	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) != 0 )
+	{
+		return( 1 );
 	}
 	if( mft_entry->i30_index == NULL )
 	{

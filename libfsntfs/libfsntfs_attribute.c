@@ -1092,18 +1092,19 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 				if( data_run_value_size == 0 )
 				{
-					if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
-					 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-						 "%s: MFT data run value size value out of bounds.",
-						 function );
-
-						goto on_error;
+						if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+						 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
+						{
+							libcnotify_printf(
+							 "%s: data run is sparse but no flags set.\n",
+							 function );
+						}
 					}
+#endif
+/* TODO: assuming a data run is sparse even if LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE or LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK is not set ? */
 					range_flags |= LIBFDATA_RANGE_FLAG_IS_SPARSE;
 				}
 				else
