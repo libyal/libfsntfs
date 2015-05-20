@@ -40,11 +40,105 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 
 #include "fsntfs_mft_entry.h"
 
 const char fsntfs_mft_entry_signature[ 4 ] = "FILE";
+
+/* Checks if a buffer containing the MFT entry is filled with 0-byte values (empty-block)
+ * Returns 1 if empty, 0 if not or -1 on error
+ */
+int libfsntfs_mft_entry_check_for_empty_block(
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_aligned_t *aligned_data_index = NULL;
+	libfsntfs_aligned_t *aligned_data_start = NULL;
+	uint8_t *data_index                     = NULL;
+	uint8_t *data_start                     = NULL;
+	static char *function                   = "libfsntfs_mft_entry_check_for_empty_block";
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	data_start = (uint8_t *) data;
+	data_index = (uint8_t *) data + 1;
+	data_size -= 1;
+
+	/* Only optimize for data larger than the alignment
+	 */
+	if( data_size > ( 2 * sizeof( libfsntfs_aligned_t ) ) )
+	{
+		/* Align the data start
+		 */
+		while( ( (intptr_t) data_start % sizeof( libfsntfs_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_start += 1;
+			data_index += 1;
+			data_size  -= 1;
+		}
+		/* Align the data index
+		 */
+		while( ( (intptr_t) data_index % sizeof( libfsntfs_aligned_t ) ) != 0 )
+		{
+			if( *data_start != *data_index )
+			{
+				return( 0 );
+			}
+			data_index += 1;
+			data_size  -= 1;
+		}
+		aligned_data_start = (libfsntfs_aligned_t *) data_start;
+		aligned_data_index = (libfsntfs_aligned_t *) data_index;
+
+		while( data_size > sizeof( libfsntfs_aligned_t ) )
+		{
+			if( *aligned_data_start != *aligned_data_index )
+			{
+				return( 0 );
+			}
+			aligned_data_index += 1;
+			data_size          -= sizeof( libfsntfs_aligned_t );
+		}
+		data_index = (uint8_t *) aligned_data_index;
+	}
+	while( data_size != 0 )
+	{
+		if( *data_start != *data_index )
+		{
+			return( 0 );
+		}
+		data_index += 1;
+		data_size  -= 1;
+	}
+	return( 1 );
+}
 
 /* Creates a MFT entry
  * Make sure the value mft_entry is referencing, is set to NULL
@@ -289,14 +383,17 @@ int libfsntfs_mft_entry_read(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_read";
+	int result            = 0;
 
-	if( libfsntfs_mft_entry_read_header(
-	     mft_entry,
-	     io_handle,
-	     file_io_handle,
-	     file_offset,
-	     mft_entry_index,
-	     error ) != 1 )
+	result = libfsntfs_mft_entry_read_header(
+	          mft_entry,
+	          io_handle,
+	          file_io_handle,
+	          file_offset,
+	          mft_entry_index,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -307,28 +404,44 @@ int libfsntfs_mft_entry_read(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read_attributes(
-	     mft_entry,
-	     io_handle,
-	     file_io_handle,
-	     mft_entry_vector,
-	     flags,
-	     error ) != 1 )
+	else if( result == 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read attributes.",
-		 function );
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: MFT entry: %" PRIu32 " is empty.\n",
+			 function,
+			 mft_entry_index );
+		}
+#endif
+/* TODO flags MFT entry as empty */
+	}
+	else
+	{
+		if( libfsntfs_mft_entry_read_attributes(
+		     mft_entry,
+		     io_handle,
+		     file_io_handle,
+		     mft_entry_vector,
+		     flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read attributes.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
 
 /* Reads the MFT entry header
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_entry_read_header(
      libfsntfs_mft_entry_t *mft_entry,
@@ -348,6 +461,7 @@ int libfsntfs_mft_entry_read_header(
 	uint16_t fixup_values_offset              = 0;
 	uint16_t number_of_fixup_values           = 0;
 	uint16_t total_entry_size                 = 0;
+	int result                                = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint16_t value_16bit                      = 0;
@@ -433,6 +547,26 @@ int libfsntfs_mft_entry_read_header(
 		 function );
 
 		goto on_error;
+	}
+	result = libfsntfs_mft_entry_check_for_empty_block(
+	          mft_entry->data,
+	          mft_entry->data_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry is empty.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		return( 0 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

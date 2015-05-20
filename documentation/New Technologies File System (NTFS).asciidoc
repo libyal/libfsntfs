@@ -385,7 +385,11 @@ Although the size of a MFT entry is defined in the volume header is commonly
 * The MFT entry header
 * The fix-up values
 * An array of MFT attribute values
-* Padding, which should contain zero bytes
+* Padding, which should contain 0-byte values
+
+[NOTE]
+The MFT entry can be filled entirely with 0-byte values. Seen in Windows XP
+for MFT entry indexes 16 - 23.
 
 ==== MFT entry header
 The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 48 bytes of size and 

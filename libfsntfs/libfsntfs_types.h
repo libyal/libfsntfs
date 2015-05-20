@@ -51,5 +51,10 @@ typedef intptr_t libfsntfs_volume_t;
 
 #endif /* defined( HAVE_LOCAL_LIBFSNTFS ) */
 
+/* The largest primary (or scalar) available
+ * supported by a single load and store instruction
+ */
+typedef unsigned long int libfsntfs_aligned_t;
+
 #endif
 

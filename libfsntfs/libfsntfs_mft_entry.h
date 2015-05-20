@@ -128,6 +128,11 @@ struct libfsntfs_mft_entry
 	uint8_t is_corrupted;
 };
 
+int libfsntfs_mft_entry_check_for_empty_block(
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_initialize(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
