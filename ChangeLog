@@ -136,6 +136,7 @@ Deployment
 
 20150520
 * improvements for $MFT scan
+* improvements for compression support
 
 20150516
 * worked on compression support

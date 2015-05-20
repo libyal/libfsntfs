@@ -570,7 +570,9 @@ Contains an offset relative from the start of the MFT attribute
 | 18 | 2 | | Compression unit size +
 Contains the compression unit size as `2^(n)` number of cluster blocks. +
 This value is used for compressed data in the data runs. +
-A value of 0 indicates the attribute data is uncompressed.
+[yellow-background]*A value of 0 indicates the attribute data is uncompressed.?* +
+[yellow-background]*Seen on XP, compressed MFT attribute data with compression unit size of 0.* +
+[yellow-background]*So it looks more the default compression unit size (16 cluster blocks) should be used.*
 | 20 | 4 | | Padding +
 Contains zero-bytes
 | 24 | 8 | | Allocated data size (or allocated length) +

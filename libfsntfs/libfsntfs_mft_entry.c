@@ -860,7 +860,6 @@ int libfsntfs_mft_entry_read_header(
 				 value_16bit );
 			}
 #endif
-fprintf( stderr, "X: %zd < %zd\n", mft_entry_fixup_offset, mft_entry->data_size );
 			if( mft_entry_fixup_offset < mft_entry->data_size )
 			{
 				if( ( mft_entry->data[ mft_entry_fixup_offset ] != mft_entry->data[ mft_entry_fixup_placeholder_offset ] )

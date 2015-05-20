@@ -867,6 +867,19 @@ int libfsntfs_cluster_block_stream_initialize(
 			}
 			if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 			{
+				if( compression_unit_size == 0 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid compression unit size value out of bounds.",
+					 function );
+
+					data_handle = NULL;
+
+					goto on_error;
+				}
 				if( compression_unit_data_size > 0 )
 				{
 					if( compression_unit_data_size > (size64_t) compression_unit_size )
@@ -1042,9 +1055,8 @@ int libfsntfs_cluster_block_stream_initialize(
 					compression_unit_data_size        = data_run->size;
 					compression_unit_data_range_flags = data_run->range_flags;
 				}
-				while( compression_unit_data_size > (size64_t) compression_unit_size )
+				while( compression_unit_data_size >= (size64_t) compression_unit_size )
 				{
-/* TODO see if the list can be changed to allow for multiple cluster blocks to be combined in one list entry */
 #if defined( HAVE_DEBUG_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
