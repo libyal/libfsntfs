@@ -399,7 +399,8 @@ and consists of:
 |===
 | Offset | Size | Value | Description
 4+| _MULTI_SECTOR_HEADER_
-| 0 | 4 | "FILE" | Signature
+| 0 | 4 | "BAAD" +
+"FILE" | Signature
 | 4 | 2 | | The fix-up values offset +
 Contains an offset relative from the start of the MFT entry +
 According to `[MSDN]` this value is the update sequence array offset
