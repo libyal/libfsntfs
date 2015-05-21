@@ -440,13 +440,27 @@ record segment is freed; it is 0 if the segment is not used.
 value in the first sector. It also claims the update sequence array size value 
 contains the number of bytes. It seems to be more likely to the number of words.
 
-The "BAAD" signature presumably indicates an empty MFT entry. The MFT remainder
-of the MFT entry should be filled with 0-byte values except for the fix-up
-values. The signature has been seen to be used on Windows NT4 and XP.
+The "BAAD" signature presumably indicates a bad MFT entry. `[LINUXNTFS]` states 
+that during chkdsk, if NTFS finds a multi-sector item where the multi-sector 
+header does not match the values at the end of the sector, it marks the item as 
+"BAAD" and fill it with 0-byte values except for a fix-up value at the end of
+the first sector. The "BAAD" signature has been seen to be used on Windows NT4
+and XP.
 
 In NT4 (version 1.2) the MFT entry is 42 bytes in size and the fix-up values
 are stored at offset 42. This is likely where the field name wfixupPattern
 originates from.
+
+==== Notes
+Signatures as indicated in `[LINUXNTFS]`:
+....
+        "BAAD" == corrupt record
+        "CHKD" == chkdsk ???
+        "FILE" == mft entry
+        "HOLE" == ??? (NTFS 3.0+?)
+        "INDX" == index buffer
+        RSTR & ???
+....
 
 === [[mft_entry_flags]]MFT entry flags
 
