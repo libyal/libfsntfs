@@ -123,6 +123,10 @@ struct libfsntfs_mft_entry
 	 */
 	libfsntfs_index_t *i30_index;
 
+	/* Value to indicate the MFT entry is empty
+	 */
+	uint8_t is_empty;
+
 	/* Value to indicate the MFT entry is corrupted
 	 */
 	uint8_t is_corrupted;
@@ -182,6 +186,10 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
      libbfio_handle_t *file_io_handle,
      libcdata_btree_t *directory_entries_tree,
      uint8_t flags,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_is_empty(
+     libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_is_allocated(

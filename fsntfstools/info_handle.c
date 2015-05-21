@@ -2838,6 +2838,7 @@ int info_handle_mft_entry_fprint(
 	uint64_t value_64bit               = 0;
 	int attribute_index                = 0;
 	int is_allocated                   = 0;
+	int is_empty                       = 0;
 	int number_of_attributes           = 0;
 	int result                         = 0;
 
@@ -2889,172 +2890,200 @@ int info_handle_mft_entry_fprint(
 
 		goto on_error;
 	}
-	is_allocated = libfsntfs_file_entry_is_allocated(
-	                file_entry,
-	                error );
+	is_empty = libfsntfs_file_entry_is_empty(
+	            file_entry,
+	            error );
 
-	if( is_allocated == -1 )
+	if( is_empty == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if file entry is allocated.",
+		 "%s: unable to determine if file entry is empty.",
 		 function );
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tIs allocated\t\t\t: " );
-
-	if( is_allocated == 0 )
+	else if( is_empty != 0 )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "false" );
+		 "\tIs empty\n" );
+
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
 	}
 	else
 	{
+		is_allocated = libfsntfs_file_entry_is_allocated(
+		                file_entry,
+		                error );
+
+		if( is_allocated == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry is allocated.",
+			 function );
+
+			goto on_error;
+		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "true" );
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
+		 "\tIs allocated\t\t\t: " );
 
-	if( libfsntfs_file_entry_get_file_reference(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file reference.",
-		 function );
+		if( is_allocated == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "false" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "true" );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
 
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-	 value_64bit & 0xffffffffffffUL,
-	 value_64bit >> 48 );
-
-	if( libfsntfs_file_entry_get_base_record_file_reference(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve base record_file reference.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tBase record file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-	 value_64bit & 0xffffffffffffUL,
-	 value_64bit >> 48 );
-
-	if( libfsntfs_file_entry_get_journal_sequence_number(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve journal sequence number.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tJournal sequence number\t\t: %" PRIu64 "\n",
-	 value_64bit );
-
-	if( libfsntfs_file_entry_get_number_of_attributes(
-	     file_entry,
-	     &number_of_attributes,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of attributes.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tNumber of attributes\t\t: %d\n",
-	 number_of_attributes );
-
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
-
-	for( attribute_index = 0;
-	     attribute_index < number_of_attributes;
-	     attribute_index++ )
-	{
-		if( libfsntfs_file_entry_get_attribute_by_index(
+		if( libfsntfs_file_entry_get_file_reference(
 		     file_entry,
-		     attribute_index,
-		     &attribute,
+		     &value_64bit,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d.",
-			 function,
-			 attribute_index );
+			 "%s: unable to retrieve file reference.",
+			 function );
 
 			goto on_error;
 		}
-		if( info_handle_attribute_fprint(
-		     info_handle,
-		     attribute,
-		     attribute_index,
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 value_64bit & 0xffffffffffffUL,
+		 value_64bit >> 48 );
+
+		if( libfsntfs_file_entry_get_base_record_file_reference(
+		     file_entry,
+		     &value_64bit,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print attribute: %d information.",
-			 function,
-			 attribute_index );
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve base record_file reference.",
+			 function );
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_free(
-		     &attribute,
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tBase record file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 value_64bit & 0xffffffffffffUL,
+		 value_64bit >> 48 );
+
+		if( libfsntfs_file_entry_get_journal_sequence_number(
+		     file_entry,
+		     &value_64bit,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free attribute: %d.",
-			 function,
-			 attribute_index );
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve journal sequence number.",
+			 function );
 
 			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tJournal sequence number\t\t: %" PRIu64 "\n",
+		 value_64bit );
+
+		if( libfsntfs_file_entry_get_number_of_attributes(
+		     file_entry,
+		     &number_of_attributes,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of attributes.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tNumber of attributes\t\t: %d\n",
+		 number_of_attributes );
+
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+
+		for( attribute_index = 0;
+		     attribute_index < number_of_attributes;
+		     attribute_index++ )
+		{
+			if( libfsntfs_file_entry_get_attribute_by_index(
+			     file_entry,
+			     attribute_index,
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute: %d.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+			if( info_handle_attribute_fprint(
+			     info_handle,
+			     attribute,
+			     attribute_index,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print attribute: %d information.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+			if( libfsntfs_attribute_free(
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute: %d.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
 		}
 	}
 	if( libfsntfs_file_entry_free(

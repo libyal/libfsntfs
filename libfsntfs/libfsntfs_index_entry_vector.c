@@ -42,6 +42,7 @@ int libfsntfs_index_entry_vector_initialize(
      libfdata_vector_t **index_entry_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_attribute_t *attribute,
+     uint32_t index_entry_size,
      libcerror_error_t **error )
 {
 	libfsntfs_data_run_t *data_run = NULL;
@@ -112,7 +113,7 @@ int libfsntfs_index_entry_vector_initialize(
 	}
 	if( libfdata_vector_initialize(
 	     index_entry_vector,
-	     (size64_t) io_handle->index_entry_size,
+	     (size64_t) index_entry_size,
 	     (intptr_t *) io_handle,
 	     NULL,
 	     NULL,

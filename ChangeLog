@@ -1,7 +1,4 @@
 TODO
-* compressed files need fdata list with mapped sizes?
-  - compression_unit_size = io_handle->cluster_block_size * 16;
-* fix get file entry by name
 * cached indexes?
 * handle cached out MFT entries
   - copy directory entries in file entry
@@ -133,6 +130,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150521
+* worked on NTFS version 1.2 support
 
 20150520
 * improvements for $MFT scan

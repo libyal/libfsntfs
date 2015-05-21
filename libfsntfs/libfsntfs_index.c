@@ -542,6 +542,7 @@ int libfsntfs_index_read(
 		     &( index->index_entry_vector ),
 		     io_handle,
 		     index->index_allocation_attribute,
+		     index->index_entry_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -632,7 +633,6 @@ int libfsntfs_index_read_root(
 	size_t attribute_data_offset            = 0;
 	size_t unknown_data_size                = 0;
 	ssize_t read_count                      = 0;
-	uint32_t index_entry_size               = 0;
 	uint32_t index_node_size                = 0;
 	uint32_t index_values_offset            = 0;
 	int entry_index                         = 0;
@@ -731,7 +731,7 @@ int libfsntfs_index_read_root(
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->index_entry_size,
-	 index_entry_size );
+	 index->index_entry_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -754,7 +754,7 @@ int libfsntfs_index_read_root(
 		libcnotify_printf(
 		 "%s: index entry size\t\t\t: %" PRIu32 "\n",
 		 function,
-		 index_entry_size );
+		 index->index_entry_size );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->index_entry_number_of_cluster_blocks,
@@ -768,17 +768,19 @@ int libfsntfs_index_read_root(
 		 "\n" );
 	}
 #endif
-	if( index_entry_size != io_handle->index_entry_size )
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid index entry size.",
-		 function );
-
-		goto on_error;
+		if( index->index_entry_size != io_handle->index_entry_size )
+		{
+			libcnotify_printf(
+			 "%s: mismatch in index entry size (in index root: %" PRIu32 ", in volume header: %" PRIu32 ").\n",
+			 function,
+			 index->index_entry_size,
+			 io_handle->index_entry_size );
+		}
 	}
+#endif
 	attribute_data_offset = sizeof( fsntfs_index_root_header_t );
 
 	if( libfsntfs_index_node_initialize(

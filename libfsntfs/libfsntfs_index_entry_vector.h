@@ -38,6 +38,7 @@ int libfsntfs_index_entry_vector_initialize(
      libfdata_vector_t **index_entry_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_attribute_t *attribute,
+     uint32_t index_entry_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

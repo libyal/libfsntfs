@@ -165,6 +165,7 @@ int libfsntfs_index_entry_read(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
+     uint32_t index_entry_size,
      uint32_t index_entry_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
@@ -221,7 +222,7 @@ int libfsntfs_index_entry_read(
 
 		return( -1 );
 	}
-	if( io_handle->index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_entry_header_t ) ) )
+	if( index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_entry_header_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -260,7 +261,7 @@ int libfsntfs_index_entry_read(
 		goto on_error;
 	}
 	index_entry->data = (uint8_t *) memory_allocate(
-	                                 sizeof( uint8_t ) * io_handle->index_entry_size );
+	                                 sizeof( uint8_t ) * index_entry_size );
 
 	if( index_entry->data == NULL )
 	{
@@ -273,7 +274,7 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	index_entry->data_size = (size_t) io_handle->index_entry_size;
+	index_entry->data_size = (size_t) index_entry_size;
 
 	read_count = libbfio_handle_read_buffer(
 	              file_io_handle,
@@ -779,7 +780,7 @@ int libfsntfs_index_entry_read_element_data(
      int element_index,
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t index_entry_offset,
-     size64_t element_data_size LIBFSNTFS_ATTRIBUTE_UNUSED,
+     size64_t index_entry_size,
      uint32_t element_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
@@ -788,7 +789,6 @@ int libfsntfs_index_entry_read_element_data(
 	static char *function                = "libfsntfs_index_entry_read_element_data";
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_size )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_flags )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
@@ -821,6 +821,7 @@ int libfsntfs_index_entry_read_element_data(
 	     io_handle,
 	     file_io_handle,
 	     index_entry_offset,
+	     index_entry_size,
 	     (uint32_t) element_index,
 	     error ) != 1 )
 	{

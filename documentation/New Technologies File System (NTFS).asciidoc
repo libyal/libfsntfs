@@ -85,7 +85,7 @@ There are multiple version of NTFS.
 | NTFS version | Remarks
 | 1.0 | Introduced in Windows NT 3.1
 | 1.1 | Introduced in Windows NT 3.5
-| 1.2 | Introduced in Windows NT 3.51
+| 1.2 | Introduced in Windows NT 3.51, also used in NT4
 | 3.0 | Introduced in Windows 2000
 | 3.1 | Introduced in Windows XP
 |===
@@ -392,8 +392,8 @@ The MFT entry can be filled entirely with 0-byte values. Seen in Windows XP
 for MFT entry indexes 16 - 23.
 
 ==== MFT entry header
-The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 48 bytes of size and 
-consists of:
+The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 42 or 48 bytes of size
+and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -422,10 +422,11 @@ Contains the number of bytes of the MFT entry
 | 32 | 8 | | Base record file reference +
 See section: <<file_reference,The file reference>>
 | 40 | 2 | | First available attribute identifier
+4+| _Version 3.0_
 | 42 | 2 | | [yellow-background]*Unknown (wfixupPattern)*
-4+| _Version 3.0 or earlier_
 | 44 | 4 | | [yellow-background]*Unknown*
-4+| _Version 3.1 or later_
+4+| _Version 3.1_
+| 42 | 2 | | [yellow-background]*Unknown (wfixupPattern)*
 | 44 | 4 | | The index
 |===
 
@@ -438,6 +439,14 @@ record segment is freed; it is 0 if the segment is not used.
 `[MSDN]` states that the update sequence array must end before the last USHORT 
 value in the first sector. It also claims the update sequence array size value 
 contains the number of bytes. It seems to be more likely to the number of words.
+
+The "BAAD" signature presumably indicates an empty MFT entry. The MFT remainder
+of the MFT entry should be filled with 0-byte values except for the fix-up
+values. The signature has been seen to be used on Windows NT4 and XP.
+
+In NT4 (version 1.2) the MFT entry is 42 bytes in size and the fix-up values
+are stored at offset 42. This is likely where the field name wfixupPattern
+originates from.
 
 === [[mft_entry_flags]]MFT entry flags
 
@@ -1181,6 +1190,11 @@ See section: <<collection_type,Collation type>>
 Note that `[CARRIER05]` and `[RUSSON05]` state that the last 3 bytes are unused 
 (alignment padding). However it is highly probably that the last value is 
 32-bit of size.
+
+===== Version 1.2 Notes
+In NT4 (version 1.2) 
+
+* the index entry size does not have to match the index entry size in the volume header. The correct size seems to be the value in the index root header.
 
 ==== [[collation_type]]Collation type
 

@@ -403,6 +403,14 @@ int libfsntfs_file_entry_free(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_error_t **error );
 
+/* Determines if the file entry is emtpy
+ * Returns 1 if empty, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_empty(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
 /* Determines if the file entry is allocated (MFT entry in use flag is set)
  * Returns 1 if allocated, 0 if not or -1 on error
  */

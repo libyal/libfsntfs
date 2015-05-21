@@ -415,7 +415,7 @@ int libfsntfs_mft_entry_read(
 			 mft_entry_index );
 		}
 #endif
-/* TODO flags MFT entry as empty */
+		mft_entry->is_empty = 1;
 	}
 	else
 	{
@@ -441,7 +441,7 @@ int libfsntfs_mft_entry_read(
 }
 
 /* Reads the MFT entry header
- * Returns 1 if successful, 0 if not available or -1 on error
+ * Returns 1 if successful, 0 if empty or -1 on error
  */
 int libfsntfs_mft_entry_read_header(
      libfsntfs_mft_entry_t *mft_entry,
@@ -456,6 +456,7 @@ int libfsntfs_mft_entry_read_header(
 	size_t mft_entry_fixup_offset             = 0;
 	size_t mft_entry_fixup_placeholder_offset = 0;
 	size_t unknown_data_size                  = 0;
+	size_t read_size                          = 0;
 	ssize_t read_count                        = 0;
 	uint16_t fixup_value_index                = 0;
 	uint16_t fixup_values_offset              = 0;
@@ -568,18 +569,38 @@ int libfsntfs_mft_entry_read_header(
 	{
 		return( 0 );
 	}
+	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->fixup_values_offset,
+	 fixup_values_offset );
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( fixup_values_offset > 42 )
+		{
+			read_size = sizeof( fsntfs_mft_entry_header_t );
+		}
+		else
+		{
+			read_size = 42;
+		}
 		libcnotify_printf(
 		 "%s: MFT entry header data:\n",
 		 function );
 		libcnotify_print_data(
 		 mft_entry->data,
-		 sizeof( fsntfs_mft_entry_header_t ),
+		 read_size,
 		 0 );
 	}
 #endif
+	if( memory_compare(
+	     ( (fsntfs_mft_entry_header_t *) mft_entry->data )->signature,
+	     "BAAD",
+	     4 ) == 0 )
+	{
+/* TODO do empty block check on the remainder of the MFT entry? */
+		return( 0 );
+	}
 	if( memory_compare(
 	     ( (fsntfs_mft_entry_header_t *) mft_entry->data )->signature,
 	     fsntfs_mft_entry_signature,
@@ -605,9 +626,6 @@ int libfsntfs_mft_entry_read_header(
 
 		goto on_error;
 	}
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->fixup_values_offset,
-	 fixup_values_offset );
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->number_of_fixup_values,
 	 number_of_fixup_values );
@@ -644,10 +662,12 @@ int libfsntfs_mft_entry_read_header(
 	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->base_record_file_reference,
 	 mft_entry->base_record_file_reference );
 
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->index,
-	 mft_entry->index );
-
+	if( fixup_values_offset > 42 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->index,
+		 mft_entry->index );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -722,25 +742,33 @@ int libfsntfs_mft_entry_read_header(
 		 function,
 		 value_16bit );
 
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->unknown1,
-		 value_16bit );
-		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t\t: 0x%04" PRIu16 "\n",
-		 function,
-		 value_16bit );
+		if( fixup_values_offset > 42 )
+		{
+			byte_stream_copy_to_uint16_little_endian(
+			 ( (fsntfs_mft_entry_header_t *) mft_entry->data )->unknown1,
+			 value_16bit );
+			libcnotify_printf(
+			 "%s: unknown1\t\t\t\t\t: 0x%04" PRIu16 "\n",
+			 function,
+			 value_16bit );
 
-		libcnotify_printf(
-		 "%s: index\t\t\t\t\t\t: %" PRIu32 "\n",
-		 function,
-		 mft_entry->index );
-
+			libcnotify_printf(
+			 "%s: index\t\t\t\t\t\t: %" PRIu32 "\n",
+			 function,
+			 mft_entry->index );
+		}
 		libcnotify_printf(
 		 "\n" );
 	}
 #endif
-	mft_entry_data_offset += sizeof( fsntfs_mft_entry_header_t );
-
+	if( fixup_values_offset > 42 )
+	{
+		mft_entry_data_offset += sizeof( fsntfs_mft_entry_header_t );
+	}
+	else
+	{
+		mft_entry_data_offset += 42;
+	}
 	if( mft_entry->index != mft_entry_index )
 	{
 		mft_entry->index = mft_entry_index;
@@ -772,7 +800,9 @@ int libfsntfs_mft_entry_read_header(
 #endif
 	if( number_of_fixup_values > 0 )
 	{
-		if( ( fixup_values_offset < sizeof( fsntfs_mft_entry_header_t ) )
+		/* In NT4 the fixup values offset can point to wfixupPattern
+		 */
+		if( ( fixup_values_offset < 42 )
 		 || ( fixup_values_offset >= mft_entry->data_size ) )
 		{
 			libcerror_error_set(
@@ -884,10 +914,13 @@ int libfsntfs_mft_entry_read_header(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: fix up: 0x%02" PRIx8 "%02" PRIx8 " => 0x%02" PRIx8 "%02" PRIx8 "\n",
+					 "%s: applying fixup value: %" PRIu16 "\t\t\t: (offset: %" PRIzd ") 0x%02" PRIx8 "%02" PRIx8 " => (offset: %" PRIzd ") 0x%02" PRIx8 "%02" PRIx8 "\n",
 					 function,
+					 fixup_value_index,
+					 mft_entry_fixup_offset,
 					 mft_entry->data[ mft_entry_fixup_offset + 1 ],
 					 mft_entry->data[ mft_entry_fixup_offset ],
+					 mft_entry_data_offset,
 					 mft_entry->data[ mft_entry_data_offset + 1 ],
 					 mft_entry->data[ mft_entry_data_offset ] );
 				}
@@ -1870,6 +1903,29 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Determines if the MFT entry is empty
+ * Returns 1 if empty, 0 if not or -1 on error
+ */
+int libfsntfs_mft_entry_is_empty(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_is_empty";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	return( (int) mft_entry->is_empty );
 }
 
 /* Determines if the MFT entry is allocated (in use)

@@ -349,6 +349,48 @@ int libfsntfs_file_entry_free(
 	return( result );
 }
 
+/* Determines if the file entry is empty
+ * Returns 1 if empty, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_is_empty(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_is_empty";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	result = libfsntfs_mft_entry_is_empty(
+	          internal_file_entry->mft_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry is empty.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Determines if the file entry is allocated (MFT entry in use flag is set)
  * Returns 1 if allocated, 0 if not or -1 on error
  */

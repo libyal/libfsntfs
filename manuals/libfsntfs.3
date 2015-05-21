@@ -1,4 +1,4 @@
-.Dd May 10, 2015
+.Dd May 21, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -100,6 +100,8 @@ Available when compiled with libbfio support:
 File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_free "libfsntfs_file_entry_t **file_entry, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_is_empty "libfsntfs_file_entry_t *file_entry, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_is_allocated "libfsntfs_file_entry_t *file_entry, libfsntfs_error_t **error"
 .Ft int

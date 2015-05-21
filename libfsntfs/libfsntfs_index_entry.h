@@ -73,6 +73,7 @@ int libfsntfs_index_entry_read(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
+     uint32_t index_entry_size,
      uint32_t index_entry_index,
      libcerror_error_t **error );
 
@@ -91,7 +92,7 @@ int libfsntfs_index_entry_read_element_data(
      int element_index,
      int element_file_index,
      off64_t index_entry_offset,
-     size64_t element_size,
+     size64_t index_entry_size,
      uint32_t element_flags,
      uint8_t read_flags,
      libcerror_error_t **error );
