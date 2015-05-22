@@ -1176,7 +1176,7 @@ int libfsntfs_cluster_block_stream_initialize(
 
 						goto on_error;
 					}
-		#if defined( HAVE_DEBUG_OUTPUT )
+#if defined( HAVE_DEBUG_OUTPUT )
 					if( libcnotify_verbose != 0 )
 					{
 						if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
@@ -1194,7 +1194,7 @@ int libfsntfs_cluster_block_stream_initialize(
 						 compression_unit_data_offset,
 						 compression_unit_data_size );
 					}
-		#endif
+#endif
 					result = libfdata_list_append_element(
 						  data_handle->compression_unit_list,
 						  &element_index,
