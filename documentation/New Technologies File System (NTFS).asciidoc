@@ -1385,9 +1385,6 @@ compression unit. The data is stored compressed in the first 2 blocks and the
 14 sparse blocks are only there to make sure the data runs add up to the
 compression unit size. They do not define actual sparse data.
 
-[yellow-background]*What about a total number of blocks that is 15 and not 16?
-It seems that the compressed data consists of 15 uncompressed blocks.*
-
 Another example:
 ....
 21 40 37 52
@@ -1404,6 +1401,10 @@ compression unit (blocks 49 to 64) would be compressed.
 Also "sparse data" and "sparse compression unit" data runs can be mixed. If in
 the previous example the 60 data blocks would be followed by 20 sparse blocks
 the last compression unit (blocks 65 to 80) would be sparse.
+
+[NOTE]
+A compression unit can consists of multiple compressed data runs, e.g. 1 data 
+block followed by 4 data blocks followed by 11 sparse blocks.
 
 [yellow-background]*Does the sparse flag needs to be set for sparse compressed
 files?*
