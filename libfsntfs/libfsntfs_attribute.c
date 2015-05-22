@@ -705,26 +705,6 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			{
 				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
 			}
-			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-			{
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: data is flagged as compressed but no compression unit size set.\n",
-					 function );
-				}
-#endif
-				internal_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
-			}
-			else if( compression_unit_size != 0 )
-			{
-/* TODO add bounds checks */
-				/* The size is calculated as: 2 ^ value
-				 */
-				internal_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
-				internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
-			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
@@ -802,6 +782,26 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 "\n" );
 			}
 #endif
+			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: data is flagged as compressed but no compression unit size set.\n",
+					 function );
+				}
+#endif
+				internal_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
+			}
+			else if( compression_unit_size != 0 )
+			{
+/* TODO add bounds checks */
+				/* The size is calculated as: 2 ^ value
+				 */
+				internal_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
+				internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
+			}
 			if( data_runs_offset > 0 )
 			{
 				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + non_resident_data_size;

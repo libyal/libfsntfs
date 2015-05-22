@@ -737,7 +737,7 @@ int libfsntfs_index_read_root(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: attribute type\t\t\t: 0x%08" PRIx32 " (%s)\n",
+		 "%s: attribute type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
 		 index->attribute_type,
 		 libfsntfs_debug_print_attribute_type(
@@ -747,12 +747,12 @@ int libfsntfs_index_read_root(
 		 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->collating_type,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: collating type\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: collating type\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: index entry size\t\t\t: %" PRIu32 "\n",
+		 "%s: index entry size\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 index->index_entry_size );
 
@@ -760,7 +760,7 @@ int libfsntfs_index_read_root(
 		 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->index_entry_number_of_cluster_blocks,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: index entry number of cluster blocks\t: %" PRIu32 "\n",
+		 "%s: index entry number of cluster blocks\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 

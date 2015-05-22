@@ -58,6 +58,7 @@ December 2010 | Initial version, based on earlier notes.
 August 2014 | Textual changes and additional information.
 | 0.0.6 | J.B. Metz | March 2015 | Additional information. +
 Switched to asccidoc format.
+| 0.0.7 | J.B. Metz | May 2015 | Additional information.
 |===
 
 :numbered:
@@ -85,12 +86,12 @@ There are multiple version of NTFS.
 | NTFS version | Remarks
 | 1.0 | Introduced in Windows NT 3.1
 | 1.1 | Introduced in Windows NT 3.5
-| 1.2 | Introduced in Windows NT 3.51, also used in NT4
+| 1.2 | Introduced in Windows NT 3.51
 | 3.0 | Introduced in Windows 2000
 | 3.1 | Introduced in Windows XP
 |===
 
-This document mainly focuses on NTFS 3.1 or later.
+[yellow-background]*Need test images for version 1.0 and 1.1*
 
 [NOTE]
 The versions mentioned above are the version as used by NTFS. Another common 
@@ -101,15 +102,15 @@ NTFS used on Windows XP which is version 3.1 in schema mentioned above.
 The following version of programs were used to test the information within this 
 document:
 
-* [yellow-background]*TODO: Windows NT4*
-* [yellow-background]*TODO: Windows 2000*
-* Windows XP SP3
-* [yellow-background]*TODO: Windows 2003*
-* Windows Vista
-* [yellow-background]*TODO: Windows 2008*
-* Windows 7
-* Windows 8
-* [yellow-background]*TODO: Windows 10*
+* Windows NT4 (version 1.2)
+* Windows 2000 (version 3.0)
+* Windows XP SP3 (version 3.1)
+* Windows 2003 (version 3.1)
+* Windows Vista (version 3.1)
+* Windows 2008 (version 3.1)
+* Windows 7 (version 3.1)
+* Windows 8 (version 3.1)
+* Windows 10 (version 3.1)
 * NTFS-3G
 
 == Terminology
@@ -580,6 +581,20 @@ Contains an offset relative from the start of the MFT attribute
 Contains an empty byte
 |===
 
+[yellow-background]*What meaning has ATTRIBUTE_FLAG_COMPRESSION_MASK in
+$INDEX_ROOT attribute? The attribute data is uncompressed.*
+
+Seen on Windows 10 (version 3.1)
+....
+type                                 : 0x00000090 ($INDEX_ROOT)
+size                                 : 88
+non resident flag                    : 0x00
+name size                            : 4
+name offset                          : 24
+data flags                           : 0x0001
+        Is compressed
+....
+
 ==== Non-resident MFT attribute
 The non-resident MFT attribute data is present when the non-resident flag is 
 set (1). The non-resident data is 48 or 56 bytes in size and consists of:
@@ -691,6 +706,10 @@ do not.
 [NOTE]
 Compression is supported upto NTFS file systems with a cluster block size of 
 4096 bytes or less.
+
+The compression is specified on a pre attribute basis. Where an attribute
+chain can consists of attribute with compressed and uncompressed attribute
+data.
 
 According to `[RUSSON05]` the size of the runlist is rounded up to the next 
 multitude of 4 bytes. The size of the trailing data can be even larger than 3 
@@ -1365,6 +1384,9 @@ This data run defines 2 data blocks starting at block number 21045 followed by
 compression unit. The data is stored compressed in the first 2 blocks and the
 14 sparse blocks are only there to make sure the data runs add up to the
 compression unit size. They do not define actual sparse data.
+
+[yellow-background]*What about a total number of blocks that is 15 and not 16?
+It seems that the compressed data consists of 15 uncompressed blocks.*
 
 Another example:
 ....

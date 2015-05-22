@@ -161,13 +161,13 @@ void info_handle_file_attribute_flags_fprint(
 	{
 		fprintf(
 		 notify_stream,
-		 "\tIs directory (0x10000000)\n" );
+		 "\t\tIs directory (0x10000000)\n" );
 	}
 	if( ( file_attribute_flags & 0x20000000UL ) != 0 )
 	{
 		fprintf(
 		 notify_stream,
-		 "\tIs index view (0x20000000)\n" );
+		 "\t\tIs index view (0x20000000)\n" );
 	}
 }
 

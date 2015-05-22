@@ -1,4 +1,7 @@
 TODO
+* what about compressed runs with 15 cluster blocks?
+* handle pre 3.1 attribute names?
+
 * cached indexes?
 * handle cached out MFT entries
   - copy directory entries in file entry
@@ -130,6 +133,10 @@ Debug:
 
 Deployment
 * write man pages
+
+20150522
+* worked on compression support
+  - handling mixed compressed attribute chains
 
 20150521
 * worked on NTFS version 1.2 support
