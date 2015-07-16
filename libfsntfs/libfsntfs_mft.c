@@ -185,6 +185,8 @@ on_error:
 		}
 		memory_free(
 		 *mft );
+
+		*mft = NULL;
 	}
 	return( -1 );
 }

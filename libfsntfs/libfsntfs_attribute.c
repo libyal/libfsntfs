@@ -2787,6 +2787,59 @@ int libfsntfs_attribute_get_utf16_name(
 	return( 1 );
 }
 
+/* Retrieves the data VCN range
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_get_data_vcn_range(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *data_first_vcn,
+     uint64_t *data_last_vcn,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_get_data_vcn_range";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( data_first_vcn == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data first VCN.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_last_vcn == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data last VCN.",
+		 function );
+
+		return( -1 );
+	}
+	*data_first_vcn = internal_attribute->data_first_vcn;
+	*data_last_vcn  = internal_attribute->data_last_vcn;
+
+	return( 1 );
+}
+
 /* Retrieves the data flags
  * Returns 1 if successful or -1 on error
  */

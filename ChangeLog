@@ -1,6 +1,11 @@
 TODO
+* complete compressed file support
+  - libcdata_range_list_insert_range is caused by it
+* create fsntfsexport tool to export file entry data
 * what about compressed runs with 15 cluster blocks?
 * handle pre 3.1 attribute names?
+* make get by path/name functions case insensitive
+* check file entry life times
 
 * cached indexes?
 * handle cached out MFT entries
@@ -133,6 +138,15 @@ Debug:
 
 Deployment
 * write man pages
+
+20150716
+* bug fixes
+
+20150712
+* worked on library
+
+20150525
+* worked on NTFS version 1.2 and 3.0 support
 
 20150522
 * worked on compression support

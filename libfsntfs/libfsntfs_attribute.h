@@ -212,6 +212,12 @@ int libfsntfs_attribute_compare_name_with_utf16_string(
      size_t utf16_string_length,
      libcerror_error_t **error );
 
+int libfsntfs_attribute_get_data_vcn_range(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *data_first_vcn,
+     uint64_t *data_last_vcn,
+     libcerror_error_t **error );
+
 int libfsntfs_attribute_get_data_flags(
      libfsntfs_attribute_t *attribute,
      uint16_t *data_flags,

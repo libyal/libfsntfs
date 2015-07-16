@@ -639,7 +639,7 @@ The attribute name is variable of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | ... | | Name +
-UTF-16 little-endian without the end-of-string character
+Contains an UTF-16 little-endian without the end-of-string character
 |===
 
 ==== Data runs
@@ -719,6 +719,8 @@ See `[CARRIER05]` and/or `[RUSSON05]` for examples on reading the runlist.
 
 == The attributes
 === [[attribute_types]]The attribute types
+Technically the attribute types are stored in the `$AttrDef` metadata file.
+Also see section: <<attribute_definitions,The attribute definitions>>
 
 [cols="1,1,5",options="header"]
 |===
@@ -846,7 +848,7 @@ The attribute name is variable of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | ... | | Name +
-UTF-16 little-endian without the end-of-string character
+Contains an UTF-16 little-endian without the end-of-string character
 |===
 
 === [[file_name_attribute]]The file name attribute
@@ -882,7 +884,7 @@ See below.
 Contains the number of characters with-out the end-of-string character
 | 65 | 1 | | Namespace of the name string +
 | 66 | ... | | Name string
-UTF-16 little-endian without an end-of-string character
+Contains an UTF-16 little-endian without an end-of-string character
 |===
 
 The extended data contains:
@@ -966,7 +968,10 @@ case 3:
 in a directory with a lot of filenames starting with "x86_microsoft", becomes "X8FCA6~1.163"
 
 === The volume version attribute
-[yellow-background]*TODO, need a pre NTFS 3.0 volume*
+The volume version attribute ($VOLUME_VERSION) contains [yellow-background]*TODO*
+
+[yellow-background]*Need a pre NTFS 3.0 volume with this attribute. $AttrDef 
+indicates the attribute to be 8 bytes of size.*
 
 === The object identifier attribute
 The object identifier attribute ($OBJECT_ID) contains distributed link tracker 
@@ -1006,7 +1011,7 @@ The volume name data is variable of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | ... | | Name string +
-UTF-16 little-endian without an end-of-string character
+Contains an UTF-16 little-endian without an end-of-string character
 |===
 
 The volume name attribute is used in the $Volume metadata file MFT entry.
@@ -1093,6 +1098,12 @@ It is known to be used in:
 * the MFT (nameless), where an allocation element represents a MFT entry;
 * indexes ($I##), where an allocation element represents an index entry.
 
+=== The symbolic link attribute
+The symbolic link attribute ($SYMBOLIC_LINK) contains [yellow-background]*TODO*
+
+[yellow-background]*Need a pre NTFS 3.0 volume with this attribute. $AttrDef 
+indicates the attribute is variable of size.*
+
 === The reparse point attribute
 The reparse point attribute ($REPARSE_POINT) contains information about a file 
 system-level link. It is stored as a resident MFT attribute.
@@ -1100,7 +1111,10 @@ system-level link. It is stored as a resident MFT attribute.
 See section: <<reparse_point,The reparse point>>.
 
 === The (HPFS) extended attribute information
-[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes*
+The (HPFS) extended attribute information ($EA_INFORMATION) contains [yellow-background]*TODO*
+
+[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes 
+$AttrDef indicates the attribute to be 8 bytes of size.*
 
 ....
 0x00 2 Size of the packed Extended Attributes 
@@ -1109,6 +1123,8 @@ See section: <<reparse_point,The reparse point>>.
 ....
 
 === The (HPFS) extended attribute
+The (HPFS) extended attribute ($EA) contains [yellow-background]*TODO*
+
 [yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes*
 
 ....
@@ -1124,7 +1140,10 @@ Flags:
 ....
 
 === The property set attribute
-[yellow-background]*TODO, need a pre NTFS 3.0 volume*
+The property set attribute ($PROPERTY_SET) contains [yellow-background]*TODO*
+
+[yellow-background]*Need a pre NTFS 3.0 volume with this attribute. $AttrDef 
+indicates does not seem to always define this attribute.*
 
 === The logged utility stream attribute
 [yellow-background]*attribute type for storing additional data for the files and directories*
@@ -1151,6 +1170,41 @@ attributes. Other attributes should have a size of 0.
 
 It is assumed that the attributes in a chain must be continuous and defined 
 in-order.
+
+== [[attribute_types]]The attribute types
+The attribute types are stored in the `$AttrDef` metadata file.
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 128 | | Attribute name +
+Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?* +
+[yellow-background]*The unused bytes are filled with 0-byte values*
+| 128 | 4 | | Attribute type (or type code)
+| 132 | 8 | | [yellow-background]*Unknown (empty values?)*
+| 140 | 4 | | [yellow-background]*Unknown (flags?)*
+Seen: 0x40, 0x42, 0x80
+| 144 | 8 | | [yellow-background]*Unknown (minimum attribute size?)*
+| 152 | 8 | | [yellow-background]*Unknown (maximum attribute size?)* +
+Seen: -1 (no maximum?), 48
+|===
+
+....
+00000000  24 00 53 00 54 00 41 00  4e 00 44 00 41 00 52 00  |$.S.T.A.N.D.A.R.|
+00000010  44 00 5f 00 49 00 4e 00  46 00 4f 00 52 00 4d 00  |D._.I.N.F.O.R.M.|
+00000020  41 00 54 00 49 00 4f 00  4e 00 00 00 00 00 00 00  |A.T.I.O.N.......|
+00000030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000080  10 00 00 00 00 00 00 00  00 00 00 00 40 00 00 00  |............@...|
+00000090  30 00 00 00 00 00 00 00  30 00 00 00 00 00 00 00  |0.......0.......|
+000000a0  24 00 41 00 54 00 54 00  52 00 49 00 42 00 55 00  |$.A.T.T.R.I.B.U.|
+000000b0  54 00 45 00 5f 00 4c 00  49 00 53 00 54 00 00 00  |T.E._.L.I.S.T...|
+000000c0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+00000120  20 00 00 00 00 00 00 00  00 00 00 00 80 00 00 00  | ...............|
+00000130  00 00 00 00 00 00 00 00  ff ff ff ff ff ff ff ff  |................|
+00000140  24 00 46 00 49 00 4c 00  45 00 5f 00 4e 00 41 00  |$.F.I.L.E._.N.A.|
+....
 
 == [[index]]The index
 The index structures are used for various purposes one of which are the 
@@ -1680,9 +1734,9 @@ The offset is relative from the start of the reparse name data
 Value in bytes, the size of the end-of-string character is not included
 4+| _Reparse name data_
 | 8 | ... | | Substitute name +
-UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 | ... | ... | | Print name +
-UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 |===
 
 [yellow-background]*TODO: what do byte values like 0x02 represent in the substitute name?*
@@ -1710,9 +1764,9 @@ Value in bytes, the size of the end-of-string character is not included
 | 8 | 4 | | Symbolic link flags
 4+| _Reparse name data_
 | 12 | ... | | Substitute name +
-UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 | ... | ... | | Print name +
-UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
 |===
 
 ==== Symbolic link flags

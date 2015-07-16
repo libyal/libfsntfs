@@ -26,7 +26,7 @@
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_libcerror.h"
 
-/* Creates data run
+/* Creates a data run
  * Make sure the value data_run is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -104,7 +104,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees data run
+/* Frees a data run
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_data_run_free(
