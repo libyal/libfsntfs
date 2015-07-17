@@ -41,6 +41,10 @@ typedef struct libfsntfs_mft libfsntfs_mft_t;
 
 struct libfsntfs_mft
 {
+	/* The number of MFT entries
+	 */
+	uint64_t number_of_mft_entries;
+
 	/* The MFT entry vector
 	 */
 	libfdata_vector_t *mft_entry_vector;

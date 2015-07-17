@@ -259,6 +259,8 @@ int libfsntfs_mft_set_data_runs(
 	libfsntfs_internal_attribute_t *data_attribute = NULL;
 	libfsntfs_data_run_t *data_run                 = NULL;
 	static char *function                          = "libfsntfs_mft_set_data_runs";
+	size64_t mft_data_size                         = 0;
+	size64_t mft_entry_size                        = 0;
 	int data_run_index                             = 0;
 	int number_of_data_runs                        = 0;
 	int segment_index                              = 0;
@@ -293,6 +295,45 @@ int libfsntfs_mft_set_data_runs(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid MFT entry: 0 - missing data attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_size(
+	     mft_entry->data_attribute,
+	     &mft_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry size.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_vector_get_element_data_size(
+	     mft->mft_entry_vector,
+	     &mft_entry_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry size.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT entry size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -418,6 +459,10 @@ int libfsntfs_mft_set_data_runs(
 		}
 		data_attribute = (libfsntfs_internal_attribute_t *) data_attribute->next_attribute;
 	}
+	/* We cannot use the vector here since it uses the allocated size of the data runs.
+	 */
+	mft->number_of_mft_entries = (uint64_t) ( mft_data_size / mft_entry_size );
+
 	return( 1 );
 }
 
@@ -837,8 +882,7 @@ int libfsntfs_mft_get_number_of_entries(
      uint64_t *number_of_entries,
      libcerror_error_t **error )
 {
-	static char *function      = "libfsntfs_mft_get_number_of_entries";
-	int safe_number_of_entries = 0;
+	static char *function = "libfsntfs_mft_get_number_of_entries";
 
 	if( mft == NULL )
 	{
@@ -862,21 +906,7 @@ int libfsntfs_mft_get_number_of_entries(
 
 		return( -1 );
 	}
-	if( libfdata_vector_get_number_of_elements(
-	     mft->mft_entry_vector,
-	     &safe_number_of_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve nubmer of MFT entries.",
-		 function );
-
-		return( -1 );
-	}
-	*number_of_entries = (uint64_t) safe_number_of_entries;
+	*number_of_entries = mft->number_of_mft_entries;
 
 	return( 1 );
 }
