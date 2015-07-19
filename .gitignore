@@ -113,6 +113,8 @@ stamp-h[1-9]
 /fsntfstools/fsntfsinfo
 /pyfsntfs/setup.py
 /tests/fsntfs_test_open_close
+/tests/fsntfs_test_read
+/tests/fsntfs_test_seek
 /tests/input
 /tests/tmp
 

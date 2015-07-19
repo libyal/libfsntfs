@@ -8,18 +8,21 @@ AM_CPPFLAGS = \
 
 TESTS = \
 	test_open_close.sh \
+	test_seek.sh \
 	test_fsntfsinfo.sh
 
 check_SCRIPTS = \
-	test_open_close.sh \
 	test_fsntfsinfo.sh \
-	test_runner.sh
+	test_open_close.sh \
+	test_runner.sh \
+	test_seek.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
-	fsntfs_test_open_close
+	fsntfs_test_open_close \
+	fsntfs_test_seek
 
 fsntfs_test_open_close_SOURCES = \
 	fsntfs_test_libcerror.h \
@@ -30,6 +33,21 @@ fsntfs_test_open_close_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_open_close_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
+
+fsntfs_test_seek_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libcstring.h \
+	fsntfs_test_libcthreads.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_seek.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_seek_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
