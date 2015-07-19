@@ -3,19 +3,38 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
 TESTS = \
+	test_open_close.sh \
 	test_fsntfsinfo.sh
 
 check_SCRIPTS = \
+	test_open_close.sh \
 	test_fsntfsinfo.sh \
 	test_runner.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
-check_PROGRAMS =
+check_PROGRAMS = \
+	fsntfs_test_open_close
+
+fsntfs_test_open_close_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libcstring.h \
+	fsntfs_test_libcthreads.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_open_close.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_open_close_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBCSTRING_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

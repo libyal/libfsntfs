@@ -112,6 +112,7 @@ stamp-h[1-9]
 /libfsntfs/libfsntfs_definitions.h
 /fsntfstools/fsntfsinfo
 /pyfsntfs/setup.py
+/tests/fsntfs_test_open_close
 /tests/input
 /tests/tmp
 

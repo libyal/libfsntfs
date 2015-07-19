@@ -1,4 +1,5 @@
 MSVSCPP_FILES = \
+	fsntfs_test_open_close/fsntfs_test_open_close.vcproj \
 	fsntfsinfo/fsntfsinfo.vcproj \
 	libbfio/libbfio.vcproj \
 	libcdata/libcdata.vcproj \

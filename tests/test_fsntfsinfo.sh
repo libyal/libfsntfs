@@ -88,7 +88,7 @@ test_info_mft()
 	rm -rf tmp;
 	mkdir tmp;
 
-	${TEST_RUNNER} ${FSNTFSINFO} -H ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
+	${TEST_RUNNER} ${FSNTFSINFO} -E all ${INPUT_FILE} | sed '1,2d' > tmp/${BASENAME}.log;
 
 	RESULT=$?;
 
