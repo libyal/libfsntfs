@@ -106,11 +106,11 @@ int fsntfs_test_seek_offset(
 	{
 		if( result != 1 )
 		{
-			libfsntfs_error_backtrace_fprint(
+			libcerror_error_backtrace_fprint(
 			 error,
 			 stderr );
 		}
-		libfsntfs_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( result );
@@ -498,6 +498,16 @@ int fsntfs_test_seek_file_entry(
 
 		goto on_error;
 	}
+	if( libfsntfs_file_entry_free(
+	     &file_entry,
+	     error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to free file entry.\n" );
+
+		goto on_error;
+	}
 	if( libfsntfs_volume_close(
 	     volume,
 	     error ) != 0 )
@@ -521,6 +531,12 @@ int fsntfs_test_seek_file_entry(
 	return( result );
 
 on_error:
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
 	if( volume != NULL )
 	{
 		libfsntfs_volume_close(
@@ -581,10 +597,10 @@ int main( int argc, char * const argv[] )
 on_error:
 	if( error != NULL )
 	{
-		libfsntfs_error_backtrace_fprint(
+		libcerror_error_backtrace_fprint(
 		 error,
 		 stderr );
-		libfsntfs_error_free(
+		libcerror_error_free(
 		 &error );
 	}
 	return( EXIT_FAILURE );
