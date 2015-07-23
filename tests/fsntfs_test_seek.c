@@ -462,7 +462,7 @@ int fsntfs_test_seek_file_entry(
 	}
 	result = libfsntfs_volume_get_file_entry_by_utf8_path(
 	          volume,
-	          "\\$UpCase",
+	          (uint8_t *) "\\$UpCase",
 	          8,
 	          &file_entry,
 	          error );
