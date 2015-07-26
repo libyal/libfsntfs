@@ -24,7 +24,7 @@ EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
 TEST_PREFIX="fsntfs";
-OPTION_SETS="";
+OPTION_SETS="hierarchy mft_scan";
 
 list_contains()
 {
