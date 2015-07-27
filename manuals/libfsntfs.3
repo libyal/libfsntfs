@@ -1,4 +1,4 @@
-.Dd July 26, 2015
+.Dd July 27, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -69,6 +69,10 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_get_cluster_block_size "libfsntfs_volume_t *volume, size_t *cluster_block_size, libfsntfs_error_t **error"
 .Ft int
+.Fn libfsntfs_volume_get_mft_entry_size "libfsntfs_volume_t *volume, size32_t *mft_entry_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_index_entry_size "libfsntfs_volume_t *volume, size32_t *index_entry_size, libfsntfs_error_t **error"
+.Ft int
 .Fn libfsntfs_volume_get_utf8_name_size "libfsntfs_volume_t *volume, size_t *utf8_name_size, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_utf8_name "libfsntfs_volume_t *volume, uint8_t *utf8_name, size_t utf8_name_size, libfsntfs_error_t **error"
@@ -78,6 +82,8 @@ Volume functions
 .Fn libfsntfs_volume_get_utf16_name "libfsntfs_volume_t *volume, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_version "libfsntfs_volume_t *volume, uint8_t *major_version, uint8_t *minor_version, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_serial_number "libfsntfs_volume_t *volume, uint64_t *serial_number, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_number_of_file_entries "libfsntfs_volume_t *volume, uint64_t *number_of_file_entries, libfsntfs_error_t **error"
 .Ft int

@@ -285,6 +285,24 @@ int libfsntfs_volume_get_cluster_block_size(
      size_t *cluster_block_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the MFT entry size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_mft_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *mft_entry_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the index entry size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_index_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *index_entry_size,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
@@ -339,6 +357,15 @@ int libfsntfs_volume_get_version(
      libfsntfs_volume_t *volume,
      uint8_t *major_version,
      uint8_t *minor_version,
+     libfsntfs_error_t **error );
+
+/* Retrieves the serial number
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_serial_number(
+     libfsntfs_volume_t *volume,
+     uint64_t *serial_number,
      libfsntfs_error_t **error );
 
 /* Retrieves the number of file entries (MFT entries)

@@ -127,6 +127,18 @@ int libfsntfs_volume_get_cluster_block_size(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_mft_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *mft_entry_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_index_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *index_entry_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name_size(
      libfsntfs_volume_t *volume,
      size_t *utf8_name_size,
@@ -157,6 +169,12 @@ int libfsntfs_volume_get_version(
      libfsntfs_volume_t *volume,
      uint8_t *major_version,
      uint8_t *minor_version,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_serial_number(
+     libfsntfs_volume_t *volume,
+     uint64_t *serial_number,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

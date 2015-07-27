@@ -1063,7 +1063,7 @@ int libfsntfs_volume_get_cluster_block_size(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	static char *function                        = "libfsntfs_volume_cluster_block_size";
+	static char *function                        = "libfsntfs_volume_get_cluster_block_size";
 
 	if( volume == NULL )
 	{
@@ -1101,6 +1101,108 @@ int libfsntfs_volume_get_cluster_block_size(
 		return( -1 );
 	}
 	*cluster_block_size = internal_volume->io_handle->cluster_block_size;
+
+	return( 1 );
+}
+
+/* Retrieves the MFT entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_mft_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *mft_entry_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_mft_entry_size";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*mft_entry_size = (size32_t) internal_volume->io_handle->mft_entry_size;
+
+	return( 1 );
+}
+
+/* Retrieves the index entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_index_entry_size(
+     libfsntfs_volume_t *volume,
+     size32_t *index_entry_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_index_entry_size";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( index_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*index_entry_size = (size32_t) internal_volume->io_handle->index_entry_size;
 
 	return( 1 );
 }
@@ -1326,6 +1428,57 @@ int libfsntfs_volume_get_version(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Retrieves the serial number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_serial_number(
+     libfsntfs_volume_t *volume,
+     uint64_t *serial_number,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_serial_number";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( serial_number == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid serial number.",
+		 function );
+
+		return( -1 );
+	}
+	*serial_number = internal_volume->io_handle->volume_serial_number;
+
 	return( 1 );
 }
 

@@ -4302,11 +4302,14 @@ int info_handle_volume_fprint(
 {
 	libcstring_system_character_t *volume_name = NULL;
 	static char *function                      = "info_handle_volume_fprint";
+	size32_t index_entry_size                  = 0;
+	size32_t mft_entry_size                    = 0;
 	size_t cluster_block_size                  = 0;
 	size_t volume_name_size                    = 0;
-	int result                                 = 0;
+	uint64_t serial_number                     = 0;
 	uint8_t major_version                      = 0;
 	uint8_t minor_version                      = 0;
+	int result                                 = 0;
 
 	if( info_handle == NULL )
 	{
@@ -4482,6 +4485,33 @@ int info_handle_volume_fprint(
 	}
 	else if( info_handle->input_volume != NULL )
 	{
+		result = libfsntfs_volume_get_serial_number(
+		          info_handle->input_volume,
+		          &serial_number,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve serial number.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tSerial number\t\t\t: %08" PRIx64 "\n",
+	 serial_number );
+
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+/* TODO */
+	}
+	else if( info_handle->input_volume != NULL )
+	{
 		result = libfsntfs_volume_get_cluster_block_size(
 		          info_handle->input_volume,
 		          &cluster_block_size,
@@ -4502,6 +4532,60 @@ int info_handle_volume_fprint(
 	 info_handle->notify_stream,
 	 "\tCluster block size\t\t: %" PRIzd "\n",
 	 cluster_block_size );
+
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+/* TODO */
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_mft_entry_size(
+		          info_handle->input_volume,
+		          &mft_entry_size,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry size.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tMFT entry size\t\t\t: %" PRIu32 "\n",
+	 mft_entry_size );
+
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+/* TODO */
+	}
+	else if( info_handle->input_volume != NULL )
+	{
+		result = libfsntfs_volume_get_index_entry_size(
+		          info_handle->input_volume,
+		          &index_entry_size,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tIndex entry size\t\t: %" PRIu32 "\n",
+	 index_entry_size );
 
 /* TODO print more info */
 

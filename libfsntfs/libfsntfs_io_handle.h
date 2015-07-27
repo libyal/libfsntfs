@@ -50,6 +50,10 @@ struct libfsntfs_io_handle
 	 */
 	size64_t volume_size;
 
+	/* The volume serial number
+	 */
+	uint64_t volume_serial_number;
+
 	/* The MFT entry size
 	 */
 	uint32_t mft_entry_size;

@@ -296,6 +296,10 @@ int libfsntfs_io_handle_read_volume_header(
 	 volume_header_data.index_entry_size,
 	 io_handle->index_entry_size );
 
+	byte_stream_copy_to_uint64_little_endian(
+	 volume_header_data.volume_serial_number,
+	 io_handle->volume_serial_number );
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -416,13 +420,10 @@ int libfsntfs_io_handle_read_volume_header(
 		 function,
 		 io_handle->index_entry_size );
 
-		byte_stream_copy_to_uint64_little_endian(
-		 volume_header_data.volume_serial_number,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: volume serial number\t\t: 0x%08" PRIx64 "\n",
 		 function,
-		 value_64bit );
+		 io_handle->volume_serial_number );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 volume_header_data.checksum,

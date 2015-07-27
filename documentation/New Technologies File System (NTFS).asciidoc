@@ -59,6 +59,7 @@ August 2014 | Textual changes and additional information.
 | 0.0.6 | J.B. Metz | March 2015 | Additional information. +
 Switched to asccidoc format.
 | 0.0.7 | J.B. Metz | May 2015 | Additional information.
+| 0.0.8 | J.B. Metz | July 2015 | Textual changes.
 |===
 
 :numbered:
@@ -299,7 +300,7 @@ Values available in Windows are:
 The MFT offset can be determined as following:
 ....
 MFT offset = volume header offset
-           + ( MFT cluster block number x Cluster block size)
+           + ( MFT cluster block number x Cluster block size )
 ....
 
 Note that the lower 32-bit part of the NTFS volume serial number is the WINAPI 
@@ -332,14 +333,14 @@ eb 58 90 2d 46 56 45 26 46 53 2d
 ....
 
 BDE is largely a stand-alone but has some integration with NTFS. For more 
-information about BDE see `[LIBBDE]`.
+information about BDE see https://github.com/libyal/libbde/blob/master/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc[[LIBBDE\]].
 
 === Volume Shadow Snapshots (VSS)
 Volume Shadow Snapshots (VSS) uses the GUID 
 3808876b-c176-4e48-b7ae-04046e6cc752 (stored in little-endian) to identify its 
 data. VSS is largely a stand-alone but has some integration with NTFS.
 
-For more information about VSS see `[LIBVSHADOW]`.
+For more information about VSS see https://github.com/libyal/libvshadow/blob/master/documentation/Volume%20Shadow%20Snapshot%20(VSS)%20format.asciidoc[[LIBVSHADOW\]].
 
 === [[media_descriptor]]Media descriptor
 
