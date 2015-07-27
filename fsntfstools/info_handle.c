@@ -3220,10 +3220,6 @@ int info_handle_mft_entries_fprint(
 
 		return( -1 );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "Windows NT File System information:\n\n" );
-
 	for( file_entry_index = 0;
 	     file_entry_index < number_of_file_entries;
 	     file_entry_index++ )
