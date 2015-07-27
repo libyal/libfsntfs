@@ -31,7 +31,8 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libbfio.h"
+#include "libfsntfs_libfcache.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -115,6 +116,14 @@ struct libfsntfs_internal_attribute
 	/* The next attribute in the chain
 	 */
 	libfsntfs_attribute_t *next_attribute;
+
+	/* The compression unit list
+	 */
+	libfdata_list_t *compression_unit_list;
+
+	/* The cluster block vector
+	 */
+	libfdata_vector_t *cluster_block_vector;
 };
 
 int libfsntfs_attribute_initialize(
@@ -274,6 +283,32 @@ int libfsntfs_attribute_append_to_chain(
      libfsntfs_attribute_t *attribute,
      libfsntfs_attribute_t *chained_attribute,
      libcerror_error_t **error );
+
+int libfsntfs_attribute_data_stream_initialize(
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_data_stream_initialize_compressed(
+     libfsntfs_internal_attribute_t *internal_attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_data_stream_initialize_uncompressed(
+     libfsntfs_internal_attribute_t *internal_attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libcerror_error_t **error );
+
+ssize_t libfsntfs_attribute_data_stream_read_buffer(
+         libfsntfs_attribute_t *attribute,
+         libfsntfs_io_handle_t *io_handle,
+         libbfio_handle_t *file_io_handle,
+         libfcache_cache_t *cache,
+         off64_t data_offset,
+         uint8_t *buffer,
+         size_t buffer_size,
+         uint8_t read_flags,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

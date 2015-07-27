@@ -959,6 +959,15 @@ int libfsntfs_attribute_get_utf16_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the data size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_data_size(
+     libfsntfs_attribute_t *attribute,
+     size64_t *data_size,
+     libfsntfs_error_t **error );
+
 /* -------------------------------------------------------------------------
  * $FILE_NAME attribute functions
  * ------------------------------------------------------------------------- */

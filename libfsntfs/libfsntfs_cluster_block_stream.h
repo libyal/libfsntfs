@@ -39,25 +39,17 @@ typedef struct libfsntfs_cluster_block_stream_data_handle libfsntfs_cluster_bloc
 
 struct libfsntfs_cluster_block_stream_data_handle
 {
-	/* The cluster block size
+	/* The IO handle
 	 */
-	size_t cluster_block_size;
-
-	/* The compression unit size
-	 */
-	size_t compression_unit_size;
+	libfsntfs_io_handle_t *io_handle;
 
 	/* The current offset
 	 */
 	off64_t current_offset;
 
-	/* The compression unit list
+	/* The attributes array
 	 */
-	libfdata_list_t *compression_unit_list;
-
-	/* The cluster block vector
-	 */
-	libfdata_vector_t *cluster_block_vector;
+	libcdata_array_t *attributes_array;
 
 	/* The cache
 	 */
@@ -66,6 +58,7 @@ struct libfsntfs_cluster_block_stream_data_handle
 
 int libfsntfs_cluster_block_stream_data_handle_initialize(
      libfsntfs_cluster_block_stream_data_handle_t **data_handle,
+     libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_stream_data_handle_free(
@@ -79,7 +72,7 @@ int libfsntfs_cluster_block_stream_data_handle_clone(
 
 ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
          libfsntfs_cluster_block_stream_data_handle_t *data_handle,
-         intptr_t *file_io_handle,
+         libbfio_handle_t *file_io_handle,
          int segment_index,
          int segment_file_index,
          uint8_t *segment_data,

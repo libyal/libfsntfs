@@ -1,4 +1,4 @@
-.Dd May 21, 2015
+.Dd July 26, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -210,6 +210,8 @@ Attribute functions
 .Fn libfsntfs_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute, size_t *utf16_name_size, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_attribute_get_utf16_name "libfsntfs_attribute_t *attribute, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_get_data_size "libfsntfs_attribute_t *attribute, size64_t *data_size, libfsntfs_error_t **error"
 .Pp
 $FILE_NAME attribute functions
 .Ft int

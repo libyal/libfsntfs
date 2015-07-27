@@ -851,6 +851,21 @@ int info_handle_attribute_fprint(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_DATA:
+			if( info_handle_data_attribute_fprint(
+			     info_handle,
+			     attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print data attribute: %d information.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
@@ -991,7 +1006,51 @@ on_error:
 	return( -1 );
 }
 
-/* Prints $STANDARD_INFORMATION attribute information
+/* Prints $DATA attribute information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_data_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error )
+{
+	static char *function = "info_handle_data_attribute_fprint";
+	size64_t data_size    = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_size(
+	     attribute,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tData size\t\t\t: %" PRIu64 " bytes \n",
+	 data_size );
+
+	return( 1 );
+}
+
+/* Prints $FILE_NAME attribute information
  * Returns 1 if successful or -1 on error
  */
 int info_handle_file_name_attribute_fprint(

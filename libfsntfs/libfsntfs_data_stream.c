@@ -146,7 +146,7 @@ int libfsntfs_data_stream_initialize(
 	}
 	if( libfsntfs_attribute_get_data_size(
 	     data_attribute,
-	     &( internal_data_stream->size ),
+	     &( internal_data_stream->data_size ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -589,7 +589,7 @@ off64_t libfsntfs_data_stream_seek_offset(
 	}
 	else if( whence == SEEK_END )
 	{
-		offset += (off64_t) internal_data_stream->size;
+		offset += (off64_t) internal_data_stream->data_size;
 	}
 	if( offset < 0 )
 	{
@@ -682,7 +682,7 @@ int libfsntfs_data_stream_get_size(
 
 		return( -1 );
 	}
-	*size = internal_data_stream->size;
+	*size = internal_data_stream->data_size;
 
 	return( 1 );
 }
@@ -840,7 +840,7 @@ int libfsntfs_data_stream_get_extent_by_index(
 		return( -1 );
 	}
 	if( ( *extent_offset < 0 )
-	 || ( (size64_t) *extent_offset >= internal_data_stream->size ) )
+	 || ( (size64_t) *extent_offset >= internal_data_stream->data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -851,7 +851,7 @@ int libfsntfs_data_stream_get_extent_by_index(
 
 		return( -1 );
 	}
-	data_size = internal_data_stream->size - *extent_offset;
+	data_size = internal_data_stream->data_size - *extent_offset;
 
 	if( *extent_size > data_size )
 	{

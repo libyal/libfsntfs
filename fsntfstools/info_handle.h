@@ -101,6 +101,11 @@ int info_handle_attribute_fprint(
      int attribute_index,
      libfsntfs_error_t **error );
 
+int info_handle_data_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error );
+
 int info_handle_file_name_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,

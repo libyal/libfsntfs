@@ -69,9 +69,9 @@ struct libfsntfs_internal_file_entry
 	 */
 	off64_t current_offset;
 
-	/* The size
+	/* The data size
 	 */
-	size64_t size;
+	size64_t data_size;
 
 	/* The default (nameless) $DATA attribute
 	 */

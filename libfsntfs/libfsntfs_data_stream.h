@@ -57,9 +57,9 @@ struct libfsntfs_internal_data_stream
 	 */
 	off64_t current_offset;
 
-	/* The size
+	/* The data size
 	 */
-	size64_t size;
+	size64_t data_size;
 };
 
 int libfsntfs_data_stream_initialize(

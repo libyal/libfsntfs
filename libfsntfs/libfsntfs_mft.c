@@ -338,6 +338,21 @@ int libfsntfs_mft_set_data_runs(
 
 		return( -1 );
 	}
+	/* We cannot use the vector here since it uses the allocated size of the data runs.
+	 */
+	mft->number_of_mft_entries = (uint64_t) ( mft_data_size / mft_entry_size );
+
+	if( mft->number_of_mft_entries > (uint64_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of MFT entries value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	data_attribute = (libfsntfs_internal_attribute_t *) mft_entry->data_attribute;
 
 	while( data_attribute != NULL )
@@ -459,10 +474,6 @@ int libfsntfs_mft_set_data_runs(
 		}
 		data_attribute = (libfsntfs_internal_attribute_t *) data_attribute->next_attribute;
 	}
-	/* We cannot use the vector here since it uses the allocated size of the data runs.
-	 */
-	mft->number_of_mft_entries = (uint64_t) ( mft_data_size / mft_entry_size );
-
 	return( 1 );
 }
 
@@ -934,7 +945,7 @@ int libfsntfs_mft_get_mft_entry_by_index(
 
 		return( -1 );
 	}
-	if( mft_entry_index > (uint64_t) INT_MAX )
+	if( mft_entry_index > mft->number_of_mft_entries )
 	{
 		libcerror_error_set(
 		 error,
