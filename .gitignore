@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20150720
+# Version: 20150725
 
 # Generic auto-generated build files
 *~
@@ -33,6 +33,7 @@ stamp-h[1-9]
 /ABOUT-NLS
 /aclocal.m4
 /autom4te.cache/
+/build
 /compile
 /config.guess
 /config.log
@@ -41,6 +42,7 @@ stamp-h[1-9]
 /config.sub
 /configure
 /depcomp
+/dist
 /install-sh
 /libtool
 /ltmain.sh
@@ -111,7 +113,6 @@ stamp-h[1-9]
 /libfsntfs/libfsntfs.rc
 /libfsntfs/libfsntfs_definitions.h
 /fsntfstools/fsntfsinfo
-/pyfsntfs/setup.py
 /tests/fsntfs_test_open_close
 /tests/fsntfs_test_read
 /tests/fsntfs_test_seek
