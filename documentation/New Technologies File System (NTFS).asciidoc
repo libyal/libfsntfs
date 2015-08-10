@@ -1468,6 +1468,8 @@ block followed by 4 data blocks followed by 11 sparse blocks.
 [yellow-background]*Does the sparse flag needs to be set for sparse compressed
 files?*
 
+[yellow-background]*Is resident data is always uncompressed?*
+
 Also see `[RUSSON05]` for more detailed examples.
 
 === [[compression_block_based_storage]]Block based storage

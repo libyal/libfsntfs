@@ -464,6 +464,7 @@ int libfsntfs_mft_entry_read_header(
 	int result                                = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	size_t read_size                          = 0;
 	uint16_t value_16bit                      = 0;
 #endif
 

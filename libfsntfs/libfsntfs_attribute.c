@@ -3614,16 +3614,10 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 		return( -1 );
 	}
+	/* The data is resident and not compressed. */
 	if( internal_attribute->data != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid attribute - data value set.",
-		 function );
-
-		return( -1 );
+		return( 1 );
 	}
 /* TODO replace compression_unit_list by compression_units_array ? */
 	if( internal_attribute->compression_units_array != NULL )
@@ -3915,6 +3909,7 @@ int libfsntfs_attribute_data_stream_initialize_uncompressed(
 
 		return( -1 );
 	}
+	/* The data is resident and not segmented. */
 	if( internal_attribute->data != NULL )
 	{
 		return( 1 );
@@ -4263,7 +4258,7 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			cluster_block_data  = internal_attribute->data;
 			read_size           = (size_t) internal_attribute->data_size;
 		}
-		if( element_data_offset >= read_size )
+		if( element_data_offset >= (off64_t) read_size )
 		{
 			return( 0 );
 		}

@@ -8,6 +8,7 @@ TODO
 * handle pre 3.1 attribute names?
 * make get by path/name functions case insensitive
 * check file entry life times
+* set file entry name, if get by index and number of filenames is 1
 
 * cached indexes?
 * handle cached out MFT entries
