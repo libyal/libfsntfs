@@ -58,7 +58,6 @@ int libfsntfs_file_entry_initialize(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_initialize";
-	int number_of_data_runs                              = 0;
 
 	if( file_entry == NULL )
 	{
@@ -197,37 +196,20 @@ int libfsntfs_file_entry_initialize(
 	}
 	if( mft_entry->data_attribute != NULL )
 	{
-		if( libfsntfs_attribute_get_number_of_data_runs(
+		if( libfsntfs_cluster_block_stream_initialize(
+		     &( internal_file_entry->data_cluster_block_stream ),
+		     io_handle,
 		     mft_entry->data_attribute,
-		     &number_of_data_runs,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of data runs.",
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create data cluster block stream.",
 			 function );
 
 			goto on_error;
-		}
-		if( number_of_data_runs > 0 )
-		{
-			if( libfsntfs_cluster_block_stream_initialize(
-			     &( internal_file_entry->data_cluster_block_stream ),
-			     io_handle,
-			     mft_entry->data_attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create data cluster block stream.",
-				 function );
-
-				goto on_error;
-			}
 		}
 		if( libfsntfs_attribute_get_data_size(
 		     mft_entry->data_attribute,

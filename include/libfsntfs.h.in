@@ -944,6 +944,15 @@ int libfsntfs_attribute_get_type(
      uint32_t *type,
      libfsntfs_error_t **error );
 
+/* Retrieves the data flags
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_data_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *data_flags,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error

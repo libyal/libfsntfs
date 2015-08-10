@@ -1016,6 +1016,7 @@ int info_handle_data_attribute_fprint(
 {
 	static char *function = "info_handle_data_attribute_fprint";
 	size64_t data_size    = 0;
+	uint16_t data_flags   = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1046,6 +1047,25 @@ int info_handle_data_attribute_fprint(
 	 info_handle->notify_stream,
 	 "\tData size\t\t\t: %" PRIu64 " bytes \n",
 	 data_size );
+
+	if( libfsntfs_attribute_get_data_flags(
+	     attribute,
+	     &data_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data flags.",
+		 function );
+
+		return( -1 );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tData flags\t\t\t: 0x%04" PRIx16 "\n",
+	 data_flags );
 
 	return( 1 );
 }

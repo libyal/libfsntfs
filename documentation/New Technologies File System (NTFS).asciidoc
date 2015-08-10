@@ -566,6 +566,9 @@ identifier				: 4
 | 0x8000 | ATTRIBUTE_FLAG_SPARSE | Is sparse
 |===
 
+[yellow-background]*Does 0x0001 indicate the LZNT1 compression method?
+Do other values indicate other compression values?*
+
 ==== Resident MFT attribute
 The resident MFT attribute data is present when the non-resident flag is not 
 set (0). The resident data is 8 bytes in size and consists of:
@@ -604,7 +607,8 @@ set (1). The non-resident data is 48 or 56 bytes in size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | 8 | | First (or lowest) Virtual Cluster Number (VCN) of the data
-| 8 | 8 | | Last (or highest) Virtual Cluster Number (VCN) of the data
+| 8 | 8 | | Last (or highest) Virtual Cluster Number (VCN) of the data +
+[yellow-background]*Seen this value to be -1 in combination with data size of 0*
 | 16 | 2 | | Data runs offset (or mappings pairs offset) +
 Contains an offset relative from the start of the MFT attribute
 | 18 | 2 | | Compression unit size +

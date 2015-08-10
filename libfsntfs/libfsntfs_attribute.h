@@ -99,6 +99,10 @@ struct libfsntfs_internal_attribute
 	 */
 	libcdata_array_t *data_runs_array;
 
+	/* The compression units array
+	 */
+	libcdata_array_t *compression_units_array;
+
 	/* The file reference
 	 */
 	uint64_t file_reference;
@@ -174,6 +178,12 @@ int libfsntfs_attribute_get_type(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_data_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_value(
      libfsntfs_attribute_t *attribute,
      intptr_t **value,
@@ -225,11 +235,6 @@ int libfsntfs_attribute_get_data_vcn_range(
      libfsntfs_attribute_t *attribute,
      uint64_t *data_first_vcn,
      uint64_t *data_last_vcn,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_get_data_flags(
-     libfsntfs_attribute_t *attribute,
-     uint16_t *data_flags,
      libcerror_error_t **error );
 
 int libfsntfs_attribute_get_compression_unit_size(

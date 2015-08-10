@@ -509,7 +509,9 @@ int libfsntfs_cluster_block_stream_initialize(
 	static char *function                                     = "libfsntfs_cluster_block_stream_initialize";
 	off64_t attribute_data_vcn_offset                         = 0;
 	off64_t calculated_attribute_data_vcn_offset              = 0;
+	size64_t attribute_data_size                              = 0;
 	size64_t attribute_data_vcn_size                          = 0;
+	size64_t data_size                                        = 0;
 	int attribute_index                                       = 0;
 	int element_index                                         = 0;
 	int entry_index                                           = 0;
@@ -537,6 +539,20 @@ int libfsntfs_cluster_block_stream_initialize(
 		 function );
 
 		return( -1 );
+	}
+	if( libfsntfs_attribute_get_data_size(
+	     attribute,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute data size",
+		 function );
+
+		goto on_error;
 	}
 	if( libfsntfs_cluster_block_stream_data_handle_initialize(
 	     &data_handle,
@@ -610,6 +626,23 @@ int libfsntfs_cluster_block_stream_initialize(
 			data_handle = NULL;
 
 			goto on_error;
+		}
+		if( attribute_data_vcn_size == 0xffffffffffffffffULL )
+		{
+			if( attribute_data_size != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data last VCN value out of bounds.",
+				 function );
+
+				data_handle = NULL;
+
+				goto on_error;
+			}
+			break;
 		}
 		if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
 		{
@@ -688,8 +721,10 @@ int libfsntfs_cluster_block_stream_initialize(
 
 			goto on_error;
 		}
-		calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
-
+		if( attribute_data_vcn_size > data_size )
+		{
+			attribute_data_vcn_size = data_size;
+		}
 		/* The data stream segments are mapped directly to the list elements segment to ease current offset calculation
 		 */
 		if( libfdata_stream_append_segment(
@@ -713,6 +748,9 @@ int libfsntfs_cluster_block_stream_initialize(
 
 			goto on_error;
 		}
+		data_size                           -= attribute_data_vcn_size;
+		calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
+
 		if( libfsntfs_attribute_get_chained_attribute(
 		     attribute,
 		     &attribute,

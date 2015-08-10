@@ -190,7 +190,6 @@ int libfsntfs_io_handle_read_volume_header(
 	uint64_t mirror_mft_cluster_block_number = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit                     = 0;
 	uint32_t value_32bit                     = 0;
 	uint16_t value_16bit                     = 0;
 #endif

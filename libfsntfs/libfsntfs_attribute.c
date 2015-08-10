@@ -29,6 +29,7 @@
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_compression_unit.h"
+#include "libfsntfs_compression_unit_descriptor.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
@@ -219,6 +220,23 @@ int libfsntfs_internal_attribute_free(
 			 function );
 
 			result = -1;
+		}
+		if( ( *internal_attribute )->compression_units_array != NULL )
+		{
+			if( libcdata_array_free(
+			     &( ( *internal_attribute )->compression_units_array ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compression_unit_descriptor_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free compression units array.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( ( *internal_attribute )->value != NULL )
 		{
@@ -756,14 +774,14 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: data first VCN\t\t\t: %" PRIu64 "\n",
+				 "%s: data first VCN\t\t\t: %" PRIi64 "\n",
 				 function,
-				 internal_attribute->data_first_vcn );
+				 (int64_t) internal_attribute->data_first_vcn );
 
 				libcnotify_printf(
-				 "%s: data last VCN\t\t\t: %" PRIu64 "\n",
+				 "%s: data last VCN\t\t\t: %" PRIi64 "\n",
 				 function,
-				 internal_attribute->data_last_vcn );
+				 (int64_t) internal_attribute->data_last_vcn );
 
 				libcnotify_printf(
 				 "%s: data runs offset\t\t\t: 0x%04" PRIx16 "\n",
@@ -2512,6 +2530,46 @@ int libfsntfs_attribute_get_type(
 	return( 1 );
 }
 
+/* Retrieves the data flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_get_data_flags(
+     libfsntfs_attribute_t *attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_get_data_flags";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( data_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data flags.",
+		 function );
+
+		return( -1 );
+	}
+	*data_flags = internal_attribute->data_flags;
+
+	return( 1 );
+}
+
 /* Retrieves the value
  * Returns 1 if successful or -1 on error
  */
@@ -2871,46 +2929,6 @@ int libfsntfs_attribute_get_data_vcn_range(
 	}
 	*data_first_vcn = internal_attribute->data_first_vcn;
 	*data_last_vcn  = internal_attribute->data_last_vcn;
-
-	return( 1 );
-}
-
-/* Retrieves the data flags
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_attribute_get_data_flags(
-     libfsntfs_attribute_t *attribute,
-     uint16_t *data_flags,
-     libcerror_error_t **error )
-{
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_get_data_flags";
-
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
-
-	if( data_flags == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data flags.",
-		 function );
-
-		return( -1 );
-	}
-	*data_flags = internal_attribute->data_flags;
 
 	return( 1 );
 }
@@ -3569,22 +3587,20 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
      libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_data_run_t *data_run                = NULL;
-	static char *function                         = "libfsntfs_attribute_data_stream_initialize_compressed";
-	off64_t compression_unit_data_offset          = 0;
-	size64_t compression_unit_data_size           = 0;
-	size64_t remaining_compression_unit_data_size = 0;
-	size_t stored_compression_unit_size           = 0;
-	uint32_t compression_unit_data_range_flags    = 0;
-	int attribute_index                           = 0;
-	int data_run_index                            = 0;
-	int entry_index                               = 0;
-	int element_index                             = 0;
-	int number_of_data_runs                       = 0;
-	int result                                    = 0;
+	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
+	libfsntfs_data_run_t *data_run                                       = NULL;
+	static char *function                                                = "libfsntfs_attribute_data_stream_initialize_compressed";
+	off64_t data_run_offset                                              = 0;
+	size64_t data_run_size                                               = 0;
+	size64_t data_segment_size                                           = 0;
+	size_t remaining_compression_unit_size                               = 0;
+	int compression_unit_descriptor_index                                = 0;
+	int data_run_index                                                   = 0;
+	int entry_index                                                      = 0;
+	int number_of_data_runs                                              = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	char *compression_unit_data_type              = NULL;
+	char *compression_unit_data_type                                     = NULL;
 #endif
 
 	if( internal_attribute == NULL )
@@ -3598,16 +3614,21 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 		return( -1 );
 	}
-	if( internal_attribute->compression_unit_list != NULL )
+	if( internal_attribute->data != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid attribute - compression unit list value already set.",
+		 "%s: invalid attribute - data value set.",
 		 function );
 
 		return( -1 );
+	}
+/* TODO replace compression_unit_list by compression_units_array ? */
+	if( internal_attribute->compression_units_array != NULL )
+	{
+		return( 1 );
 	}
 	if( ( internal_attribute->compression_unit_size == 0 )
 	 || ( internal_attribute->compression_unit_size > (size_t) SSIZE_MAX ) )
@@ -3621,6 +3642,7 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 		goto on_error;
 	}
+/* TODO replace compression_unit_list by compression_units_array ? */
 	if( libfdata_list_initialize(
 	     &( internal_attribute->compression_unit_list ),
 	     (intptr_t *) io_handle,
@@ -3636,6 +3658,20 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create compression unit list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_initialize(
+	     &( internal_attribute->compression_units_array ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create compression units array.",
 		 function );
 
 		goto on_error;
@@ -3686,242 +3722,148 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 			goto on_error;
 		}
-		if( compression_unit_data_size > 0 )
+		data_run_offset = data_run->start_offset;
+		data_run_size   = data_run->size;
+
+		while( data_run_size > 0 )
 		{
-			if( compression_unit_data_size > (size64_t) internal_attribute->compression_unit_size )
+			if( compression_unit_descriptor == NULL )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid compression unit data size value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
-			remaining_compression_unit_data_size = (size64_t) internal_attribute->compression_unit_size - compression_unit_data_size;
-
-			stored_compression_unit_size = internal_attribute->compression_unit_size;
-
-			if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-			{
-				if( data_run->size < remaining_compression_unit_data_size )
+				if( libfsntfs_compression_unit_descriptor_initialize(
+				     &compression_unit_descriptor,
+				     error ) != 1 )
 				{
-/* TODO
-					if( ( remaining_compression_unit_data_size - data_run->size ) == io_handle->cluster_block_size )
-					{
-						remaining_compression_unit_data_size -= io_handle->cluster_block_size;
-						stored_compression_unit_size         -= io_handle->cluster_block_size;
-					}
-					else
-*/
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-						 "%s: invalid sparse data run size value out of bounds.",
-						 function );
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create compression unit descriptor.",
+					 function );
 
-						goto on_error;
-					}
+					goto on_error;
 				}
-				if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+				remaining_compression_unit_size = internal_attribute->compression_unit_size;
+			}
+			if( ( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+			 && ( remaining_compression_unit_size < internal_attribute->compression_unit_size ) )
+			{
+				/* A sparse data run marks the end of a compression unit and
+				 * should be at minimum the size of the remaining data in the compression unit
+				 */
+				if( data_run_size < (size64_t) remaining_compression_unit_size )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid compression unit data run value cannot be sparse.",
+					 "%s: invalid sparse data run size value out of bounds.",
 					 function );
 
 					goto on_error;
 				}
-				compression_unit_data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-				{
-					compression_unit_data_type = "compressed";
-				}
-				else if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-				{
-					compression_unit_data_type = "sparse";
-				}
-				else
-				{
-					compression_unit_data_type = "uncompressed";
-				}
-				libcnotify_printf(
-				 "%s: %d blocks %s compression unit data offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
-				 function,
-				 stored_compression_unit_size / io_handle->cluster_block_size,
-				 compression_unit_data_type,
-				 compression_unit_data_offset,
-				 compression_unit_data_size );
-			}
-#endif
-			if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-			{
-				result = libfdata_list_append_element_with_mapped_size(
-					  internal_attribute->compression_unit_list,
-					  &element_index,
-					  0,
-					  compression_unit_data_offset,
-					  compression_unit_data_size,
-					  compression_unit_data_range_flags,
-					  (size64_t) stored_compression_unit_size,
-					  error );
+				compression_unit_descriptor->data_range_flags |= LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
+
+				data_run_size                  -= remaining_compression_unit_size;
+				remaining_compression_unit_size = 0;
 			}
 			else
 			{
-				result = libfdata_list_append_element(
-					  internal_attribute->compression_unit_list,
-					  &element_index,
-					  0,
-					  compression_unit_data_offset,
-					  compression_unit_data_size,
-					  compression_unit_data_range_flags,
-					  error );
-			}
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append attribute: %d data run: %d as compression unit list element.",
-				 function,
-				 attribute_index,
-				 entry_index );
-
-				goto on_error;
-			}
-			if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) == 0 )
-			{
-				compression_unit_data_offset      = 0;
-				compression_unit_data_size        = 0;
-				compression_unit_data_range_flags = 0;
-			}
-			else
-			{
-				/* The sparse data run upto the size of the compression unit is ignored
-				 */
-				compression_unit_data_offset      = data_run->start_offset + remaining_compression_unit_data_size;
-				compression_unit_data_size        = data_run->size - remaining_compression_unit_data_size;
-				compression_unit_data_range_flags = data_run->range_flags;
-
-				if( compression_unit_data_size == 0 )
+				if( data_run_size < remaining_compression_unit_size )
 				{
-					continue;
-				}
-			}
-		}
-		if( compression_unit_data_size == 0 )
-		{
-			compression_unit_data_offset      = data_run->start_offset;
-			compression_unit_data_size        = data_run->size;
-			compression_unit_data_range_flags = data_run->range_flags;
-		}
-		while( compression_unit_data_size >= (size64_t) internal_attribute->compression_unit_size )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-				{
-					compression_unit_data_type = "sparse";
+					data_segment_size = data_run_size;
 				}
 				else
 				{
-					compression_unit_data_type = "uncompressed";
+					data_segment_size = (size64_t) remaining_compression_unit_size;
 				}
-				libcnotify_printf(
-				 "%s: %s compression unit data offset: 0x%08" PRIx64 ", size: %" PRIzd ".\n",
-				 function,
-				 compression_unit_data_type,
-				 compression_unit_data_offset,
-				 internal_attribute->compression_unit_size );
-			}
-#endif
-			if( libfdata_list_append_element(
-			     internal_attribute->compression_unit_list,
-			     &element_index,
-			     0,
-			     compression_unit_data_offset,
-			     (size64_t) internal_attribute->compression_unit_size,
-			     compression_unit_data_range_flags,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append attribute: %d data run: %d as compression unit list element.",
-				 function,
-				 attribute_index,
-				 entry_index );
-
-				goto on_error;
-			}
-			compression_unit_data_offset += internal_attribute->compression_unit_size;
-			compression_unit_data_size   -= internal_attribute->compression_unit_size;
-		}
-		if( compression_unit_data_size > 0 )
-		{
-			if( compression_unit_data_size > (size64_t) internal_attribute->compression_unit_size )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid compression unit data size value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
 #if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( compression_unit_data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
+				if( libcnotify_verbose != 0 )
 				{
-					compression_unit_data_type = "sparse";
+					if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					{
+						compression_unit_data_type = "sparse ";
+					}
+					else
+					{
+						compression_unit_data_type = "";
+					}
+					libcnotify_printf(
+					 "%s: compression unit: %d %sdata segment offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
+					 function,
+					 compression_unit_descriptor_index,
+					 compression_unit_data_type,
+					 data_run_offset,
+					 data_segment_size );
 				}
-				else
-				{
-					compression_unit_data_type = "uncompressed";
-				}
-				libcnotify_printf(
-				 "%s: %s compression unit data offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
-				 function,
-				 compression_unit_data_type,
-				 compression_unit_data_offset,
-				 compression_unit_data_size );
-			}
 #endif
-			result = libfdata_list_append_element(
-				  internal_attribute->compression_unit_list,
-				  &element_index,
-				  0,
-				  compression_unit_data_offset,
-				  compression_unit_data_size,
-				  compression_unit_data_range_flags,
-				  error );
+				if( libfsntfs_compression_unit_descriptor_append_data_segment(
+				     compression_unit_descriptor,
+				     data_run_offset,
+				     data_segment_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append data segment to compression unit descriptor: %d.",
+					 function,
+					 compression_unit_descriptor_index );
 
-			if( result != 1 )
+					goto on_error;
+				}
+				compression_unit_descriptor->data_range_flags = data_run->range_flags;
+
+				if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
+				{
+					data_run_offset += data_segment_size;
+				}
+				data_run_size                   -= data_segment_size;
+				remaining_compression_unit_size -= data_segment_size;
+			}
+			if( remaining_compression_unit_size == 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append attribute: %d data run: %d as compression unit list element.",
-				 function,
-				 attribute_index,
-				 entry_index );
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					{
+						compression_unit_data_type = "compressed";
+					}
+					else if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					{
+						compression_unit_data_type = "sparse";
+					}
+					else
+					{
+						compression_unit_data_type = "uncompressed";
+					}
+					libcnotify_printf(
+					 "%s: %" PRIzd " blocks %s compression unit: %d.\n",
+					 function,
+					 compression_unit_descriptor->data_size / io_handle->cluster_block_size,
+					 compression_unit_data_type,
+					 compression_unit_descriptor_index );
+				}
+#endif
+				if( libcdata_array_append_entry(
+				     internal_attribute->compression_units_array,
+				     &entry_index,
+				     (intptr_t *) compression_unit_descriptor,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append compression unit descriptor: %d to array.",
+					 function,
+					 compression_unit_descriptor_index );
 
-				goto on_error;
+					goto on_error;
+				}
+				compression_unit_descriptor        = NULL;
+				compression_unit_descriptor_index += 1;
 			}
 		}
 	}
@@ -3962,17 +3904,6 @@ int libfsntfs_attribute_data_stream_initialize_uncompressed(
 
 		return( -1 );
 	}
-	if( internal_attribute->cluster_block_vector != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid attribute - cluster block vector value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3983,6 +3914,14 @@ int libfsntfs_attribute_data_stream_initialize_uncompressed(
 		 function );
 
 		return( -1 );
+	}
+	if( internal_attribute->data != NULL )
+	{
+		return( 1 );
+	}
+	if( internal_attribute->cluster_block_vector != NULL )
+	{
+		return( 1 );
 	}
 	if( libfdata_vector_initialize(
 	     &( internal_attribute->cluster_block_vector ),
@@ -4004,7 +3943,7 @@ int libfsntfs_attribute_data_stream_initialize_uncompressed(
 
 		goto on_error;
 	}
-/* TODO add mapped offset ?*/
+/* TODO add mapped offset ? - needs to be in sync with compressed version */
 	if( libcdata_array_get_number_of_entries(
 	     internal_attribute->data_runs_array,
 	     &number_of_data_runs,
@@ -4153,6 +4092,10 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 
 		return( -1 );
 	}
+	if( internal_attribute->data_size == 0 )
+	{
+		return( 0 );
+	}
 	if( internal_attribute->compression_unit_list != NULL )
 	{
 		if( libfdata_list_get_element_index_at_offset(
@@ -4184,7 +4127,7 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			return( -1 );
 		}
 	}
-	else
+	else if( internal_attribute->cluster_block_vector != NULL )
 	{
 		if( libfdata_vector_get_element_index_at_offset(
 		     internal_attribute->cluster_block_vector,
@@ -4210,6 +4153,31 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid element data offset value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( internal_attribute->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid attribute - missing data.",
+			 function );
+
+			return( -1 );
+		}
+		if( internal_attribute->data_size > (size64_t) SSIZE_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid attribute - data size value out of bounds.",
 			 function );
 
 			return( -1 );
@@ -4253,7 +4221,7 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			cluster_block_data = compression_unit->data;
 			read_size          = compression_unit->data_size;
 		}
-		else
+		else if( internal_attribute->cluster_block_vector != NULL )
 		{
 			if( libfdata_vector_get_element_value_by_index(
 			     internal_attribute->cluster_block_vector,
@@ -4288,6 +4256,16 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			}
 			cluster_block_data = cluster_block->data;
 			read_size          = cluster_block->data_size;
+		}
+		else
+		{
+			element_data_offset = data_offset;
+			cluster_block_data  = internal_attribute->data;
+			read_size           = (size_t) internal_attribute->data_size;
+		}
+		if( element_data_offset >= read_size )
+		{
+			return( 0 );
 		}
 		if( element_data_offset > 0 )
 		{

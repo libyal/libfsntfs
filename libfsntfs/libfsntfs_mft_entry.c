@@ -456,7 +456,6 @@ int libfsntfs_mft_entry_read_header(
 	size_t mft_entry_fixup_offset             = 0;
 	size_t mft_entry_fixup_placeholder_offset = 0;
 	size_t unknown_data_size                  = 0;
-	size_t read_size                          = 0;
 	ssize_t read_count                        = 0;
 	uint16_t fixup_value_index                = 0;
 	uint16_t fixup_values_offset              = 0;
