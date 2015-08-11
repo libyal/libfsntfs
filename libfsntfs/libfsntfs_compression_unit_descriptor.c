@@ -24,7 +24,9 @@
 #include <types.h>
 
 #include "libfsntfs_compression_unit_descriptor.h"
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_unused.h"
 
 /* Creates a compression unit descriptor
  * Make sure the value compression_unit_descriptor is referencing, is set to NULL
@@ -176,6 +178,7 @@ int libfsntfs_compression_unit_descriptor_append_data_segment(
      libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      off64_t segment_offset,
      size64_t segment_size,
+     uint32_t segment_flags,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_compression_unit_descriptor_append_data_segment";
@@ -198,7 +201,7 @@ int libfsntfs_compression_unit_descriptor_append_data_segment(
 	     0,
 	     segment_offset,
 	     segment_size,
-	     0,
+	     segment_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -210,6 +213,71 @@ int libfsntfs_compression_unit_descriptor_append_data_segment(
 
 		return( -1 );
 	}
+	compression_unit_descriptor->data_size += segment_size;
+
 	return( 1 );
+}
+
+/* Reads data from the current offset into a buffer
+ * Callback for the compression unit descriptor data stream
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t libfsntfs_compression_unit_descriptor_read_segment_data(
+         intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
+         libbfio_handle_t *file_io_handle,
+         int segment_index,
+         int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
+         uint8_t *segment_data,
+         size_t segment_data_size,
+         uint32_t segment_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+         uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+         libcerror_error_t **error )
+{
+	static char *function      = "libfsntfs_compression_unit_descriptor_read_segment_data";
+	size_t segment_data_offset = 0;
+
+	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_flags )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
+
+	if( data_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment data.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid segment data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	while( segment_data_size > 0 )
+	{
+/* TODO */
+	}
+	return( (ssize_t) segment_data_offset );
 }
 

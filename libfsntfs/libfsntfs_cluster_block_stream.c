@@ -335,7 +335,6 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_flags )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
 	if( data_handle == NULL )
 	{

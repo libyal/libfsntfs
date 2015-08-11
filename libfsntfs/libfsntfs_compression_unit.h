@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
@@ -58,13 +58,14 @@ int libfsntfs_compression_unit_free(
      libcerror_error_t **error );
 
 int libfsntfs_compression_unit_read_element_data(
-     libfsntfs_io_handle_t *io_handle,
+     libcdata_array_t *compression_unit_descriptors_array,
      libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *list_element,
+     libfdata_vector_t *vector,
      libfcache_cache_t *cache,
+     int element_index,
      int element_data_file_index,
-     off64_t compression_unit_data_offset,
-     size64_t compression_unit_data_size,
+     off64_t element_data_offset,
+     size64_t compression_unit_size,
      uint32_t range_flags,
      uint8_t read_flags,
      libcerror_error_t **error );

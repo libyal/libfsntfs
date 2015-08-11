@@ -99,9 +99,9 @@ struct libfsntfs_internal_attribute
 	 */
 	libcdata_array_t *data_runs_array;
 
-	/* The compression units array
+	/* The compression unit descriptors array
 	 */
-	libcdata_array_t *compression_units_array;
+	libcdata_array_t *compression_unit_descriptors_array;
 
 	/* The file reference
 	 */
@@ -121,13 +121,13 @@ struct libfsntfs_internal_attribute
 	 */
 	libfsntfs_attribute_t *next_attribute;
 
-	/* The compression unit list
-	 */
-	libfdata_list_t *compression_unit_list;
-
 	/* The cluster block vector
 	 */
 	libfdata_vector_t *cluster_block_vector;
+
+	/* The compression unit vector
+	 */
+	libfdata_vector_t *compression_unit_vector;
 };
 
 int libfsntfs_attribute_initialize(

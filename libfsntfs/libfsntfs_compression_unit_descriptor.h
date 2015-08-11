@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 
@@ -61,7 +62,19 @@ int libfsntfs_compression_unit_descriptor_append_data_segment(
      libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      off64_t segment_offset,
      size64_t segment_size,
+     uint32_t segment_flags,
      libcerror_error_t **error );
+
+ssize_t libfsntfs_compression_unit_descriptor_read_segment_data(
+         intptr_t *data_handle,
+         libbfio_handle_t *file_io_handle,
+         int segment_index,
+         int segment_file_index,
+         uint8_t *segment_data,
+         size_t segment_data_size,
+         uint32_t segment_flags,
+         uint8_t read_flags,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
