@@ -1955,6 +1955,33 @@ int libfsntfs_mft_entry_is_allocated(
 	return( 0 );
 }
 
+/* Determines if the MFT entry is a MFT attribute list element
+ * Returns 1 if the MFT entry is a MFT attribute list element, 0 if not or -1 on error
+ */
+int libfsntfs_mft_entry_is_mft_attribute_list_element(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_is_mft_attribute_list_element";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->base_record_file_reference != 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
 /* Retrieves the file reference
  * Returns 1 if successful or -1 on error
  */

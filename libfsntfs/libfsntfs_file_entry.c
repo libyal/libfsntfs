@@ -173,57 +173,60 @@ int libfsntfs_file_entry_initialize(
 
 		goto on_error;
 	}
-	if( mft_entry->i30_index != NULL )
+	if( mft_entry->base_record_file_reference == 0 )
 	{
-		if( libfsntfs_mft_entry_read_directory_entries_tree(
-		     mft_entry,
-		     io_handle,
-		     file_io_handle,
-		     internal_file_entry->directory_entries_tree,
-		     flags,
-		     error ) != 1 )
+		if( mft_entry->i30_index != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT entry: %" PRIu32 " directory entries tree.",
-			 function,
-			 mft_entry->index );
+			if( libfsntfs_mft_entry_read_directory_entries_tree(
+			     mft_entry,
+			     io_handle,
+			     file_io_handle,
+			     internal_file_entry->directory_entries_tree,
+			     flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read MFT entry: %" PRIu32 " directory entries tree.",
+				 function,
+				 mft_entry->index );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
-	}
-	if( mft_entry->data_attribute != NULL )
-	{
-		if( libfsntfs_cluster_block_stream_initialize(
-		     &( internal_file_entry->data_cluster_block_stream ),
-		     io_handle,
-		     mft_entry->data_attribute,
-		     error ) != 1 )
+		if( mft_entry->data_attribute != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create data cluster block stream.",
-			 function );
+			if( libfsntfs_cluster_block_stream_initialize(
+			     &( internal_file_entry->data_cluster_block_stream ),
+			     io_handle,
+			     mft_entry->data_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create data cluster block stream.",
+				 function );
 
-			goto on_error;
-		}
-		if( libfsntfs_attribute_get_data_size(
-		     mft_entry->data_attribute,
-		     &( internal_file_entry->data_size ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data attribute data size.",
-			 function );
+				goto on_error;
+			}
+			if( libfsntfs_attribute_get_data_size(
+			     mft_entry->data_attribute,
+			     &( internal_file_entry->data_size ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve data attribute data size.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 	}
 	internal_file_entry->file_io_handle = file_io_handle;
@@ -408,6 +411,48 @@ int libfsntfs_file_entry_is_allocated(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if MFT entry is allocated.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Determines if the file entry is MFT attribute list element
+ * Returns 1 if the MFT entry is a MFT attribute list element, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_is_mft_attribute_list_element(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_is_mft_attribute_list_element";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	result = libfsntfs_mft_entry_is_mft_attribute_list_element(
+	          internal_file_entry->mft_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry is a MFT attribute list element.",
 		 function );
 
 		return( -1 );

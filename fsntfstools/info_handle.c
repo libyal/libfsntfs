@@ -2918,6 +2918,7 @@ int info_handle_mft_entry_fprint(
 	int attribute_index                = 0;
 	int is_allocated                   = 0;
 	int is_empty                       = 0;
+	int is_mft_attribute_list_element  = 0;
 	int number_of_attributes           = 0;
 	int result                         = 0;
 
@@ -3012,6 +3013,41 @@ int info_handle_mft_entry_fprint(
 		 "\tIs allocated\t\t\t: " );
 
 		if( is_allocated == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "false" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "true" );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+
+		is_mft_attribute_list_element = libfsntfs_file_entry_is_mft_attribute_list_element(
+		                                 file_entry,
+		                                 error );
+
+		if( is_mft_attribute_list_element == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry is a MFT attribute list element.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tIs MFT attribute list element\t: " );
+
+		if( is_mft_attribute_list_element == 0 )
 		{
 			fprintf(
 			 info_handle->notify_stream,

@@ -3445,9 +3445,10 @@ int libfsntfs_attribute_append_to_chain(
      libfsntfs_attribute_t *chained_attribute,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_attribute_t *internal_attribute         = NULL;
-	libfsntfs_internal_attribute_t *internal_chained_attribute = NULL;
-	static char *function                                      = "libfsntfs_attribute_append_to_chain";
+	libfsntfs_internal_attribute_t *internal_attribute          = NULL;
+	libfsntfs_internal_attribute_t *internal_chained_attribute  = NULL;
+	libfsntfs_internal_attribute_t *previous_internal_attribute = NULL;
+	static char *function                                       = "libfsntfs_attribute_append_to_chain";
 
 	if( attribute == NULL )
 	{
@@ -3486,8 +3487,7 @@ int libfsntfs_attribute_append_to_chain(
 
 		return( -1 );
 	}
-/* TODO check VCN of previous attribute? */
-	while( internal_attribute->next_attribute != NULL )
+	while( internal_attribute != NULL )
 	{
 		if( internal_attribute == internal_chained_attribute )
 		{
@@ -3500,9 +3500,15 @@ int libfsntfs_attribute_append_to_chain(
 
 			return( -1 );
 		}
+		previous_internal_attribute = internal_attribute;
+
+		if( internal_attribute->data_first_vcn > internal_chained_attribute->data_first_vcn )
+		{
+			break;
+		}
 	        internal_attribute = (libfsntfs_internal_attribute_t *) internal_attribute->next_attribute;
 	}
-	if( internal_attribute == internal_chained_attribute )
+	if( previous_internal_attribute == internal_chained_attribute )
 	{
 		libcerror_error_set(
 		 error,
@@ -3513,7 +3519,11 @@ int libfsntfs_attribute_append_to_chain(
 
 		return( -1 );
 	}
-	internal_attribute->next_attribute = chained_attribute;
+	if( previous_internal_attribute->next_attribute != NULL )
+	{
+		internal_chained_attribute->next_attribute = (libfsntfs_attribute_t *) previous_internal_attribute;
+	}
+	previous_internal_attribute->next_attribute = chained_attribute;
 
 	return( 1 );
 }
