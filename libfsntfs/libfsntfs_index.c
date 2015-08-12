@@ -337,7 +337,7 @@ int libfsntfs_index_set_index_allocation_attribute(
 	else
 	{
 		if( libfsntfs_attribute_append_to_chain(
-		     index->index_allocation_attribute,
+		     &( index->index_allocation_attribute ),
 		     attribute,
 		     error ) != 1 )
 		{
@@ -393,7 +393,7 @@ int libfsntfs_index_set_bitmap_attribute(
 	else
 	{
 		if( libfsntfs_attribute_append_to_chain(
-		     index->bitmap_attribute,
+		     &( index->bitmap_attribute ),
 		     attribute,
 		     error ) != 1 )
 		{

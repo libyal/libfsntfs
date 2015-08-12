@@ -282,6 +282,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint8_t *name,
      size_t name_size,
+     int *attribute_index,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 

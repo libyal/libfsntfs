@@ -1,6 +1,4 @@
 TODO
-* Fix issue in fsntfsinfo test
-  - libcsystem_string_decimal_copy_to_64_bit: unsupported character value: at index: 0.
 * complete compressed file support
   - libcdata_range_list_insert_range is caused by it
 * create fsntfsexport tool to export file entry data

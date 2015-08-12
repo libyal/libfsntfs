@@ -3028,6 +3028,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 {
 	libfsntfs_attribute_t *data_attribute = NULL;
 	static char *function                 = "libfsntfs_mft_entry_append_data_attribute";
+	int attribute_index                   = 0;
 	int entry_index                       = 0;
 	int result                            = 0;
 
@@ -3066,7 +3067,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 		else
 		{
 			if( libfsntfs_attribute_append_to_chain(
-			     mft_entry->data_attribute,
+			     &( mft_entry->data_attribute ),
 			     attribute,
 			     error ) != 1 )
 			{
@@ -3087,6 +3088,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 			  mft_entry,
 			  ( (libfsntfs_internal_attribute_t *) attribute )->name,
 			  ( (libfsntfs_internal_attribute_t *) attribute )->name_size,
+			  &attribute_index,
 			  &data_attribute,
 			  error );
 
@@ -3122,7 +3124,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 		else
 		{
 			if( libfsntfs_attribute_append_to_chain(
-			     data_attribute,
+			     &data_attribute,
 			     attribute,
 			     error ) != 1 )
 			{
@@ -3132,6 +3134,22 @@ int libfsntfs_mft_entry_append_data_attribute(
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 				 "%s: unable to chain alternate data attribute.",
 				 function );
+
+				return( -1 );
+			}
+			if( libcdata_array_set_entry_by_index(
+			     mft_entry->alternate_data_attributes_array,
+			     attribute_index,
+			     (intptr_t *) data_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+				 "%s: unable to append set data attribute: %d in array.",
+				 function,
+				 attribute_index );
 
 				return( -1 );
 			}
@@ -3147,11 +3165,11 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint8_t *name,
      size_t name_size,
+     int *attribute_index,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error )
 {
 	static char *function    = "libfsntfs_mft_entry_get_data_attribute_by_name";
-	int attribute_index      = 0;
 	int number_of_attributes = 0;
 
 	if( mft_entry == NULL )
@@ -3187,6 +3205,17 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 
 		return( -1 );
 	}
+	if( attribute_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute index.",
+		 function );
+
+		return( -1 );
+	}
 	if( attribute == NULL )
 	{
 		libcerror_error_set(
@@ -3212,13 +3241,13 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 
 		return( -1 );
 	}
-	for( attribute_index = 0;
-	     attribute_index < number_of_attributes;
-	     attribute_index++ )
+	for( *attribute_index = 0;
+	     *attribute_index < number_of_attributes;
+	     *attribute_index += 1 )
 	{
 		if( libcdata_array_get_entry_by_index(
 		     mft_entry->attributes_array,
-		     attribute_index,
+		     *attribute_index,
 		     (intptr_t **) attribute,
 		     error ) != 1 )
 		{
@@ -3228,7 +3257,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve alternate data attribute: %d.",
 			 function,
-			 attribute_index );
+			 *attribute_index );
 
 			return( -1 );
 		}
@@ -3240,7 +3269,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing alternate data attribute: %d.",
 			 function,
-			 attribute_index );
+			 *attribute_index );
 
 			return( -1 );
 		}

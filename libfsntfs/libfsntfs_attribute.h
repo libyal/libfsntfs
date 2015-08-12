@@ -285,7 +285,7 @@ int libfsntfs_attribute_get_chained_attribute(
      libcerror_error_t **error );
 
 int libfsntfs_attribute_append_to_chain(
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_attribute_t **attribute,
      libfsntfs_attribute_t *chained_attribute,
      libcerror_error_t **error );
 
