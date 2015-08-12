@@ -3500,13 +3500,24 @@ int libfsntfs_attribute_append_to_chain(
 
 			return( -1 );
 		}
-		previous_internal_attribute = internal_attribute;
-
 		if( internal_attribute->data_first_vcn > internal_chained_attribute->data_first_vcn )
 		{
 			break;
 		}
-	        internal_attribute = (libfsntfs_internal_attribute_t *) internal_attribute->next_attribute;
+		previous_internal_attribute = internal_attribute;
+	        internal_attribute          = (libfsntfs_internal_attribute_t *) internal_attribute->next_attribute;
+	}
+/* TODO add support to switch attribute chain head? */
+	if( previous_internal_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid previous attribute value out of bounds.",
+		 function );
+
+		return( -1 );
 	}
 	if( previous_internal_attribute == internal_chained_attribute )
 	{
@@ -3521,7 +3532,7 @@ int libfsntfs_attribute_append_to_chain(
 	}
 	if( previous_internal_attribute->next_attribute != NULL )
 	{
-		internal_chained_attribute->next_attribute = (libfsntfs_attribute_t *) previous_internal_attribute;
+		internal_chained_attribute->next_attribute = (libfsntfs_attribute_t *) ( previous_internal_attribute->next_attribute );
 	}
 	previous_internal_attribute->next_attribute = chained_attribute;
 
