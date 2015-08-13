@@ -24,7 +24,6 @@
 #include <types.h>
 
 #include "libfsntfs_attribute.h"
-#include "libfsntfs_compression_unit.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_data_run.h"

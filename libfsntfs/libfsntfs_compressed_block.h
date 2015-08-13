@@ -1,5 +1,5 @@
 /*
- * Compression unit functions
+ * Compressed block functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_COMPRESSION_UNIT_H )
-#define _LIBFSNTFS_COMPRESSION_UNIT_H
+#if !defined( _LIBFSNTFS_COMPRESSED_BLOCK_H )
+#define _LIBFSNTFS_COMPRESSED_BLOCK_H
 
 #include <common.h>
 #include <types.h>
@@ -35,9 +35,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_compression_unit libfsntfs_compression_unit_t;
+typedef struct libfsntfs_compressed_block libfsntfs_compressed_block_t;
 
-struct libfsntfs_compression_unit
+struct libfsntfs_compressed_block
 {
 	/* The data
 	 */
@@ -48,24 +48,24 @@ struct libfsntfs_compression_unit
 	size_t data_size;
 };
 
-int libfsntfs_compression_unit_initialize(
-     libfsntfs_compression_unit_t **compression_unit,
+int libfsntfs_compressed_block_initialize(
+     libfsntfs_compressed_block_t **compressed_block,
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_compression_unit_free(
-     libfsntfs_compression_unit_t **compression_unit,
+int libfsntfs_compressed_block_free(
+     libfsntfs_compressed_block_t **compressed_block,
      libcerror_error_t **error );
 
-int libfsntfs_compression_unit_read_element_data(
-     libcdata_array_t *compression_unit_descriptors_array,
+int libfsntfs_compressed_block_read_element_data(
+     libcdata_array_t *compressed_block_descriptors_array,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfcache_cache_t *cache,
      int element_index,
      int element_data_file_index,
      off64_t element_data_offset,
-     size64_t compression_unit_size,
+     size64_t compressed_block_size,
      uint32_t range_flags,
      uint8_t read_flags,
      libcerror_error_t **error );

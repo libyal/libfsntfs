@@ -1,5 +1,5 @@
 /*
- * Compression unit functions
+ * Compressed block functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -23,8 +23,8 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_compression_unit.h"
-#include "libfsntfs_compression_unit_descriptor.h"
+#include "libfsntfs_compressed_block.h"
+#include "libfsntfs_compressed_block_descriptor.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
@@ -35,35 +35,35 @@
 #include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 
-/* Creates a compression unit
- * Make sure the value compression_unit is referencing, is set to NULL
+/* Creates a compressed block
+ * Make sure the value compressed_block is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compression_unit_initialize(
-     libfsntfs_compression_unit_t **compression_unit,
+int libfsntfs_compressed_block_initialize(
+     libfsntfs_compressed_block_t **compressed_block,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compression_unit_initialize";
+	static char *function = "libfsntfs_compressed_block_initialize";
 
-	if( compression_unit == NULL )
+	if( compressed_block == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compression unit.",
+		 "%s: invalid compressed block.",
 		 function );
 
 		return( -1 );
 	}
-	if( *compression_unit != NULL )
+	if( *compressed_block != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid compression unit value already set.",
+		 "%s: invalid compressed block value already set.",
 		 function );
 
 		return( -1 );
@@ -79,45 +79,45 @@ int libfsntfs_compression_unit_initialize(
 
 		return( -1 );
 	}
-	*compression_unit = memory_allocate_structure(
-	                     libfsntfs_compression_unit_t );
+	*compressed_block = memory_allocate_structure(
+	                     libfsntfs_compressed_block_t );
 
-	if( *compression_unit == NULL )
+	if( *compressed_block == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create compression unit.",
+		 "%s: unable to create compressed block.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     *compression_unit,
+	     *compressed_block,
 	     0,
-	     sizeof( libfsntfs_compression_unit_t ) ) == NULL )
+	     sizeof( libfsntfs_compressed_block_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear compression unit.",
+		 "%s: unable to clear compressed block.",
 		 function );
 
 		memory_free(
-		 *compression_unit );
+		 *compressed_block );
 
-		*compression_unit = NULL;
+		*compressed_block = NULL;
 
 		return( -1 );
 	}
 	if( data_size > 0 )
 	{
-		( *compression_unit )->data = (uint8_t *) memory_allocate(
+		( *compressed_block )->data = (uint8_t *) memory_allocate(
 		                                           sizeof( uint8_t ) * data_size );
 
-		if( ( *compression_unit )->data == NULL )
+		if( ( *compressed_block )->data == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -128,78 +128,78 @@ int libfsntfs_compression_unit_initialize(
 
 			goto on_error;
 		}
-		( *compression_unit )->data_size = data_size;
+		( *compressed_block )->data_size = data_size;
 	}
 	return( 1 );
 
 on_error:
-	if( *compression_unit != NULL )
+	if( *compressed_block != NULL )
 	{
 		memory_free(
-		 *compression_unit );
+		 *compressed_block );
 
-		*compression_unit = NULL;
+		*compressed_block = NULL;
 	}
 	return( -1 );
 }
 
-/* Frees a compression unit
+/* Frees a compressed block
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compression_unit_free(
-     libfsntfs_compression_unit_t **compression_unit,
+int libfsntfs_compressed_block_free(
+     libfsntfs_compressed_block_t **compressed_block,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compression_unit_free";
+	static char *function = "libfsntfs_compressed_block_free";
 
-	if( compression_unit == NULL )
+	if( compressed_block == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compression unit.",
+		 "%s: invalid compressed block.",
 		 function );
 
 		return( -1 );
 	}
-	if( *compression_unit != NULL )
+	if( *compressed_block != NULL )
 	{
-		if( ( *compression_unit )->data != NULL )
+		if( ( *compressed_block )->data != NULL )
 		{
 			memory_free(
-			 ( *compression_unit )->data );
+			 ( *compressed_block )->data );
 		}
 		memory_free(
-		 *compression_unit );
+		 *compressed_block );
 
-		*compression_unit = NULL;
+		*compressed_block = NULL;
 	}
 	return( 1 );
 }
 
-/* Reads a compression unit
- * Callback function for the compression unit vector
+/* Reads a compressed block
+ * Callback function for the compressed block vector
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compression_unit_read_element_data(
-     libcdata_array_t *compression_unit_descriptors_array,
+int libfsntfs_compressed_block_read_element_data(
+     libcdata_array_t *compressed_block_descriptors_array,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfcache_cache_t *cache,
      int element_index,
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t element_data_offset LIBFSNTFS_ATTRIBUTE_UNUSED,
-     size64_t compression_unit_size,
+     size64_t compressed_block_size,
      uint32_t range_flags,
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	libfsntfs_compression_unit_t *compression_unit                       = NULL;
-	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
+	libfsntfs_compressed_block_t *compressed_block                       = NULL;
+	libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor = NULL;
 	uint8_t *compressed_data                                             = NULL;
-	uint8_t *compression_unit_data                                       = NULL;
-	static char *function                                                = "libfsntfs_compression_unit_read_element_data";
+	uint8_t *compressed_block_data                                       = NULL;
+	static char *function                                                = "libfsntfs_compressed_block_read_element_data";
 	ssize_t read_count                                                   = 0;
 	int result                                                           = 0;
 
@@ -207,67 +207,67 @@ int libfsntfs_compression_unit_read_element_data(
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_offset )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
-	if( compression_unit_descriptors_array == NULL )
+	if( compressed_block_descriptors_array == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compression unit descriptors array.",
+		 "%s: invalid compressed block descriptors array.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( compression_unit_size == 0 )
-	 || ( compression_unit_size > (size64_t) SSIZE_MAX ) )
+	if( ( compressed_block_size == 0 )
+	 || ( compressed_block_size > (size64_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid compression unit size value out of bounds.",
+		 "%s: invalid compressed block size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
 	if( libcdata_array_get_entry_by_index(
-	     compression_unit_descriptors_array,
+	     compressed_block_descriptors_array,
 	     element_index,
-	     (intptr_t **) &compression_unit_descriptor,
+	     (intptr_t **) &compressed_block_descriptor,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve compression unit descriptor: %d.",
+		 "%s: unable to retrieve compressed block descriptor: %d.",
 		 function,
 		 element_index );
 
 		goto on_error;
 	}
-/* TODO check compression_unit_descriptor == NULL */
-	if( libfsntfs_compression_unit_initialize(
-	     &compression_unit,
-	     compression_unit_size,
+/* TODO check compressed_block_descriptor == NULL */
+	if( libfsntfs_compressed_block_initialize(
+	     &compressed_block,
+	     compressed_block_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create compression unit.",
+		 "%s: unable to create compressed block.",
 		 function );
 
 		goto on_error;
 	}
-	if( compression_unit == NULL )
+	if( compressed_block == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing compression unit.",
+		 "%s: missing compressed block.",
 		 function );
 
 		goto on_error;
@@ -275,7 +275,7 @@ int libfsntfs_compression_unit_read_element_data(
 	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		compressed_data = (uint8_t *) memory_allocate(
-		                               sizeof( uint8_t ) * (size_t) compression_unit_size );
+		                               sizeof( uint8_t ) * (size_t) compressed_block_size );
 
 		if( compressed_data == NULL )
 		{
@@ -288,27 +288,27 @@ int libfsntfs_compression_unit_read_element_data(
 
 			goto on_error;
 		}
-		compression_unit_data = compressed_data;
+		compressed_block_data = compressed_data;
 	}
 	else
 	{
-		compression_unit_data = compression_unit->data;
+		compressed_block_data = compressed_block->data;
 	}
 	read_count = libfdata_stream_read_buffer(
-	              compression_unit_descriptor->data_stream,
+	              compressed_block_descriptor->data_stream,
 		      (intptr_t *) file_io_handle,
-		      compression_unit_data,
-		      compression_unit_size,
+		      compressed_block_data,
+		      compressed_block_size,
 		      0,
 		      error );
 
-	if( read_count != (ssize_t) compression_unit_size )
+	if( read_count != (ssize_t) compressed_block_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read compression unit.",
+		 "%s: unable to read compressed block.",
 		 function );
 
 		goto on_error;
@@ -317,9 +317,9 @@ int libfsntfs_compression_unit_read_element_data(
 	{
 		result = libfwnt_lznt1_decompress(
 			  compressed_data,
-			  (size_t) compression_unit_size,
-			  compression_unit->data,
-			  &( compression_unit->data_size ),
+			  (size_t) compressed_block_size,
+			  compressed_block->data,
+			  &( compressed_block->data_size ),
 			  error );
 
 		if( result != 1 )
@@ -343,8 +343,8 @@ int libfsntfs_compression_unit_read_element_data(
 	     (intptr_t *) file_io_handle,
 	     cache,
 	     element_index,
-	     (intptr_t *) compression_unit,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compression_unit_free,
+	     (intptr_t *) compressed_block,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compressed_block_free,
 	     LIBFDATA_VECTOR_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -365,10 +365,10 @@ on_error:
 		memory_free(
 		 compressed_data );
 	}
-	if( compression_unit != NULL )
+	if( compressed_block != NULL )
 	{
-		libfsntfs_compression_unit_free(
-		 &compression_unit,
+		libfsntfs_compressed_block_free(
+		 &compressed_block,
 		 NULL );
 	}
 	return( -1 );

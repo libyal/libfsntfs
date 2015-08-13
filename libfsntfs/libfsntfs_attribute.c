@@ -28,8 +28,8 @@
 #include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
-#include "libfsntfs_compression_unit.h"
-#include "libfsntfs_compression_unit_descriptor.h"
+#include "libfsntfs_compressed_block.h"
+#include "libfsntfs_compressed_block_descriptor.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
@@ -221,18 +221,18 @@ int libfsntfs_internal_attribute_free(
 
 			result = -1;
 		}
-		if( ( *internal_attribute )->compression_unit_descriptors_array != NULL )
+		if( ( *internal_attribute )->compressed_block_descriptors_array != NULL )
 		{
 			if( libcdata_array_free(
-			     &( ( *internal_attribute )->compression_unit_descriptors_array ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compression_unit_descriptor_free,
+			     &( ( *internal_attribute )->compressed_block_descriptors_array ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compressed_block_descriptor_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free compression unit descriptors array.",
+				 "%s: unable to free compressed block descriptors array.",
 				 function );
 
 				result = -1;
@@ -273,17 +273,17 @@ int libfsntfs_internal_attribute_free(
 				result = -1;
 			}
 		}
-		if( ( *internal_attribute )->compression_unit_vector != NULL )
+		if( ( *internal_attribute )->compressed_block_vector != NULL )
 		{
 			if( libfdata_vector_free(
-			     &( ( *internal_attribute )->compression_unit_vector ),
+			     &( ( *internal_attribute )->compressed_block_vector ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free compression unit vector.",
+				 "%s: unable to free compressed block vector.",
 				 function );
 
 				result = -1;
@@ -3604,14 +3604,14 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
      libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
+	libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor = NULL;
 	libfsntfs_data_run_t *data_run                                       = NULL;
 	static char *function                                                = "libfsntfs_attribute_data_stream_initialize_compressed";
 	off64_t data_run_offset                                              = 0;
 	size64_t data_run_size                                               = 0;
 	size64_t data_segment_size                                           = 0;
 	size_t remaining_compression_unit_size                               = 0;
-	int compression_unit_descriptor_index                                = 0;
+	int compressed_block_descriptor_index                                = 0;
 	int data_run_index                                                   = 0;
 	int element_index                                                    = 0;
 	int entry_index                                                      = 0;
@@ -3637,8 +3637,8 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 	{
 		return( 1 );
 	}
-	if( ( internal_attribute->compression_unit_descriptors_array != NULL )
-	 || ( internal_attribute->compression_unit_vector != NULL ) )
+	if( ( internal_attribute->compressed_block_descriptors_array != NULL )
+	 || ( internal_attribute->compressed_block_vector != NULL ) )
 	{
 		return( 1 );
 	}
@@ -3655,7 +3655,7 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 		goto on_error;
 	}
 	if( libcdata_array_initialize(
-	     &( internal_attribute->compression_unit_descriptors_array ),
+	     &( internal_attribute->compressed_block_descriptors_array ),
 	     0,
 	     error ) != 1 )
 	{
@@ -3663,18 +3663,18 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create compression unit descriptors array.",
+		 "%s: unable to create compressed block descriptors array.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfdata_vector_initialize(
-	     &( internal_attribute->compression_unit_vector ),
-	     (size64_t) io_handle->cluster_block_size,
-	     (intptr_t *) internal_attribute->compression_unit_descriptors_array,
+	     &( internal_attribute->compressed_block_vector ),
+	     (size64_t) internal_attribute->compression_unit_size,
+	     (intptr_t *) internal_attribute->compressed_block_descriptors_array,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compression_unit_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compressed_block_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -3683,7 +3683,7 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create compression unit vector.",
+		 "%s: unable to create compressed block vector.",
 		 function );
 
 		goto on_error;
@@ -3740,17 +3740,17 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 		while( data_run_size > 0 )
 		{
-			if( compression_unit_descriptor == NULL )
+			if( compressed_block_descriptor == NULL )
 			{
-				if( libfsntfs_compression_unit_descriptor_initialize(
-				     &compression_unit_descriptor,
+				if( libfsntfs_compressed_block_descriptor_initialize(
+				     &compressed_block_descriptor,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create compression unit descriptor.",
+					 "%s: unable to create compressed block descriptor.",
 					 function );
 
 					goto on_error;
@@ -3774,11 +3774,11 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 					goto on_error;
 				}
-				compression_unit_descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
+				compressed_block_descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
 			}
 			else
 			{
-				compression_unit_descriptor->data_range_flags = data_run->range_flags;
+				compressed_block_descriptor->data_range_flags = data_run->range_flags;
 			}
 			if( data_run_size < remaining_compression_unit_size )
 			{
@@ -3802,14 +3802,14 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 				libcnotify_printf(
 				 "%s: compression unit: %d %sdata segment offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
 				 function,
-				 compression_unit_descriptor_index,
+				 compressed_block_descriptor_index,
 				 compression_unit_data_type,
 				 data_run_offset,
 				 data_segment_size );
 			}
 #endif
-			if( libfsntfs_compression_unit_descriptor_append_data_segment(
-			     compression_unit_descriptor,
+			if( libfsntfs_compressed_block_descriptor_append_data_segment(
+			     compressed_block_descriptor,
 			     data_run_offset,
 			     data_segment_size,
 			     data_run->range_flags,
@@ -3819,9 +3819,9 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append data segment to compression unit descriptor: %d.",
+				 "%s: unable to append data segment to compressed block descriptor: %d.",
 				 function,
-				 compression_unit_descriptor_index );
+				 compressed_block_descriptor_index );
 
 				goto on_error;
 			}
@@ -3837,11 +3837,11 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
-					if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 					{
 						compression_unit_data_type = "compressed";
 					}
-					else if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					else if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 					{
 						compression_unit_data_type = "sparse";
 					}
@@ -3852,59 +3852,59 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 					libcnotify_printf(
 					 "%s: %" PRIzd " blocks %s compression unit: %d.\n",
 					 function,
-					 compression_unit_descriptor->data_size / io_handle->cluster_block_size,
+					 compressed_block_descriptor->data_size / io_handle->cluster_block_size,
 					 compression_unit_data_type,
-					 compression_unit_descriptor_index );
+					 compressed_block_descriptor_index );
 				}
 #endif
 				if( libfdata_vector_append_segment(
-				     internal_attribute->compression_unit_vector,
+				     internal_attribute->compressed_block_vector,
 				     &element_index,
 				     0,
 				     0,
 				     internal_attribute->compression_unit_size,
-				     compression_unit_descriptor->data_range_flags,
+				     compressed_block_descriptor->data_range_flags,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append compression unit: %d to compression unit vector.",
+					 "%s: unable to append compression unit: %d to compressed block vector.",
 					 function,
-					 compression_unit_descriptor_index );
+					 compressed_block_descriptor_index );
 
 					goto on_error;
 				}
 				if( libcdata_array_append_entry(
-				     internal_attribute->compression_unit_descriptors_array,
+				     internal_attribute->compressed_block_descriptors_array,
 				     &entry_index,
-				     (intptr_t *) compression_unit_descriptor,
+				     (intptr_t *) compressed_block_descriptor,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append compression unit descriptor: %d to array.",
+					 "%s: unable to append compressed block descriptor: %d to array.",
 					 function,
-					 compression_unit_descriptor_index );
+					 compressed_block_descriptor_index );
 
 					goto on_error;
 				}
-				compression_unit_descriptor        = NULL;
-				compression_unit_descriptor_index += 1;
+				compressed_block_descriptor        = NULL;
+				compressed_block_descriptor_index += 1;
 			}
 		}
 	}
 	return( 1 );
 
 on_error:
-	if( internal_attribute->compression_unit_descriptors_array != NULL )
+	if( internal_attribute->compressed_block_descriptors_array != NULL )
 	{
 		libcdata_array_free(
-		 &( internal_attribute->compression_unit_descriptors_array ),
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compression_unit_descriptor_free,
+		 &( internal_attribute->compressed_block_descriptors_array ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compressed_block_descriptor_free,
 		 NULL );
 	}
 	return( -1 );
@@ -4069,7 +4069,7 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
          libcerror_error_t **error )
 {
 	libfsntfs_cluster_block_t *cluster_block           = NULL;
-	libfsntfs_compression_unit_t *compression_unit     = NULL;
+	libfsntfs_compressed_block_t *compressed_block     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	uint8_t *cluster_block_data                        = NULL;
 	static char *function                              = "libfsntfs_attribute_data_stream_read_buffer";
@@ -4128,10 +4128,10 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 	{
 		return( 0 );
 	}
-	if( internal_attribute->compression_unit_vector != NULL )
+	if( internal_attribute->compressed_block_vector != NULL )
 	{
 		if( libfdata_vector_get_element_index_at_offset(
-		     internal_attribute->compression_unit_vector,
+		     internal_attribute->compressed_block_vector,
 		     data_offset,
 		     &element_index,
 		     &element_data_offset,
@@ -4141,7 +4141,7 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve compression unit vector element index for offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve compressed block vector element index for offset: 0x%08" PRIx64 ".",
 			 function,
 			 data_offset );
 
@@ -4217,14 +4217,14 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 	}
 	while( buffer_size > 0 )
 	{
-		if( internal_attribute->compression_unit_vector != NULL )
+		if( internal_attribute->compressed_block_vector != NULL )
 		{
 			if( libfdata_vector_get_element_value_by_index(
-			     internal_attribute->compression_unit_vector,
+			     internal_attribute->compressed_block_vector,
 			     (intptr_t *) file_io_handle,
 			     cache,
 			     element_index,
-			     (intptr_t **) &compression_unit,
+			     (intptr_t **) &compressed_block,
 			     read_flags,
 			     error ) != 1 )
 			{
@@ -4232,26 +4232,26 @@ ssize_t libfsntfs_attribute_data_stream_read_buffer(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve compression unit: %d from vector.",
+				 "%s: unable to retrieve compressed block: %d from vector.",
 				 function,
 				 element_index );
 
 				return( -1 );
 			}
-			if( compression_unit == NULL )
+			if( compressed_block == NULL )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing compression unit: %d.",
+				 "%s: missing compressed block: %d.",
 				 function,
 				 element_index );
 
 				return( -1 );
 			}
-			cluster_block_data = compression_unit->data;
-			read_size          = compression_unit->data_size;
+			cluster_block_data = compressed_block->data;
+			read_size          = compressed_block->data_size;
 		}
 		else if( internal_attribute->cluster_block_vector != NULL )
 		{

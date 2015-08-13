@@ -198,11 +198,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_descriptor.c"
 				>
 			</File>
 			<File
@@ -420,11 +420,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_descriptor.h"
 				>
 			</File>
 			<File
