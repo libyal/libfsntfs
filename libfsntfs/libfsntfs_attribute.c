@@ -3608,6 +3608,7 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 	libfsntfs_data_run_t *data_run                                       = NULL;
 	static char *function                                                = "libfsntfs_attribute_data_stream_initialize_compressed";
 	off64_t data_run_offset                                              = 0;
+	off64_t data_segment_offset                                          = 0;
 	size64_t data_run_size                                               = 0;
 	size64_t data_segment_size                                           = 0;
 	size_t remaining_compression_unit_size                               = 0;
@@ -3861,7 +3862,7 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 				     internal_attribute->compressed_block_vector,
 				     &element_index,
 				     0,
-				     0,
+				     data_segment_offset,
 				     internal_attribute->compression_unit_size,
 				     compressed_block_descriptor->data_range_flags,
 				     error ) != 1 )
@@ -3876,6 +3877,9 @@ int libfsntfs_attribute_data_stream_initialize_compressed(
 
 					goto on_error;
 				}
+				/* Make sure to give every segment a unique offset */
+				data_segment_offset += internal_attribute->compression_unit_size;
+
 				if( libcdata_array_append_entry(
 				     internal_attribute->compressed_block_descriptors_array,
 				     &entry_index,
