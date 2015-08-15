@@ -1003,6 +1003,27 @@ int libfsntfs_attribute_get_utf16_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the data VCN range
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_data_vcn_range(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *data_first_vcn,
+     uint64_t *data_last_vcn,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file references as an MFT entry index and sequence number
+ * If the value sequence_number is NULL it will be ignored
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_file_reference(
+     libfsntfs_attribute_t *attribute,
+     uint64_t *mft_entry_index,
+     uint16_t *sequence_number,
+     libfsntfs_error_t **error );
+
 /* Retrieves the data size
  * Returns 1 if successful or -1 on error
  */

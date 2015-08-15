@@ -140,6 +140,10 @@ Debug:
 Deployment
 * write man pages
 
+20150815
+* worked on format support
+* bug fix handling alternate data streams
+
 20150813
 * worked on compression support
 

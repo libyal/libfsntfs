@@ -3029,7 +3029,7 @@ int libfsntfs_attribute_compare_name_with_utf8_string(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_get_file_reference";
+	static char *function                              = "libfsntfs_attribute_compare_name_with_utf8_string";
 	int result                                         = 0;
 
 	if( attribute == NULL )
@@ -3081,7 +3081,7 @@ int libfsntfs_attribute_compare_name_with_utf16_string(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_get_file_reference";
+	static char *function                              = "libfsntfs_attribute_compare_name_with_utf16_string";
 	int result                                         = 0;
 
 	if( attribute == NULL )

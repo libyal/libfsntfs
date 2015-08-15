@@ -231,6 +231,7 @@ int libfsntfs_attribute_compare_name_with_utf16_string(
      size_t utf16_string_length,
      libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_data_vcn_range(
      libfsntfs_attribute_t *attribute,
      uint64_t *data_first_vcn,

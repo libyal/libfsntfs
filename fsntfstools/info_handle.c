@@ -1014,9 +1014,11 @@ int info_handle_data_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	static char *function = "info_handle_data_attribute_fprint";
-	size64_t data_size    = 0;
-	uint16_t data_flags   = 0;
+	static char *function   = "info_handle_data_attribute_fprint";
+	size64_t data_size      = 0;
+	uint64_t data_first_vcn = 0;
+	uint64_t data_last_vcn  = 0;
+	uint16_t data_flags     = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1029,25 +1031,48 @@ int info_handle_data_attribute_fprint(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_data_size(
+	if( libfsntfs_attribute_get_data_vcn_range(
 	     attribute,
-	     &data_size,
+	     &data_first_vcn,
+	     &data_last_vcn,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size.",
+		 "%s: unable to retrieve data VCN range.",
 		 function );
 
 		return( -1 );
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tData size\t\t\t: %" PRIu64 " bytes \n",
-	 data_size );
+	 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
+	 data_first_vcn,
+	 data_last_vcn );
 
+	if( data_first_vcn == 0 )
+	{
+		if( libfsntfs_attribute_get_data_size(
+		     attribute,
+		     &data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data size.",
+			 function );
+
+			return( -1 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tData size\t\t\t: %" PRIu64 " bytes \n",
+		 data_size );
+	}
 	if( libfsntfs_attribute_get_data_flags(
 	     attribute,
 	     &data_flags,

@@ -3246,7 +3246,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 	     *attribute_index += 1 )
 	{
 		if( libcdata_array_get_entry_by_index(
-		     mft_entry->attributes_array,
+		     mft_entry->alternate_data_attributes_array,
 		     *attribute_index,
 		     (intptr_t **) attribute,
 		     error ) != 1 )
@@ -3273,7 +3273,6 @@ int libfsntfs_mft_entry_get_data_attribute_by_name(
 
 			return( -1 );
 		}
-/* TODO should a name of NULL return the default data attribute ? */
 		if( ( ( (libfsntfs_internal_attribute_t *) *attribute )->name != NULL )
 		 && ( ( (libfsntfs_internal_attribute_t *) *attribute )->name_size == name_size )
 		 && ( memory_compare(
