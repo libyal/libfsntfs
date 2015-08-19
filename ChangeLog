@@ -1,8 +1,9 @@
 TODO
+* data stream fix data size
+* file entry fix handling of extents and resident data
 * make get by path/name functions case insensitive
   - determine if NTFS really is case insensitive and make appropriate changes
   - maybe have a flag or different functions to control case in compare
-* add has_ADS_ functions ?
 * create fsntfsexport tool to export file entry data
 * handle pre 3.1 attribute names?
 * check file entry life times

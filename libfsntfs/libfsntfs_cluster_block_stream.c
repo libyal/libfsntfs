@@ -489,7 +489,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 
 			return( -1 );
 		}
-		if( data_handle->current_segment_offset < segment_offset )
+		if( segment_offset < data_handle->current_segment_offset )
 		{
 			libcerror_error_set(
 			 error,
@@ -1233,9 +1233,6 @@ int libfsntfs_cluster_block_stream_initialize(
 
 							goto on_error;
 						}
-						/* Make sure to give every segment a unique offset */
-						data_segment_offset += compression_unit_size;
-
 						if( libcdata_array_append_entry(
 						     data_handle->compressed_block_descriptors_array,
 						     &entry_index,
@@ -1280,6 +1277,9 @@ int libfsntfs_cluster_block_stream_initialize(
 							goto on_error;
 						}
 						compressed_block_descriptor_index++;
+
+						/* Make sure to give every segment a unique offset */
+						data_segment_offset += compression_unit_size;
 					}
 				}
 			}
