@@ -60,6 +60,7 @@ August 2014 | Textual changes and additional information.
 Switched to asccidoc format.
 | 0.0.7 | J.B. Metz | May 2015 | Additional information.
 | 0.0.8 | J.B. Metz | July 2015 | Textual changes.
+| 0.0.9 | J.B. Metz | August 2015 | Additional information.
 |===
 
 :numbered:
@@ -714,7 +715,8 @@ Compression is supported upto NTFS file systems with a cluster block size of
 
 The compression is specified on a pre attribute basis. Where an attribute
 chain can consists of attribute with compressed and uncompressed attribute
-data.
+data. [yellow-background]*Note that it is unknown if mixing compressed and
+uncompressed attributes is supported by the Windows implementation.*
 
 According to `[RUSSON05]` the size of the runlist is rounded up to the next 
 multitude of 4 bytes. The size of the trailing data can be even larger than 3 
@@ -937,6 +939,10 @@ Note the name must follow the 8.3 format.
 | 3 | DOS_WINDOWS | Both the DOS and WINDOWS names are identical +
 [yellow-background]*Which is the same as the DOS character set, with the exception that lower case is used as well.*
 |===
+
+
+[NOTE]
+The Windows API function CreateFile allows to create case sensitive file names when the flag FILE_FLAG_POSIX_SEMANTICS is set.
 
 ==== Long to short name conversion
 Basically the conversion from a long name to short name boils down to the 
@@ -1464,6 +1470,10 @@ the last compression unit (blocks 65 to 80) would be sparse.
 [NOTE]
 A compression unit can consists of multiple compressed data runs, e.g. 1 data 
 block followed by 4 data blocks followed by 11 sparse blocks.
+
+[NOTE]
+The sparse blocks data run can be stored in a subsequent attribute in an
+attribute chain.
 
 [yellow-background]*Does the sparse flag needs to be set for sparse compressed
 files?*

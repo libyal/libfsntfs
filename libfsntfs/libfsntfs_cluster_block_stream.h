@@ -43,13 +43,33 @@ struct libfsntfs_cluster_block_stream_data_handle
 	 */
 	libfsntfs_io_handle_t *io_handle;
 
-	/* The current offset
+	/* The current segment offset
 	 */
-	off64_t current_offset;
+	off64_t current_segment_offset;
 
-	/* The attributes array
+	/* The data size
 	 */
-	libcdata_array_t *attributes_array;
+	size64_t data_size;
+
+	/* The compression unit size
+	 */
+	size_t compression_unit_size;
+
+	/* The data flags
+	 */
+	uint16_t data_flags;
+
+	/* The resident data
+	 */
+	uint8_t *resident_data;
+
+	/* The compressed block descriptors array
+	 */
+	libcdata_array_t *compressed_block_descriptors_array;
+
+	/* The compressed block vector
+	 */
+	libfdata_vector_t *compressed_block_vector;
 
 	/* The cache
 	 */
@@ -59,6 +79,9 @@ struct libfsntfs_cluster_block_stream_data_handle
 int libfsntfs_cluster_block_stream_data_handle_initialize(
      libfsntfs_cluster_block_stream_data_handle_t **data_handle,
      libfsntfs_io_handle_t *io_handle,
+     size64_t data_size,
+     size_t compression_unit_size,
+     uint16_t data_flags,
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_stream_data_handle_free(

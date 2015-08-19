@@ -26,6 +26,8 @@
 #include "libfsntfs_compressed_block_descriptor.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_unused.h"
 
 /* Creates a compressed block descriptor
@@ -225,7 +227,7 @@ int libfsntfs_compressed_block_descriptor_append_data_segment(
 ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
          intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
          libbfio_handle_t *file_io_handle,
-         int segment_index,
+         int segment_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          uint8_t *segment_data,
          size_t segment_data_size,
@@ -237,6 +239,7 @@ ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
 	ssize_t read_count    = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_flags )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
@@ -330,4 +333,129 @@ off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
 	}
 	return( segment_offset );
 }
+
+#if defined( HAVE_DEBUG_OUTPUT )
+
+/* Debug prints the compressed block descriptor
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_compressed_block_descriptor_print(
+     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+     libfsntfs_io_handle_t *io_handle,
+     int compressed_block_descriptor_index,
+     libcerror_error_t **error )
+{
+	char *compression_unit_data_type = NULL;
+	static char *function            = "libfsntfs_compressed_block_descriptor_print";
+	off64_t segment_offset           = 0;
+	size64_t segment_size            = 0;
+	uint32_t segment_flags           = 0;
+	int number_of_segments           = 0;
+	int segment_file_index           = 0;
+	int segment_index                = 0;
+
+	if( compressed_block_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compressed block descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	{
+		compression_unit_data_type = "compressed";
+	}
+	else if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	{
+		compression_unit_data_type = "sparse";
+	}
+	else
+	{
+		compression_unit_data_type = "uncompressed";
+	}
+	libcnotify_printf(
+	 "%s: %" PRIzd " blocks %s compression unit: %d.\n",
+	 function,
+	 compressed_block_descriptor->data_size / io_handle->cluster_block_size,
+	 compression_unit_data_type,
+	 compressed_block_descriptor_index );
+
+	if( libfdata_stream_get_number_of_segments(
+	     compressed_block_descriptor->data_stream,
+	     &number_of_segments,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of segments.",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_index = 0;
+	     segment_index < number_of_segments;
+	     segment_index++ )
+	{
+		if( libfdata_stream_get_segment_by_index(
+		     compressed_block_descriptor->data_stream,
+		     segment_index,
+		     &segment_file_index,
+		     &segment_offset,
+		     &segment_size,
+		     &segment_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve segment: %d.",
+			 function,
+			 segment_index );
+
+			return( -1 );
+		}
+		if( ( segment_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+		{
+			libcnotify_printf(
+			 "%s: segment: %d sparse of size: %" PRIu64 "\n",
+			 function,
+			 segment_index,
+			 segment_size );
+		}
+		else
+		{
+			libcnotify_printf(
+			 "%s: segment: %d at offset: 0x%08" PRIx64 " of size: %" PRIu64 "\n",
+			 function,
+			 segment_index,
+			 segment_offset,
+			 segment_size );
+		}
+	}
+	libcnotify_printf(
+	 "\n" );
+
+	return( 1 );
+}
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 

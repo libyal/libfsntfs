@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
@@ -83,6 +84,16 @@ off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
          int segment_file_index,
          off64_t segment_offset,
          libcerror_error_t **error );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+
+int libfsntfs_compressed_block_descriptor_print(
+     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+     libfsntfs_io_handle_t *io_handle,
+     int compressed_block_descriptor_index,
+     libcerror_error_t **error );
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 #if defined( __cplusplus )
 }

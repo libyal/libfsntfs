@@ -315,6 +315,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Retrieves a specific alternate data stream." },
 
+	{ "has_alternate_data_stream_by_name",
+	  (PyCFunction) pyfsntfs_file_entry_has_alternate_data_stream_by_name,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "has_alternate_data_stream_by_name(name) -> Boolean\n"
+	  "\n"
+	  "Determines if there is an alternate data stream specified by the name." },
+
 	{ "get_alternate_data_stream_by_name",
 	  (PyCFunction) pyfsntfs_file_entry_get_alternate_data_stream_by_name,
 	  METH_VARARGS | METH_KEYWORDS,
@@ -3679,6 +3686,80 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_streams(
 		return( NULL );
 	}
 	return( data_streams_object );
+}
+
+/* Determines if there is an alternate data stream specified by the name
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_has_alternate_data_stream_by_name(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	libcerror_error_t *error       = NULL;
+	char *data_stream_name         = NULL;
+	static char *keyword_list[]    = { "data_stream_name", NULL };
+	static char *function          = "pyfsntfs_file_entry_has_alternate_data_stream_by_name";
+	size_t data_stream_name_length = 0;
+	int result                     = 0;
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "s",
+	     keyword_list,
+	     &data_stream_name ) == 0 )
+	{
+		return( NULL );
+	}
+	data_stream_name_length = libcstring_narrow_string_length(
+	                           data_stream_name );
+
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name(
+	           pyfsntfs_file_entry->file_entry,
+	           (uint8_t *) data_stream_name,
+	           data_stream_name_length,
+	           &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if alternate data stream exists.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	/* Check if the alternate data stream is present
+	 */
+	if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
 }
 
 /* Retrieves the alternate data stream specified by the name

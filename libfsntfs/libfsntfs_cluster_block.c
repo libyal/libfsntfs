@@ -193,7 +193,6 @@ int libfsntfs_cluster_block_read_element_data(
      libcerror_error_t **error )
 {
 	libfsntfs_cluster_block_t *cluster_block = NULL;
-	uint8_t *cluster_block_data              = NULL;
 	static char *function                    = "libfsntfs_cluster_block_read_element_data";
 	ssize_t read_count                       = 0;
 
@@ -212,7 +211,8 @@ int libfsntfs_cluster_block_read_element_data(
 
 		return( -1 );
 	}
-	if( cluster_block_size > (size64_t) SSIZE_MAX )
+	if( ( cluster_block_size == 0 )
+	 || ( cluster_block_size > (size64_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -304,11 +304,9 @@ int libfsntfs_cluster_block_read_element_data(
 
 			goto on_error;
 		}
-		cluster_block_data = cluster_block->data;
-
 		read_count = libbfio_handle_read_buffer(
 		              file_io_handle,
-		              cluster_block_data,
+		              cluster_block->data,
 		              cluster_block->data_size,
 		              error );
 

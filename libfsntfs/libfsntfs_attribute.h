@@ -99,10 +99,6 @@ struct libfsntfs_internal_attribute
 	 */
 	libcdata_array_t *data_runs_array;
 
-	/* The compressed block descriptors array
-	 */
-	libcdata_array_t *compressed_block_descriptors_array;
-
 	/* The file reference
 	 */
 	uint64_t file_reference;
@@ -120,14 +116,6 @@ struct libfsntfs_internal_attribute
 	/* The next attribute in the chain
 	 */
 	libfsntfs_attribute_t *next_attribute;
-
-	/* The cluster block vector
-	 */
-	libfdata_vector_t *cluster_block_vector;
-
-	/* The compressed block vector
-	 */
-	libfdata_vector_t *compressed_block_vector;
 };
 
 int libfsntfs_attribute_initialize(
@@ -289,32 +277,6 @@ int libfsntfs_attribute_append_to_chain(
      libfsntfs_attribute_t **attribute,
      libfsntfs_attribute_t *chained_attribute,
      libcerror_error_t **error );
-
-int libfsntfs_attribute_data_stream_initialize(
-     libfsntfs_attribute_t *attribute,
-     libfsntfs_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_data_stream_initialize_compressed(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     libfsntfs_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_data_stream_initialize_uncompressed(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     libfsntfs_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-ssize_t libfsntfs_attribute_data_stream_read_buffer(
-         libfsntfs_attribute_t *attribute,
-         libfsntfs_io_handle_t *io_handle,
-         libbfio_handle_t *file_io_handle,
-         libfcache_cache_t *cache,
-         off64_t data_offset,
-         uint8_t *buffer,
-         size_t buffer_size,
-         uint8_t read_flags,
-         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

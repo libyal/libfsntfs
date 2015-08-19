@@ -1,10 +1,10 @@
 TODO
-* complete compressed file support
-  - libcdata_range_list_insert_range is caused by it
-* create fsntfsexport tool to export file entry data
-* what about compressed runs with 15 cluster blocks?
-* handle pre 3.1 attribute names?
 * make get by path/name functions case insensitive
+  - determine if NTFS really is case insensitive and make appropriate changes
+  - maybe have a flag or different functions to control case in compare
+* add has_ADS_ functions ?
+* create fsntfsexport tool to export file entry data
+* handle pre 3.1 attribute names?
 * check file entry life times
 * set file entry name, if get by index and number of filenames is 1
 
@@ -139,6 +139,14 @@ Debug:
 
 Deployment
 * write man pages
+
+20150819
+* worked on format support
+
+20150817
+* worked on compression support
+* worked on caseless compare
+  - determine if NTFS really is case insensitive
 
 20150815
 * worked on format support

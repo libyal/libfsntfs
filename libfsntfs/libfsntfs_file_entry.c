@@ -2450,6 +2450,102 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_index(
 	return( 1 );
 }
 
+/* Determines if there is an alternate data stream for an UTF-8 encoded name
+ * Returns 1 if available, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *data_attribute                = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
+	          internal_file_entry->mft_entry,
+	          utf8_string,
+	          utf8_string_length,
+	          &data_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve alternate data attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Determines if there is an alternate data stream for an UTF-8 encoded name
+ * Returns 1 if available, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *data_attribute                = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
+	          internal_file_entry->mft_entry,
+	          utf16_string,
+	          utf16_string_length,
+	          &data_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve alternate data attribute.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Retrieves the alternate data stream for an UTF-8 encoded name
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */

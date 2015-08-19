@@ -227,6 +227,11 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_streams(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_has_alternate_data_stream_by_name(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments,

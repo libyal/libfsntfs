@@ -1019,6 +1019,7 @@ int info_handle_data_attribute_fprint(
 	uint64_t data_first_vcn = 0;
 	uint64_t data_last_vcn  = 0;
 	uint16_t data_flags     = 0;
+	int result              = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1031,11 +1032,13 @@ int info_handle_data_attribute_fprint(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_data_vcn_range(
-	     attribute,
-	     &data_first_vcn,
-	     &data_last_vcn,
-	     error ) != 1 )
+	result = libfsntfs_attribute_get_data_vcn_range(
+	          attribute,
+	          &data_first_vcn,
+	          &data_last_vcn,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1046,12 +1049,14 @@ int info_handle_data_attribute_fprint(
 
 		return( -1 );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
-	 data_first_vcn,
-	 data_last_vcn );
-
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
+		 data_first_vcn,
+		 data_last_vcn );
+	}
 	if( data_first_vcn == 0 )
 	{
 		if( libfsntfs_attribute_get_data_size(

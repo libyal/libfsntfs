@@ -798,6 +798,26 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_index(
      libfsntfs_data_stream_t **alternate_data_stream,
      libfsntfs_error_t **error );
 
+/* Determines if there is an alternate data stream for an UTF-8 encoded name
+ * Returns 1 if available, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_error_t **error );
+
+/* Determines if there is an alternate data stream for an UTF-16 encoded name
+ * Returns 1 if available, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name(
+     libfsntfs_file_entry_t *file_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_error_t **error );
+
 /* Retrieves the alternate data stream for an UTF-8 encoded name
  * Returns 1 if successful, 0 if the file entry does not contain such value or -1 on error
  */
@@ -1004,7 +1024,7 @@ int libfsntfs_attribute_get_utf16_name(
      libfsntfs_error_t **error );
 
 /* Retrieves the data VCN range
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_data_vcn_range(

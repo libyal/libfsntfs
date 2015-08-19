@@ -1,4 +1,4 @@
-.Dd August 15, 2015
+.Dd August 17, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -178,6 +178,10 @@ File entry functions
 .Fn libfsntfs_file_entry_get_number_of_alternate_data_streams "libfsntfs_file_entry_t *file_entry, int *number_of_alternate_data_streams, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_alternate_data_stream_by_index "libfsntfs_file_entry_t *file_entry, int alternate_data_stream_index, libfsntfs_data_stream_t **alternate_data_stream, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name "libfsntfs_file_entry_t *file_entry, const uint8_t *utf8_string, size_t utf8_string_length, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name "libfsntfs_file_entry_t *file_entry, const uint16_t *utf16_string, size_t utf16_string_length, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name "libfsntfs_file_entry_t *file_entry, const uint8_t *utf8_string, size_t utf8_string_length, libfsntfs_data_stream_t **alternate_data_stream, libfsntfs_error_t **error"
 .Ft int

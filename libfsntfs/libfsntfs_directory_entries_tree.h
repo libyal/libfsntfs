@@ -33,11 +33,25 @@
 extern "C" {
 #endif
 
+int libfsntfs_directory_entries_tree_compare_name_with_utf8_string(
+     const uint8_t *directory_entry_name,
+     size_t directory_entry_name_size,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
 int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
      libcdata_btree_t *directory_entries_tree,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entries_tree_compare_name_with_utf16_string(
+     const uint8_t *directory_entry_name,
+     size_t directory_entry_name_size,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
      libcerror_error_t **error );
 
 int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(

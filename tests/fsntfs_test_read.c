@@ -920,7 +920,7 @@ int main( int argc, char * const argv[] )
 	          (uint8_t *) "\\$UpCase",
 	          8,
 	          &file_entry,
-	          error );
+	          &error );
 
 	if( result != 1 )
 	{
