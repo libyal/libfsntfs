@@ -2571,6 +2571,7 @@ int info_handle_file_entry_fprint(
 	uint32_t file_attribute_flags                   = 0;
 	int alternate_data_stream_index                 = 0;
 	int has_default_data_stream                     = 0;
+	int has_directory_entries_index                 = 0;
 	int indentation_level_iterator                  = 0;
 	int number_of_alternate_data_streams            = 0;
 	int number_of_sub_file_entries                  = 0;
@@ -2618,6 +2619,23 @@ int info_handle_file_entry_fprint(
 		goto on_error;
 	}
 	has_default_data_stream = result;
+
+	result = libfsntfs_file_entry_has_directory_entries_index(
+		  file_entry,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has directory entries index.",
+		 function );
+
+		goto on_error;
+	}
+	has_directory_entries_index = result;
 
 	if( libfsntfs_file_entry_get_number_of_alternate_data_streams(
 	     file_entry,
@@ -2710,12 +2728,11 @@ int info_handle_file_entry_fprint(
 
 			goto on_error;
 		}
-		/* The file attribute flags are used to determine if the file entry
-		 * is a directory in since checking for number_of_sub_file_entries != 0
-		 * will skip empty directories.
+		/* Do not print the name of files that have an ADS but no default data stream.
 		 */
 		if( ( has_default_data_stream != 0 )
-		 || ( ( file_attribute_flags & 0x10000000UL ) != 0 ) )
+		 || ( has_directory_entries_index != 0 )
+		 || ( number_of_alternate_data_streams == 0 ) )
 		{
 			for( indentation_level_iterator = 0;
 			     indentation_level_iterator < indentation_level;

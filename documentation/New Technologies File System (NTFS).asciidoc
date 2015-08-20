@@ -2131,8 +2131,8 @@ The content of the file or directory should not be indexed by the indexing servi
 3+| _The following flags are mainly used in the file name attribute and sparsely in the standard information attribute;_ +
 _it could be that they have a different meaning in both types of attributes or that the standard information flags are not updated._ +
 _For now the latter is assumed._
-| 0x10000000 | | [yellow-background]*Is directory (or has $I30 index ?)* +
-[yellow-background]*(used instead of 0x00000010 ?)*
+| 0x10000000 | | [yellow-background]*Unknown* +
+[yellow-background]*Is directory (or has $I30 index ?) used instead of 0x00000010 ? Seen $Extend directory without this flag*
 | 0x20000000 | | [yellow-background]*Is index view* +
 [yellow-background]*(copy from corresponding bit in MFT record)*
 |===
