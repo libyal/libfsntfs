@@ -61,7 +61,7 @@ struct libfsntfs_cluster_block_stream_data_handle
 
 	/* The resident data
 	 */
-	uint8_t *resident_data;
+	const uint8_t *resident_data;
 
 	/* The compressed block descriptors array
 	 */
@@ -80,6 +80,7 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
      libfsntfs_cluster_block_stream_data_handle_t **data_handle,
      libfsntfs_io_handle_t *io_handle,
      size64_t data_size,
+     const uint8_t *resident_data,
      size_t compression_unit_size,
      uint16_t data_flags,
      libcerror_error_t **error );

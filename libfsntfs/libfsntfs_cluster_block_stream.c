@@ -45,6 +45,7 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
      libfsntfs_cluster_block_stream_data_handle_t **data_handle,
      libfsntfs_io_handle_t *io_handle,
      size64_t data_size,
+     const uint8_t *resident_data,
      size_t compression_unit_size,
      uint16_t data_flags,
      libcerror_error_t **error )
@@ -117,7 +118,8 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
 
 		return( -1 );
 	}
-	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	 && ( resident_data == NULL ) )
 	{
 		if( libcdata_array_initialize(
 		     &( ( *data_handle )->compressed_block_descriptors_array ),
@@ -156,6 +158,7 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
 	}
 	( *data_handle )->io_handle             = io_handle;
 	( *data_handle )->data_size             = data_size;
+	( *data_handle )->resident_data         = resident_data;
 	( *data_handle )->compression_unit_size = compression_unit_size;
 	( *data_handle )->data_flags            = data_flags;
 
@@ -303,6 +306,7 @@ int libfsntfs_cluster_block_stream_data_handle_clone(
 	     destination_data_handle,
 	     source_data_handle->io_handle,
 	     source_data_handle->data_size,
+	     source_data_handle->resident_data,
 	     source_data_handle->compression_unit_size,
 	     source_data_handle->data_flags,
 	     error ) != 1 )
@@ -690,6 +694,7 @@ int libfsntfs_cluster_block_stream_initialize(
 	libfsntfs_cluster_block_stream_data_handle_t *data_handle            = NULL;
 	libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor = NULL;
 	libfsntfs_data_run_t *data_run                                       = NULL;
+	uint8_t *resident_data                                               = NULL;
 	static char *function                                                = "libfsntfs_cluster_block_stream_initialize";
 	off64_t attribute_data_vcn_offset                                    = 0;
 	off64_t calculated_attribute_data_vcn_offset                         = 0;
@@ -738,6 +743,21 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		return( -1 );
 	}
+	if( libfsntfs_attribute_get_data(
+	     attribute,
+	     &resident_data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute data",
+		 function );
+
+		goto on_error;
+	}
 	if( libfsntfs_attribute_get_data_flags(
 	     attribute,
 	     &data_flags,
@@ -752,7 +772,8 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
-	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	 && ( resident_data == NULL ) )
 	{
 		if( libfsntfs_attribute_get_compression_unit_size(
 		     attribute,
@@ -781,24 +802,11 @@ int libfsntfs_cluster_block_stream_initialize(
 			goto on_error;
 		}
 	}
-	if( libfsntfs_attribute_get_data_size(
-	     attribute,
-	     &data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute data size",
-		 function );
-
-		goto on_error;
-	}
 	if( libfsntfs_cluster_block_stream_data_handle_initialize(
 	     &data_handle,
 	     io_handle,
 	     data_size,
+	     resident_data,
 	     compression_unit_size,
 	     data_flags,
 	     error ) != 1 )
@@ -846,7 +854,8 @@ int libfsntfs_cluster_block_stream_initialize(
 	}
 	while( attribute != NULL )
 	{
-		if( data_handle->resident_data != NULL )
+		if( ( attribute_index > 0 )
+		 && ( data_handle->resident_data != NULL ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -880,23 +889,6 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		if( result == 0 )
 		{
-			if( libfsntfs_attribute_get_data(
-			     attribute,
-			     &( data_handle->resident_data ),
-			     &attribute_data_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve resident attribute data",
-				 function );
-
-				data_handle = NULL;
-
-				goto on_error;
-			}
 			if( libfdata_stream_append_segment(
 			     *cluster_block_stream,
 			     &element_index,
