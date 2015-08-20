@@ -1051,11 +1051,22 @@ int info_handle_data_attribute_fprint(
 	}
 	else if( result != 0 )
 	{
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
-		 data_first_vcn,
-		 data_last_vcn );
+		if( ( data_first_vcn == data_last_vcn )
+		 || ( data_last_vcn == 0xffffffffffffffffUL ) )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tData VCN\t\t\t: %" PRIu64 "\n",
+			 data_first_vcn );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
+			 data_first_vcn,
+			 data_last_vcn );
+		}
 	}
 	if( data_first_vcn == 0 )
 	{
