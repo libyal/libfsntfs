@@ -1318,23 +1318,26 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		attribute_index++;
 	}
-	if( libfdata_stream_set_mapped_size(
-	     *cluster_block_stream,
-	     data_size,
-	     error ) != 1 )
+	if( ( number_of_data_runs != 0 )
+	 || ( resident_data != NULL ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set mapped cluster block stream size.",
-		 function );
+		if( libfdata_stream_set_mapped_size(
+		     *cluster_block_stream,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set mapped cluster block stream size.",
+			 function );
 
-		data_handle = NULL;
+			data_handle = NULL;
 
-		goto on_error;
+			goto on_error;
+		}
 	}
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -1342,7 +1345,8 @@ int libfsntfs_cluster_block_stream_initialize(
 		 "\n" );
 	}
 #endif
-	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	 && ( resident_data == NULL ) )
 	{
 		if( libfcache_cache_initialize(
 		     &( data_handle->cache ),

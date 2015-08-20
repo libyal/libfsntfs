@@ -897,6 +897,19 @@ int libfsntfs_mft_metadata_file_open_read(
 
 		goto on_error;
 	}
+	internal_mft_metadata_file->mft->number_of_mft_entries = (uint64_t) ( file_size / internal_mft_metadata_file->io_handle->mft_entry_size );
+
+	if( internal_mft_metadata_file->mft->number_of_mft_entries > (uint64_t) INT_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of MFT entries value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfsntfs_mft_entry_free(
 	     &mft_entry,
 	     error ) != 1 )
