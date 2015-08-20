@@ -489,7 +489,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 
 			return( -1 );
 		}
-		if( segment_offset < data_handle->current_segment_offset )
+		if( data_handle->current_segment_offset < segment_offset )
 		{
 			libcerror_error_set(
 			 error,
@@ -500,7 +500,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 
 			return( -1 );
 		}
-		segment_offset -= data_handle->current_segment_offset;
+		segment_offset = data_handle->current_segment_offset - segment_offset;
 
 		if( segment_offset >= segment_size )
 		{

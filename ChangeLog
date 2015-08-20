@@ -1,6 +1,7 @@
 TODO
-* data stream fix data size
-* file entry fix handling of extents and resident data
+* compressed data
+  - handle decompression errors e.g.
+    compression tuple offset value out of bounds.
 * make get by path/name functions case insensitive
   - determine if NTFS really is case insensitive and make appropriate changes
   - maybe have a flag or different functions to control case in compare
