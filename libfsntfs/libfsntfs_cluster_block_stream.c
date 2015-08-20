@@ -709,7 +709,6 @@ int libfsntfs_cluster_block_stream_initialize(
 	int data_run_index                                                   = 0;
 	int element_index                                                    = 0;
 	int entry_index                                                      = 0;
-	int number_of_cache_entries                                          = 0;
 	int number_of_data_runs                                              = 0;
 	int result                                                           = 0;
 
@@ -898,6 +897,26 @@ int libfsntfs_cluster_block_stream_initialize(
 
 				goto on_error;
 			}
+			if( libfdata_stream_append_segment(
+			     *cluster_block_stream,
+			     &element_index,
+			     0,
+			     0,
+			     (size64_t) data_size,
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append resident data as cluster block stream segment.",
+				 function );
+
+				data_handle = NULL;
+
+				goto on_error;
+			}
 		}
 		else if( attribute_data_vcn_size == 0xffffffffffffffffULL )
 		{
@@ -932,147 +951,112 @@ int libfsntfs_cluster_block_stream_initialize(
 			}
 			break;
 		}
-		if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
+		else
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid attribute data last VCN value out of bounds.",
-			 function );
+			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data last VCN value out of bounds.",
+				 function );
 
-			data_handle = NULL;
+				data_handle = NULL;
 
-			goto on_error;
-		}
-		if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid attribute data first VCN value out of bounds.",
-			 function );
+				goto on_error;
+			}
+			if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value out of bounds.",
+				 function );
 
-			data_handle = NULL;
+				data_handle = NULL;
 
-			goto on_error;
-		}
-		attribute_data_vcn_size   += 1;
-		attribute_data_vcn_size   -= attribute_data_vcn_offset;
-		attribute_data_vcn_offset *= io_handle->cluster_block_size;
-		attribute_data_vcn_size   *= io_handle->cluster_block_size;
+				goto on_error;
+			}
+			attribute_data_vcn_size   += 1;
+			attribute_data_vcn_size   -= attribute_data_vcn_offset;
+			attribute_data_vcn_offset *= io_handle->cluster_block_size;
+			attribute_data_vcn_size   *= io_handle->cluster_block_size;
 
-		if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid attribute data VCN offset value out of bounds.",
-			 function );
+			if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data VCN offset value out of bounds.",
+				 function );
 
-			data_handle = NULL;
+				data_handle = NULL;
 
-			goto on_error;
-		}
-		if( libfsntfs_attribute_get_data_flags(
-		     attribute,
-		     &attribute_data_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute data flags.",
-			 function );
-
-			data_handle = NULL;
-
-			goto on_error;
-		}
-		if( data_flags != attribute_data_flags )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid attribute data flags value out of bounds.",
-			 function );
-
-			data_handle = NULL;
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_get_number_of_data_runs(
-		     attribute,
-		     &number_of_data_runs,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of data runs.",
-			 function );
-
-			data_handle = NULL;
-
-			goto on_error;
-		}
-		for( data_run_index = 0;
-		     data_run_index < number_of_data_runs;
-		     data_run_index++ )
-		{
-			if( libfsntfs_attribute_get_data_run_by_index(
+				goto on_error;
+			}
+			if( libfsntfs_attribute_get_data_flags(
 			     attribute,
-			     data_run_index,
-			     &data_run,
+			     &attribute_data_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve data run: %d.",
-				 function,
-				 data_run_index );
+				 "%s: unable to retrieve attribute data flags.",
+				 function );
 
 				data_handle = NULL;
 
 				goto on_error;
 			}
-			if( data_run == NULL )
+			if( data_flags != attribute_data_flags )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing data run: %d.",
-				 function,
-				 data_run_index );
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data flags value out of bounds.",
+				 function );
 
 				data_handle = NULL;
 
 				goto on_error;
 			}
-			if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+			if( libfsntfs_attribute_get_number_of_data_runs(
+			     attribute,
+			     &number_of_data_runs,
+			     error ) != 1 )
 			{
-				if( libfdata_stream_append_segment(
-				     *cluster_block_stream,
-				     &element_index,
-				     0,
-				     data_run->start_offset,
-				     data_run->size,
-				     data_run->range_flags,
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve number of data runs.",
+				 function );
+
+				data_handle = NULL;
+
+				goto on_error;
+			}
+			for( data_run_index = 0;
+			     data_run_index < number_of_data_runs;
+			     data_run_index++ )
+			{
+				if( libfsntfs_attribute_get_data_run_by_index(
+				     attribute,
+				     data_run_index,
+				     &data_run,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append data run: %d as cluster block stream segment.",
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve data run: %d.",
 					 function,
 					 data_run_index );
 
@@ -1080,91 +1064,28 @@ int libfsntfs_cluster_block_stream_initialize(
 
 					goto on_error;
 				}
-			}
-			else
-			{
-				data_run_offset = data_run->start_offset;
-				data_run_size   = data_run->size;
-
-				while( data_run_size > 0 )
+				if( data_run == NULL )
 				{
-					if( compressed_block_descriptor == NULL )
-					{
-						if( libfsntfs_compressed_block_descriptor_initialize(
-						     &compressed_block_descriptor,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-							 "%s: unable to create compressed block descriptor.",
-							 function );
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing data run: %d.",
+					 function,
+					 data_run_index );
 
-							data_handle = NULL;
+					data_handle = NULL;
 
-							goto on_error;
-						}
-						remaining_compression_unit_size = compression_unit_size;
-					}
-					if( ( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-					 && ( remaining_compression_unit_size < compression_unit_size ) )
-					{
-						/* A sparse data run marks the end of a compression unit and
-						 * should be at minimum the size of the remaining data in the compression unit
-						 */
-						if( data_run_size < (size64_t) remaining_compression_unit_size )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-							 "%s: invalid sparse data run: %d size value out of bounds.",
-							 function,
-							 data_run_index );
-
-							data_handle = NULL;
-
-							goto on_error;
-						}
-						compressed_block_descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
-					}
-					else
-					{
-						compressed_block_descriptor->data_range_flags = data_run->range_flags;
-					}
-					if( data_run_size < remaining_compression_unit_size )
-					{
-						data_segment_size = data_run_size;
-					}
-					else
-					{
-						data_segment_size = (size64_t) remaining_compression_unit_size;
-					}
-#if defined( HAVE_DEBUG_OUTPUT )
-					if( libcnotify_verbose != 0 )
-					{
-						if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-						{
-							compression_unit_data_type = "sparse ";
-						}
-						else
-						{
-							compression_unit_data_type = "";
-						}
-						libcnotify_printf(
-						 "%s: compression unit: %d %sdata segment offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
-						 function,
-						 compressed_block_descriptor_index,
-						 compression_unit_data_type,
-						 data_run_offset,
-						 data_segment_size );
-					}
-#endif
-					if( libfsntfs_compressed_block_descriptor_append_data_segment(
-					     compressed_block_descriptor,
-					     data_run_offset,
-					     data_segment_size,
+					goto on_error;
+				}
+				if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+				{
+					if( libfdata_stream_append_segment(
+					     *cluster_block_stream,
+					     &element_index,
+					     0,
+					     data_run->start_offset,
+					     data_run->size,
 					     data_run->range_flags,
 					     error ) != 1 )
 					{
@@ -1172,37 +1093,160 @@ int libfsntfs_cluster_block_stream_initialize(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-						 "%s: unable to append data segment to compressed block descriptor: %d.",
+						 "%s: unable to append data run: %d as cluster block stream segment.",
 						 function,
-						 compressed_block_descriptor_index );
+						 data_run_index );
 
 						data_handle = NULL;
 
 						goto on_error;
 					}
-					if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
-					{
-						data_run_offset += data_segment_size;
-					}
-					data_run_size                   -= data_segment_size;
-					remaining_compression_unit_size -= data_segment_size;
+				}
+				else
+				{
+					data_run_offset = data_run->start_offset;
+					data_run_size   = data_run->size;
 
-					if( remaining_compression_unit_size == 0 )
+					while( data_run_size > 0 )
 					{
-#if defined( HAVE_DEBUG_OUTPUT )
-						if( libcnotify_verbose != 0 )
+						if( compressed_block_descriptor == NULL )
 						{
-							if( libfsntfs_compressed_block_descriptor_print(
-							     compressed_block_descriptor,
-							     io_handle,
-							     compressed_block_descriptor_index,
+							if( libfsntfs_compressed_block_descriptor_initialize(
+							     &compressed_block_descriptor,
 							     error ) != 1 )
 							{
 								libcerror_error_set(
 								 error,
 								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-								 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-								 "%s: unable to print the compressed block descriptor: %d.",
+								 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+								 "%s: unable to create compressed block descriptor.",
+								 function );
+
+								data_handle = NULL;
+
+								goto on_error;
+							}
+							remaining_compression_unit_size = compression_unit_size;
+						}
+						if( ( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+						 && ( remaining_compression_unit_size < compression_unit_size ) )
+						{
+							/* A sparse data run marks the end of a compression unit and
+							 * should be at minimum the size of the remaining data in the compression unit
+							 */
+							if( data_run_size < (size64_t) remaining_compression_unit_size )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+								 "%s: invalid sparse data run: %d size value out of bounds.",
+								 function,
+								 data_run_index );
+
+								data_handle = NULL;
+
+								goto on_error;
+							}
+							compressed_block_descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
+						}
+						else
+						{
+							compressed_block_descriptor->data_range_flags = data_run->range_flags;
+						}
+						if( data_run_size < remaining_compression_unit_size )
+						{
+							data_segment_size = data_run_size;
+						}
+						else
+						{
+							data_segment_size = (size64_t) remaining_compression_unit_size;
+						}
+#if defined( HAVE_DEBUG_OUTPUT )
+						if( libcnotify_verbose != 0 )
+						{
+							if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+							{
+								compression_unit_data_type = "sparse ";
+							}
+							else
+							{
+								compression_unit_data_type = "";
+							}
+							libcnotify_printf(
+							 "%s: compression unit: %d %sdata segment offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
+							 function,
+							 compressed_block_descriptor_index,
+							 compression_unit_data_type,
+							 data_run_offset,
+							 data_segment_size );
+						}
+#endif
+						if( libfsntfs_compressed_block_descriptor_append_data_segment(
+						     compressed_block_descriptor,
+						     data_run_offset,
+						     data_segment_size,
+						     data_run->range_flags,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+							 "%s: unable to append data segment to compressed block descriptor: %d.",
+							 function,
+							 compressed_block_descriptor_index );
+
+							data_handle = NULL;
+
+							goto on_error;
+						}
+						if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
+						{
+							data_run_offset += data_segment_size;
+						}
+						data_run_size                   -= data_segment_size;
+						remaining_compression_unit_size -= data_segment_size;
+
+						if( remaining_compression_unit_size == 0 )
+						{
+#if defined( HAVE_DEBUG_OUTPUT )
+							if( libcnotify_verbose != 0 )
+							{
+								if( libfsntfs_compressed_block_descriptor_print(
+								     compressed_block_descriptor,
+								     io_handle,
+								     compressed_block_descriptor_index,
+								     error ) != 1 )
+								{
+									libcerror_error_set(
+									 error,
+									 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+									 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+									 "%s: unable to print the compressed block descriptor: %d.",
+									 function,
+									 compressed_block_descriptor_index );
+
+									data_handle = NULL;
+
+									goto on_error;
+								}
+							}
+#endif
+							if( libfdata_vector_append_segment(
+							     data_handle->compressed_block_vector,
+							     &element_index,
+							     0,
+							     data_segment_offset,
+							     compression_unit_size,
+							     compressed_block_descriptor->data_range_flags,
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+								 "%s: unable to append compression unit to compressed block vector: %d.",
 								 function,
 								 compressed_block_descriptor_index );
 
@@ -1210,82 +1254,59 @@ int libfsntfs_cluster_block_stream_initialize(
 
 								goto on_error;
 							}
+							if( libcdata_array_append_entry(
+							     data_handle->compressed_block_descriptors_array,
+							     &entry_index,
+							     (intptr_t *) compressed_block_descriptor,
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+								 "%s: unable to append compressed block descriptor: %d to array.",
+								 function,
+								 compressed_block_descriptor_index );
+
+								data_handle = NULL;
+
+								goto on_error;
+							}
+							compressed_block_descriptor = NULL;
+
+							/* The data stream segments are mapped directly to the vector elements to ease current offset calculation
+							 */
+							if( libfdata_stream_append_segment(
+							     *cluster_block_stream,
+							     &element_index,
+							     0,
+							     data_segment_offset,
+							     compression_unit_size,
+							     0,
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+								 "%s: unable to append compressed block: %d as cluster block stream segment.",
+								 function,
+								 compressed_block_descriptor_index );
+
+								data_handle = NULL;
+
+								goto on_error;
+							}
+							compressed_block_descriptor_index++;
+
+							/* Make sure to give every segment a unique offset */
+							data_segment_offset += compression_unit_size;
 						}
-#endif
-						if( libfdata_vector_append_segment(
-						     data_handle->compressed_block_vector,
-						     &element_index,
-						     0,
-						     data_segment_offset,
-						     compression_unit_size,
-						     compressed_block_descriptor->data_range_flags,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-							 "%s: unable to append compression unit to compressed block vector: %d.",
-							 function,
-							 compressed_block_descriptor_index );
-
-							data_handle = NULL;
-
-							goto on_error;
-						}
-						if( libcdata_array_append_entry(
-						     data_handle->compressed_block_descriptors_array,
-						     &entry_index,
-						     (intptr_t *) compressed_block_descriptor,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-							 "%s: unable to append compressed block descriptor: %d to array.",
-							 function,
-							 compressed_block_descriptor_index );
-
-							data_handle = NULL;
-
-							goto on_error;
-						}
-						compressed_block_descriptor = NULL;
-
-						/* The data stream segments are mapped directly to the vector elements to ease current offset calculation
-						 */
-						if( libfdata_stream_append_segment(
-						     *cluster_block_stream,
-						     &element_index,
-						     0,
-						     data_segment_offset,
-						     compression_unit_size,
-						     0,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-							 "%s: unable to append compressed block: %d as cluster block stream segment.",
-							 function,
-							 compressed_block_descriptor_index );
-
-							data_handle = NULL;
-
-							goto on_error;
-						}
-						compressed_block_descriptor_index++;
-
-						/* Make sure to give every segment a unique offset */
-						data_segment_offset += compression_unit_size;
 					}
 				}
 			}
+			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
 		}
-		calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
-
 		if( libfsntfs_attribute_get_chained_attribute(
 		     attribute,
 		     &attribute,
@@ -1305,6 +1326,23 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		attribute_index++;
 	}
+	if( libfdata_stream_set_mapped_size(
+	     *cluster_block_stream,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set mapped cluster block stream size.",
+		 function );
+
+		data_handle = NULL;
+
+		goto on_error;
+	}
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -1314,25 +1352,22 @@ int libfsntfs_cluster_block_stream_initialize(
 #endif
 	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	{
-		number_of_cache_entries = LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_COMPRESSION_UNITS;
-	}
-	else
-	{
-		number_of_cache_entries = LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_CLUSTER_BLOCKS;
-	}
-	if( libfcache_cache_initialize(
-	     &( data_handle->cache ),
-             number_of_cache_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create cache.",
-		 function );
+		if( libfcache_cache_initialize(
+		     &( data_handle->cache ),
+		     LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_COMPRESSION_UNITS,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create cache.",
+			 function );
 
-		goto on_error;
+			data_handle = NULL;
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 
