@@ -87,6 +87,10 @@ struct libfsntfs_internal_attribute
 	 */
 	size64_t allocated_data_size;
 
+	/* The valid data size
+	 */
+	size64_t valid_data_size;
+
 	/* The data
 	 */
 	uint8_t *data;
@@ -256,6 +260,12 @@ ssize_t libfsntfs_attribute_copy_data(
          size_t buffer_size,
          off64_t data_offset,
          libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_valid_data_size(
+     libfsntfs_attribute_t *attribute,
+     size64_t *valid_data_size,
+     libcerror_error_t **error );
 
 int libfsntfs_attribute_get_number_of_data_runs(
      libfsntfs_attribute_t *attribute,

@@ -506,7 +506,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 		}
 		segment_offset = data_handle->current_segment_offset - segment_offset;
 
-		if( segment_offset >= segment_size )
+		if( (size64_t) segment_offset >= segment_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -698,13 +698,14 @@ int libfsntfs_cluster_block_stream_initialize(
 	static char *function                                                = "libfsntfs_cluster_block_stream_initialize";
 	off64_t attribute_data_vcn_offset                                    = 0;
 	off64_t calculated_attribute_data_vcn_offset                         = 0;
+	off64_t data_offset                                                  = 0;
 	off64_t data_run_offset                                              = 0;
-	off64_t data_segment_offset                                          = 0;
 	size64_t attribute_data_size                                         = 0;
 	size64_t attribute_data_vcn_size                                     = 0;
 	size64_t data_run_size                                               = 0;
 	size64_t data_segment_size                                           = 0;
 	size64_t data_size                                                   = 0;
+	size64_t valid_data_size                                             = 0;
 	size_t compression_unit_size                                         = 0;
 	size_t remaining_compression_unit_size                               = 0;
 	uint16_t attribute_data_flags                                        = 0;
@@ -758,6 +759,24 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
+	if( libfsntfs_attribute_get_valid_data_size(
+	     attribute,
+	     &valid_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve valid data size",
+		 function );
+
+		goto on_error;
+	}
+	if( valid_data_size == 0 )
+	{
+		valid_data_size = data_size;
+	}
 	if( libfsntfs_attribute_get_data_flags(
 	     attribute,
 	     &data_flags,
@@ -771,6 +790,21 @@ int libfsntfs_cluster_block_stream_initialize(
 		 function );
 
 		goto on_error;
+	}
+	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	 || ( resident_data != NULL ) )
+	{
+		if( valid_data_size != data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: unuspported valid data size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	 && ( resident_data == NULL ) )
@@ -868,6 +902,19 @@ int libfsntfs_cluster_block_stream_initialize(
 
 			goto on_error;
 		}
+		if( (size64_t) data_offset > valid_data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid data offset value out of bounds.",
+			 function );
+
+			data_handle = NULL;
+
+			goto on_error;
+		}
 		result = libfsntfs_attribute_get_data_vcn_range(
 		          attribute,
 		          (uint64_t *) &attribute_data_vcn_offset,
@@ -887,14 +934,14 @@ int libfsntfs_cluster_block_stream_initialize(
 
 			goto on_error;
 		}
-		if( result == 0 )
+		else if( result == 0 )
 		{
 			if( libfdata_stream_append_segment(
 			     *cluster_block_stream,
 			     &element_index,
 			     0,
 			     0,
-			     (size64_t) data_size,
+			     data_size,
 			     0,
 			     error ) != 1 )
 			{
@@ -909,6 +956,7 @@ int libfsntfs_cluster_block_stream_initialize(
 
 				goto on_error;
 			}
+			data_offset += data_size;
 		}
 		else if( attribute_data_vcn_size == 0xffffffffffffffffULL )
 		{
@@ -1070,14 +1118,21 @@ int libfsntfs_cluster_block_stream_initialize(
 
 					goto on_error;
 				}
+				data_run_offset = data_run->start_offset;
+				data_run_size   = data_run->size;
+
 				if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
 				{
+					if( data_run_size > ( valid_data_size - data_offset ) )
+					{
+						data_run_size = valid_data_size - data_offset;
+					}
 					if( libfdata_stream_append_segment(
 					     *cluster_block_stream,
 					     &element_index,
 					     0,
-					     data_run->start_offset,
-					     data_run->size,
+					     data_run_offset,
+					     data_run_size,
 					     data_run->range_flags,
 					     error ) != 1 )
 					{
@@ -1093,12 +1148,35 @@ int libfsntfs_cluster_block_stream_initialize(
 
 						goto on_error;
 					}
+					data_offset += data_run_size;
+
+					if( (size64_t) data_offset >= valid_data_size )
+					{
+						if( libfdata_stream_append_segment(
+						     *cluster_block_stream,
+						     &element_index,
+						     0,
+						     data_offset,
+						     data_size - data_offset,
+						     LIBFDATA_RANGE_FLAG_IS_SPARSE,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+							 "%s: unable to append data run: %d as cluster block stream segment.",
+							 function,
+							 data_run_index );
+
+							data_handle = NULL;
+
+							goto on_error;
+						}
+					}
 				}
 				else
 				{
-					data_run_offset = data_run->start_offset;
-					data_run_size   = data_run->size;
-
 					while( data_run_size > 0 )
 					{
 						if( compressed_block_descriptor == NULL )
@@ -1229,7 +1307,7 @@ int libfsntfs_cluster_block_stream_initialize(
 							     data_handle->compressed_block_vector,
 							     &element_index,
 							     0,
-							     data_segment_offset,
+							     data_offset,
 							     compression_unit_size,
 							     compressed_block_descriptor->data_range_flags,
 							     error ) != 1 )
@@ -1272,7 +1350,7 @@ int libfsntfs_cluster_block_stream_initialize(
 							     *cluster_block_stream,
 							     &element_index,
 							     0,
-							     data_segment_offset,
+							     data_offset,
 							     compression_unit_size,
 							     0,
 							     error ) != 1 )
@@ -1292,7 +1370,7 @@ int libfsntfs_cluster_block_stream_initialize(
 							compressed_block_descriptor_index++;
 
 							/* Make sure to give every segment a unique offset */
-							data_segment_offset += compression_unit_size;
+							data_offset += compression_unit_size;
 						}
 					}
 				}

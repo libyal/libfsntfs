@@ -703,6 +703,10 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->data_size,
 			 internal_attribute->data_size );
 
+			byte_stream_copy_to_uint64_little_endian(
+			 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->valid_data_size,
+			 internal_attribute->valid_data_size );
+
 			if( compression_unit_size == 0 )
 			{
 				non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_t );
@@ -765,14 +769,11 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 function,
 				 internal_attribute->data_size );
 
-				byte_stream_copy_to_uint64_little_endian(
-				 ( (fsntfs_mft_attribute_non_resident_t *) mft_attribute_non_resident_data )->valid_data_size,
-				 value_64bit );
 				libcnotify_printf(
 				 "%s: valid data size\t\t\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
 				 function,
-				 value_64bit,
-				 value_64bit );
+				 internal_attribute->valid_data_size,
+				 internal_attribute->valid_data_size );
 
 				if( compression_unit_size > 0 )
 				{
@@ -788,6 +789,17 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 "\n" );
 			}
 #endif
+			if( internal_attribute->valid_data_size > internal_attribute->data_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: attribute valid data size value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
 			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -3433,6 +3445,46 @@ ssize_t libfsntfs_attribute_copy_data(
 		return( -1 );
 	}
 	return( (ssize_t) buffer_size );
+}
+
+/* Retrieves the valid data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_get_valid_data_size(
+     libfsntfs_attribute_t *attribute,
+     size64_t *valid_data_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_get_valid_data_size";
+
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
+
+	if( valid_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid valid data size.",
+		 function );
+
+		return( -1 );
+	}
+	*valid_data_size = internal_attribute->valid_data_size;
+
+	return( 1 );
 }
 
 /* Retrieves the number of data runs

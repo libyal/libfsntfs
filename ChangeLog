@@ -1,7 +1,11 @@
 TODO
+* resident data
+  - handle valid data size
 * compressed data
   - handle decompression errors e.g.
     compression tuple offset value out of bounds.
+  - have means to map sparse ranges outside compressed blocks
+  - handle valid data size
 * make get by path/name functions case insensitive
   - determine if NTFS really is case insensitive and make appropriate changes
   - maybe have a flag or different functions to control case in compare
@@ -132,6 +136,7 @@ Tests:
 * file with non-resident data
 * file with sparse data
 * file with compressed data
+* file with valid data size < data size
 
 Performance:
 * compact attribute union data/file reference (use type to distinguish between them)
@@ -141,6 +146,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150823
+* worked on format support
 
 20150820
 * worked on format support

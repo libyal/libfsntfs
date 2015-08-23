@@ -161,7 +161,7 @@ void info_handle_file_attribute_flags_fprint(
 	{
 		fprintf(
 		 notify_stream,
-		 "\t\tIs directory (0x10000000)\n" );
+		 "\t\tUnknown (0x10000000)\n" );
 	}
 	if( ( file_attribute_flags & 0x20000000UL ) != 0 )
 	{

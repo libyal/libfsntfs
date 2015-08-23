@@ -627,13 +627,19 @@ This value is not valid if the first VCN is nonzero.
 Contains the data size in number of bytes. +
 This value is not valid if the first VCN is nonzero.
 | 40 | 8 | | Valid data size (or valid data length) +
-Contains the valid data size in number of bytes. +
-[yellow-background]*What does it contain and what is it used for?* +
+Contains the valid data size in number of bytes.
 This value is not valid if the first VCN is nonzero. +
 4+| _If compression unit size > 0_
 | 48 | 8 | | Total allocated size +
 Contains the total allocated size in number of cluster blocks.
 |===
+
+[NOTE]
+Windows will fill data ranges beyond the valid data size with 0-byte values. 
+The data size remains unchanged.
+
+[yellow-background]*What is the behavior of valid data size in combination
+with resident or compressed data?*
 
 [yellow-background]*The sizes do not always seem to map to the entire range 
 defined by the data runs. Seen in multi $DATA attribute MFT.*

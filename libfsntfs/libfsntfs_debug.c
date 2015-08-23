@@ -167,7 +167,7 @@ void libfsntfs_debug_print_file_attribute_flags(
 	if( ( file_attribute_flags & 0x10000000UL ) != 0 )
 	{
 		libcnotify_printf(
-		 "\tIs directory (0x10000000)\n" );
+		 "\tUnknown (0x10000000)\n" );
 	}
 	if( ( file_attribute_flags & 0x20000000UL ) != 0 )
 	{
