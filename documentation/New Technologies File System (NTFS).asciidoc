@@ -1244,8 +1244,8 @@ contains index value data make up for the directory entries.
 
 The index value data in a branch node signifies the upper bound of the values 
 in the that specific branch. E.g. if directory entries index branch node 
-contains the name \'textfile.txt' all names in that index branch are smaller 
-than \'textfile.txt'. Note the actual sorting order is dependent on the 
+contains the name 'textfile.txt' all names in that index branch are smaller 
+than 'textfile.txt'. Note the actual sorting order is dependent on the 
 collation type defined in the index root attribute.
 
 The index allocation attribute is accompanied by a bitmap attribute with the 
