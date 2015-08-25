@@ -65,10 +65,6 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
-	/* The current offset
-	 */
-	off64_t current_offset;
-
 	/* The data size
 	 */
 	size64_t data_size;

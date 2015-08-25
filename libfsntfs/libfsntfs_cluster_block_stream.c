@@ -1127,6 +1127,7 @@ int libfsntfs_cluster_block_stream_initialize(
 					{
 						data_run_size = valid_data_size - data_offset;
 					}
+/* TODO what if data run size is 0 ? */
 					if( libfdata_stream_append_segment(
 					     *cluster_block_stream,
 					     &element_index,
@@ -1150,7 +1151,8 @@ int libfsntfs_cluster_block_stream_initialize(
 					}
 					data_offset += data_run_size;
 
-					if( (size64_t) data_offset >= valid_data_size )
+					if( ( valid_data_size != data_size )
+					 && ( (size64_t) data_offset >= valid_data_size ) )
 					{
 						if( libfdata_stream_append_segment(
 						     *cluster_block_stream,

@@ -3185,21 +3185,6 @@ ssize_t libfsntfs_file_entry_read_buffer(
 	{
 		return( 0 );
 	}
-	if( libfdata_stream_seek_offset(
-	     internal_file_entry->data_cluster_block_stream,
-	     internal_file_entry->current_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in data cluster block stream.",
-		 function );
-
-		return( -1 );
-	}
 	read_count = libfdata_stream_read_buffer(
 		      internal_file_entry->data_cluster_block_stream,
 		      (intptr_t *) internal_file_entry->file_io_handle,
@@ -3219,8 +3204,6 @@ ssize_t libfsntfs_file_entry_read_buffer(
 
 		return( -1 );
 	}
-	internal_file_entry->current_offset += read_count;
-
 	return( read_count );
 }
 
@@ -3308,51 +3291,23 @@ off64_t libfsntfs_file_entry_seek_offset(
 
 		return( -1 );
 	}
-	if( internal_file_entry->current_offset < 0 )
+	offset = libfdata_stream_seek_offset(
+	          internal_file_entry->data_cluster_block_stream,
+	          offset,
+	          whence,
+	          error );
+
+	if( offset == -1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid file entry- current offset value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in data cluster block stream.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( whence != SEEK_CUR )
-	 && ( whence != SEEK_END )
-	 && ( whence != SEEK_SET ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported whence.",
-		 function );
-
-		return( -1 );
-	}
-	if( whence == SEEK_CUR )
-	{
-		offset += internal_file_entry->current_offset;
-	}
-	else if( whence == SEEK_END )
-	{
-		offset += (off64_t) internal_file_entry->data_size;
-	}
-	if( offset < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry->current_offset = offset;
-
 	return( offset );
 }
 
@@ -3391,19 +3346,20 @@ int libfsntfs_file_entry_get_offset(
 
 		return( -1 );
 	}
-	if( offset == NULL )
+	if( libfdata_stream_get_offset(
+	     internal_file_entry->data_cluster_block_stream,
+	     offset,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve offset from data cluster block stream.",
 		 function );
 
 		return( -1 );
 	}
-	*offset = internal_file_entry->current_offset;
-
 	return( 1 );
 }
 
@@ -3605,6 +3561,23 @@ int libfsntfs_file_entry_get_extent_by_index(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve data cluster block stream segment: %d.",
+		 function,
+		 extent_index );
+
+		return( -1 );
+	}
+	if( libfdata_stream_get_segment_mapped_range(
+	     internal_file_entry->data_cluster_block_stream,
+	     extent_index,
+	     extent_offset,
+	     extent_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data cluster block stream segment: %d mapped range.",
 		 function,
 		 extent_index );
 

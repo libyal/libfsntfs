@@ -53,10 +53,6 @@ struct libfsntfs_internal_data_stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
 
-	/* The current offset
-	 */
-	off64_t current_offset;
-
 	/* The data size
 	 */
 	size64_t data_size;

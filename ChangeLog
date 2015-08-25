@@ -137,6 +137,8 @@ Tests:
 * file with sparse data
 * file with compressed data
 * file with valid data size < data size
+* file with ADS
+* directory with ADS
 
 Performance:
 * compact attribute union data/file reference (use type to distinguish between them)
@@ -146,6 +148,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150825
+* fixes for handling extents
 
 20150823
 * worked on format support
