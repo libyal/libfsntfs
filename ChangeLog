@@ -149,6 +149,13 @@ Debug:
 Deployment
 * write man pages
 
+20150827
+* worked on security descriptors support
+* fixed index value handling for $SII index
+
+20150826
+* worked on security descriptors support
+
 20150825
 * fixes for handling extents
 

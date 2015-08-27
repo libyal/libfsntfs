@@ -478,4 +478,3 @@ int libfsntfs_compressed_block_descriptor_print(
 
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-

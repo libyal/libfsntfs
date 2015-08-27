@@ -157,9 +157,8 @@ size_t libfsntfs_index_value_read(
         size_t index_value_data_offset,
         libcerror_error_t **error )
 {
-	static char *function      = "libfsntfs_index_value_read";
-	uint32_t remaining_size    = 0;
-	uint16_t data_padding_size = 0;
+	static char *function   = "libfsntfs_index_value_read";
+	uint32_t remaining_size = 0;
 
 	if( index_value == NULL )
 	{
@@ -379,41 +378,6 @@ size_t libfsntfs_index_value_read(
 #endif
 		index_value_data_offset += index_value->data_size;
 		remaining_size          -= index_value->data_size;
-
-		data_padding_size = index_value->data_size % 8;
-
-		if( data_padding_size > 0 )
-		{
-			data_padding_size = 8 - data_padding_size;
-
-			if( (uint32_t) data_padding_size > remaining_size )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: index value: %03d data padding size exceeds size.",
-				 function,
-				 *index_value_entry );
-
-				goto on_error;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: index value: %03d data padding:\n",
-				 function,
-				 *index_value_entry );
-				libcnotify_print_data(
-				 &( index_value_data[ index_value_data_offset ] ),
-				 (size_t) data_padding_size,
-				 0 );
-			}
-#endif
-			index_value_data_offset += data_padding_size;
-			remaining_size          -= data_padding_size;
-		}
 	}
 	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
@@ -429,7 +393,41 @@ size_t libfsntfs_index_value_read(
 
 			goto on_error;
 		}
-		byte_stream_copy_to_uint64_little_endian(
+		remaining_size -= 8;
+	}
+	if( remaining_size > 0 )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d unknown data:\n",
+			 function,
+			 *index_value_entry );
+			libcnotify_print_data(
+			 &( index_value_data[ index_value_data_offset ] ),
+			 (size_t) remaining_size,
+			 0 );
+		}
+#endif
+		index_value_data_offset += remaining_size;
+	}
+	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d sub node VCN data:\n",
+			 function,
+			 *index_value_entry );
+			libcnotify_print_data(
+			 &( index_value_data[ index_value_data_offset ] ),
+			 8,
+			 0 );
+		}
+#endif
+		byte_stream_copy_to_uint32_little_endian(
 		 &( index_value_data[ index_value_data_offset ] ),
 		 index_value->sub_node_vcn );
 
@@ -446,25 +444,7 @@ size_t libfsntfs_index_value_read(
 			 "\n" );
 		}
 #endif
-		index_value_data_offset += 8;
-		remaining_size          -= 8;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( remaining_size > 0 )
-		{
-			libcnotify_printf(
-			 "%s: index value: %03d trailing data:\n",
-			 function,
-			 *index_value_entry );
-			libcnotify_print_data(
-			 &( index_value_data[ index_value_data_offset ] ),
-			 (size_t) remaining_size,
-			 0 );
-		}
-	}
-#endif
 	*index_value_entry += 1;
 
 	return( (ssize_t) index_value->size );
@@ -481,4 +461,65 @@ on_error:
 
 	return( -1 );
 }
+
+#if defined( HAVE_DEBUG_OUTPUT )
+
+/* Debug prints the index value
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_value_print(
+     libfsntfs_index_value_t *index_value,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_value_print";
+
+	if( index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index value.",
+		 function );
+
+		return( -1 );
+	}
+	libcnotify_printf(
+	 "%s: file reference\t\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+	 function,
+	 index_value->file_reference & 0xffffffffffffUL,
+	 index_value->file_reference >> 48 );
+
+	libcnotify_printf(
+	 "%s: size\t\t\t\t\t: %" PRIu16 "\n",
+	 function,
+	 index_value->size );
+
+	libcnotify_printf(
+	 "%s: data size\t\t\t\t\t: %" PRIu16 "\n",
+	 function,
+	 index_value->data_size );
+
+	libcnotify_printf(
+	 "%s: flags\t\t\t\t\t: 0x%08" PRIx32 "\n",
+	 function,
+	 index_value->flags );
+	libfsntfs_debug_print_index_value_flags(
+	 index_value->flags );
+	libcnotify_printf(
+	 "\n" );
+
+	libcnotify_printf(
+	 "%s: sub node VCN\t\t\t\t: %" PRIu64 "\n",
+	 function,
+	 index_value->sub_node_vcn );
+
+/* TODO add more debug information */
+	libcnotify_printf(
+	 "\n" );
+
+	return( 1 );
+}
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

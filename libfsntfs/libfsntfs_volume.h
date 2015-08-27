@@ -217,6 +217,11 @@ int libfsntfs_volume_read_bitmap(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
+int libfsntfs_volume_read_security_descriptors(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

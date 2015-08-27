@@ -1224,6 +1224,7 @@ on_error:
 	 NULL );
 
 	mft_entry->i30_index = NULL;
+	mft_entry->sii_index = NULL;
 
 	libcdata_array_empty(
 	 mft_entry->alternate_data_attributes_array,
@@ -1905,6 +1906,98 @@ on_error:
 	return( -1 );
 }
 
+/* Reads the MFT entry security identifier index if available
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_read_security_identifiers(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     uint8_t flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_index_value_t *index_value = NULL;
+	static char *function                = "libfsntfs_mft_entry_read_security_identifiers";
+	int index_value_entry                = 0;
+	int number_of_index_values           = 0;
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) != 0 )
+	{
+		return( 1 );
+	}
+	if( mft_entry->sii_index == NULL )
+	{
+		return( 1 );
+	}
+	if( libfsntfs_index_read(
+	     mft_entry->sii_index,
+	     io_handle,
+	     file_io_handle,
+	     flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read $SII index.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_index_get_number_of_index_values(
+	     mft_entry->sii_index,
+	     &number_of_index_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of $SII index values.",
+		 function );
+
+		goto on_error;
+	}
+	for( index_value_entry = 0;
+	     index_value_entry < number_of_index_values;
+	     index_value_entry++ )
+	{
+		if( libfsntfs_index_get_index_value_by_index(
+		     mft_entry->sii_index,
+		     file_io_handle,
+		     index_value_entry,
+		     &index_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve $SII index value: %d.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	return( -1 );
+}
+
 /* Determines if the MFT entry is empty
  * Returns 1 if empty, 0 if not or -1 on error
  */
@@ -2566,7 +2659,7 @@ int libfsntfs_mft_entry_append_index(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare name.",
+			 "%s: unable to compare index name with $I30.",
 			 function );
 
 			return( -1 );
@@ -2574,6 +2667,32 @@ int libfsntfs_mft_entry_append_index(
 		else if( result != 0 )
 		{
 			mft_entry->i30_index = *index;
+		}
+	}
+	if( mft_entry->sii_index == NULL )
+	{
+		result = libuna_utf8_string_compare_with_utf16_stream(
+			  (uint8_t *) "$SII",
+			  4,
+			  ( *index )->name,
+			  ( *index )->name_size,
+			  LIBUNA_ENDIAN_LITTLE,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare index name with $SII.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			mft_entry->sii_index = *index;
 		}
 	}
 	return( 1 );
@@ -2654,7 +2773,7 @@ int libfsntfs_mft_entry_get_index_by_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare name.",
+			 "%s: unable to compare index name with $I30.",
 			 function );
 
 			return( -1 );
@@ -2662,6 +2781,34 @@ int libfsntfs_mft_entry_get_index_by_name(
 		else if( result != 0 )
 		{
 			*index = mft_entry->i30_index;
+
+			return( 1 );
+		}
+	}
+	if( mft_entry->sii_index != NULL )
+	{
+		result = libuna_utf8_string_compare_with_utf16_stream(
+			  (uint8_t *) "$I30",
+			  4,
+			  name,
+			  name_size,
+			  LIBUNA_ENDIAN_LITTLE,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare index name with $SII.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			*index = mft_entry->sii_index;
 
 			return( 1 );
 		}

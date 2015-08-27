@@ -1143,6 +1143,21 @@ int libfsntfs_index_read_sub_nodes(
 
 			goto on_error;
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libfsntfs_index_value_print(
+		     node_index_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print index value.",
+			 function );
+
+			goto on_error;
+		}
+#endif
 		if( ( node_index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 		{
 			if( node_index_value->sub_node_vcn > (uint64_t) INT_MAX )

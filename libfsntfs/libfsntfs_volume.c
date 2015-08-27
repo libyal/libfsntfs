@@ -943,7 +943,7 @@ int libfsntfs_volume_open_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "Reading MFT entry: 6:\n" );
+		 "Reading MFT entry: 6 ($Bitmap):\n" );
 	}
 #endif
 	if( libfsntfs_volume_read_bitmap(
@@ -956,6 +956,27 @@ int libfsntfs_volume_open_read(
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read MFT entry: 6.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "Reading MFT entry: 9 ($Secure):\n" );
+	}
+#endif
+	if( libfsntfs_volume_read_security_descriptors(
+	     internal_volume,
+	     file_io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read MFT entry: 9.",
 		 function );
 
 		goto on_error;
@@ -2055,7 +2076,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		 "%s: unable to retrieve MFT entry: 5.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( utf16_string_length == 0 )
 	 || ( utf16_string_length == 1 ) )
@@ -2110,7 +2131,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 "%s: unable to read directory entries tree.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		utf16_string_segment        = (uint16_t *) &( utf16_string[ utf16_string_index ] );
 		utf16_string_segment_length = utf16_string_index;
@@ -2131,7 +2152,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 				 "%s: unable to copy UTF-16 string to Unicode character.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			if( ( unicode_character == (libuna_unicode_character_t) LIBFSNTFS_SEPARATOR )
 			 || ( unicode_character == 0 ) )
@@ -2165,7 +2186,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 "%s: unable to retrieve directory entry by name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -2183,7 +2204,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 "%s: unable to retrieve MFT entry index.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		if( libfsntfs_mft_get_mft_entry_by_index(
 		     internal_volume->mft,
@@ -2200,7 +2221,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 function,
 			 mft_entry_index );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( result != 0 )
@@ -2222,7 +2243,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 "%s: unable to create file entry.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( directory_entries_tree != NULL )
@@ -2309,8 +2330,9 @@ int libfsntfs_volume_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 6.",
-		 function );
+		 "%s: unable to retrieve MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
 
 		goto on_error;
 	}
@@ -2320,8 +2342,9 @@ int libfsntfs_volume_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 6.",
-		 function );
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
 
 		goto on_error;
 	}
@@ -2331,8 +2354,9 @@ int libfsntfs_volume_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT entry: 6 - missing data attribute.",
-		 function );
+		 "%s: invalid MFT entry: %d - missing data attribute.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
 
 		goto on_error;
 	}
@@ -2595,6 +2619,90 @@ on_error:
 		 &cluster_block_vector,
 		 NULL );
 	}
+	return( -1 );
+}
+
+/* Reads the security descriptors file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_read_security_descriptors(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	static char *function            = "libfsntfs_volume_read_security_descriptors";
+
+	if( internal_volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal volume.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     file_io_handle,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_SECURE,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+
+		goto on_error;
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_entry_read_security_identifiers(
+	     mft_entry,
+	     internal_volume->io_handle,
+	     file_io_handle,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security descriptors.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
 	return( -1 );
 }
 

@@ -81,6 +81,14 @@ size_t libfsntfs_index_value_read(
         size_t index_value_data_offset,
         libcerror_error_t **error );
 
+#if defined( HAVE_DEBUG_OUTPUT )
+
+int libfsntfs_index_value_print(
+     libfsntfs_index_value_t *index_value,
+     libcerror_error_t **error );
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 #if defined( __cplusplus )
 }
 #endif

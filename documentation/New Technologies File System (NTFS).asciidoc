@@ -61,6 +61,7 @@ Switched to asccidoc format.
 | 0.0.7 | J.B. Metz | May 2015 | Additional information.
 | 0.0.8 | J.B. Metz | July 2015 | Textual changes.
 | 0.0.9 | J.B. Metz | August 2015 | Additional information.
+| 0.0.10 | J.B. Metz | August 2015 | Additional information regarding index and security descriptors.
 |===
 
 :numbered:
@@ -799,8 +800,9 @@ See section: <<file_attribute_flags,File attribute flags>>
 4+| _Introduced in NTFS version 3.0 (Windows 2000)_
 | 48 | 4 | | Owner identifier +
 [yellow-background]*What does it contain and what is it used for?*
-| 52 | 4 | | Security identifier [yellow-background]*index* +
-Contains the index of the security identifier in the $Secure metadata file
+| 52 | 4 | | Security descriptor identifier +
+Contains the entry number in the security ID index ($Secure:$SII) +
+See section: <<access_control,Access Control>>
 | 56 | 8 | | Quota charged +
 [yellow-background]*What does it contain and what is it used for?*
 | 64 | 8 | | Update Sequence Number (USN)
@@ -1010,6 +1012,9 @@ Contains a GUID
 |===
 
 === The security descriptor attribute
+[yellow-background]*TODO, need a NTFS volume with a security descriptor
+attribute. Also does this override any value in $Secure:$SDS?*
+
 The security descriptor attribute ($SECURITY_DESCRIPTOR) contains 
 [yellow-background]*TODO*. It can be stored as either a resident (for a small 
 amount of data) and non-resident MFT attribute.
@@ -1262,8 +1267,8 @@ Indexes commonly used by NTFS are:
 |===
 | Value | Identifier | Description
 | $I30 | | Directory entries (used by directories)
-| $SDH | | Security descriptors (used by $Secure)
-| $SII | | Security identifiers (used by $Secure)
+| $SDH | | Security descriptor hashes (used by $Secure)
+| $SII | | Security descriptor identifiers (used by $Secure)
 | $O | | Object identifiers (used by $ObjId)
 | $O | | Owner identifiers (used by $Quota)
 | $Q | | Quotas (used by $Quota)
@@ -1388,18 +1393,20 @@ The index value is variable of size and consists of:
 | 0 | 8 | | File reference +
 See section: <<file_reference,The file reference>>
 | 8 | 2 | | Index value size
-| 10 | 2 | | Index value data size +
-Note that the size of the padding is not included in the value data size
+| 10 | 2 | | Index key data size
 | 12 | 4 | | Index value flags
-4+| _If index value data size > 0_
-| 16 | ... | | Index value data
-| ... | ... | | Alignment padding (8-byte alignment) +
-Can contain remnant data
+4+| _If index key data size > 0_
+| 16 | ... | | Index key data
+| ... | ... | | Index value data
 4+| _If index value flag 0x00000001 (has sub node) is set_
-| ... | 8 | | Sub node Virtual Cluster Number (VCN) 
+| ... | 8 | | Sub node Virtual Cluster Number (VCN)
 |===
 
-The index values are 8 byte aligned.
+The index values appear to be stored 8 byte aligned.
+
+[NOTE]
+Some sources define the index value flags as a 16-bit value followed by
+2 bytes of padding.
 
 ==== The index value flags
 
@@ -1412,22 +1419,37 @@ If set the index value contains a sub node Virtual Cluster Number (VCN)
 If set the index value is the last in the index values array
 |===
 
-=== The index value data
-==== The directory entry
+=== Index key and value data
+==== Directory entry index value
 The MFT attribute name of the directory entry index is: $I30.
 
-The directory entry index value data contains a file name attribute. See 
-section: <<file_name_attribute,The file name attribute>>.
+The directory entry index value does not distinguish between key and value data 
+and contains a file name attribute. See section: <<file_name_attribute,The file 
+name attribute>>.
 
-Note that both the short and long names of the same file have a separate index 
-value. The short name uses the DOS namespace and the long name the WINDOWS 
-namespace. [yellow-background]*Index values with a single name use either the 
-POSIX or DOS_WINDOWS namespace.*
+[NOTE]
+Both the short and long names of the same file have a separate index value. The 
+short name uses the DOS namespace and the long name the WINDOWS namespace.
+
+[yellow-background]*Index values with a single name use either the POSIX or 
+DOS_WINDOWS namespace?*
 
 A hard link to a file in the same directory will also have a separate index 
 value.
 
 [yellow-background]*Does the hard link always has POSIX namespace?*
+
+==== Security descriptor hash index value
+The MFT attribute name of the security descriptor hash index is: $SDH.
+It appears to only to be used by the $Secure metadata file.
+
+See section: <<security_descriptor_hash,The security descriptor hash>>
+
+==== Security descriptor identifier index value
+The MFT attribute name of the security descriptor identifier index is: $SII.
+It appears to only to be used by the $Secure metadata file.
+
+See section: <<security_descriptor_identifier,The security descriptor identifier>>
 
 == [[compression]]Compression
 Typically NTFS compression groups 16 cluster blocks together. This group of 16 
@@ -1806,6 +1828,111 @@ The metadata file $Bitmap contains the allocation bitmap.
 Every bit in the allocation bitmap represents a block the size of the cluster 
 block, where the LSB is the first bit in a byte.
 
+== [[access_control]]Access control
+The $Secure metadata file contains the security descriptors used for access control.
+
+[cols="1,1,5",options="header"]
+|===
+| Type | Name | Description
+| Data | $SDS | Security descriptor data stream +
+Contains all the Security descriptors on the volume
+| Index | $SDH | Security descriptor hash index
+| Index | $SII | Security descriptor identifier index +
+Contains the mapping of the security descriptor identifier (in $STANDARD_INFORMATION) to the offset of the security descriptor data (in $Secure:$SDS)
+|===
+
+[yellow-background]*TODO add text*
+
+[yellow-background]*In the $SII index do the index values contain a 32-bit checksum?*
+
+=== Security descriptor hash ($SDH) index
+==== [[security_descriptor_hash]]The security descriptor hash
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _Key data_
+| 0 | 4 | | Security descriptor hash
+| 4 | 4 | | Security descriptor identifier
+4+| _Value data_
+| 8 | 4 | | Security descriptor hash
+| 12 | 4 | | Security descriptor identifier
+| 16 | 8 | | Security descriptor data offset (in $SDS)
+| 24 | 4 | | Security descriptor data size (in $SDS)
+| 28 | 4 | | [yellow-background]*Alignment padding (8-byte alignment)* +
+[yellow-background]*Contains string "I\x00I\x00" ?*
+|===
+
+=== Security descriptor identifier ($SII) index
+==== [[security_descriptor_identifier]]The security descriptor identifier
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _Key data_
+| 0 | 4 | | Security descriptor identifier
+4+| _Value data_
+| 4 | 4 | | Security descriptor hash +
+[yellow-background]*TODO describe the hash algorithm*
+| 8 | 4 | | Security descriptor identifier
+| 12 | 8 | | Security descriptor data offset (in $SDS)
+| 20 | 4 | | Security descriptor data size (in $SDS)
+|===
+
+=== Notes
+SDS
+....
+Offset	Size	Description
+0x00	4	Hash of Security Descriptor
+0x04	4	Security Id
+0x08	8	Offset of this entry in this file
+0x10	4	Size of this entry
+0x04	V	Self-relative Security Descriptor
+V+0x04	P16	Padding
+....
+
+== The object identifiers
+[yellow-background]*TODO add text*
+
+=== $ObjID:$O
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _Key data_
+| 0 | 16 | | File (or object) identifier +
+Contains a GUID
+4+| _Value data_
+| 4 | 8 | | File reference +
+See section: <<file_reference,The file reference>>
+| 12 | 16 | | Birth droid volume identifier +
+Contains a GUID
+| 28 | 16 | | Birth droid file (or object) identifier +
+Contains a GUID
+| 44 | 16 | | Birth droid domain identifier +
+Contains a GUID
+|===
+
+....
+00000000  00 00 00 00 13 00 00 00  00 10 00 00 01 00 00 00  |................| 
+00000010  10 00 00 00 88 00 00 00  88 00 00 00 01 00 00 00  |................| 
+00000020  20 00 38 00 00 00 00 00  60 00 10 00 01 00 00 00  | .8.....`.......| 
+
+OBJECT_ID: 43ecee59-e2b3-11dc-ad7e-001c2582598f of root directory
+
+00000030  59 ee ec 43 b3 e2 dc 11  ad 7e 00 1c 25 82 59 8f  |Y..C.....~..%.Y.| 
+
+MFT file reference
+OBJECT_ID: e6a67b60-c0b5-4b53-b8fe-94470c83df89 of $Volume
+
+00000040  05 00 00 00 00 00 05 00  60 7b a6 e6 b5 c0 53 4b  |........`{....SK| 
+00000050  b8 fe 94 47 0c 83 df 89  59 ee ec 43 b3 e2 dc 11  |...G....Y..C....| 
+00000060  ad 7e 00 1c 25 82 59 8f  00 00 00 00 00 00 00 00  |.~..%.Y.........| 
+00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
+00000080  00 00 00 00 00 00 00 00  18 00 00 00 03 00 00 00  |................| 
+00000090  01 00 00 00 00 00 00 00                           |........| 
+....
+
 == [[update_journal]]Update (or change) journal
 The metadata file $Extend\$UsnJrnl contains the update (or change) journal. It 
 is a sparse file in which NTFS stores records of changes to files and 
@@ -2144,27 +2271,6 @@ _For now the latter is assumed._
 |===
 
 == Notes
-=== $ObjID:$O
-....
-00000000  00 00 00 00 13 00 00 00  00 10 00 00 01 00 00 00  |................| 
-00000010  10 00 00 00 88 00 00 00  88 00 00 00 01 00 00 00  |................| 
-00000020  20 00 38 00 00 00 00 00  60 00 10 00 01 00 00 00  | .8.....`.......| 
-
-OBJECT_ID: 43ecee59-e2b3-11dc-ad7e-001c2582598f of root directory
-
-00000030  59 ee ec 43 b3 e2 dc 11  ad 7e 00 1c 25 82 59 8f  |Y..C.....~..%.Y.| 
-
-MFT file reference
-OBJECT_ID: e6a67b60-c0b5-4b53-b8fe-94470c83df89 of $VOlume
-
-00000040  05 00 00 00 00 00 05 00  60 7b a6 e6 b5 c0 53 4b  |........`{....SK| 
-00000050  b8 fe 94 47 0c 83 df 89  59 ee ec 43 b3 e2 dc 11  |...G....Y..C....| 
-00000060  ad 7e 00 1c 25 82 59 8f  00 00 00 00 00 00 00 00  |.~..%.Y.........| 
-00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................| 
-00000080  00 00 00 00 00 00 00 00  18 00 00 00 03 00 00 00  |................| 
-00000090  01 00 00 00 00 00 00 00                           |........| 
-....
-
 === NTFS reserved file names
 ....
 Filename
