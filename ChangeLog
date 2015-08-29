@@ -152,6 +152,7 @@ Deployment
 20150829
 * worked on format support
 * fix for handling resident attribute name alignment padding
+* changes for msvscpp build
 
 20150827
 * worked on security descriptors support

@@ -31,7 +31,7 @@
 
 #include "fsntfs_volume_header.h"
 
-const char fsntfs_volume_file_system_signature[ 8 ] = "NTFS    ";
+const char *fsntfs_volume_file_system_signature = "NTFS    ";
 
 /* Creates an IO handle
  * Make sure the value io_handle is referencing, is set to NULL

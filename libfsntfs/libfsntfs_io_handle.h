@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-extern const char fsntfs_volume_file_system_signature[ 8 ];
+extern const char *fsntfs_volume_file_system_signature;
 
 typedef struct libfsntfs_io_handle libfsntfs_io_handle_t;
 
