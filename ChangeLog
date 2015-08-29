@@ -95,7 +95,7 @@ TODO
   - mark ignored attribute list
   - mark ignored data stream
   - mark ignored index
-  - handle corrupt MFT entries (e.g. missing FILE signature)
+  - handle corrupt MFT entries (e.g. missing FILE signature) (+/-)
   - allow to read data runs but do not allow to read data
 * $UsnJrnl:$J parsing
   - move UsnJrnl parsing into library ?
@@ -148,6 +148,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150829
+* worked on format support
 
 20150827
 * worked on security descriptors support

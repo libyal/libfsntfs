@@ -596,7 +596,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: resident data:\n",
+				 "%s: resident attribute data:\n",
 				 function );
 				libcnotify_print_data(
 				 mft_attribute_resident_data,
@@ -719,7 +719,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: non-resident data:\n",
+				 "%s: non-resident attribute data:\n",
 				 function );
 				libcnotify_print_data(
 				 mft_attribute_non_resident_data,

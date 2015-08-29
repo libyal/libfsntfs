@@ -2962,7 +2962,7 @@ on_error:
 }
 
 /* Prints the MFT entry information
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int info_handle_mft_entry_fprint(
      info_handle_t *info_handle,
@@ -2991,11 +2991,6 @@ int info_handle_mft_entry_fprint(
 
 		return( -1 );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "MFT entry: %" PRIu64 " information:\n",
-	 mft_entry_index );
-
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
 		result = libfsntfs_mft_metadata_file_get_file_entry_by_index(
@@ -3014,16 +3009,21 @@ int info_handle_mft_entry_fprint(
 	}
 	if( result != 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry: %" PRIu64 ".",
-		 function,
+		libfsntfs_error_free(
+		 error );
+
+		fprintf(
+		 info_handle->notify_stream,
+		 "Error reading MFT entry: %" PRIu64 "\n\n",
 		 mft_entry_index );
 
-		goto on_error;
+		return( 0 );
 	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "MFT entry: %" PRIu64 " information:\n",
+	 mft_entry_index );
+
 	is_empty = libfsntfs_file_entry_is_empty(
 	            file_entry,
 	            error );
@@ -3338,10 +3338,12 @@ int info_handle_mft_entries_fprint(
 	     file_entry_index < number_of_file_entries;
 	     file_entry_index++ )
 	{
-		if( info_handle_mft_entry_fprint(
-		     info_handle,
-		     file_entry_index,
-		     error ) != 1 )
+		result = info_handle_mft_entry_fprint(
+		          info_handle,
+		          file_entry_index,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,

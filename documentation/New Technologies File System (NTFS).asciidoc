@@ -467,6 +467,17 @@ Signatures as indicated in `[LINUXNTFS]`:
         RSTR & ???
 ....
 
+....
+Live MFT header:
+00000000: 02 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+00000020: 00 00 00 00 00 00 00 00  00 00                     ........ ..
+
+00000000: 03 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+00000020: 00 00 00 00 00 00 00 00  00 00                     ........ ..
+....
+
 === [[mft_entry_flags]]MFT entry flags
 
 [cols="1,1,5",options="header"]
@@ -636,14 +647,13 @@ Contains the total allocated size in number of cluster blocks.
 |===
 
 [NOTE]
+The total size of the data runs should be larger or equal to the data size.
+
+[NOTE]
 Windows will fill data ranges beyond the valid data size with 0-byte values. 
-The data size remains unchanged.
-
-[yellow-background]*What is the behavior of valid data size in combination
-with resident or compressed data?*
-
-[yellow-background]*The sizes do not always seem to map to the entire range 
-defined by the data runs. Seen in multi $DATA attribute MFT.*
+The data size remains unchanged. This applies to compressed and uncompressed
+data. If the first VCN is zero a valid data size of 0 represents a file 
+entirely filled with 0-byte values.
 
 ==== Attribute name
 The attribute name is variable of size and consists of:
