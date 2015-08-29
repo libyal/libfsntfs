@@ -527,6 +527,7 @@ The MFT attribute consist of:
 * the attribute header
 * the attribute resident or non-resident data
 * the attribute name
+* [yellow-background]*unknown data likely alignment padding (4-byte alignment)*
 * the attribute data runs or data
 * alignment padding (8-byte alignment), can contain remnant data
 

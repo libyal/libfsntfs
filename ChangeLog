@@ -151,6 +151,7 @@ Deployment
 
 20150829
 * worked on format support
+* fix for handling resident attribute name alignment padding
 
 20150827
 * worked on security descriptors support

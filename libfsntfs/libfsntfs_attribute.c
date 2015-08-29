@@ -656,7 +656,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 					goto on_error;
 				}
-				attribute_data_offset += mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_resident_t );
+				attribute_data_offset += mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t );
 			}
 			mft_attribute_data_offset += sizeof( fsntfs_mft_attribute_resident_t );
 
@@ -1264,6 +1264,22 @@ ssize_t libfsntfs_attribute_read_from_mft(
 		}
 		else
 		{
+			if( mft_attribute_data_offset < attribute_data_offset )
+			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: unknown data:\n",
+					 function );
+					libcnotify_print_data(
+					 &( mft_entry_data[ mft_attribute_data_offset ] ),
+					 (size_t) attribute_data_offset - mft_attribute_data_offset,
+					 0 );
+				}
+#endif
+				mft_attribute_data_offset = attribute_data_offset;
+			}
 #if SIZEOF_SIZE_T <= 4
 			if( attribute_data_size > (size_t) SSIZE_MAX )
 			{
@@ -1291,6 +1307,18 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 				goto on_error;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: resident data:\n",
+				 function );
+				libcnotify_print_data(
+				 &( mft_entry_data[ mft_attribute_data_offset ] ),
+				 attribute_data_size,
+				 0 );
+			}
+#endif
 			if( memory_copy(
 			     internal_attribute->data,
 			     &( mft_entry_data[ mft_attribute_data_offset ] ),
