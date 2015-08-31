@@ -107,10 +107,6 @@ PyObject *pyfsntfs_file_entry_is_allocated(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
-PyObject *pyfsntfs_file_entry_is_mft_attribute_list_element(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments );
-
 PyObject *pyfsntfs_file_entry_has_directory_entries_index(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

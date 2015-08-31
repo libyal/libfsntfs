@@ -143,13 +143,6 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Determines if the file entry is allocated." },
 
-	{ "is_mft_attribute_list_element",
-	  (PyCFunction) pyfsntfs_file_entry_is_mft_attribute_list_element,
-	  METH_NOARGS,
-	  "is_mft_attribute_list_element() -> Boolean\n"
-	  "\n"
-	  "Determines if the file entry is a MFT attribute list element." },
-
 	{ "has_directory_entries_index",
 	  (PyCFunction) pyfsntfs_file_entry_has_directory_entries_index,
 	  METH_NOARGS,
@@ -1805,62 +1798,6 @@ PyObject *pyfsntfs_file_entry_is_allocated(
 		 error,
 		 PyExc_IOError,
 		 "%s: unable to determine if file entry is allocated.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	if( result != 0 )
-	{
-		Py_IncRef(
-		 (PyObject *) Py_True );
-
-		return( Py_True );
-	}
-	Py_IncRef(
-	 (PyObject *) Py_False );
-
-	return( Py_False );
-}
-
-/* Determines if the file entry is a MFT attribute list element
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_file_entry_is_mft_attribute_list_element(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyfsntfs_file_entry_is_mft_attribute_list_element";
-	int result               = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_file_entry == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_is_mft_attribute_list_element(
-	          pyfsntfs_file_entry->file_entry,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result == -1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to determine if file entry is a MFT attribute list element.",
 		 function );
 
 		libcerror_error_free(

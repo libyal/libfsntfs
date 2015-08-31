@@ -1,4 +1,4 @@
-.Dd August 17, 2015
+.Dd August 31, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -110,8 +110,6 @@ File entry functions
 .Fn libfsntfs_file_entry_is_empty "libfsntfs_file_entry_t *file_entry, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_is_allocated "libfsntfs_file_entry_t *file_entry, libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_file_entry_is_mft_attribute_list_element "libfsntfs_file_entry_t *file_entry, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_file_reference "libfsntfs_file_entry_t *file_entry, uint64_t *file_reference, libfsntfs_error_t **error"
 .Ft int

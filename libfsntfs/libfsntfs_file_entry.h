@@ -112,11 +112,6 @@ int libfsntfs_file_entry_is_allocated(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_is_mft_attribute_list_element(
-     libfsntfs_file_entry_t *file_entry,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_file_reference(
      libfsntfs_file_entry_t *file_entry,
      uint64_t *file_reference,

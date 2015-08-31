@@ -153,6 +153,7 @@ Deployment
 
 20150831
 * worked on Python bindings
+* removed is_mft_attribute_list_element
 
 20150829
 * worked on format support

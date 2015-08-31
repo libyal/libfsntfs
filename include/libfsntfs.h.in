@@ -446,14 +446,6 @@ int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_error_t **error );
 
-/* Determines if the file entry is MFT attribute list element
- * Returns 1 if the MFT entry is a MFT attribute list element, 0 if not or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_is_mft_attribute_list_element(
-     libfsntfs_file_entry_t *file_entry,
-     libfsntfs_error_t **error );
-
 /* Retrieves the file reference
  * Returns 1 if successful or -1 on error
  */

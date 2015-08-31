@@ -2969,16 +2969,16 @@ int info_handle_mft_entry_fprint(
      uint64_t mft_entry_index,
      libfsntfs_error_t **error )
 {
-	libfsntfs_attribute_t *attribute   = NULL;
-	libfsntfs_file_entry_t *file_entry = NULL;
-	static char *function              = "info_handle_mft_entry_fprint";
-	uint64_t value_64bit               = 0;
-	int attribute_index                = 0;
-	int is_allocated                   = 0;
-	int is_empty                       = 0;
-	int is_mft_attribute_list_element  = 0;
-	int number_of_attributes           = 0;
-	int result                         = 0;
+	libfsntfs_attribute_t *attribute    = NULL;
+	libfsntfs_file_entry_t *file_entry  = NULL;
+	static char *function               = "info_handle_mft_entry_fprint";
+	uint64_t base_record_file_reference = 0;
+	uint64_t value_64bit                = 0;
+	int attribute_index                 = 0;
+	int is_allocated                    = 0;
+	int is_empty                        = 0;
+	int number_of_attributes            = 0;
+	int result                          = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3086,41 +3086,6 @@ int info_handle_mft_entry_fprint(
 		 info_handle->notify_stream,
 		 "\n" );
 
-		is_mft_attribute_list_element = libfsntfs_file_entry_is_mft_attribute_list_element(
-		                                 file_entry,
-		                                 error );
-
-		if( is_mft_attribute_list_element == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if file entry is a MFT attribute list element.",
-			 function );
-
-			goto on_error;
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tIs MFT attribute list element\t: " );
-
-		if( is_mft_attribute_list_element == 0 )
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "false" );
-		}
-		else
-		{
-			fprintf(
-			 info_handle->notify_stream,
-			 "true" );
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\n" );
-
 		if( libfsntfs_file_entry_get_file_reference(
 		     file_entry,
 		     &value_64bit,
@@ -3143,7 +3108,7 @@ int info_handle_mft_entry_fprint(
 
 		if( libfsntfs_file_entry_get_base_record_file_reference(
 		     file_entry,
-		     &value_64bit,
+		     &base_record_file_reference,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3158,8 +3123,8 @@ int info_handle_mft_entry_fprint(
 		fprintf(
 		 info_handle->notify_stream,
 		 "\tBase record file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-		 value_64bit & 0xffffffffffffUL,
-		 value_64bit >> 48 );
+		 base_record_file_reference & 0xffffffffffffUL,
+		 base_record_file_reference >> 48 );
 
 		if( libfsntfs_file_entry_get_journal_sequence_number(
 		     file_entry,
