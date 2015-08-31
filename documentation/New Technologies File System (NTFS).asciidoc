@@ -154,13 +154,13 @@ The following metadata files are predefined and use a fixed MFT entry index.
 |===
 | MFT entry index | Filename | Description
 | 0 | $MFT | Master File Table
-| 1 | $MFTMirr | Back up of the Master File Table
-| 2 | $LogFile | Metadata journal
+| 1 | $MFTMirr | Back up of the first 4 entries of the Master File Table
+| 2 | $LogFile | Metadata transaction journal
 | 3 | $Volume | Volume information
-| 4 | $AttrDef | File and directory attribute definitions
+| 4 | $AttrDef | MFT entry attribute definitions
 | 5 | .  | Root directory
-| 6 | $Bitmap | Allocation bitmap
-| 7 | $Boot | Boot code
+| 6 | $Bitmap | Cluster block allocation bitmap
+| 7 | $Boot | Boot record (or boot code)
 | 8 | $BadClus | Bad clusters
 | 9 | $Quota | Quota information +
 Last used in Windows NT 4
@@ -180,10 +180,11 @@ Was MFT entry 9 in Windows NT 4
 3+| _As of Windows Vista_ ([yellow-background]*or server 2003?*) +
 _Transactional NTFS metadata (See section: <<transactional_ntfs,Transactional NTFS (TxF)>>)_
 | 27 | $Extend\$RmMetadata | Resource manager metadata directory
-| 28 | $Extend\$RmMetadata\$Repair | Resource manager repair information
+| 28 | $Extend\$RmMetadata\$Repair | Repair information
 | 29 | $Extend\$RmMetadata\$TxfLog | Transactional NTFS (TxF) log metadata directory
 | 30 | $Extend\$RmMetadata\$Txf | Transactional NTFS (TxF) metadata directory
-| 31 | $Extend\$RmMetadata\$TxfLog\$Tops | TxF Old Page Stream (TOPS) file
+| 31 | $Extend\$RmMetadata\$TxfLog\$Tops | TxF Old Page Stream (TOPS) file +
+Used to store data that has been overwritten inside a currently active transaction
 | 32 | $Extend\$RmMetadata\$TxfLog\$TxfLog.blf | Transactional NTFS (TxF) base log metadata file
 3+| _Common_
 | | ... | A file or directory
@@ -411,8 +412,8 @@ According to `[MSDN]` this value is the update sequence array offset
 | 6 | 2 | | The number of fix-up values +
 According to `[MSDN]` this value is the update sequence array size.
 4+| 
-| 8 | 8 | | Journal sequence number +
-$LogFile Sequence Number (LSN)
+| 8 | 8 | | Metadata transaction journal sequence number +
+Contains a $LogFile Sequence Number (LSN)
 | 16 | 2 | | Sequence (number)
 | 18 | 2 | | Reference (link) count
 | 20 | 2 | | Attributes offset (or first attribute offset) +
@@ -457,16 +458,6 @@ are stored at offset 42. This is likely where the field name wfixupPattern
 originates from.
 
 ==== Notes
-Signatures as indicated in `[LINUXNTFS]`:
-....
-        "BAAD" == corrupt record
-        "CHKD" == chkdsk ???
-        "FILE" == mft entry
-        "HOLE" == ??? (NTFS 3.0+?)
-        "INDX" == index buffer
-        RSTR & ???
-....
-
 ....
 Live MFT header:
 00000000: 02 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
@@ -1353,8 +1344,8 @@ The index entry header is 32 bytes of size and consists of:
 | 4 | 2 | | The fix-up values offset +
 Contains an offset relative from the start of the index entry header.
 | 6 | 2 | | The number of fix-up values
-| 8 | 8 | | Journal sequence number +
-$LogFile Sequence Number (LSN)
+| 8 | 8 | | Metadata transaction journal sequence number +
+Contains a $LogFile Sequence Number (LSN)
 | 16 | 8 | | Virtual Cluster Number (VCN) of the index entry
 |===
 
@@ -1944,6 +1935,101 @@ OBJECT_ID: e6a67b60-c0b5-4b53-b8fe-94470c83df89 of $Volume
 00000090  01 00 00 00 00 00 00 00                           |........| 
 ....
 
+== [[log_file]]Metadata transaction journal (log file)
+The metadata file $LogFile contains the metadata transaction journal.
+
+[yellow-background]*TODO add text.*
+
+* Log File Service restart page header
+* <<fix_up_values,fix-up values>>
+
+=== Log File service restart page header
+The Log File service restart page header (LFS_RESTART_PAGE_HEADER) is 30 bytes 
+of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _MULTI_SECTOR_HEADER_
+| 0 | 4 | "CHKD" +
+"RSTR" | Signature
+| 4 | 2 | | The fix-up values offset +
+Contains an offset relative from the start of the restart page header +
+According to `[MSDN]` this value is the update sequence array offset
+| 6 | 2 | | The number of fix-up values +
+According to `[MSDN]` this value is the update sequence array size.
+4+| 
+| 8 | 8 | | Checkdisk last LSN
+| 16 | 4 | | System page size
+| 20 | 4 | | Log page size
+| 24 | 2 | | Restart offset
+| 26 | 2 | | Minor format version
+| 28 | 2 | | Major format version +
+-1 => Beta Version +
+0 => Transition +
+1 => Update sequence support
+|===
+
+=== Notes
+Log File Service record header (LFS_RECORD_HEADER)
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | Metadata transaction journal sequence number +
+Contains a $LogFile Sequence Number (LSN)
+| 8 | 8 | | Previous metadata transaction journal sequence number +
+Contains a $LogFile Sequence Number (LSN)
+| 16 | 8 | | Undo next metadata transaction journal sequence number +
+Contains a $LogFile Sequence Number (LSN)
+|===
+
+LFS_RECORD_HEADER {
+
+    //
+    //  The following field is the size of data area for this record.  The
+    //  log record header will be padded if necessary to fill to a 64-bit
+    //  boundary, so the client data will begin on a 64-bit boundary to
+    //  insure that all of his data is 64-bit aligned.  The below value
+    //  has not been padded to 64 bits however.
+    //
+
+    ULONG ClientDataLength;
+
+    //
+    //  Client ID.  This identifies the owner of this log record.  The owner
+    //  is uniquely identified by his offset in the client array and the
+    //  sequence number associated with that client record.
+    //
+
+    LFS_CLIENT_ID ClientId;
+
+    //
+    //  This the Log Record type.  This could be a commit protocol record,
+    //  a client restart area or a client update record.
+    //
+
+    LFS_RECORD_TYPE RecordType;
+
+    //
+    //  Transaction ID.  This is used externally by a client (Transaction
+    //  Manager) to group log file entries.
+    //
+
+    TRANSACTION_ID TransactionId;
+
+    //
+    //  Log record flags.
+    //
+
+    USHORT Flags;
+
+    //
+    //  Alignment field.
+    //
+
+    USHORT AlignWord;
+
 == [[update_journal]]Update (or change) journal
 The metadata file $Extend\$UsnJrnl contains the update (or change) journal. It 
 is a sparse file in which NTFS stores records of changes to files and 
@@ -2282,82 +2368,21 @@ _For now the latter is assumed._
 |===
 
 == Notes
+Signatures as indicated in `[LINUXNTFS]`:
+....
+        "HOLE" == ??? (NTFS 3.0+?)
+....
+
 === NTFS reserved file names
-....
-Filename
-Description
-
-\$Mft
-Master File Table (MFT) - an index of every file
-
-\$MftMirr
-A backup copy of the first 4 records of the MFT
-
-\$LogFile
-Transactional logging file
-
-\$Volume
-Serial number, creation time, dirty flag
-
-\$AttrDef
-Attribute definitions
-
-\$Bitmap
-Contains volume's cluster map (in-use vs. free)
-
-\$Boot
-Boot record of the volume
-
-\$BadClus
-Lists bad clusters on the volume
-
-\$Secure
-Security descriptors used by the volume
-
-\$UpCase
-Table of uppercase characters used for collating
-
-\$Extend
-A directory
-....
-
-....
-Filename
-Description
-
-\$Extend\$Config
-Use for NTFS repair activity
-
-\$Extend\$Delete
-Delete file name
-
-\$Extend\$ObjId
-Unique Ids given to every file
-
-\$Extend\$Quota
-Quota information
-
-\$Extend\$Repair
-Repair name
-
-\$Extend\$Repair.log
-Repair log name
-
-\$Extend\$Reparse
-Reparse point information
-
-\$Extend\$RmMetadata
-Transactional NTFS resource manager metadata name
-
-\$Extend\$Tops
-Transactional NTFS Old Page Stream, used to store data that has been overwritten inside a currently active transaction
-
-\$Extend\$Txf
-Transactional NTFS
-
-\$Extend\$TxfLog
-Transactional NTFS log
-....
+[cols="1,1,5",options="header"]
+|===
+| MFT entry index | Filename | Description
+| | \$Extend\$Config | Used for NTFS repair activity
+| | \$Extend\$Delete | Delete file name
+| | \$Extend\$Repair.log | Repair log name
+| | \$Extend\$Tops | 
+| | \$Extend\$TxfLog | Transactional NTFS log
+|===
 
 === File system flags
 ....

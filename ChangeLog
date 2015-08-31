@@ -33,6 +33,8 @@ TODO
     or make clear in function documentation that first
     non-short filename is the fallback?
   - add support to retrieve name of the root entry if directory entry is missing
+* pyfsntfs
+  - add attribute type enum
 * pyfsntfs file entry
   - expose more MFT entry values through API and pyfsntfs
   - add is empty function
@@ -148,6 +150,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20150831
+* worked on Python bindings
 
 20150829
 * worked on format support
