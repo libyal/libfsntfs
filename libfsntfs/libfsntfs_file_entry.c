@@ -159,20 +159,6 @@ int libfsntfs_file_entry_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_directory_entry_clone(
-	     &( internal_file_entry->directory_entry ),
-	     directory_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create directory entry.",
-		 function );
-
-		goto on_error;
-	}
 	if( mft_entry->base_record_file_reference == 0 )
 	{
 		if( mft_entry->i30_index != NULL )
@@ -229,12 +215,13 @@ int libfsntfs_file_entry_initialize(
 			}
 		}
 	}
-	internal_file_entry->file_io_handle = file_io_handle;
-	internal_file_entry->io_handle      = io_handle;
-	internal_file_entry->mft            = mft;
-	internal_file_entry->mft_entry      = mft_entry;
-	internal_file_entry->data_attribute = mft_entry->data_attribute;
-	internal_file_entry->flags          = flags;
+	internal_file_entry->file_io_handle  = file_io_handle;
+	internal_file_entry->io_handle       = io_handle;
+	internal_file_entry->mft             = mft;
+	internal_file_entry->mft_entry       = mft_entry;
+	internal_file_entry->directory_entry = directory_entry;
+	internal_file_entry->data_attribute  = mft_entry->data_attribute;
+	internal_file_entry->flags           = flags;
 
 	*file_entry = (libfsntfs_file_entry_t *) internal_file_entry;
 
@@ -283,7 +270,7 @@ int libfsntfs_file_entry_free(
 		internal_file_entry = (libfsntfs_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
-		/* The file_io_handle, io_handle, mft, mft_entry and directory_entry references are freed elsewhere
+		/* The file_io_handle, io_handle, mft and mft_entry references are freed elsewhere
 		 */
 		if( internal_file_entry->data_cluster_block_stream != NULL )
 		{
@@ -301,32 +288,38 @@ int libfsntfs_file_entry_free(
 				result = -1;
 			}
 		}
-		if( libcdata_btree_free(
-		     &( internal_file_entry->directory_entries_tree ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
-		     error ) != 1 )
+		if( internal_file_entry->directory_entries_tree != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free directory entries array.",
-			 function );
+			if( libcdata_btree_free(
+			     &( internal_file_entry->directory_entries_tree ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free directory entries array.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
-		if( libfsntfs_directory_entry_free(
-		     &( internal_file_entry->directory_entry ),
-		     error ) != 1 )
+		if( internal_file_entry->directory_entry != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free directory entry.",
-			 function );
+			if( libfsntfs_directory_entry_free(
+			     &( internal_file_entry->directory_entry ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free directory entry.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
 		memory_free(
 		 internal_file_entry );
@@ -2738,6 +2731,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
      libcerror_error_t **error )
 {
 	libfsntfs_directory_entry_t *directory_entry         = NULL;
+	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_index";
@@ -2792,7 +2786,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 function,
 		 sub_file_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_directory_entry_get_mft_entry_index(
 	     directory_entry,
@@ -2806,7 +2800,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 "%s: unable to retrieve MFT entry index.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
@@ -2823,15 +2817,31 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 function,
 		 mft_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
+	if( libfsntfs_directory_entry_clone(
+	     &sub_directory_entry,
+	     directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub directory entry.",
+		 function );
+
+		goto on_error;
+	}
+	/* libfsntfs_file_entry_initialize takes over management of sub_directory_entry
+	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
-	     directory_entry,
+	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
@@ -2843,9 +2853,18 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 function,
 		 sub_file_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( sub_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &sub_directory_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for an UTF-8 encoded name
@@ -2859,6 +2878,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
      libcerror_error_t **error )
 {
 	libfsntfs_directory_entry_t *directory_entry         = NULL;
+	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf8_name";
@@ -2916,7 +2936,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 "%s: unable to retrieve directory entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result == 0 )
 	{
@@ -2934,7 +2954,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 "%s: unable to retrieve MFT entry index.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
@@ -2951,15 +2971,31 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 function,
 		 mft_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
+	if( libfsntfs_directory_entry_clone(
+	     &sub_directory_entry,
+	     directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub directory entry.",
+		 function );
+
+		goto on_error;
+	}
+	/* libfsntfs_file_entry_initialize takes over management of sub_directory_entry
+	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
-	     directory_entry,
+	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
@@ -2970,9 +3006,18 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 "%s: unable to create sub file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( sub_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &sub_directory_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves the sub file entry for an UTF-16 encoded name
@@ -2986,6 +3031,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
      libcerror_error_t **error )
 {
 	libfsntfs_directory_entry_t *directory_entry         = NULL;
+	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf16_name";
@@ -3043,7 +3089,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 "%s: unable to retrieve directory entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result == 0 )
 	{
@@ -3061,7 +3107,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 "%s: unable to retrieve MFT entry index.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_file_entry->mft,
@@ -3078,15 +3124,31 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 function,
 		 mft_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
+	if( libfsntfs_directory_entry_clone(
+	     &sub_directory_entry,
+	     directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub directory entry.",
+		 function );
+
+		goto on_error;
+	}
+	/* libfsntfs_file_entry_initialize takes over management of sub_directory_entry
+	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
 	     mft_entry,
-	     directory_entry,
+	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
@@ -3097,9 +3159,18 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 "%s: unable to create sub file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( sub_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &sub_directory_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Reads data at the current offset from the default data stream (nameless $DATA attribute)

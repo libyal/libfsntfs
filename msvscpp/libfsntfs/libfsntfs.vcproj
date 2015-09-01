@@ -322,6 +322,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_update_journal.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_volume.c"
 				>
 			</File>
@@ -605,6 +609,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_unused.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_update_journal.h"
 				>
 			</File>
 			<File

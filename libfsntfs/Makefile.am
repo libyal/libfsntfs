@@ -86,6 +86,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_types.h \
 	libfsntfs_txf_data_values.c libfsntfs_txf_data_values.h \
 	libfsntfs_unused.h \
+	libfsntfs_update_journal.c libfsntfs_update_journal.h \
 	libfsntfs_volume.c libfsntfs_volume.h \
 	libfsntfs_volume_information_attribute.c libfsntfs_volume_information_attribute.h \
 	libfsntfs_volume_information_values.c libfsntfs_volume_information_values.h \

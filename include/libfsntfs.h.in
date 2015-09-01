@@ -1686,6 +1686,18 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_error_t **error );
 
+/* -------------------------------------------------------------------------
+ * Update (or change) journal functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an update journal
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_update_journal_free(
+     libfsntfs_update_journal_t **update_journal,
+     libfsntfs_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

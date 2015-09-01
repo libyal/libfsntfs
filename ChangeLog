@@ -14,6 +14,7 @@ TODO
 * check file entry life times
 * set file entry name, if get by index and number of filenames is 1
 
+* volume cache directory entries trees ?
 * cached indexes?
 * handle cached out MFT entries
   - copy directory entries in file entry

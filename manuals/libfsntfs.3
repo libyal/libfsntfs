@@ -1,4 +1,4 @@
-.Dd August 31, 2015
+.Dd September  1, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -348,6 +348,10 @@ Available when compiled with wide character string support:
 Available when compiled with libbfio support:
 .Ft int
 .Fn libfsntfs_mft_metadata_file_open_file_io_handle "libfsntfs_mft_metadata_file_t *mft_metadata_file, libbfio_handle_t *file_io_handle, int access_flags, libfsntfs_error_t **error"
+.Pp
+Update (or change) journal functions
+.Ft int
+.Fn libfsntfs_update_journal_free "libfsntfs_update_journal_t **update_journal, libfsntfs_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libfsntfs_get_version

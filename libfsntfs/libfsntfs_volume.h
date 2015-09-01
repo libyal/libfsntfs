@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -196,12 +197,28 @@ int libfsntfs_volume_get_root_directory(
      libfsntfs_file_entry_t **root_directory_file_entry,
      libcerror_error_t **error );
 
+int libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
+     libfsntfs_internal_volume_t *internal_volume,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_mft_entry_t **mft_entry,
+     libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error );
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_file_entry_by_utf8_path(
      libfsntfs_volume_t *volume,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libfsntfs_file_entry_t **sub_file_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path(
+     libfsntfs_internal_volume_t *internal_volume,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_mft_entry_t **mft_entry,
+     libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -220,6 +237,12 @@ int libfsntfs_volume_read_bitmap(
 int libfsntfs_volume_read_security_descriptors(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_update_journal(
+     libfsntfs_volume_t *volume,
+     libfsntfs_update_journal_t **update_journal,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
