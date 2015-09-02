@@ -913,7 +913,7 @@ The allocated file size and file size values do not always contain accurate
 values when stored in a MFT attribute, see `[CARRIER05]` page 363 for more 
 information. [CARRIER05] also states that the file size values are accurate 
 when 'used in a directory index' (stored in an index value), however this seems 
-to be true for most files but not for all. At least the $MFT and $MFTMirror 
+to be true for most files but not for all. At least the $MFT and $MFTMirr 
 metadata file directory entries on a Windows Vista NTFS volume were found to 
 contain the same value as the corresponding MFT entries, which were not equal 
 to the size of the data stream.
@@ -1952,6 +1952,7 @@ of size and consists of:
 | Offset | Size | Value | Description
 4+| _MULTI_SECTOR_HEADER_
 | 0 | 4 | "CHKD" +
+"RCRD" +
 "RSTR" | Signature
 | 4 | 2 | | The fix-up values offset +
 Contains an offset relative from the start of the restart page header +
@@ -2062,7 +2063,9 @@ remaining cluster block can contain 0-byte values. The stream starts with a
 sparse data run.
 
 ==== Update journal entry
-The update journal entry (USN_RECORD) is variable of size and consists of:
+===== Update journal entry version 2
+The update journal entry version 2 (USN_RECORD or USN_RECORD_V2) is variable of 
+size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2093,7 +2096,51 @@ The offset is relative from the start of the update journal entry
 | ... | ... | 0x00 | Padding
 |===
 
-[yellow-background]*TODO what about other update journal entry versions?*
+===== Update journal entry version 3
+[yellow-background]*TODO check with Windows 2012 or Windows 8*
+
+The update journal entry version 3 (USN_RECORD_V3) is variable of size and 
+consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Entry (or record) size
+| 4 | 2 | 0x0003 | Major version
+| 6 | 2 | 0x0000 | Minor version
+| 8 | *16* | | File reference
+| 24 | *16* | | Parent file reference
+| 40 | 8 | | Update sequence number (USN) +
+Contains the file offset of the update journal entry which is used as a unique identifier
+| 48 | 8 | | Update date and time +
+Contains a FILETIME
+| 56 | 4 | | Update reason flags +
+See section: <<update_reason_flags,Update reason flags>>
+| 60 | 4 | | Update source flags +
+See section: <<update_source_flags,Update source flags>>
+| 64 | 4 | | Security identifier [yellow-background]*index* +
+Contains the index of the security identifier in the $Secure metadata file
+| 68 | 4 | | File attribute flags +
+See section: <<file_attribute_flags,File attribute flags>>
+| 72 | 2 | | Name size +
+Contains the byte size of the name
+| 74 | 2 | | Name offset +
+The offset is relative from the start of the update journal entry
+4+| _Common_
+| 78 | (name size) | | Name
+| ... | ... | 0x00 | Padding
+|===
+
+The file reference has changed from a 64-bit to a 128-bit value which consists 
+of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 8 | | MFT entry index +
+Note that the index value in the MFT entry is only 32-bit of size.
+| 8 | 8 | | Sequence number
+|===
 
 ==== [[update_reason_flags]]Update reason flags
 
@@ -2129,10 +2176,9 @@ One or more file or directory attributes were changed e.g. read-only, hidden, sy
 | 0x00080000 | USN_REASON_OBJECT_ID_CHANGE | The object identifier of a file or directory was changed
 | 0x00100000 | USN_REASON_REPARSE_POINT_CHANGE | The reparse point that in a file or directory was changed, or a reparse point was added to or deleted from a file or directory.
 | 0x00200000 | USN_REASON_STREAM_CHANGE | A named data stream ($DATA attribute) is added to or removed from a file, or a named stream is renamed
-| 0x00400000 | | [yellow-background]*Unknown found in TxF update journal entry list*
-| 0x00800000 | USN_REASON_CLOSE | The file or directory was closed
+| 0x00400000 | USN_REASON_TRANSACTED_CHANGE | [yellow-background]*Unknown found in TxF update journal entry list*
 | | | 
-| 0x80000000 | | [yellow-background]*Unknown found in TxF update journal entry list*
+| 0x80000000 | USN_REASON_CLOSE | The file or directory was closed
 |===
 
 ==== [[update_source_flags]]Update source flags

@@ -1,6 +1,6 @@
 dnl Functions for libfusn
 dnl
-dnl Version: 20120520
+dnl Version: 20150902
 
 dnl Function to detect if libfusn is available
 dnl ac_libfusn_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
    [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
    [PKG_CHECK_MODULES(
     [libfusn],
-    [libfusn >= 20120520],
+    [libfusn >= 20150902],
     [ac_cv_libfusn=yes],
     [ac_cv_libfusn=no])
    ])

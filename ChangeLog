@@ -152,6 +152,9 @@ Debug:
 Deployment
 * write man pages
 
+20150902
+* update libfusn
+
 20150831
 * worked on Python bindings
 * removed is_mft_attribute_list_element
