@@ -152,6 +152,9 @@ Debug:
 Deployment
 * write man pages
 
+20150906
+* worked on Python bindings
+
 20150902
 * update libfusn
 

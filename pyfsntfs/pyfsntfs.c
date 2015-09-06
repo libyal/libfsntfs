@@ -28,6 +28,7 @@
 
 #include "pyfsntfs.h"
 #include "pyfsntfs_attribute.h"
+#include "pyfsntfs_attribute_types.h"
 #include "pyfsntfs_attributes.h"
 #include "pyfsntfs_data_stream.h"
 #include "pyfsntfs_data_streams.h"
@@ -470,6 +471,7 @@ PyMODINIT_FUNC initpyfsntfs(
 {
 	PyObject *module                                         = NULL;
 	PyTypeObject *attribute_type_object                      = NULL;
+	PyTypeObject *attribute_types_type_object                = NULL;
 	PyTypeObject *attributes_type_object                     = NULL;
 	PyTypeObject *data_stream_type_object                    = NULL;
 	PyTypeObject *data_streams_type_object                   = NULL;
@@ -824,6 +826,30 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "_volume_file_entries",
 	 (PyObject *) volume_file_entries_type_object );
+
+	/* Setup the attribute types type object
+	 */
+	pyfsntfs_attribute_types_type_object.tp_new = PyType_GenericNew;
+
+	if( pyfsntfs_attribute_types_init_type(
+	     &pyfsntfs_attribute_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyfsntfs_attribute_types_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_attribute_types_type_object );
+
+	attribute_types_type_object = &pyfsntfs_attribute_types_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "attribute_types",
+	 (PyObject *) attribute_types_type_object );
 
 	/* Setup the file attribute flags type object
 	 */

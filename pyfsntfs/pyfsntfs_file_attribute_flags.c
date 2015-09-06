@@ -376,11 +376,11 @@ PyObject *pyfsntfs_file_attribute_flags_new(
            void )
 {
 	pyfsntfs_file_attribute_flags_t *pyfsntfs_file_attribute_flags = NULL;
-	static char *function                                    = "pyfsntfs_file_attribute_flags_new";
+	static char *function                                          = "pyfsntfs_file_attribute_flags_new";
 
 	pyfsntfs_file_attribute_flags = PyObject_New(
-	                              struct pyfsntfs_file_attribute_flags,
-	                              &pyfsntfs_file_attribute_flags_type_object );
+	                                 struct pyfsntfs_file_attribute_flags,
+	                                 &pyfsntfs_file_attribute_flags_type_object );
 
 	if( pyfsntfs_file_attribute_flags == NULL )
 	{

@@ -18,6 +18,7 @@ pyexec_LTLIBRARIES = pyfsntfs.la
 pyfsntfs_la_SOURCES = \
 	pyfsntfs.c pyfsntfs.h \
 	pyfsntfs_attribute.c pyfsntfs_attribute.h \
+	pyfsntfs_attribute_types.c pyfsntfs_attribute_types.h \
 	pyfsntfs_attributes.c pyfsntfs_attributes.h \
 	pyfsntfs_data_stream.c pyfsntfs_data_stream.h \
 	pyfsntfs_data_streams.c pyfsntfs_data_streams.h \
