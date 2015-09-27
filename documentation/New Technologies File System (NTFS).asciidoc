@@ -1013,6 +1013,8 @@ Contains a GUID
 Contains a GUID
 |===
 
+Droid in this context refers to CDomainRelativeObjId.
+
 === The security descriptor attribute
 [yellow-background]*TODO, need a NTFS volume with a security descriptor
 attribute. Also does this override any value in $Secure:$SDS?*
@@ -2196,7 +2198,7 @@ As of Vista ([yellow-background]*or windows server 2003?*) Transactional NTFS
 (TxF) was added.
 
 In TxF the resource manager (RM) keeps track of transactional metadata and log 
-files . The TxF related metadata files are stored in the metadata directory:
+files. The TxF related metadata files are stored in the metadata directory:
 ....
 $Extend\$RmMetadata
 ....
