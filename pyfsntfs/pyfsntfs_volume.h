@@ -94,6 +94,10 @@ PyObject *pyfsntfs_volume_get_name(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 
+PyObject *pyfsntfs_volume_get_update_journal(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_volume_get_number_of_file_entries(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );

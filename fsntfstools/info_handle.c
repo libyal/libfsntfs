@@ -3956,28 +3956,13 @@ int info_handle_user_journal_fprint(
      info_handle_t *info_handle,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *name            = NULL;
-	libcstring_system_character_t *path            = NULL;
-	libfsntfs_data_stream_t *alternate_data_stream = NULL;
-	libfsntfs_file_entry_t *file_entry             = NULL;
-	libfusn_record_t *usn_record                   = NULL;
-	uint8_t *buffer                                = NULL;
-	static char *function                          = "info_handle_user_journal_fprint";
-	off64_t cluster_block_offset                   = 0;
-	off64_t current_offset                         = 0;
-	off64_t extent_offset                          = 0;
-	size64_t data_size                             = 0;
-	size64_t extent_size                           = 0;
-	size_t buffer_offset                           = 0;
-	size_t cluster_block_size                      = 0;
-	size_t name_length                             = 0;
-	size_t path_length                             = 0;
-	ssize_t read_count                             = 0;
-	uint32_t extent_flags                          = 0;
-	uint32_t usn_record_size                       = 0;
-	int extent_index                               = 0;
-	int number_of_extents                          = 0;
-	int result                                     = 0;
+	libfsntfs_update_journal_t *update_journal = NULL;
+	libfusn_record_t *usn_record               = NULL;
+	uint8_t *buffer                            = NULL;
+	static char *function                      = "info_handle_user_journal_fprint";
+	size_t cluster_block_size                  = 0;
+	ssize_t read_count                         = 0;
+	uint32_t usn_record_size                   = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3994,75 +3979,10 @@ int info_handle_user_journal_fprint(
 	 info_handle->notify_stream,
 	 "Windows NT File System information:\n\n" );
 
-	path = _LIBCSTRING_SYSTEM_STRING( "\\$Extend\\$UsnJrnl" );
-
-	path_length = libcstring_system_string_length(
-	               path );
-
 	fprintf(
 	 info_handle->notify_stream,
-	 "User journal: %" PRIs_LIBCSTRING_SYSTEM "\n\n",
-	 path );
+	 "Update journal: \\$Extend\\$UsnJrnl\n\n" );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_volume_get_file_entry_by_utf16_path(
-	          info_handle->input_volume,
-	          (uint16_t *) path,
-	          path_length,
-	          &file_entry,
-	          error );
-#else
-	result = libfsntfs_volume_get_file_entry_by_utf8_path(
-	          info_handle->input_volume,
-	          (uint8_t *) path,
-	          path_length,
-	          &file_entry,
-	          error );
-#endif
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry: %" PRIs_LIBCSTRING_SYSTEM ".",
-		 function,
-		 path );
-
-		goto on_error;
-	}
-	name = _LIBCSTRING_SYSTEM_STRING( "$J" );
-
-	name_length = libcstring_system_string_length(
-	               name );
-
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
-	          file_entry,
-	          (uint16_t *) name,
-	          name_length,
-	          &alternate_data_stream,
-	          error );
-#else
-	result = libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
-	          file_entry,
-	          (uint8_t *) name,
-	          name_length,
-	          &alternate_data_stream,
-	          error );
-#endif
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
-		 function,
-		 name );
-
-		goto on_error;
-	}
 	if( libfsntfs_volume_get_cluster_block_size(
 	     info_handle->input_volume,
 	     &cluster_block_size,
@@ -4077,16 +3997,28 @@ int info_handle_user_journal_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_data_stream_get_size(
-	     alternate_data_stream,
-	     &data_size,
+	if( ( cluster_block_size == 0 )
+	 || ( cluster_block_size > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid cluster block size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_get_update_journal(
+	     info_handle->input_volume,
+	     &update_journal,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve alternate data stream size.",
+		 "%s: unable to retrieve update (or change) journal.",
 		 function );
 
 		goto on_error;
@@ -4105,228 +4037,114 @@ int info_handle_user_journal_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_data_stream_get_number_of_extents(
-	     alternate_data_stream,
-	     &number_of_extents,
-	     error ) != 1 )
+	do
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve alternate data stream number of extents.",
-		 function );
+		read_count = libfsntfs_update_journal_read_usn_record(
+			      update_journal,
+			      buffer,
+			      cluster_block_size,
+			      error );
 
-		goto on_error;
-	}
-/* TODO check if extent size is within data size */
-	for( extent_index = 0;
-	     extent_index < number_of_extents;
-	     extent_index++ )
-	{
-		if( libfsntfs_data_stream_get_extent_by_index(
-		     alternate_data_stream,
-		     extent_index,
-		     &extent_offset,
-		     &extent_size,
-		     &extent_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve alternate data stream extent: %d.",
-			 function,
-			 extent_index );
-
-			goto on_error;
-		}
-		if( ( extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
-		{
-			continue;
-		}
-		if( libfsntfs_data_stream_seek_offset(
-		     alternate_data_stream,
-		     extent_offset,
-		     SEEK_SET,
-		     error ) != extent_offset )
+		if( read_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset: 0x%08" PRIx64 " in alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
-			 function,
-			 extent_offset,
-			 name );
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read USN record data.",
+			 function );
 
 			goto on_error;
 		}
-		cluster_block_offset = 0;
-
-/* TODO check if extent size is multitude of cluster block size */
-		while( (size64_t) cluster_block_offset < extent_size )
+		else if( read_count > 0 )
 		{
-/* TODO work around for remnant data in buffer */
-			if( memory_set(
-			     buffer,
-			     0,
-			     cluster_block_size ) == NULL )
+			if( libfusn_record_initialize(
+			     &usn_record,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to clear buffer.",
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to initialize USN record.",
 				 function );
 
 				goto on_error;
 			}
-			read_count = libfsntfs_data_stream_read_buffer(
-				      alternate_data_stream,
-				      buffer,
-				      cluster_block_size,
-				      error );
-
-			if( read_count < 0 )
+			if( libfusn_record_copy_from_byte_stream(
+			     usn_record,
+			     buffer,
+			     read_count,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read from alternate data stream: %" PRIs_LIBCSTRING_SYSTEM ".",
-				 function,
-				 name );
+				 "%s: unable to copy USN record from byte stream.",
+				 function );
 
 				goto on_error;
 			}
-			else if( result == 0 )
+			if( libfusn_record_get_size(
+			     usn_record,
+			     &usn_record_size,
+			     error ) != 1 )
 			{
-				break;
-			}
-			buffer_offset = 0;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve USN record size.",
+				 function );
 
-/* TODO do an empty block check
-			if( buffer[ 0 ] == 0 )
+				goto on_error;
+			}
+			if( info_handle_usn_record_fprint(
+			     info_handle,
+			     usn_record,
+			     error ) != 1 )
 			{
-				continue;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print USN record information.",
+				 function );
+
+				goto on_error;
 			}
-*/
-			while( buffer_offset < ( (size_t) read_count - 60 ) )
+			if( libfusn_record_free(
+			     &usn_record,
+			     error ) != 1 )
 			{
-				current_offset = extent_offset + cluster_block_offset + (off64_t) buffer_offset;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free USN record.",
+				 function );
 
-				if( (size64_t) current_offset >= data_size )
-				{
-					break;
-				}
-				if( buffer[ buffer_offset ] == 0 )
-				{
-					break;
-				}
-				if( libfusn_record_initialize(
-				     &usn_record,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to initialize USN record.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfusn_record_copy_from_byte_stream(
-				     usn_record,
-				     &( buffer[ buffer_offset ] ),
-				     read_count,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to copy USN record from byte stream at offset: 0x%08" PRIx64 ".",
-					 function,
-					 current_offset );
-
-					goto on_error;
-				}
-				if( libfusn_record_get_size(
-				     usn_record,
-				     &usn_record_size,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve USN record size.",
-					 function );
-
-					goto on_error;
-				}
-				if( info_handle_usn_record_fprint(
-				     info_handle,
-				     usn_record,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-					 "%s: unable to print USN record information.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfusn_record_free(
-				     &usn_record,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free USN record.",
-					 function );
-
-					goto on_error;
-				}
-				buffer_offset += usn_record_size;
+				goto on_error;
 			}
-			cluster_block_offset += read_count;
 		}
 	}
+	while( read_count > 0 );
+
 	memory_free(
 	 buffer );
 
 	buffer = NULL;
 
-	if( libfsntfs_data_stream_free(
-	     &alternate_data_stream,
+	if( libfsntfs_update_journal_free(
+	     &update_journal,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free alternate data stream.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_entry_free(
-	     &file_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free file entry.",
+		 "%s: unable to free update (or change) journal.",
 		 function );
 
 		goto on_error;
@@ -4349,16 +4167,10 @@ on_error:
 		memory_free(
 		 buffer );
 	}
-	if( alternate_data_stream != NULL )
+	if( update_journal != NULL )
 	{
-		libfsntfs_data_stream_free(
-		 &alternate_data_stream,
-		 NULL );
-	}
-	if( file_entry != NULL )
-	{
-		libfsntfs_file_entry_free(
-		 &file_entry,
+		libfsntfs_update_journal_free(
+		 &update_journal,
 		 NULL );
 	}
 	return( -1 );

@@ -36,6 +36,7 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
+#include "pyfsntfs_update_journal.h"
 #include "pyfsntfs_volume.h"
 #include "pyfsntfs_volume_file_entries.h"
 
@@ -88,6 +89,13 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 	  "get_name() -> Unicode string or None\n"
 	  "\n"
 	  "Retrieves the name." },
+
+	{ "get_update_journal",
+	  (PyCFunction) pyfsntfs_volume_get_update_journal,
+	  METH_NOARGS,
+	  "get_update_journal() -> Object or None\n"
+	  "\n"
+	  "Retrieves the update journal." },
 
 	/* Functions to access the file entries */
 
@@ -977,6 +985,84 @@ on_error:
 	{
 		PyMem_Free(
 		 name );
+	}
+	return( NULL );
+}
+
+/* Retrieves the update journal
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_update_journal(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error                   = NULL;
+	libfsntfs_update_journal_t *update_journal = NULL;
+	PyObject *update_journal_object            = NULL;
+	static char *function                      = "pyfsntfs_volume_get_update_journal";
+	int result                                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_update_journal(
+	          pyfsntfs_volume->volume,
+	          &update_journal,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve update journal.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	update_journal_object = pyfsntfs_update_journal_new(
+	                         update_journal,
+	                         (PyObject *) pyfsntfs_volume );
+
+	if( update_journal_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create update journal object.",
+		 function );
+
+		goto on_error;
+	}
+	return( update_journal_object );
+
+on_error:
+	if( update_journal != NULL )
+	{
+		libfsntfs_update_journal_free(
+		 &update_journal,
+		 NULL );
 	}
 	return( NULL );
 }

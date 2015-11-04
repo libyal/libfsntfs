@@ -43,6 +43,7 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_python.h \
 	pyfsntfs_reparse_point_attribute.c pyfsntfs_reparse_point_attribute.h \
 	pyfsntfs_standard_information_attribute.c pyfsntfs_standard_information_attribute.h \
+	pyfsntfs_update_journal.c pyfsntfs_update_journal.h \
 	pyfsntfs_unused.h \
 	pyfsntfs_volume.c pyfsntfs_volume.h \
 	pyfsntfs_volume_file_entries.c pyfsntfs_volume_file_entries.h \

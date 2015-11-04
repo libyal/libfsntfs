@@ -457,7 +457,7 @@ int libfsntfs_volume_name_values_get_utf8_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: TF-8 name size value too small.",
+			 "%s: UTF-8 name size value too small.",
 			 function );
 
 			return( -1 );
@@ -599,7 +599,7 @@ int libfsntfs_volume_name_values_get_utf16_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: TF-16 name size value too small.",
+			 "%s: UTF-16 name size value too small.",
 			 function );
 
 			return( -1 );

@@ -55,6 +55,46 @@ struct libfsntfs_internal_update_journal
 	/* The $J $DATA attribute
 	 */
 	libfsntfs_attribute_t *data_attribute;
+
+	/* The $J data stream
+	 */
+	libfsntfs_data_stream_t *data_stream;
+
+	/* The data offset
+	 */
+	off64_t data_offset;
+
+	/* The data size
+	 */
+	size64_t data_size;
+
+	/* The number of extents
+	 */
+	int number_of_extents;
+
+	/* The extent index
+	 */
+	int extent_index;
+
+	/* The extent offset
+	 */
+	off64_t extent_offset;
+
+	/* The extent size
+	 */
+	size64_t extent_size;
+
+	/* The extent flags
+	 */
+	uint32_t extent_flags;
+
+	/* The cluster block data
+	 */
+	uint8_t *cluster_block_data;
+
+	/* The cluster block (data) offset
+	 */
+	size_t cluster_block_offset;
 };
 
 int libfsntfs_update_journal_initialize(
@@ -70,6 +110,15 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_update_journal_free(
      libfsntfs_update_journal_t **update_journal,
      libcerror_error_t **error );
+
+/* TODO add get offset */
+
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_update_journal_read_usn_record(
+         libfsntfs_update_journal_t *update_journal,
+         uint8_t *usn_record_data,
+         size_t usn_record_data_size,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

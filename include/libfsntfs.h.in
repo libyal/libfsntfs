@@ -1420,6 +1420,15 @@ int libfsntfs_volume_name_attribute_get_utf16_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the update journal
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_update_journal(
+     libfsntfs_volume_t *volume,
+     libfsntfs_update_journal_t **update_journal,
+     libfsntfs_error_t **error );
+
 /* -------------------------------------------------------------------------
  * Data stream functions
  * ------------------------------------------------------------------------- */
@@ -1697,6 +1706,16 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_update_journal_free(
      libfsntfs_update_journal_t **update_journal,
      libfsntfs_error_t **error );
+
+/* Reads an USN record
+ * Returns the number of bytes read if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+ssize_t libfsntfs_update_journal_read_usn_record(
+         libfsntfs_update_journal_t *update_journal,
+         uint8_t *usn_record_data,
+         size_t usn_record_data_size,
+         libfsntfs_error_t **error );
 
 #if defined( __cplusplus )
 }
