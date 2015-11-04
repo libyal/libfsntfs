@@ -2085,8 +2085,9 @@ Contains a FILETIME
 See section: <<update_reason_flags,Update reason flags>>
 | 44 | 4 | | Update source flags +
 See section: <<update_source_flags,Update source flags>>
-| 48 | 4 | | Security identifier [yellow-background]*index* +
-Contains the index of the security identifier in the $Secure metadata file
+| 48 | 4 | | Security descriptor identifier +
+Contains the entry number in the security ID index ($Secure:$SII) +
+See section: <<access_control,Access Control>>
 | 52 | 4 | | File attribute flags +
 See section: <<file_attribute_flags,File attribute flags>>
 | 56 | 2 | | Name size +
@@ -2120,8 +2121,9 @@ Contains a FILETIME
 See section: <<update_reason_flags,Update reason flags>>
 | 60 | 4 | | Update source flags +
 See section: <<update_source_flags,Update source flags>>
-| 64 | 4 | | Security identifier [yellow-background]*index* +
-Contains the index of the security identifier in the $Secure metadata file
+| 64 | 4 | | Security descriptor identifier +
+Contains the entry number in the security ID index ($Secure:$SII) +
+See section: <<access_control,Access Control>>
 | 68 | 4 | | File attribute flags +
 See section: <<file_attribute_flags,File attribute flags>>
 | 72 | 2 | | Name size +
