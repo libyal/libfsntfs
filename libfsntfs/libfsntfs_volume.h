@@ -240,9 +240,9 @@ int libfsntfs_volume_read_security_descriptors(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_update_journal(
+int libfsntfs_volume_get_usn_change_journal(
      libfsntfs_volume_t *volume,
-     libfsntfs_update_journal_t **update_journal,
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

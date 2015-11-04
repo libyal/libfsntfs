@@ -1,5 +1,5 @@
 /*
- * Update (or change) journal functions
+ * USN change journal functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,15 +27,15 @@
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
-#include "libfsntfs_update_journal.h"
+#include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_types.h"
 
-/* Creates an update journal
- * Make sure the value update_journal is referencing, is set to NULL
+/* Creates an USN change journal
+ * Make sure the value usn_change_journal is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_update_journal_initialize(
-     libfsntfs_update_journal_t **update_journal,
+int libfsntfs_usn_change_journal_initialize(
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
@@ -43,27 +43,27 @@ int libfsntfs_update_journal_initialize(
      libfsntfs_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_update_journal_t *internal_update_journal = NULL;
-	static char *function                                        = "libfsntfs_update_journal_initialize";
+	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
+	static char *function                                                = "libfsntfs_usn_change_journal_initialize";
 
-	if( update_journal == NULL )
+	if( usn_change_journal == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( -1 );
 	}
-	if( *update_journal != NULL )
+	if( *usn_change_journal != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid update journal value already set.",
+		 "%s: invalid USN change journal value already set.",
 		 function );
 
 		return( -1 );
@@ -124,39 +124,39 @@ int libfsntfs_update_journal_initialize(
 
 		return( -1 );
 	}
-	internal_update_journal = memory_allocate_structure(
-	                           libfsntfs_internal_update_journal_t );
+	internal_usn_change_journal = memory_allocate_structure(
+	                               libfsntfs_internal_usn_change_journal_t );
 
-	if( internal_update_journal == NULL )
+	if( internal_usn_change_journal == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create update journal.",
+		 "%s: unable to create USN change journal.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     internal_update_journal,
+	     internal_usn_change_journal,
 	     0,
-	     sizeof( libfsntfs_internal_update_journal_t ) ) == NULL )
+	     sizeof( libfsntfs_internal_usn_change_journal_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear update journal.",
+		 "%s: unable to clear USN change journal.",
 		 function );
 
 		memory_free(
-		 internal_update_journal );
+		 internal_usn_change_journal );
 
 		return( -1 );
 	}
 	if( libfsntfs_data_stream_initialize(
-	     &( internal_update_journal->data_stream ),
+	     &( internal_usn_change_journal->data_stream ),
 	     file_io_handle,
 	     io_handle,
 	     data_attribute,
@@ -172,8 +172,8 @@ int libfsntfs_update_journal_initialize(
 		return( -1 );
 	}
 	if( libfsntfs_data_stream_get_size(
-	     internal_update_journal->data_stream,
-	     &( internal_update_journal->data_size ),
+	     internal_usn_change_journal->data_stream,
+	     &( internal_usn_change_journal->data_size ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -186,8 +186,8 @@ int libfsntfs_update_journal_initialize(
 		goto on_error;
 	}
 	if( libfsntfs_data_stream_get_number_of_extents(
-	     internal_update_journal->data_stream,
-	     &( internal_update_journal->number_of_extents ),
+	     internal_usn_change_journal->data_stream,
+	     &( internal_usn_change_journal->number_of_extents ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -200,11 +200,11 @@ int libfsntfs_update_journal_initialize(
 		goto on_error;
 	}
 	if( libfsntfs_data_stream_get_extent_by_index(
-	     internal_update_journal->data_stream,
-	     internal_update_journal->extent_index,
-	     &( internal_update_journal->extent_offset ),
-	     &( internal_update_journal->extent_size ),
-	     &( internal_update_journal->extent_flags ),
+	     internal_usn_change_journal->data_stream,
+	     internal_usn_change_journal->extent_index,
+	     &( internal_usn_change_journal->extent_offset ),
+	     &( internal_usn_change_journal->extent_size ),
+	     &( internal_usn_change_journal->extent_flags ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -213,14 +213,14 @@ int libfsntfs_update_journal_initialize(
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve $J data stream extent: %d.",
 		 function,
-		 internal_update_journal->extent_index );
+		 internal_usn_change_journal->extent_index );
 
 		goto on_error;
 	}
-	internal_update_journal->cluster_block_data = (uint8_t *) memory_allocate(
-	                                                           sizeof( uint8_t ) * io_handle->cluster_block_size );
+	internal_usn_change_journal->cluster_block_data = (uint8_t *) memory_allocate(
+	                                                               sizeof( uint8_t ) * io_handle->cluster_block_size );
 
-	if( internal_update_journal->cluster_block_data == NULL )
+	if( internal_usn_change_journal->cluster_block_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -231,62 +231,62 @@ int libfsntfs_update_journal_initialize(
 
 		goto on_error;
 	}
-	internal_update_journal->file_io_handle  = file_io_handle;
-	internal_update_journal->io_handle       = io_handle;
-	internal_update_journal->mft_entry       = mft_entry;
-	internal_update_journal->directory_entry = directory_entry;
-	internal_update_journal->data_attribute  = data_attribute;
+	internal_usn_change_journal->file_io_handle  = file_io_handle;
+	internal_usn_change_journal->io_handle       = io_handle;
+	internal_usn_change_journal->mft_entry       = mft_entry;
+	internal_usn_change_journal->directory_entry = directory_entry;
+	internal_usn_change_journal->data_attribute  = data_attribute;
 
-	*update_journal = (libfsntfs_update_journal_t *) internal_update_journal;
+	*usn_change_journal = (libfsntfs_usn_change_journal_t *) internal_usn_change_journal;
 
 	return( 1 );
 
 on_error:
-	if( internal_update_journal != NULL )
+	if( internal_usn_change_journal != NULL )
 	{
-		if( internal_update_journal->data_stream != NULL )
+		if( internal_usn_change_journal->data_stream != NULL )
 		{
 			libfsntfs_data_stream_free(
-			 &( internal_update_journal->data_stream ),
+			 &( internal_usn_change_journal->data_stream ),
 			 NULL );
 		}
 		memory_free(
-		 internal_update_journal );
+		 internal_usn_change_journal );
 	}
 	return( -1 );
 }
 
-/* Frees an update journal
+/* Frees an USN change journal
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_update_journal_free(
-     libfsntfs_update_journal_t **update_journal,
+int libfsntfs_usn_change_journal_free(
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_update_journal_t *internal_update_journal = NULL;
-	static char *function                                        = "libfsntfs_update_journal_free";
-	int result                                                   = 1;
+	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
+	static char *function                                                = "libfsntfs_usn_change_journal_free";
+	int result                                                           = 1;
 
-	if( update_journal == NULL )
+	if( usn_change_journal == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( -1 );
 	}
-	if( *update_journal != NULL )
+	if( *usn_change_journal != NULL )
 	{
-		internal_update_journal = (libfsntfs_internal_update_journal_t *) *update_journal;
-		*update_journal         = NULL;
+		internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) *usn_change_journal;
+		*usn_change_journal         = NULL;
 
 		/* The file_io_handle, io_handle, mft_entry and data_attribute references are freed elsewhere
 		 */
 		if( libfsntfs_directory_entry_free(
-		     &( internal_update_journal->directory_entry ),
+		     &( internal_usn_change_journal->directory_entry ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -299,7 +299,7 @@ int libfsntfs_update_journal_free(
 			result = -1;
 		}
 		if( libfsntfs_data_stream_free(
-		     &( internal_update_journal->data_stream ),
+		     &( internal_usn_change_journal->data_stream ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -312,60 +312,60 @@ int libfsntfs_update_journal_free(
 			result = -1;
 		}
 		memory_free(
-		 internal_update_journal->cluster_block_data );
+		 internal_usn_change_journal->cluster_block_data );
 		memory_free(
-		 internal_update_journal );
+		 internal_usn_change_journal );
 	}
 	return( result );
 }
 
-/* Reads an USN record
+/* Reads an USN record from the USN change journal
  * Returns the number of bytes read if successful or -1 on error
  */
-ssize_t libfsntfs_update_journal_read_usn_record(
-         libfsntfs_update_journal_t *update_journal,
+ssize_t libfsntfs_usn_change_journal_read_usn_record(
+         libfsntfs_usn_change_journal_t *usn_change_journal,
          uint8_t *usn_record_data,
          size_t usn_record_data_size,
          libcerror_error_t **error )
 {
-	libfsntfs_internal_update_journal_t *internal_update_journal = NULL;
-	static char *function                                        = "libfsntfs_update_journal_read_usn_record";
-	size_t read_size                                             = 0;
-	ssize_t read_count                                           = 0;
-	uint32_t usn_record_size                                     = 0;
-	int read_cluster_block                                       = 0;
+	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
+	static char *function                                                = "libfsntfs_usn_change_journal_read_usn_record";
+	size_t read_size                                                     = 0;
+	ssize_t read_count                                                   = 0;
+	uint32_t usn_record_size                                             = 0;
+	int read_cluster_block                                               = 0;
 
-	if( update_journal == NULL )
+	if( usn_change_journal == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( -1 );
 	}
-	internal_update_journal = (libfsntfs_internal_update_journal_t *) update_journal;
+	internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) usn_change_journal;
 
-	if( internal_update_journal->io_handle == NULL )
+	if( internal_usn_change_journal->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid update journal - missing IO handle.",
+		 "%s: invalid USN change journal - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_update_journal->io_handle->cluster_block_size < 60 )
+	if( internal_usn_change_journal->io_handle->cluster_block_size < 60 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid update journal - invalid IO handle - cluster block size value out of bounds.",
+		 "%s: invalid USN change journal - invalid IO handle - cluster block size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -392,28 +392,28 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 
 		return( -1 );
 	}
-	if( internal_update_journal->extent_index >= internal_update_journal->number_of_extents )
+	if( internal_usn_change_journal->extent_index >= internal_usn_change_journal->number_of_extents )
 	{
 		return( 0 );
 	}
 	while( usn_record_size == 0 )
 	{
-		while( ( ( internal_update_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
-		    || ( (size64_t) internal_update_journal->extent_offset >= internal_update_journal->extent_size ) )
+		while( ( ( internal_usn_change_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
+		    || ( (size64_t) internal_usn_change_journal->extent_offset >= internal_usn_change_journal->extent_size ) )
 		{
-			internal_update_journal->extent_index += 1;
+			internal_usn_change_journal->extent_index += 1;
 
-			if( internal_update_journal->extent_index >= internal_update_journal->number_of_extents )
+			if( internal_usn_change_journal->extent_index >= internal_usn_change_journal->number_of_extents )
 			{
 				return( 0 );
 			}
 /* TODO make sure internal values are reset on error */
 			if( libfsntfs_data_stream_get_extent_by_index(
-			     internal_update_journal->data_stream,
-			     internal_update_journal->extent_index,
-			     &( internal_update_journal->extent_offset ),
-			     &( internal_update_journal->extent_size ),
-			     &( internal_update_journal->extent_flags ),
+			     internal_usn_change_journal->data_stream,
+			     internal_usn_change_journal->extent_index,
+			     &( internal_usn_change_journal->extent_offset ),
+			     &( internal_usn_change_journal->extent_size ),
+			     &( internal_usn_change_journal->extent_flags ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -422,21 +422,21 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 				 "%s: unable to retrieve $J data stream extent: %d.",
 				 function,
-				 internal_update_journal->extent_index );
+				 internal_usn_change_journal->extent_index );
 
 				return( -1 );
 			}
-			if( ( internal_update_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
+			if( ( internal_usn_change_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
 			{
-				internal_update_journal->data_offset += internal_update_journal->extent_size;
+				internal_usn_change_journal->data_offset += internal_usn_change_journal->extent_size;
 			}
 			else
 			{
 				if( libfsntfs_data_stream_seek_offset(
-				     internal_update_journal->data_stream,
-				     internal_update_journal->extent_offset,
+				     internal_usn_change_journal->data_stream,
+				     internal_usn_change_journal->extent_offset,
 				     SEEK_SET,
-				     error ) != internal_update_journal->extent_offset )
+				     error ) != internal_usn_change_journal->extent_offset )
 				{
 					libcerror_error_set(
 					 error,
@@ -444,36 +444,36 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 					 LIBCERROR_IO_ERROR_SEEK_FAILED,
 					 "%s: unable to seek offset: 0x%08" PRIx64 " in $J data stream.",
 					 function,
-					 internal_update_journal->extent_offset );
+					 internal_usn_change_journal->extent_offset );
 
 					return( -1 );
 				}
-				internal_update_journal->extent_size += internal_update_journal->extent_offset;
+				internal_usn_change_journal->extent_size += internal_usn_change_journal->extent_offset;
 
 				read_cluster_block = 1;
 			}
 		}
-		if( (size64_t) internal_update_journal->extent_offset >= internal_update_journal->extent_size )
+		if( (size64_t) internal_usn_change_journal->extent_offset >= internal_usn_change_journal->extent_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid update journal - extent data offset value out of bounds.",
+			 "%s: invalid USN change journal - extent data offset value out of bounds.",
 			 function );
 
 			return( -1 );
 		}
-		if( internal_update_journal->cluster_block_offset >= ( internal_update_journal->io_handle->cluster_block_size - 60 ) )
+		if( internal_usn_change_journal->cluster_block_offset >= ( internal_usn_change_journal->io_handle->cluster_block_size - 60 ) )
 		{
 			read_cluster_block = 1;
 		}
 		if( read_cluster_block != 0 )
 		{
 			if( memory_set(
-			     internal_update_journal->cluster_block_data,
+			     internal_usn_change_journal->cluster_block_data,
 			     0,
-			     internal_update_journal->io_handle->cluster_block_size ) == NULL )
+			     internal_usn_change_journal->io_handle->cluster_block_size ) == NULL )
 			{
 				libcerror_error_set(
 				 error,
@@ -484,15 +484,15 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 
 				return( -1 );
 			}
-			read_size = internal_update_journal->io_handle->cluster_block_size;
+			read_size = internal_usn_change_journal->io_handle->cluster_block_size;
 
-			if( read_size > ( internal_update_journal->extent_size - internal_update_journal->extent_offset ) )
+			if( read_size > ( internal_usn_change_journal->extent_size - internal_usn_change_journal->extent_offset ) )
 			{
-				read_size = (size_t) ( internal_update_journal->extent_size - internal_update_journal->extent_offset );
+				read_size = (size_t) ( internal_usn_change_journal->extent_size - internal_usn_change_journal->extent_offset );
 			}
 			read_count = libfsntfs_data_stream_read_buffer(
-				      internal_update_journal->data_stream,
-				      internal_update_journal->cluster_block_data,
+				      internal_usn_change_journal->data_stream,
+				      internal_usn_change_journal->cluster_block_data,
 				      read_size,
 				      error );
 
@@ -507,8 +507,8 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 
 				return( -1 );
 			}
-			internal_update_journal->extent_offset       += internal_update_journal->io_handle->cluster_block_size;
-			internal_update_journal->cluster_block_offset = 0;
+			internal_usn_change_journal->extent_offset       += internal_usn_change_journal->io_handle->cluster_block_size;
+			internal_usn_change_journal->cluster_block_offset = 0;
 
 /* TODO do an empty block check
 			if( buffer[ 0 ] == 0 )
@@ -517,29 +517,29 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 			}
 */
 		}
-		if( internal_update_journal->cluster_block_offset >= ( internal_update_journal->io_handle->cluster_block_size - 60 ) )
+		if( internal_usn_change_journal->cluster_block_offset >= ( internal_usn_change_journal->io_handle->cluster_block_size - 60 ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid update journal - cluster block offset value out of bounds.",
+			 "%s: invalid USN change journal - cluster block offset value out of bounds.",
 			 function );
 
 			return( -1 );
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 &( internal_update_journal->cluster_block_data[ internal_update_journal->cluster_block_offset ] ),
+		 &( internal_usn_change_journal->cluster_block_data[ internal_usn_change_journal->cluster_block_offset ] ),
 		 usn_record_size );
 
 		if( usn_record_size == 0 )
 		{
-			internal_update_journal->data_offset          = internal_update_journal->io_handle->cluster_block_size - internal_update_journal->cluster_block_offset;
-			internal_update_journal->cluster_block_offset = internal_update_journal->io_handle->cluster_block_size;
+			internal_usn_change_journal->data_offset          = internal_usn_change_journal->io_handle->cluster_block_size - internal_usn_change_journal->cluster_block_offset;
+			internal_usn_change_journal->cluster_block_offset = internal_usn_change_journal->io_handle->cluster_block_size;
 		}
 	}
 	if( ( usn_record_size < 60 )
-	 || ( usn_record_size > ( internal_update_journal->io_handle->cluster_block_size - internal_update_journal->cluster_block_offset ) ) )
+	 || ( usn_record_size > ( internal_usn_change_journal->io_handle->cluster_block_size - internal_usn_change_journal->cluster_block_offset ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -563,7 +563,7 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 	}
 	if( memory_copy(
 	     usn_record_data,
-	     &( internal_update_journal->cluster_block_data[ internal_update_journal->cluster_block_offset ] ),
+	     &( internal_usn_change_journal->cluster_block_data[ internal_usn_change_journal->cluster_block_offset ] ),
 	     (size_t) usn_record_size ) == NULL )
 	{
 		libcerror_error_set(
@@ -575,8 +575,8 @@ ssize_t libfsntfs_update_journal_read_usn_record(
 
 		return( -1 );
 	}
-	internal_update_journal->data_offset          += usn_record_size;
-	internal_update_journal->cluster_block_offset += usn_record_size;
+	internal_usn_change_journal->data_offset          += usn_record_size;
+	internal_usn_change_journal->cluster_block_offset += usn_record_size;
 
 	return( (ssize_t) usn_record_size );
 }

@@ -1420,13 +1420,13 @@ int libfsntfs_volume_name_attribute_get_utf16_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the update journal
+/* Retrieves the usn change journal
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_update_journal(
+int libfsntfs_volume_get_usn_change_journal(
      libfsntfs_volume_t *volume,
-     libfsntfs_update_journal_t **update_journal,
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1696,23 +1696,23 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
- * Update (or change) journal functions
+ * USN change journal functions
  * ------------------------------------------------------------------------- */
 
-/* Frees an update journal
+/* Frees an USN change journal
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_update_journal_free(
-     libfsntfs_update_journal_t **update_journal,
+int libfsntfs_usn_change_journal_free(
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_error_t **error );
 
-/* Reads an USN record
+/* Reads an USN record from the USN change journal
  * Returns the number of bytes read if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
-ssize_t libfsntfs_update_journal_read_usn_record(
-         libfsntfs_update_journal_t *update_journal,
+ssize_t libfsntfs_usn_change_journal_read_usn_record(
+         libfsntfs_usn_change_journal_t *usn_change_journal,
          uint8_t *usn_record_data,
          size_t usn_record_data_size,
          libfsntfs_error_t **error );

@@ -32,14 +32,14 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
-#include "pyfsntfs_update_journal.h"
+#include "pyfsntfs_usn_change_journal.h"
 
-PyMethodDef pyfsntfs_update_journal_object_methods[] = {
+PyMethodDef pyfsntfs_usn_change_journal_object_methods[] = {
 
-	/* Functions to access the update journal */
+	/* Functions to access the USN change journal */
 
 	{ "read_usn_record",
-	  (PyCFunction) pyfsntfs_update_journal_read_usn_record,
+	  (PyCFunction) pyfsntfs_usn_change_journal_read_usn_record,
 	  METH_NOARGS,
 	  "read_usn_record() -> String\n"
 	  "\n"
@@ -49,23 +49,23 @@ PyMethodDef pyfsntfs_update_journal_object_methods[] = {
 	{ NULL, NULL, 0, NULL }
 };
 
-PyGetSetDef pyfsntfs_update_journal_object_get_set_definitions[] = {
+PyGetSetDef pyfsntfs_usn_change_journal_object_get_set_definitions[] = {
 
 	/* Sentinel */
 	{ NULL, NULL, NULL, NULL, NULL }
 };
 
-PyTypeObject pyfsntfs_update_journal_type_object = {
+PyTypeObject pyfsntfs_usn_change_journal_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs.update_journal",
+	"pyfsntfs.usn_change_journal",
 	/* tp_basicsize */
-	sizeof( pyfsntfs_update_journal_t ),
+	sizeof( pyfsntfs_usn_change_journal_t ),
 	/* tp_itemsize */
 	0,
 	/* tp_dealloc */
-	(destructor) pyfsntfs_update_journal_free,
+	(destructor) pyfsntfs_usn_change_journal_free,
 	/* tp_print */
 	0,
 	/* tp_getattr */
@@ -97,7 +97,7 @@ PyTypeObject pyfsntfs_update_journal_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyfsntfs update journal object (wraps libfsntfs_update_journal_t)",
+	"pyfsntfs USN change journal object (wraps libfsntfs_usn_change_journal_t)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -111,11 +111,11 @@ PyTypeObject pyfsntfs_update_journal_type_object = {
 	/* tp_iternext */
 	0,
 	/* tp_methods */
-	pyfsntfs_update_journal_object_methods,
+	pyfsntfs_usn_change_journal_object_methods,
 	/* tp_members */
 	0,
 	/* tp_getset */
-	pyfsntfs_update_journal_object_get_set_definitions,
+	pyfsntfs_usn_change_journal_object_get_set_definitions,
 	/* tp_base */
 	0,
 	/* tp_dict */
@@ -127,7 +127,7 @@ PyTypeObject pyfsntfs_update_journal_type_object = {
 	/* tp_dictoffset */
 	0,
 	/* tp_init */
-	(initproc) pyfsntfs_update_journal_init,
+	(initproc) pyfsntfs_usn_change_journal_init,
 	/* tp_alloc */
 	0,
 	/* tp_new */
@@ -150,119 +150,119 @@ PyTypeObject pyfsntfs_update_journal_type_object = {
 	0
 };
 
-/* Creates a new pyfsntfs update journal object
+/* Creates a new pyfsntfs USN change journal object
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_update_journal_new(
-           libfsntfs_update_journal_t *update_journal,
+PyObject *pyfsntfs_usn_change_journal_new(
+           libfsntfs_usn_change_journal_t *usn_change_journal,
            PyObject *volume_object )
 {
-	pyfsntfs_update_journal_t *pyfsntfs_update_journal = NULL;
-	static char *function                              = "pyfsntfs_update_journal_new";
+	pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal = NULL;
+	static char *function                                      = "pyfsntfs_usn_change_journal_new";
 
-	if( update_journal == NULL )
+	if( usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( NULL );
 	}
-	pyfsntfs_update_journal = PyObject_New(
-	                           struct pyfsntfs_update_journal,
-	                           &pyfsntfs_update_journal_type_object );
+	pyfsntfs_usn_change_journal = PyObject_New(
+	                               struct pyfsntfs_usn_change_journal,
+	                               &pyfsntfs_usn_change_journal_type_object );
 
-	if( pyfsntfs_update_journal == NULL )
+	if( pyfsntfs_usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize update journal.",
+		 "%s: unable to initialize USN change journal.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyfsntfs_update_journal_init(
-	     pyfsntfs_update_journal ) != 0 )
+	if( pyfsntfs_usn_change_journal_init(
+	     pyfsntfs_usn_change_journal ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize update journal.",
+		 "%s: unable to initialize USN change journal.",
 		 function );
 
 		goto on_error;
 	}
-	pyfsntfs_update_journal->update_journal = update_journal;
-	pyfsntfs_update_journal->volume_object  = volume_object;
+	pyfsntfs_usn_change_journal->usn_change_journal = usn_change_journal;
+	pyfsntfs_usn_change_journal->volume_object      = volume_object;
 
 	Py_IncRef(
-	 pyfsntfs_update_journal->volume_object );
+	 pyfsntfs_usn_change_journal->volume_object );
 
-	return( (PyObject *) pyfsntfs_update_journal );
+	return( (PyObject *) pyfsntfs_usn_change_journal );
 
 on_error:
-	if( pyfsntfs_update_journal != NULL )
+	if( pyfsntfs_usn_change_journal != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_update_journal );
+		 (PyObject *) pyfsntfs_usn_change_journal );
 	}
 	return( NULL );
 }
 
-/* Intializes an update journal object
+/* Intializes an USN change journal object
  * Returns 0 if successful or -1 on error
  */
-int pyfsntfs_update_journal_init(
-     pyfsntfs_update_journal_t *pyfsntfs_update_journal )
+int pyfsntfs_usn_change_journal_init(
+     pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal )
 {
-	static char *function = "pyfsntfs_update_journal_init";
+	static char *function = "pyfsntfs_usn_change_journal_init";
 
-	if( pyfsntfs_update_journal == NULL )
+	if( pyfsntfs_usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( -1 );
 	}
-	/* Make sure libfsntfs update journal is set to NULL
+	/* Make sure libfsntfs USN change journal is set to NULL
 	 */
-	pyfsntfs_update_journal->update_journal = NULL;
+	pyfsntfs_usn_change_journal->usn_change_journal = NULL;
 
 	return( 0 );
 }
 
-/* Frees an update journal object
+/* Frees an USN change journal object
  */
-void pyfsntfs_update_journal_free(
-      pyfsntfs_update_journal_t *pyfsntfs_update_journal )
+void pyfsntfs_usn_change_journal_free(
+      pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal )
 {
 	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
-	static char *function       = "pyfsntfs_update_journal_free";
+	static char *function       = "pyfsntfs_usn_change_journal_free";
 	int result                  = 0;
 
-	if( pyfsntfs_update_journal == NULL )
+	if( pyfsntfs_usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return;
 	}
-	if( pyfsntfs_update_journal->update_journal == NULL )
+	if( pyfsntfs_usn_change_journal->usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid update journal - missing libfsntfs update journal.",
+		 "%s: invalid USN change journal - missing libfsntfs USN change journal.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyfsntfs_update_journal );
+	           pyfsntfs_usn_change_journal );
 
 	if( ob_type == NULL )
 	{
@@ -284,8 +284,8 @@ void pyfsntfs_update_journal_free(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_update_journal_free(
-	          &( pyfsntfs_update_journal->update_journal ),
+	result = libfsntfs_usn_change_journal_free(
+	          &( pyfsntfs_usn_change_journal->usn_change_journal ),
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -295,50 +295,50 @@ void pyfsntfs_update_journal_free(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_MemoryError,
-		 "%s: unable to free update journal.",
+		 "%s: unable to free USN change journal.",
 		 function );
 
 		libcerror_error_free(
 		 &error );
 	}
-	if( pyfsntfs_update_journal->volume_object != NULL )
+	if( pyfsntfs_usn_change_journal->volume_object != NULL )
 	{
 		Py_DecRef(
-		 pyfsntfs_update_journal->volume_object );
+		 pyfsntfs_usn_change_journal->volume_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyfsntfs_update_journal );
+	 (PyObject*) pyfsntfs_usn_change_journal );
 }
 
 /* Reads an USN record
  * Returns a Python object holding the data if successful or NULL on error
  */
-PyObject *pyfsntfs_update_journal_read_usn_record(
-           pyfsntfs_update_journal_t *pyfsntfs_update_journal,
+PyObject *pyfsntfs_usn_change_journal_read_usn_record(
+           pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error  = NULL;
 	PyObject *string_object   = NULL;
-	static char *function     = "pyfsntfs_update_journal_read_usn_record";
+	static char *function     = "pyfsntfs_usn_change_journal_read_usn_record";
 	char *usn_record_data     = NULL;
 	size_t cluster_block_size = 0;
 	ssize_t read_count        = 0;
 	int result                = 0;
 
-	if( pyfsntfs_update_journal == NULL )
+	if( pyfsntfs_usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid update journal.",
+		 "%s: invalid USN change journal.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_update_journal->update_journal == NULL )
+	if( pyfsntfs_usn_change_journal->usn_change_journal == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid update journal - missing libfsntfs update journal.",
+		 "%s: invalid USN change journal - missing libfsntfs USN change journal.",
 		 function );
 
 		return( NULL );
@@ -346,7 +346,7 @@ PyObject *pyfsntfs_update_journal_read_usn_record(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_volume_get_cluster_block_size(
-	          pyfsntfs_update_journal->update_journal,
+	          pyfsntfs_usn_change_journal->usn_change_journal,
 	          &cluster_block_size,
 	          &error );
 
@@ -394,8 +394,8 @@ PyObject *pyfsntfs_update_journal_read_usn_record(
 #endif
 	Py_BEGIN_ALLOW_THREADS
 
-	read_count = libfsntfs_update_journal_read_usn_record(
-	              pyfsntfs_update_journal->update_journal,
+	read_count = libfsntfs_usn_change_journal_read_usn_record(
+	              pyfsntfs_usn_change_journal->usn_change_journal,
 	              (uint8_t *) usn_record_data,
 	              (size_t) cluster_block_size,
 	              &error );

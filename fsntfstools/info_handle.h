@@ -168,7 +168,7 @@ int info_handle_usn_record_fprint(
      libfusn_record_t *usn_record,
      libfsntfs_error_t **error );
 
-int info_handle_user_journal_fprint(
+int info_handle_usn_change_journal_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 

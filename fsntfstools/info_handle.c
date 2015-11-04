@@ -3411,7 +3411,7 @@ on_error:
 	return( -1 );
 }
 
-/* Prints the user journal ($UsnJrnl) record update reason to the notify stream
+/* Prints the USN change journal ($UsnJrnl) record update reason to the notify stream
  */
 void info_handle_usn_record_update_reason_flags_fprint(
       uint32_t update_reason_flags,
@@ -3555,7 +3555,7 @@ void info_handle_usn_record_update_reason_flags_fprint(
 	}
 }
 
-/* Prints the user journal ($UsnJrnl) record update source flags to the notify stream
+/* Prints the USN change journal ($UsnJrnl) record update source flags to the notify stream
  */
 void info_handle_usn_record_update_source_flags_fprint(
       uint32_t update_source_flags,
@@ -3582,7 +3582,7 @@ void info_handle_usn_record_update_source_flags_fprint(
 	}
 }
 
-/* Prints the user journal ($UsnJrnl) record information
+/* Prints the USN change journal ($UsnJrnl) record information
  * Returns 1 if successful or -1 on error
  */
 int info_handle_usn_record_fprint(
@@ -3949,20 +3949,20 @@ on_error:
 	return( -1 );
 }
 
-/* Prints the user journal ($UsnJrnl) entry information
+/* Prints the USN change journal ($UsnJrnl) entry information
  * Returns 1 if successful or -1 on error
  */
-int info_handle_user_journal_fprint(
+int info_handle_usn_change_journal_fprint(
      info_handle_t *info_handle,
      libfsntfs_error_t **error )
 {
-	libfsntfs_update_journal_t *update_journal = NULL;
-	libfusn_record_t *usn_record               = NULL;
-	uint8_t *buffer                            = NULL;
-	static char *function                      = "info_handle_user_journal_fprint";
-	size_t cluster_block_size                  = 0;
-	ssize_t read_count                         = 0;
-	uint32_t usn_record_size                   = 0;
+	libfsntfs_usn_change_journal_t *usn_change_journal = NULL;
+	libfusn_record_t *usn_record                       = NULL;
+	uint8_t *buffer                                    = NULL;
+	static char *function                              = "info_handle_usn_change_journal_fprint";
+	size_t cluster_block_size                          = 0;
+	ssize_t read_count                                 = 0;
+	uint32_t usn_record_size                           = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3981,7 +3981,7 @@ int info_handle_user_journal_fprint(
 
 	fprintf(
 	 info_handle->notify_stream,
-	 "Update journal: \\$Extend\\$UsnJrnl\n\n" );
+	 "USN change journal: \\$Extend\\$UsnJrnl\n\n" );
 
 	if( libfsntfs_volume_get_cluster_block_size(
 	     info_handle->input_volume,
@@ -4009,16 +4009,16 @@ int info_handle_user_journal_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_volume_get_update_journal(
+	if( libfsntfs_volume_get_usn_change_journal(
 	     info_handle->input_volume,
-	     &update_journal,
+	     &usn_change_journal,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve update (or change) journal.",
+		 "%s: unable to retrieve USN change journal.",
 		 function );
 
 		goto on_error;
@@ -4039,8 +4039,8 @@ int info_handle_user_journal_fprint(
 	}
 	do
 	{
-		read_count = libfsntfs_update_journal_read_usn_record(
-			      update_journal,
+		read_count = libfsntfs_usn_change_journal_read_usn_record(
+			      usn_change_journal,
 			      buffer,
 			      cluster_block_size,
 			      error );
@@ -4136,15 +4136,15 @@ int info_handle_user_journal_fprint(
 
 	buffer = NULL;
 
-	if( libfsntfs_update_journal_free(
-	     &update_journal,
+	if( libfsntfs_usn_change_journal_free(
+	     &usn_change_journal,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free update (or change) journal.",
+		 "%s: unable to free USN change journal.",
 		 function );
 
 		goto on_error;
@@ -4167,10 +4167,10 @@ on_error:
 		memory_free(
 		 buffer );
 	}
-	if( update_journal != NULL )
+	if( usn_change_journal != NULL )
 	{
-		libfsntfs_update_journal_free(
-		 &update_journal,
+		libfsntfs_usn_change_journal_free(
+		 &usn_change_journal,
 		 NULL );
 	}
 	return( -1 );

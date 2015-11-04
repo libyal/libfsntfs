@@ -250,7 +250,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyfsntfs\pyfsntfs_update_journal.c"
+				RelativePath="..\..\pyfsntfs\pyfsntfs_usn_change_journal.c"
 				>
 			</File>
 			<File
@@ -388,7 +388,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\pyfsntfs\pyfsntfs_update_journal.h"
+				RelativePath="..\..\pyfsntfs\pyfsntfs_usn_change_journal.h"
 				>
 			</File>
 			<File

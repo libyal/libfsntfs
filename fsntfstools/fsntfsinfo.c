@@ -44,7 +44,7 @@ enum FSNTFSINFO_MODES
 {
 	FSNTFSINFO_MODE_FILE_SYSTEM_HIERARCHY,
 	FSNTFSINFO_MODE_MFT_ENTRY,
-	FSNTFSINFO_MODE_USER_JOURNAL,
+	FSNTFSINFO_MODE_USN_CHANGE_JOURNAL,
 	FSNTFSINFO_MODE_VOLUME
 };
 
@@ -73,7 +73,7 @@ void usage_fprint(
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-H:     shows the file system hierarcy\n" );
 	fprintf( stream, "\t-o:     specify the volume offset\n" );
-	fprintf( stream, "\t-U:     shows information from the user journal ($UsnJrnl)\n" );
+	fprintf( stream, "\t-U:     shows information from the USN change journal ($UsnJrnl)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 }
@@ -208,7 +208,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (libcstring_system_integer_t) 'U':
-				option_mode = FSNTFSINFO_MODE_USER_JOURNAL;
+				option_mode = FSNTFSINFO_MODE_USN_CHANGE_JOURNAL;
 
 				break;
 
@@ -358,22 +358,22 @@ int main( int argc, char * const argv[] )
 			}
 			break;
 
-		case FSNTFSINFO_MODE_USER_JOURNAL:
+		case FSNTFSINFO_MODE_USN_CHANGE_JOURNAL:
 			if( fsntfsinfo_info_handle->input_volume == NULL )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to print user journal ($UsnJrnl) information.\n" );
+				 "Unable to print USN change journal ($UsnJrnl) information.\n" );
 
 				goto on_error;
 			}
-			if( info_handle_user_journal_fprint(
+			if( info_handle_usn_change_journal_fprint(
 			     fsntfsinfo_info_handle,
 			     &error ) != 1 )
 			{
 				fprintf(
 				 stderr,
-				 "Unable to print user journal ($UsnJrnl) information.\n" );
+				 "Unable to print USN change journal ($UsnJrnl) information.\n" );
 
 				goto on_error;
 			}

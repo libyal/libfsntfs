@@ -322,7 +322,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_update_journal.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_usn_change_journal.c"
 				>
 			</File>
 			<File
@@ -612,7 +612,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_update_journal.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_usn_change_journal.h"
 				>
 			</File>
 			<File

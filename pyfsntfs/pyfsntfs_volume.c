@@ -36,7 +36,7 @@
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
-#include "pyfsntfs_update_journal.h"
+#include "pyfsntfs_usn_change_journal.h"
 #include "pyfsntfs_volume.h"
 #include "pyfsntfs_volume_file_entries.h"
 
@@ -90,12 +90,12 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 	  "\n"
 	  "Retrieves the name." },
 
-	{ "get_update_journal",
-	  (PyCFunction) pyfsntfs_volume_get_update_journal,
+	{ "get_usn_change_journal",
+	  (PyCFunction) pyfsntfs_volume_get_usn_change_journal,
 	  METH_NOARGS,
-	  "get_update_journal() -> Object or None\n"
+	  "get_usn_change_journal() -> Object or None\n"
 	  "\n"
-	  "Retrieves the update journal." },
+	  "Retrieves the USN change journal." },
 
 	/* Functions to access the file entries */
 
@@ -989,18 +989,18 @@ on_error:
 	return( NULL );
 }
 
-/* Retrieves the update journal
+/* Retrieves the USN change journal
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_update_journal(
+PyObject *pyfsntfs_volume_get_usn_change_journal(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error                   = NULL;
-	libfsntfs_update_journal_t *update_journal = NULL;
-	PyObject *update_journal_object            = NULL;
-	static char *function                      = "pyfsntfs_volume_get_update_journal";
-	int result                                 = 0;
+	libcerror_error_t *error                           = NULL;
+	libfsntfs_usn_change_journal_t *usn_change_journal = NULL;
+	PyObject *usn_change_journal_object                = NULL;
+	static char *function                              = "pyfsntfs_volume_get_usn_change_journal";
+	int result                                         = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
@@ -1015,9 +1015,9 @@ PyObject *pyfsntfs_volume_get_update_journal(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_update_journal(
+	result = libfsntfs_volume_get_usn_change_journal(
 	          pyfsntfs_volume->volume,
-	          &update_journal,
+	          &usn_change_journal,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -1027,7 +1027,7 @@ PyObject *pyfsntfs_volume_get_update_journal(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve update journal.",
+		 "%s: unable to retrieve USN change journal.",
 		 function );
 
 		libcerror_error_free(
@@ -1042,26 +1042,26 @@ PyObject *pyfsntfs_volume_get_update_journal(
 
 		return( Py_None );
 	}
-	update_journal_object = pyfsntfs_update_journal_new(
-	                         update_journal,
-	                         (PyObject *) pyfsntfs_volume );
+	usn_change_journal_object = pyfsntfs_usn_change_journal_new(
+	                             usn_change_journal,
+	                             (PyObject *) pyfsntfs_volume );
 
-	if( update_journal_object == NULL )
+	if( usn_change_journal_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create update journal object.",
+		 "%s: unable to create USN change journal object.",
 		 function );
 
 		goto on_error;
 	}
-	return( update_journal_object );
+	return( usn_change_journal_object );
 
 on_error:
-	if( update_journal != NULL )
+	if( usn_change_journal != NULL )
 	{
-		libfsntfs_update_journal_free(
-		 &update_journal,
+		libfsntfs_usn_change_journal_free(
+		 &usn_change_journal,
 		 NULL );
 	}
 	return( NULL );

@@ -152,6 +152,9 @@ Debug:
 Deployment
 * write man pages
 
+20151105
+* renamed update journal to USN change journal
+
 20151104
 * worked on update (or change) journal
 

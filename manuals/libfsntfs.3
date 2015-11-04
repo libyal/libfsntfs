@@ -1,4 +1,4 @@
-.Dd November  3, 2015
+.Dd November  4, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -291,7 +291,7 @@ $VOLUME_NAME attribute functions
 .Ft int
 .Fn libfsntfs_volume_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_update_journal "libfsntfs_volume_t *volume, libfsntfs_update_journal_t **update_journal, libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_usn_change_journal "libfsntfs_volume_t *volume, libfsntfs_usn_change_journal_t **usn_change_journal, libfsntfs_error_t **error"
 .Pp
 Data stream functions
 .Ft int
@@ -351,11 +351,11 @@ Available when compiled with libbfio support:
 .Ft int
 .Fn libfsntfs_mft_metadata_file_open_file_io_handle "libfsntfs_mft_metadata_file_t *mft_metadata_file, libbfio_handle_t *file_io_handle, int access_flags, libfsntfs_error_t **error"
 .Pp
-Update (or change) journal functions
+USN change journal functions
 .Ft int
-.Fn libfsntfs_update_journal_free "libfsntfs_update_journal_t **update_journal, libfsntfs_error_t **error"
+.Fn libfsntfs_usn_change_journal_free "libfsntfs_usn_change_journal_t **usn_change_journal, libfsntfs_error_t **error"
 .Ft ssize_t
-.Fn libfsntfs_update_journal_read_usn_record "libfsntfs_update_journal_t *update_journal, uint8_t *usn_record_data, size_t usn_record_data_size, libfsntfs_error_t **error"
+.Fn libfsntfs_usn_change_journal_read_usn_record "libfsntfs_usn_change_journal_t *usn_change_journal, uint8_t *usn_record_data, size_t usn_record_data_size, libfsntfs_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libfsntfs_get_version

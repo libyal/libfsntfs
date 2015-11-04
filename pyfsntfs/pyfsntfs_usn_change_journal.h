@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs update (or change) journal
+ * Python object definition of the libfsntfs USN change journal
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYFSNTFS_UPDATE_JOURNAL_H )
-#define _PYFSNTFS_UPDATE_JOURNAL_H
+#if !defined( _PYFSNTFS_USN_CHANGE_JOURNAL_H )
+#define _PYFSNTFS_USN_CHANGE_JOURNAL_H
 
 #include <common.h>
 #include <types.h>
@@ -32,38 +32,38 @@
 extern "C" {
 #endif
 
-typedef struct pyfsntfs_update_journal pyfsntfs_update_journal_t;
+typedef struct pyfsntfs_usn_change_journal pyfsntfs_usn_change_journal_t;
 
-struct pyfsntfs_update_journal
+struct pyfsntfs_usn_change_journal
 {
 	/* Python object initialization
 	 */
 	PyObject_HEAD
 
-	/* The libfsntfs update (or change) journal
+	/* The libfsntfs USN change journal
 	 */
-	libfsntfs_update_journal_t *update_journal;
+	libfsntfs_usn_change_journal_t *usn_change_journal;
 
 	/* The volume object
 	 */
 	PyObject *volume_object;
 };
 
-extern PyMethodDef pyfsntfs_update_journal_object_methods[];
-extern PyTypeObject pyfsntfs_update_journal_type_object;
+extern PyMethodDef pyfsntfs_usn_change_journal_object_methods[];
+extern PyTypeObject pyfsntfs_usn_change_journal_type_object;
 
-PyObject *pyfsntfs_update_journal_new(
-           libfsntfs_update_journal_t *update_journal,
+PyObject *pyfsntfs_usn_change_journal_new(
+           libfsntfs_usn_change_journal_t *usn_change_journal,
            PyObject *volume_object );
 
-int pyfsntfs_update_journal_init(
-     pyfsntfs_update_journal_t *pyfsntfs_update_journal );
+int pyfsntfs_usn_change_journal_init(
+     pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal );
 
-void pyfsntfs_update_journal_free(
-      pyfsntfs_update_journal_t *pyfsntfs_update_journal );
+void pyfsntfs_usn_change_journal_free(
+      pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal );
 
-PyObject *pyfsntfs_update_journal_read_usn_record(
-           pyfsntfs_update_journal_t *pyfsntfs_update_journal,
+PyObject *pyfsntfs_usn_change_journal_read_usn_record(
+           pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal,
            PyObject *arguments );
 
 #if defined( __cplusplus )

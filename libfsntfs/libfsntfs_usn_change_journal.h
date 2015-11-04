@@ -1,5 +1,5 @@
 /*
- * Update (or change) journal functions
+ * USN change journal functions
  *
  * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_UPDATE_JOURNAL_H )
-#define _LIBFSNTFS_INTERNAL_UPDATE_JOURNAL_H
+#if !defined( _LIBFSNTFS_INTERNAL_USN_CHANGE_JOURNAL_H )
+#define _LIBFSNTFS_INTERNAL_USN_CHANGE_JOURNAL_H
 
 #include <common.h>
 #include <types.h>
@@ -32,9 +32,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_internal_update_journal libfsntfs_internal_update_journal_t;
+typedef struct libfsntfs_internal_usn_change_journal libfsntfs_internal_usn_change_journal_t;
 
-struct libfsntfs_internal_update_journal
+struct libfsntfs_internal_usn_change_journal
 {
 	/* The IO handle
 	 */
@@ -97,8 +97,8 @@ struct libfsntfs_internal_update_journal
 	size_t cluster_block_offset;
 };
 
-int libfsntfs_update_journal_initialize(
-     libfsntfs_update_journal_t **update_journal,
+int libfsntfs_usn_change_journal_initialize(
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
@@ -107,15 +107,15 @@ int libfsntfs_update_journal_initialize(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_update_journal_free(
-     libfsntfs_update_journal_t **update_journal,
+int libfsntfs_usn_change_journal_free(
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libcerror_error_t **error );
 
 /* TODO add get offset */
 
 LIBFSNTFS_EXTERN \
-ssize_t libfsntfs_update_journal_read_usn_record(
-         libfsntfs_update_journal_t *update_journal,
+ssize_t libfsntfs_usn_change_journal_read_usn_record(
+         libfsntfs_usn_change_journal_t *usn_change_journal,
          uint8_t *usn_record_data,
          size_t usn_record_data_size,
          libcerror_error_t **error );

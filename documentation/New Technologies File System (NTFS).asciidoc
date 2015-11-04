@@ -196,8 +196,8 @@ commonly used but not fixed.
 [cols="1,1,5",options="header"]
 |===
 | MFT entry index | Filename | Description
-| | $Extend\$UsnJrnl | Update (or change) journal +
-See section: <<update_journal,Update (or change) journal>> +
+| | $Extend\$UsnJrnl | USN change journal +
+See section: <<usn_change_journal,USN change journal>> +
 [yellow-background]*Has this file been added in Windows XP SP3? Otherwise what are reasons for it to not be present?*
 |===
 
@@ -1987,6 +1987,7 @@ Contains a $LogFile Sequence Number (LSN)
 Contains a $LogFile Sequence Number (LSN)
 |===
 
+....
 LFS_RECORD_HEADER {
 
     //
@@ -2032,21 +2033,22 @@ LFS_RECORD_HEADER {
     //
 
     USHORT AlignWord;
+....
 
-== [[update_journal]]Update (or change) journal
-The metadata file $Extend\$UsnJrnl contains the update (or change) journal. It 
+== [[usn_change_journal]]USN change journal
+The metadata file $Extend\$UsnJrnl contains the USN change journal. It 
 is a sparse file in which NTFS stores records of changes to files and 
 directories. Applications make use of the journal to respond to file and 
 directory changes as they occur, like e.g. the Windows File Replication Service 
 (FRS) and the Windows (Desktop) Search service.
 
-The update journal consists of:
+The USN change journal consists of:
 
 * the $UsnJrnl:$Max data stream, containing metadata like the maximum size of the journal 
 * the $UsnJrnl:$J data stream, containing the update (or change) entries. The $UsnJrnl:$J data stream is sparse.
 
-=== Update journal metadata
-The update journal metadata is 32 bytes of size and consists of:
+=== USN change journal metadata
+The USN change journal metadata is 32 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2058,16 +2060,16 @@ Contains a FILETIME
 | 24 | 8 | | [yellow-background]*Unknown (empty)*
 |===
 
-=== Update journal entries
-The $UsnJrnl:$J data stream consists of an array of update journal entries. The 
-update journal entries are stored on a per-cluster block-basis and thus the 
-remaining cluster block can contain 0-byte values. The stream starts with a 
+=== USN change journal entries
+The $UsnJrnl:$J data stream consists of an array of USN change journal entries. 
+The USN change journal entries are stored on a per-cluster block-basis and thus 
+the remaining cluster block can contain 0-byte values. The stream starts with a 
 sparse data run.
 
-==== Update journal entry
-===== Update journal entry version 2
-The update journal entry version 2 (USN_RECORD or USN_RECORD_V2) is variable of 
-size and consists of:
+==== USN change journal entry
+===== USN change journal entry version 2
+The USN change journal entry version 2 (USN_RECORD or USN_RECORD_V2) is 
+variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2078,7 +2080,7 @@ size and consists of:
 | 8 | 8 | | File reference
 | 16 | 8 | | Parent file reference
 | 24 | 8 | | Update sequence number (USN) +
-Contains the file offset of the update journal entry which is used as a unique identifier
+Contains the file offset of the USN chagne journal entry which is used as a unique identifier
 | 32 | 8 | | Update date and time +
 Contains a FILETIME
 | 40 | 4 | | Update reason flags +
@@ -2093,16 +2095,16 @@ See section: <<file_attribute_flags,File attribute flags>>
 | 56 | 2 | | Name size +
 Contains the byte size of the name
 | 58 | 2 | | Name offset +
-The offset is relative from the start of the update journal entry
+The offset is relative from the start of the USN chagne journal entry
 4+| _Common_
 | 60 | (name size) | | Name
 | ... | ... | 0x00 | Padding
 |===
 
-===== Update journal entry version 3
+===== USN change journal entry version 3
 [yellow-background]*TODO check with Windows 2012 or Windows 8*
 
-The update journal entry version 3 (USN_RECORD_V3) is variable of size and 
+The USN chagne journal entry version 3 (USN_RECORD_V3) is variable of size and 
 consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -2114,7 +2116,7 @@ consists of:
 | 8 | *16* | | File reference
 | 24 | *16* | | Parent file reference
 | 40 | 8 | | Update sequence number (USN) +
-Contains the file offset of the update journal entry which is used as a unique identifier
+Contains the file offset of the USN change journal entry which is used as a unique identifier
 | 48 | 8 | | Update date and time +
 Contains a FILETIME
 | 56 | 4 | | Update reason flags +
@@ -2129,7 +2131,7 @@ See section: <<file_attribute_flags,File attribute flags>>
 | 72 | 2 | | Name size +
 Contains the byte size of the name
 | 74 | 2 | | Name offset +
-The offset is relative from the start of the update journal entry
+The offset is relative from the start of the USN change journal entry
 4+| _Common_
 | 78 | (name size) | | Name
 | ... | ... | 0x00 | Padding
@@ -2167,9 +2169,9 @@ Note that the index value in the MFT entry is only 32-bit of size.
 | 0x00000400 | USN_REASON_EA_CHANGE | The extended attributes of the file were changed
 | 0x00000800 | USN_REASON_SECURITY_CHANGE | The access rights (security descriptor) of a file or directory were changed
 | 0x00001000 | USN_REASON_RENAME_OLD_NAME | The name changed +
-The update journal entry contains the old name
+The USN change journal entry contains the old name
 | 0x00002000 | USN_REASON_RENAME_NEW_NAME | The name changed +
-The update journal entry contains the new name
+The USN change journal entry contains the new name
 | 0x00004000 | USN_REASON_INDEXABLE_CHANGE | Content indexed status changed +
 the file attribute: FILE_ATTRIBUTE_NOT_CONTENT_INDEXED was changed
 | 0x00008000 | USN_REASON_BASIC_INFO_CHANGE | Basic file or directory attributes changed +
@@ -2180,7 +2182,7 @@ One or more file or directory attributes were changed e.g. read-only, hidden, sy
 | 0x00080000 | USN_REASON_OBJECT_ID_CHANGE | The object identifier of a file or directory was changed
 | 0x00100000 | USN_REASON_REPARSE_POINT_CHANGE | The reparse point that in a file or directory was changed, or a reparse point was added to or deleted from a file or directory.
 | 0x00200000 | USN_REASON_STREAM_CHANGE | A named data stream ($DATA attribute) is added to or removed from a file, or a named stream is renamed
-| 0x00400000 | USN_REASON_TRANSACTED_CHANGE | [yellow-background]*Unknown found in TxF update journal entry list*
+| 0x00400000 | USN_REASON_TRANSACTED_CHANGE | [yellow-background]*Unknown found in TxF USN change journal entry list*
 | | | 
 | 0x80000000 | USN_REASON_CLOSE | The file or directory was closed
 |===

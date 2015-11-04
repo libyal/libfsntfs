@@ -39,7 +39,7 @@
 #include "libfsntfs_libcstring.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
-#include "libfsntfs_update_journal.h"
+#include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_volume.h"
 
 /* Creates a volume
@@ -2918,19 +2918,19 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the update journal
+/* Retrieves the USN change journal
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_volume_get_update_journal(
+int libfsntfs_volume_get_usn_change_journal(
      libfsntfs_volume_t *volume,
-     libfsntfs_update_journal_t **update_journal,
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *data_attribute        = NULL;
 	libfsntfs_directory_entry_t *directory_entry = NULL;
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	libfsntfs_mft_entry_t *mft_entry             = NULL;
-	static char *function                        = "libfsntfs_volume_get_update_journal";
+	static char *function                        = "libfsntfs_volume_get_usn_change_journal";
 	int result                                   = 0;
 
 	if( volume == NULL )
@@ -3004,10 +3004,10 @@ int libfsntfs_volume_get_update_journal(
 		}
 		return( 0 );
 	}
-	/* libfsntfs_update_journal_initialize takes over management of directory_entry
+	/* libfsntfs_usn_change_journal_initialize takes over management of directory_entry
 	 */
-	if( libfsntfs_update_journal_initialize(
-	     update_journal,
+	if( libfsntfs_usn_change_journal_initialize(
+	     usn_change_journal,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
 	     mft_entry,
@@ -3019,7 +3019,7 @@ int libfsntfs_volume_get_update_journal(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create update journal.",
+		 "%s: unable to create USN change journal.",
 		 function );
 
 		goto on_error;

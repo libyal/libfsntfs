@@ -94,7 +94,7 @@ PyObject *pyfsntfs_volume_get_name(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 
-PyObject *pyfsntfs_volume_get_update_journal(
+PyObject *pyfsntfs_volume_get_usn_change_journal(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 

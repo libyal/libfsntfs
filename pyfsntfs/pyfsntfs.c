@@ -48,7 +48,7 @@
 #include "pyfsntfs_reparse_point_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
-#include "pyfsntfs_update_journal.h"
+#include "pyfsntfs_usn_change_journal.h"
 #include "pyfsntfs_volume.h"
 #include "pyfsntfs_volume_file_entries.h"
 #include "pyfsntfs_volume_information_attribute.h"
@@ -485,7 +485,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyTypeObject *object_identifier_attribute_type_object    = NULL;
 	PyTypeObject *reparse_point_attribute_type_object        = NULL;
 	PyTypeObject *standard_information_attribute_type_object = NULL;
-	PyTypeObject *update_journal_type_object                 = NULL;
+	PyTypeObject *usn_change_journal_type_object             = NULL;
 	PyTypeObject *volume_type_object                         = NULL;
 	PyTypeObject *volume_file_entries_type_object            = NULL;
 	PyTypeObject *volume_information_attribute_type_object   = NULL;
@@ -734,24 +734,24 @@ PyMODINIT_FUNC initpyfsntfs(
 	 "volume_name_attribute",
 	 (PyObject *) volume_name_attribute_type_object );
 
-	/* Setup the update journal type object
+	/* Setup the USN change journal type object
 	 */
-	pyfsntfs_update_journal_type_object.tp_new = PyType_GenericNew;
+	pyfsntfs_usn_change_journal_type_object.tp_new = PyType_GenericNew;
 
 	if( PyType_Ready(
-	     &pyfsntfs_update_journal_type_object ) < 0 )
+	     &pyfsntfs_usn_change_journal_type_object ) < 0 )
 	{
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject *) &pyfsntfs_update_journal_type_object );
+	 (PyObject *) &pyfsntfs_usn_change_journal_type_object );
 
-	update_journal_type_object = &pyfsntfs_update_journal_type_object;
+	usn_change_journal_type_object = &pyfsntfs_usn_change_journal_type_object;
 
 	PyModule_AddObject(
 	 module,
-	 "update_journal",
-	 (PyObject *) update_journal_type_object );
+	 "usn_change_journal",
+	 (PyObject *) usn_change_journal_type_object );
 
 	/* Setup the attributes type object
 	 */
