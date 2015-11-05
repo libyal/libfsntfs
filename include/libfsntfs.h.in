@@ -1707,6 +1707,15 @@ int libfsntfs_usn_change_journal_free(
      libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_error_t **error );
 
+/* Retrieves the current offset of the USN change journal
+ * Returns the offset if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_usn_change_journal_get_offset(
+     libfsntfs_usn_change_journal_t *usn_change_journal,
+     off64_t *offset,
+     libfsntfs_error_t **error );
+
 /* Reads an USN record from the USN change journal
  * Returns the number of bytes read if successful or -1 on error
  */

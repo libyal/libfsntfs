@@ -27,6 +27,7 @@
 #endif
 
 #include "pyfsntfs_error.h"
+#include "pyfsntfs_integer.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
@@ -37,6 +38,13 @@
 PyMethodDef pyfsntfs_usn_change_journal_object_methods[] = {
 
 	/* Functions to access the USN change journal */
+
+	{ "get_offset",
+	  (PyCFunction) pyfsntfs_usn_change_journal_get_offset,
+	  METH_NOARGS,
+	  "get_offset() -> Integer\n"
+	  "\n"
+	  "Returns the current offset within the USN change journal data." },
 
 	{ "read_usn_record",
 	  (PyCFunction) pyfsntfs_usn_change_journal_read_usn_record,
@@ -308,6 +316,58 @@ void pyfsntfs_usn_change_journal_free(
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_usn_change_journal );
+}
+
+/* Retrieves the offset
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_usn_change_journal_get_offset(
+           pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_usn_change_journal_get_offset";
+	off64_t offset           = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_usn_change_journal == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid USN change journal.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_usn_change_journal_get_offset(
+	          pyfsntfs_usn_change_journal->usn_change_journal,
+	          &offset,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve offset.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_signed_new_from_64bit(
+	                  (int64_t) offset );
+
+	return( integer_object );
 }
 
 /* Reads an USN record

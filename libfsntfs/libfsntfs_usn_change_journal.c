@@ -319,6 +319,46 @@ int libfsntfs_usn_change_journal_free(
 	return( result );
 }
 
+/* Retrieves the current offset of the default data stream (nameless $DATA attribute)
+ * Returns the offset if successful or -1 on error
+ */
+int libfsntfs_usn_change_journal_get_offset(
+     libfsntfs_usn_change_journal_t *usn_change_journal,
+     off64_t *offset,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
+	static char *function                                                = "libfsntfs_usn_change_journal_get_offset";
+
+	if( usn_change_journal == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid USN change journal.",
+		 function );
+
+		return( -1 );
+	}
+	internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) usn_change_journal;
+
+	if( offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset.",
+		 function );
+
+		return( -1 );
+	}
+	*offset = internal_usn_change_journal->data_offset;
+
+	return( 1 );
+}
+
 /* Reads an USN record from the USN change journal
  * Returns the number of bytes read if successful or -1 on error
  */

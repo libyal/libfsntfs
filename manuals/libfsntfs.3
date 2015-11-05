@@ -1,4 +1,4 @@
-.Dd November  4, 2015
+.Dd November  5, 2015
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -354,6 +354,8 @@ Available when compiled with libbfio support:
 USN change journal functions
 .Ft int
 .Fn libfsntfs_usn_change_journal_free "libfsntfs_usn_change_journal_t **usn_change_journal, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_usn_change_journal_get_offset "libfsntfs_usn_change_journal_t *usn_change_journal, off64_t *offset, libfsntfs_error_t **error"
 .Ft ssize_t
 .Fn libfsntfs_usn_change_journal_read_usn_record "libfsntfs_usn_change_journal_t *usn_change_journal, uint8_t *usn_record_data, size_t usn_record_data_size, libfsntfs_error_t **error"
 .Sh DESCRIPTION

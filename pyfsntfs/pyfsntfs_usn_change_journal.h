@@ -62,6 +62,10 @@ int pyfsntfs_usn_change_journal_init(
 void pyfsntfs_usn_change_journal_free(
       pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal );
 
+PyObject *pyfsntfs_usn_change_journal_get_offset(
+           pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_usn_change_journal_read_usn_record(
            pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal,
            PyObject *arguments );

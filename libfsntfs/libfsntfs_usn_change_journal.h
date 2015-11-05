@@ -111,7 +111,11 @@ int libfsntfs_usn_change_journal_free(
      libfsntfs_usn_change_journal_t **usn_change_journal,
      libcerror_error_t **error );
 
-/* TODO add get offset */
+LIBFSNTFS_EXTERN \
+int libfsntfs_usn_change_journal_get_offset(
+     libfsntfs_usn_change_journal_t *usn_change_journal,
+     off64_t *offset,
+     libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 ssize_t libfsntfs_usn_change_journal_read_usn_record(
