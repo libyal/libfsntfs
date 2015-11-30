@@ -36,10 +36,6 @@ typedef struct libfsntfs_internal_usn_change_journal libfsntfs_internal_usn_chan
 
 struct libfsntfs_internal_usn_change_journal
 {
-	/* The IO handle
-	 */
-	libfsntfs_io_handle_t *io_handle;
-
 	/* The file IO handle
 	 */
 	libbfio_handle_t *file_io_handle;
@@ -88,13 +84,17 @@ struct libfsntfs_internal_usn_change_journal
 	 */
 	uint32_t extent_flags;
 
-	/* The cluster block data
+	/* The journal block data
 	 */
-	uint8_t *cluster_block_data;
+	uint8_t *journal_block_data;
 
-	/* The cluster block (data) offset
+	/* The journal block (data) offset
 	 */
-	size_t cluster_block_offset;
+	size_t journal_block_offset;
+
+	/* The journal block size
+	 */
+	size64_t journal_block_size;
 };
 
 int libfsntfs_usn_change_journal_initialize(

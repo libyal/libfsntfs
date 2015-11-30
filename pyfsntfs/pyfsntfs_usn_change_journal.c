@@ -381,7 +381,7 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 	PyObject *string_object   = NULL;
 	static char *function     = "pyfsntfs_usn_change_journal_read_usn_record";
 	char *usn_record_data     = NULL;
-	size_t cluster_block_size = 0;
+	size_t journal_block_size = 0x1000;
 	ssize_t read_count        = 0;
 	int result                = 0;
 
@@ -403,30 +403,9 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 
 		return( NULL );
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_volume_get_cluster_block_size(
-	          pyfsntfs_usn_change_journal->usn_change_journal,
-	          &cluster_block_size,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve cluster block size.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	if( ( cluster_block_size == 0 )
-	 || ( cluster_block_size > (size_t) SSIZE_MAX ) )
+/* TODO get journal block size from USN change journal */
+	if( ( journal_block_size == 0 )
+	 || ( journal_block_size > (size_t) SSIZE_MAX ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -438,7 +417,7 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 #if PY_MAJOR_VERSION >= 3
 	string_object = PyBytes_FromStringAndSize(
 	                 NULL,
-	                 cluster_block_size );
+	                 journal_block_size );
 
 	usn_record_data = PyBytes_AsString(
 	                   string_object );
@@ -447,7 +426,7 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 	 */
 	string_object = PyString_FromStringAndSize(
 	                 NULL,
-	                 cluster_block_size );
+	                 journal_block_size );
 
 	usn_record_data = PyString_AsString(
 	                   string_object );
@@ -457,7 +436,7 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 	read_count = libfsntfs_usn_change_journal_read_usn_record(
 	              pyfsntfs_usn_change_journal->usn_change_journal,
 	              (uint8_t *) usn_record_data,
-	              (size_t) cluster_block_size,
+	              (size_t) journal_block_size,
 	              &error );
 
 	Py_END_ALLOW_THREADS
@@ -478,7 +457,7 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 
 		return( NULL );
 	}
-	/* Need to resize the string here in case cluster_block_size was not fully read.
+	/* Need to resize the string here in case journal_block_size was not fully read.
 	 */
 #if PY_MAJOR_VERSION >= 3
 	if( _PyBytes_Resize(

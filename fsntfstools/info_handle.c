@@ -3960,7 +3960,7 @@ int info_handle_usn_change_journal_fprint(
 	libfusn_record_t *usn_record                       = NULL;
 	uint8_t *buffer                                    = NULL;
 	static char *function                              = "info_handle_usn_change_journal_fprint";
-	size_t cluster_block_size                          = 0;
+	size_t journal_block_size                          = 0x1000;
 	ssize_t read_count                                 = 0;
 	uint32_t usn_record_size                           = 0;
 
@@ -3983,28 +3983,15 @@ int info_handle_usn_change_journal_fprint(
 	 info_handle->notify_stream,
 	 "USN change journal: \\$Extend\\$UsnJrnl\n\n" );
 
-	if( libfsntfs_volume_get_cluster_block_size(
-	     info_handle->input_volume,
-	     &cluster_block_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve cluster block size.",
-		 function );
-
-		goto on_error;
-	}
-	if( ( cluster_block_size == 0 )
-	 || ( cluster_block_size > (size_t) SSIZE_MAX ) )
+/* TODO get journal block size from USN change journal */
+	if( ( journal_block_size == 0 )
+	 || ( journal_block_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid cluster block size value out of bounds.",
+		 "%s: invalid journal block size value out of bounds.",
 		 function );
 
 		goto on_error;
@@ -4024,7 +4011,7 @@ int info_handle_usn_change_journal_fprint(
 		goto on_error;
 	}
 	buffer = (uint8_t *) memory_allocate(
-	                      sizeof( uint8_t ) * cluster_block_size );
+	                      sizeof( uint8_t ) * journal_block_size );
 
 	if( buffer == NULL )
 	{
@@ -4042,7 +4029,7 @@ int info_handle_usn_change_journal_fprint(
 		read_count = libfsntfs_usn_change_journal_read_usn_record(
 			      usn_change_journal,
 			      buffer,
-			      cluster_block_size,
+			      journal_block_size,
 			      error );
 
 		if( read_count < 0 )

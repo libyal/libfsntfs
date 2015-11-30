@@ -1,4 +1,6 @@
 TODO
+* USN change journal
+  - add support for values in $Max
 * resident data
   - handle valid data size
 * compressed data
@@ -151,6 +153,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20151130
+* worked on USN change journal
 
 20151106
 * worked on USN change journal

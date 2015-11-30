@@ -2047,8 +2047,10 @@ The USN change journal metadata is 32 bytes of size and consists of:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
-| 0 | 8 | | Maximum size
-| 8 | 8 | | Allocation Delta
+| 0 | 8 | | Maximum size +
+Contains the number of bytes
+| 8 | 8 | | Allocation delta +
+Contains the number of bytes
 | 16 | 8 | | Update (USN) journal identifier +
 Contains a FILETIME
 | 24 | 8 | | [yellow-background]*Unknown (empty)*
@@ -2056,9 +2058,15 @@ Contains a FILETIME
 
 === USN change journal entries
 The $UsnJrnl:$J data stream consists of an array of USN change journal entries. 
-The USN change journal entries are stored on a per-cluster block-basis and thus 
-the remaining cluster block can contain 0-byte values. The stream starts with a 
-sparse data run.
+The USN change journal entries are stored on a per block-basis and 64-bit
+aligned. Therefore the remainder of the block can contain 0-byte values.
+
+[yellow-background]*TODO: The journal block size seems to be 4096 bytes, but
+could this be defined by the index entry size? It does not match the cluster
+block size.*
+
+Once the stream reaches maximum size the earliest USN change journal entries
+are removed from the stream and replaced with a sparse data run.
 
 ==== USN change journal entry
 ===== USN change journal entry version 2
