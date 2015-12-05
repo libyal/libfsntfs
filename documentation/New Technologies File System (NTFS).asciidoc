@@ -2104,7 +2104,9 @@ The offset is relative from the start of the USN chagne journal entry
 |===
 
 ===== USN change journal entry version 3
-[yellow-background]*TODO check with Windows 2012 or Windows 8*
+[yellow-background]*TODO need a sample to confirm this version of the USN 
+record is actually used by NTFS. For now it is assumed that it is likely used 
+by ReFS.*
 
 The USN chagne journal entry version 3 (USN_RECORD_V3) is variable of size and 
 consists of:
