@@ -224,6 +224,10 @@
 				RelativePath="..\..\libfusn\libfusn_types.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libfusn\libfusn_unused.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
