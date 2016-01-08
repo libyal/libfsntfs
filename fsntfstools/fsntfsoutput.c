@@ -1,7 +1,7 @@
 /*
  * Common output functions for the fsntfstools
  *
- * Copyright (C) 2010-2015, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -53,7 +53,7 @@ void fsntfsoutput_copyright_fprint(
 	 */
 	fprintf(
 	 stream,
-	 _( "Copyright (C) 2010-2015, %s.\n" ),
+	 _( "Copyright (C) 2010-2016, %s.\n" ),
 	 _( "Joachim Metz" ) );
 
 	fprintf(
