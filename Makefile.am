@@ -24,6 +24,8 @@ SUBDIRS = \
 	libcsystem \
 	fsntfstools \
 	pyfsntfs \
+	pyfsntfs2 \
+	pyfsntfs3 \
 	po \
 	manuals \
 	tests \
@@ -37,8 +39,10 @@ DPKG_FILES = \
 	dpkg/copyright \
 	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libfsntfs-dev.docs \
 	dpkg/libfsntfs.docs \
+	dpkg/libfsntfs-dev.docs \
+	dpkg/libfsntfs-python.docs \
+	dpkg/libfsntfs-python3.docs \
 	dpkg/libfsntfs-tools.docs \
 	dpkg/source/format
 

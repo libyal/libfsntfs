@@ -33,16 +33,25 @@ Several tools for reading the Windows NT File System (NTFS) volumes
 %setup -q
 
 %package python
-Summary: Python bindings for libfsntfs
+Summary: Python 2 bindings for libfsntfs
 Group: System Environment/Libraries
 Requires: libfsntfs = %{version}-%{release} python
 BuildRequires: python-devel
 
 %description python
-Python bindings for libfsntfs
+Python 2 bindings for libfsntfs
+
+%package python3
+Summary: Python 3 bindings for libfsntfs
+Group: System Environment/Libraries
+Requires: libfsntfs = %{version}-%{release} python3
+BuildRequires: python3-devel
+
+%description python3
+Python 3 bindings for libfsntfs
 
 %build
-%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python
+%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python2 --enable-python3
 make %{?_smp_mflags}
 
 %install
@@ -80,9 +89,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %files python
 %defattr(644,root,root,755)
 %doc AUTHORS COPYING NEWS README
-%{_libdir}/python*/site-packages/*.a
-%{_libdir}/python*/site-packages/*.la
-%{_libdir}/python*/site-packages/*.so
+%{_libdir}/python2*/site-packages/*.a
+%{_libdir}/python2*/site-packages/*.la
+%{_libdir}/python2*/site-packages/*.so
+
+%files python3
+%defattr(644,root,root,755)
+%doc AUTHORS COPYING NEWS README
+%{_libdir}/python3*/site-packages/*.a
+%{_libdir}/python3*/site-packages/*.la
+%{_libdir}/python3*/site-packages/*.so
 
 %changelog
 * @SPEC_DATE@ Joachim Metz <joachim.metz@gmail.com> @VERSION@-1

@@ -1,15 +1,9 @@
 Library and tools to access the New Technology File System (NTFS).
 
-Note that this project currently only focuses on the analysis of the format.
-
 Project information:
 
 * Status: experimental
 * Licence: LGPLv3+
-
-Planned:
-
-* Finish library
 
 For more information see:
 
