@@ -77,7 +77,7 @@ pyfsntfs_la_CPPFLAGS = $(PYTHON3_CPPFLAGS)
 pyfsntfs_la_LDFLAGS  = -module -avoid-version $(PYTHON3_LDFLAGS)
 
 $(BUILT_SOURCES):
-	/bin/cp -f $(top_srcdir)/pyfsntfs/pyfsntfs*.[ch] .
+	/bin/cp -f $(top_srcdir)/pyfsntfs/$@ $@
 
 endif
 

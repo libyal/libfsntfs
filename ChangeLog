@@ -154,6 +154,9 @@ Debug:
 Deployment
 * write man pages
 
+20160109
+* fixes for rpmbuild
+
 20160108
 * worked on Python 3 support
 * 2016 update
