@@ -113,7 +113,7 @@ stamp-h[1-9]
 /include/libfsntfs/types.h
 /libfsntfs/libfsntfs.rc
 /libfsntfs/libfsntfs_definitions.h
-/pyfsntfs[23]/*.[ch]
+/pyfsntfs-python[23]/*.[ch]
 /fsntfstools/fsntfsinfo
 /tests/fsntfs_test_open_close
 /tests/fsntfs_test_read

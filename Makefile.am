@@ -24,8 +24,8 @@ SUBDIRS = \
 	libcsystem \
 	fsntfstools \
 	pyfsntfs \
-	pyfsntfs2 \
-	pyfsntfs3 \
+	pyfsntfs-python2 \
+	pyfsntfs-python3 \
 	po \
 	manuals \
 	tests \
