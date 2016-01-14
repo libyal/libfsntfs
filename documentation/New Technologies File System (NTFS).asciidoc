@@ -57,6 +57,7 @@ Switched to asccidoc format.
 | 0.0.9 | J.B. Metz | August 2015 | Additional information.
 | 0.0.10 | J.B. Metz | August 2015 | Additional information regarding index and security descriptors.
 | 0.0.11 | J.B. Metz | January 2016 | Additional information about common alternate data stream.
+| 0.0.12 | J.B. Metz | January 2016 | Additional information about extended attributes.
 |===
 
 :numbered:
@@ -1132,33 +1133,59 @@ system-level link. It is stored as a resident MFT attribute.
 See section: <<reparse_point,The reparse point>>.
 
 === The (HPFS) extended attribute information
-The (HPFS) extended attribute information ($EA_INFORMATION) contains [yellow-background]*TODO*
+The (HPFS) extended attribute information ($EA_INFORMATION) contains 
+information about the extended attribute ($EA).
 
-[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes 
-$AttrDef indicates the attribute to be 8 bytes of size.*
+The extended attribute information data is 8 bytes of size and consists of:
 
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 2 | | Size of an extended attribute entry
+| 2 | 2 | | Number of extended attributes which have NEED_EA set +
+[yellow-background]*TODO: determine what this flag is used for*
+| 4 | 4 | | Size of the extended attribute ($EA) data
+|===
+
+E.g.
 ....
-0x00 2 Size of the packed Extended Attributes 
-0x02 2 Number of Extended Attributes which have NEED_EA set 
-0x04 4 Size of the unpacked Extended Attributes 
+00000000: 08 00 00 00 18 00 00 00                            ........
 ....
 
 === The (HPFS) extended attribute
-The (HPFS) extended attribute ($EA) contains [yellow-background]*TODO*
+The (HPFS) extended attribute ($EA) contains the extended attribute data.
 
-[yellow-background]*TODO, need a NTFS volume with (HPFS) extended attributes*
+The extended attribute data is variable of size and consists of:
 
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Offset to next extended attribute entry +
+The offset is relative from the start of the extended attribute data
+| 4 | 1 | | Flags +
+0x80 => NEED_EA (Need EA) flag
+| 5 | 1 | | Number of characters of the extended attribute name
+| 6 | 2 | | Value data size
+| 8 | ... | | The extended attribute name +
+Contains an ASCII string +
+[yellow-background]*TODO: is this value 16-bit aligned?*
+| ... | ... | | Value data
+| ... | ... | | [yellow-background]*TODO: unknown trailing data*
+|===
+
+E.g.
 ....
-0x00   4 Offset to next Extended Attribute 
-0x04   1 Flags 
-0x05   1 Name Length (N) 
-0x06   2 Value Length (V) 
-0x08   N Name 
-N+0x08 V Value 
-
-Flags:
-0x80 Need EA
+00000000: 18 00 00 00 00 09 04 00  2e 55 4e 49 58 41 54 54   ........ .UNIXATT
+00000010: 52 00 b6 01 00 00 03 87                            R....... 
 ....
+
+==== UNITATTR extended attribute value data
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*TODO: is this an equivalent of st_mode?*
+|===
 
 === The property set attribute
 The property set attribute ($PROPERTY_SET) contains [yellow-background]*TODO*
