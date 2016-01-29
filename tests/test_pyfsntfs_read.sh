@@ -1,7 +1,7 @@
 #!/bin/bash
-# Library read testing script
+# Python-bindings read testing script
 #
-# Version: 20160126
+# Version: 20160127
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -11,7 +11,7 @@ TEST_PREFIX=`pwd`;
 TEST_PREFIX=`dirname ${TEST_PREFIX}`;
 TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
 
-TEST_EXECUTABLE="${TEST_PREFIX}_test_read";
+TEST_SCRIPT="py${TEST_PREFIX}_test_read.py";
 OPTION_SETS="";
 INPUT_GLOB="*";
 
@@ -39,20 +39,6 @@ run_test()
 	INPUT_FILE=$4;
 	OPTION_SET=$5;
 
-	TEST_RUNNER="tests/test_runner.sh";
-
-	if ! test -x "${TEST_RUNNER}";
-	then
-		TEST_RUNNER="./test_runner.sh";
-	fi
-
-	if ! test -x "${TEST_RUNNER}";
-	then
-		echo "Missing test runner: ${TEST_RUNNER}";
-
-		return ${EXIT_FAILURE};
-	fi
-
 	INPUT_NAME=`basename ${INPUT_FILE}`;
 
 	if test -z "${OPTION_SET}";
@@ -73,7 +59,14 @@ run_test()
 		echo "Testing ${TEST_DESCRIPTION} with option: ${OPTION_SET} and input: ${INPUT_FILE}";
 	fi
 
-	${TEST_RUNNER} ${TMPDIR} ${TEST_EXECUTABLE} ${OPTIONS} ${INPUT_FILE};
+	if test `uname -s` = 'Darwin';
+	then
+		DYLD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} ${OPTIONS} ${INPUT_FILE};
+		RESULT=$?;
+	else
+		LD_LIBRARY_PATH="../lib${TEST_PREFIX}/.libs/" PYTHONPATH="../py${TEST_PREFIX}/.libs/" ${PYTHON} ${TEST_SCRIPT} ${OPTIONS} ${INPUT_FILE};
+		RESULT=$?;
+	fi
 
 	RESULT=$?;
 
@@ -178,21 +171,23 @@ run_tests()
 	return ${EXIT_SUCCESS};
 }
 
-if ! test -z ${SKIP_LIBRARY_TESTS};
+if ! test -z ${SKIP_PYTHON_TESTS};
 then
 	exit ${EXIT_IGNORE};
 fi
 
-TEST_READ="./${TEST_EXECUTABLE}";
+PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
 
-if ! test -x "${TEST_READ}";
+if ! test -x ${PYTHON};
 then
-	TEST_READ="${TEST_EXECUTABLE}.exe";
+	echo "Missing executable: ${PYTHON}";
+
+	exit ${EXIT_FAILURE};
 fi
 
-if ! test -x "${TEST_READ}";
+if ! test -f ${TEST_SCRIPT};
 then
-	echo "Missing executable: ${TEST_READ}";
+	echo "Missing script: ${TEST_SCRIPT}";
 
 	exit ${EXIT_FAILURE};
 fi
@@ -201,7 +196,7 @@ OLDIFS=${IFS};
 IFS="
 ";
 
-run_tests "lib${TEST_PREFIX}" "read" "${TEST_READ}";
+run_tests "py${TEST_PREFIX}" "read" "${TEST_SEEK}";
 
 RESULT=$?;
 

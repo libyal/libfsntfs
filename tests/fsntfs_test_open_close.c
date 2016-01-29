@@ -20,16 +20,15 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include <stdio.h>
-
-#include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libcstring.h"
+#include "fsntfs_test_libfsntfs.h"
 
 /* Tests single open and close of a volume
  * Returns 1 if successful, 0 if not or -1 on error

@@ -6,15 +6,29 @@ AM_CPPFLAGS = \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
+if HAVE_PYTHON_TESTS
+TESTS_PYFSNTFS = \
+	test_pyfsntfs_open_close.sh \
+	test_pyfsntfs_seek.sh \
+	test_pyfsntfs_read.sh
+endif
+
 TESTS = \
 	test_open_close.sh \
 	test_read.sh \
 	test_seek.sh \
-	test_fsntfsinfo.sh
+	test_fsntfsinfo.sh \
+	$(TESTS_PYFSNTFS)
 
 check_SCRIPTS = \
+	pyfsntfs_test_open_close.py \
+	pyfsntfs_test_read.py \
+	pyfsntfs_test_seek.py \
 	test_fsntfsinfo.sh \
 	test_open_close.sh \
+	test_pyfsntfs_open_close.sh \
+	test_pyfsntfs_seek.sh \
+	test_pyfsntfs_read.sh \
 	test_read.sh \
 	test_runner.sh \
 	test_seek.sh

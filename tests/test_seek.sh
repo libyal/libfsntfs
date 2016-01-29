@@ -1,30 +1,19 @@
 #!/bin/bash
-#
 # Library seek testing script
 #
-# Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
-#
-# Refer to AUTHORS for acknowledgements.
-#
-# This software is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# Version: 20160126
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_PREFIX="fsntfs";
+TEST_PREFIX=`pwd`;
+TEST_PREFIX=`dirname ${TEST_PREFIX}`;
+TEST_PREFIX=`basename ${TEST_PREFIX} | sed 's/^lib//'`;
+
+TEST_EXECUTABLE="${TEST_PREFIX}_test_seek";
 OPTION_SETS="";
+INPUT_GLOB="*";
 
 list_contains()
 {
@@ -152,7 +141,7 @@ run_tests()
 		then
 			INPUT_FILES=`cat ${TEST_SET_DIR}/files | sed "s?^?${INPUT_DIR}/?"`;
 		else
-			INPUT_FILES=`ls ${INPUT_DIR}/*`;
+			INPUT_FILES=`ls ${INPUT_DIR}/${INPUT_GLOB}`;
 		fi
 
 		for INPUT_FILE in ${INPUT_FILES};
@@ -189,11 +178,16 @@ run_tests()
 	return ${EXIT_SUCCESS};
 }
 
-TEST_SEEK="./${TEST_PREFIX}_test_seek";
+if ! test -z ${SKIP_LIBRARY_TESTS};
+then
+	exit ${EXIT_IGNORE};
+fi
+
+TEST_SEEK="./${TEST_EXECUTABLE}";
 
 if ! test -x "${TEST_SEEK}";
 then
-	TEST_SEEK="./${TEST_PREFIX}_test_seek.exe";
+	TEST_SEEK="${TEST_EXECUTABLE}.exe";
 fi
 
 if ! test -x "${TEST_SEEK}";
