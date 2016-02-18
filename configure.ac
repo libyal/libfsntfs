@@ -123,7 +123,7 @@ AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
 dnl Check if libfsntfs should be build with debug output
 AX_COMMON_CHECK_ENABLE_DEBUG_OUTPUT
 
-dnl Check if libsmdev python bindings (pysmdev) should be build
+dnl Check if libfsext python bindings (pyfsext) should be build
 AX_PYTHON_CHECK_PYPREFIX
 AX_PYTHON_CHECK_ENABLE
 AX_PYTHON2_CHECK_ENABLE
