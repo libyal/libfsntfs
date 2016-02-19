@@ -28,7 +28,7 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_python.h"
 
-#define PYFSNTFS_ERROR_STRING_SIZE		2048
+#define PYFSNTFS_ERROR_STRING_SIZE	2048
 
 #if defined( __cplusplus )
 extern "C" {
@@ -56,5 +56,5 @@ void pyfsntfs_error_raise(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_ERROR_H ) */
 

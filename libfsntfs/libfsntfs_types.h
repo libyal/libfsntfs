@@ -58,5 +58,5 @@ typedef intptr_t libfsntfs_volume_t;
  */
 typedef unsigned long int libfsntfs_aligned_t;
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_TYPES_H ) */
 

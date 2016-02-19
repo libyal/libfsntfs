@@ -138,5 +138,5 @@ int pyfsntfs_file_object_io_handle_get_size(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_FILE_OBJECT_IO_HANDLE_H ) */
 

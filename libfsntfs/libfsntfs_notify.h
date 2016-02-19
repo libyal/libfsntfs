@@ -53,11 +53,11 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_notify_stream_close(
      libcerror_error_t **error );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBFSNTFS ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_NOTIFY_H ) */
 
