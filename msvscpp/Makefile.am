@@ -1,4 +1,5 @@
 MSVSCPP_FILES = \
+	fsntfs_test_get_version/fsntfs_test_get_version.vcproj \
 	fsntfs_test_open_close/fsntfs_test_open_close.vcproj \
 	fsntfs_test_read/fsntfs_test_read.vcproj \
 	fsntfs_test_seek/fsntfs_test_seek.vcproj \

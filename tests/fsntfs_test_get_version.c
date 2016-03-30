@@ -1,5 +1,5 @@
 /*
- * The internal libcstring header
+ * Library get version test program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,33 +19,43 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFS_TEST_LIBCSTRING_H )
-#define _FSNTFS_TEST_LIBCSTRING_H
-
 #include <common.h>
+#include <file_stream.h>
 
-/* Define HAVE_LOCAL_LIBCSTRING for local use of libcstring
- */
-#if defined( HAVE_LOCAL_LIBCSTRING )
-
-#include <libcstring_definitions.h>
-#include <libcstring_narrow_string.h>
-#include <libcstring_system_string.h>
-#include <libcstring_types.h>
-#include <libcstring_wide_string.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBCSTRING_DLL_IMPORT
- * before including libcstring.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBCSTRING_DLL_IMPORT
+#if defined( HAVE_STDLIB_H ) || defined( WINAPI )
+#include <stdlib.h>
 #endif
 
-#include <libcstring.h>
+#include "fsntfs_test_libfsntfs.h"
+#include "fsntfs_test_libcstring.h"
 
-#endif /* defined( HAVE_LOCAL_LIBCSTRING ) */
+/* The main program
+ */
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+int wmain( int argc, wchar_t * const argv[] )
+#else
+int main( int argc, char * const argv[] )
+#endif
+{
+	const char *version_string = NULL;
 
-#endif /* !defined( _FSNTFS_TEST_LIBCSTRING_H ) */
+	if( argc != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unsupported number of arguments.\n" );
+
+		return( EXIT_FAILURE );
+	}
+	version_string = libfsntfs_get_version();
+
+	if( libcstring_narrow_string_compare(
+	     version_string,
+	     LIBFSNTFS_VERSION_STRING,
+	     9 ) != 0 )
+	{
+		return( EXIT_FAILURE );
+	}
+	return( EXIT_SUCCESS );
+}
 

@@ -72,7 +72,7 @@ def pyfsntfs_test_seek_offset(
 
 
 def pyfsntfs_test_seek(fsntfs_file_entry):
-  file_size = fsntfs_file_entry.file_size
+  file_size = fsntfs_file_entry.size
 
   # Test: SEEK_SET offset: 0
   # Expected result: 0
@@ -180,7 +180,7 @@ def pyfsntfs_test_seek_file(filename):
   fsntfs_volume.open(filename, "r")
 
   fsntfs_file_entry = fsntfs_volume.get_file_entry_by_path("\\$UpCase")
-  result = pyfsntfs_test_read(fsntfs_file_entry)
+  result = pyfsntfs_test_seek(fsntfs_file_entry)
   fsntfs_volume.close()
 
   return result
@@ -193,7 +193,7 @@ def pyfsntfs_test_seek_file_object(filename):
   fsntfs_volume.open_file_object(file_object, "r")
 
   fsntfs_file_entry = fsntfs_volume.get_file_entry_by_path("\\$UpCase")
-  result = pyfsntfs_test_read(fsntfs_file_entry)
+  result = pyfsntfs_test_seek(fsntfs_file_entry)
   fsntfs_volume.close()
 
   return result

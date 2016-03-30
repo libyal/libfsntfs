@@ -8,38 +8,41 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON_TESTS
 TESTS_PYFSNTFS = \
-	test_pyfsntfs_open_close.sh \
-	test_pyfsntfs_seek.sh \
-	test_pyfsntfs_read.sh
+	test_python_functions.sh
 endif
 
 TESTS = \
-	test_open_close.sh \
-	test_read.sh \
-	test_seek.sh \
+	test_api_functions.sh \
 	test_fsntfsinfo.sh \
 	$(TESTS_PYFSNTFS)
 
 check_SCRIPTS = \
+	pyfsntfs_test_get_version.py \
 	pyfsntfs_test_open_close.py \
 	pyfsntfs_test_read.py \
 	pyfsntfs_test_seek.py \
+	test_api_functions.sh \
 	test_fsntfsinfo.sh \
-	test_open_close.sh \
-	test_pyfsntfs_open_close.sh \
-	test_pyfsntfs_seek.sh \
-	test_pyfsntfs_read.sh \
-	test_read.sh \
-	test_runner.sh \
-	test_seek.sh
+	test_python_functions.sh \
+	test_runner.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	fsntfs_test_get_version \
 	fsntfs_test_open_close \
 	fsntfs_test_read \
 	fsntfs_test_seek
+
+fsntfs_test_get_version_SOURCES = \
+	fsntfs_test_libcstring.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_get_version.c
+
+fsntfs_test_get_version_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCSTRING_LIBADD@
 
 fsntfs_test_open_close_SOURCES = \
 	fsntfs_test_libcerror.h \

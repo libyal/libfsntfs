@@ -58,6 +58,7 @@ Switched to asccidoc format.
 | 0.0.10 | J.B. Metz | August 2015 | Additional information regarding index and security descriptors.
 | 0.0.11 | J.B. Metz | January 2016 | Additional information about common alternate data stream.
 | 0.0.12 | J.B. Metz | January 2016 | Additional information about extended attributes.
+| 0.0.13 | J.B. Metz | March 2016 | Small changes. 
 |===
 
 :numbered:
@@ -471,7 +472,7 @@ Live MFT header:
 |===
 | Value | Identifier | Description
 | 0x0001 | FILE_RECORD_SEGMENT_IN_USE | In use
-| 0x0002 | FILE_FILE_NAME_INDEX_PRESENT | Has file name (or $I30) index +
+| 0x0002 | FILE_NAME_INDEX_PRESENT | Has file name (or $I30) index +
 When this flag is present the file entry is a directory (or contains sub file entries)
 | 0x0004 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse, $UsnJrnl)*
 | 0x0008 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse. $Secure)*

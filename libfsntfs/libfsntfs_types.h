@@ -49,7 +49,7 @@ typedef intptr_t libfsntfs_mft_metadata_file_t;
 typedef intptr_t libfsntfs_usn_change_journal_t;
 typedef intptr_t libfsntfs_volume_t;
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */
 
 #endif /* defined( HAVE_LOCAL_LIBFSNTFS ) */
 

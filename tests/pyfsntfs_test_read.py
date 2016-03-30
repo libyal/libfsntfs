@@ -150,30 +150,34 @@ def pyfsntfs_test_read(fsntfs_file_entry):
 
   # Test: offset: 0 size: <file_size>
   # Expected result: offset: 0 size: <file_size>
+  read_offset = 0
+  read_size = file_size
+
   if not pyfsntfs_test_seek_offset_and_read_buffer(
-      fsntfs_file_entry, 0, os.SEEK_SET, file_size, 0, file_size):
+      fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
-  # Test: offset: 0 size: <file_size>
-  # Expected result: offset: 0 size: <file_size>
   if not pyfsntfs_test_seek_offset_and_read_buffer(
-      fsntfs_file_entry, 0, os.SEEK_SET, file_size, 0, file_size):
+      fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
   # Case 1: test buffer at offset read
 
   # Test: offset: <file_size / 7> size: <file_size / 2>
   # Expected result: offset: <file_size / 7> size: <file_size / 2>
+  read_offset, _ = divmod(file_size, 7)
+  read_size, _ = divmod(file_size, 2)
+
   if not pyfsntfs_test_seek_offset_and_read_buffer(
-      fsntfs_file_entry, file_size / 7, os.SEEK_SET, file_size / 2,
-      file_size / 7, file_size / 2):
+      fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
-  # Test: offset: <file_size / 7> size: <file_size / 2>
-  # Expected result: offset: <file_size / 7> size: <file_size / 2>
   if not pyfsntfs_test_seek_offset_and_read_buffer(
-      fsntfs_file_entry, file_size / 7, os.SEEK_SET, file_size / 2,
-      file_size / 7, file_size / 2):
+      fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+      read_offset, read_size):
     return False
 
   # Case 2: test read beyond media size
@@ -181,45 +185,50 @@ def pyfsntfs_test_read(fsntfs_file_entry):
   if file_size < 1024:
     # Test: offset: <file_size - 1024> size: 4096
     # Expected result: offset: -1 size: <undetermined>
+    read_offset = file_size - 1024
+    read_size = 4096
+
     if not pyfsntfs_test_seek_offset_and_read_buffer(
-        fsntfs_file_entry, file_size - 1024, os.SEEK_SET, 4096, -1, -1):
+        fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
-    # Test: offset: <file_size - 1024> size: 4096
-    # Expected result: offset: -1 size: <undetermined>
     if not pyfsntfs_test_seek_offset_and_read_buffer(
-        fsntfs_file_entry, file_size - 1024, os.SEEK_SET, 4096, -1, -1):
+        fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+        -1, -1):
       return False
 
   else:
     # Test: offset: <file_size - 1024> size: 4096
     # Expected result: offset: <file_size - 1024> size: 1024
+    read_offset = file_size - 1024
+    read_size = 4096
+
     if not pyfsntfs_test_seek_offset_and_read_buffer(
-        fsntfs_file_entry, file_size - 1024, os.SEEK_SET, 4096,
-        file_size - 1024, 1024):
+        fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+        read_offset, 1024):
       return False
 
-    # Test: offset: <file_size - 1024> size: 4096
-    # Expected result: offset: <file_size - 1024> size: 1024
     if not pyfsntfs_test_seek_offset_and_read_buffer(
-        fsntfs_file_entry, file_size - 1024, os.SEEK_SET, 4096,
-        file_size - 1024, 1024):
+        fsntfs_file_entry, read_offset, os.SEEK_SET, read_size,
+        read_offset, 1024):
       return False
 
   # Case 3: test buffer at offset read
 
   # Test: offset: <file_size / 7> size: <file_size / 2>
   # Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
+  read_offset, _ = divmod(file_size, 7)
+  read_size, _ = divmod(file_size, 2)
+
   if not pyfsntfs_test_read_buffer_at_offset(
-      fsntfs_file_entry, file_size / 7, file_size / 2,
-      (file_size / 7) + (file_size / 2), file_size / 2):
+      fsntfs_file_entry, read_offset, read_size,
+      read_offset + read_size, read_size):
     return False
 
-  # Test: offset: <file_size / 7> size: <file_size / 2>
-  # Expected result: offset: < ( file_size / 7 ) + ( file_size / 2 ) > size: <file_size / 2>
   if not pyfsntfs_test_read_buffer_at_offset(
-      fsntfs_file_entry, file_size / 7, file_size / 2,
-      (file_size / 7) + (file_size / 2), file_size / 2):
+      fsntfs_file_entry, read_offset, read_size,
+      read_offset + read_size, read_size):
     return False
 
   return True

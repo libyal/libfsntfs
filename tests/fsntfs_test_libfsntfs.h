@@ -33,5 +33,5 @@
 
 #include <libfsntfs.h>
 
-#endif
+#endif /* !defined( _FSNTFS_TEST_LIBFSNTFS_H ) */
 
