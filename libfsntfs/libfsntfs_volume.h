@@ -30,8 +30,10 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -61,6 +63,16 @@ struct libfsntfs_internal_volume
 	/* The MFT
 	 */
 	libfsntfs_mft_t *mft;
+
+	/* The security descriptor index
+	 */
+	libfsntfs_security_descriptor_index_t *security_descriptor_index;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBFSNTFS_EXTERN \
@@ -86,13 +98,15 @@ int libfsntfs_volume_open(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_open_wide(
      libfsntfs_volume_t *volume,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_open_file_io_handle(
@@ -106,7 +120,7 @@ int libfsntfs_volume_close(
      libfsntfs_volume_t *volume,
      libcerror_error_t **error );
 
-int libfsntfs_volume_open_read(
+int libfsntfs_internal_volume_open_read(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
@@ -197,7 +211,7 @@ int libfsntfs_volume_get_root_directory(
      libfsntfs_file_entry_t **root_directory_file_entry,
      libcerror_error_t **error );
 
-int libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
+int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
      libfsntfs_internal_volume_t *internal_volume,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
@@ -213,7 +227,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
      libfsntfs_file_entry_t **sub_file_entry,
      libcerror_error_t **error );
 
-int libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path(
+int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
      libfsntfs_internal_volume_t *internal_volume,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
@@ -229,12 +243,12 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      libfsntfs_file_entry_t **sub_file_entry,
      libcerror_error_t **error );
 
-int libfsntfs_volume_read_bitmap(
+int libfsntfs_internal_volume_read_bitmap(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
-int libfsntfs_volume_read_security_descriptors(
+int libfsntfs_internal_volume_read_security_descriptors(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
@@ -249,5 +263,5 @@ int libfsntfs_volume_get_usn_change_journal(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_VOLUME_H ) */
 

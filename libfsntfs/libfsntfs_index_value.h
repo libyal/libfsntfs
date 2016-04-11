@@ -43,13 +43,21 @@ struct libfsntfs_index_value
 	 */
 	uint32_t size;
 
-	/* The data
+	/* The key data
 	 */
-	uint8_t *data;
+	uint8_t *key_data;
 
-	/* The data size
+	/* The key data size
 	 */
-	uint16_t data_size;
+	uint16_t key_data_size;
+
+	/* The value data
+	 */
+	uint8_t *value_data;
+
+	/* The value data size
+	 */
+	uint32_t value_data_size;
 
 	/* The file reference
 	 */

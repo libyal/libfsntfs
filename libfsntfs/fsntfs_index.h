@@ -128,17 +128,17 @@ struct fsntfs_index_value
 	 */
 	uint8_t size[ 2 ];
 
-	/* The index value data size
+	/* The index value key data size
 	 * Consists of 2 bytes
 	 */
-	uint8_t data_size[ 2 ];
+	uint8_t key_data_size[ 2 ];
 
 	/* The index value flags
 	 * Consists of 4 bytes
 	 */
 	uint8_t flags[ 4 ];
 
-	/* The index value data
+	/* The index value key and value data
 	 */
 
 	/* The sub node virtual cluster number (VCN)

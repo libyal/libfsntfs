@@ -192,13 +192,6 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
      uint8_t flags,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_read_security_identifiers(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     uint8_t flags,
-     libcerror_error_t **error );
-
 int libfsntfs_mft_entry_is_empty(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );

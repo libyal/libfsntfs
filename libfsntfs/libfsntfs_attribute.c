@@ -2398,6 +2398,7 @@ int libfsntfs_attribute_read_value(
 						break;
 
 					case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
+#ifdef TODO_FIX
 						if( libfsntfs_security_descriptor_values_read(
 						     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
 						     cluster_block->data,
@@ -2413,6 +2414,7 @@ int libfsntfs_attribute_read_value(
 
 							goto on_error;
 						}
+#endif
 						break;
 				}
 			}

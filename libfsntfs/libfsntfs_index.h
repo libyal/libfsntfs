@@ -178,5 +178,5 @@ int libfsntfs_index_get_index_value_by_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INDEX_H ) */
 

@@ -26,6 +26,8 @@
 #include <types.h>
 
 #include "libfsntfs_extern.h"
+#include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcerror.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -128,5 +130,5 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_USN_CHANGE_JOURNAL_H ) */
 

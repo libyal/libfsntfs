@@ -132,10 +132,15 @@ int libfsntfs_index_value_free(
 	}
 	if( *index_value != NULL )
 	{
-		if( ( *index_value )->data != NULL )
+		if( ( *index_value )->key_data != NULL )
 		{
 			memory_free(
-			 ( *index_value )->data );
+			 ( *index_value )->key_data );
+		}
+		if( ( *index_value )->value_data != NULL )
+		{
+			memory_free(
+			 ( *index_value )->value_data );
 		}
 		memory_free(
 		 *index_value );
@@ -262,8 +267,8 @@ size_t libfsntfs_index_value_read(
 	 index_value->size );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->data_size,
-	 index_value->data_size );
+	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->key_data_size,
+	 index_value->key_data_size );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->flags,
@@ -286,10 +291,10 @@ size_t libfsntfs_index_value_read(
 		 index_value->size );
 
 		libcnotify_printf(
-		 "%s: index value: %03d data size\t\t\t: %" PRIu16 "\n",
+		 "%s: index value: %03d key data size\t\t: %" PRIu16 "\n",
 		 function,
 		 *index_value_entry,
-		 index_value->data_size );
+		 index_value->key_data_size );
 
 		libcnotify_printf(
 		 "%s: index value: %03d flags\t\t\t: 0x%08" PRIx32 "\n",
@@ -319,9 +324,9 @@ size_t libfsntfs_index_value_read(
 	}
 	remaining_size = (size_t) index_value->size - sizeof( fsntfs_index_value_t );
 
-	if( index_value->data_size > 0 )
+	if( index_value->key_data_size > 0 )
 	{
-		if( (uint32_t) index_value->data_size > remaining_size )
+		if( (uint32_t) index_value->key_data_size > remaining_size )
 		{
 			libcerror_error_set(
 			 error,
@@ -333,25 +338,25 @@ size_t libfsntfs_index_value_read(
 
 			goto on_error;
 		}
-		index_value->data = (uint8_t *) memory_allocate(
-		                                 sizeof( uint8_t ) * index_value->data_size );
+		index_value->key_data = (uint8_t *) memory_allocate(
+		                                     sizeof( uint8_t ) * index_value->key_data_size );
 
-		if( index_value->data == NULL )
+		if( index_value->key_data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create index value: %03d data.",
+			 "%s: unable to create index value: %03d key data.",
 			 function,
 			 *index_value_entry );
 
 			goto on_error;
 		}
 		if( memory_copy(
-		     index_value->data,
+		     index_value->key_data,
 		     &( index_value_data[ index_value_data_offset ] ),
-		     index_value->data_size ) == NULL )
+		     (size_t) index_value->key_data_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
@@ -367,17 +372,17 @@ size_t libfsntfs_index_value_read(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: index value: %03d data:\n",
+			 "%s: index value: %03d key data:\n",
 			 function,
 			 *index_value_entry );
 			libcnotify_print_data(
 			 &( index_value_data[ index_value_data_offset ] ),
-			 (size_t) index_value->data_size,
+			 (size_t) index_value->key_data_size,
 			 0 );
 		}
 #endif
-		index_value_data_offset += index_value->data_size;
-		remaining_size          -= index_value->data_size;
+		index_value_data_offset += index_value->key_data_size;
+		remaining_size          -= index_value->key_data_size;
 	}
 	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
@@ -397,16 +402,48 @@ size_t libfsntfs_index_value_read(
 	}
 	if( remaining_size > 0 )
 	{
+		index_value->value_data = (uint8_t *) memory_allocate(
+		                                       sizeof( uint8_t ) * remaining_size );
+
+		if( index_value->value_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create index value: %03d value data.",
+			 function,
+			 *index_value_entry );
+
+			goto on_error;
+		}
+		index_value->value_data_size = remaining_size;
+
+		if( memory_copy(
+		     index_value->value_data,
+		     &( index_value_data[ index_value_data_offset ] ),
+		     (size_t) index_value->value_data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy index value: %03d data.",
+			 function,
+			 *index_value_entry );
+
+			goto on_error;
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: index value: %03d unknown data:\n",
+			 "%s: index value: %03d value data:\n",
 			 function,
 			 *index_value_entry );
 			libcnotify_print_data(
-			 &( index_value_data[ index_value_data_offset ] ),
-			 (size_t) remaining_size,
+			 index_value->value_data,
+			 (size_t) index_value->value_data_size,
 			 0 );
 		}
 #endif
@@ -450,14 +487,23 @@ size_t libfsntfs_index_value_read(
 	return( (ssize_t) index_value->size );
 
 on_error:
-	if( index_value->data != NULL )
+	if( index_value->value_data != NULL )
 	{
 		memory_free(
-		 index_value->data );
+		 index_value->value_data );
 
-		index_value->data = NULL;
+		index_value->value_data = NULL;
 	}
-	index_value->data_size = 0;
+	index_value->value_data_size = 0;
+
+	if( index_value->key_data != NULL )
+	{
+		memory_free(
+		 index_value->key_data );
+
+		index_value->key_data = NULL;
+	}
+	index_value->key_data_size = 0;
 
 	return( -1 );
 }
@@ -496,9 +542,9 @@ int libfsntfs_index_value_print(
 	 index_value->size );
 
 	libcnotify_printf(
-	 "%s: data size\t\t\t\t\t: %" PRIu16 "\n",
+	 "%s: key data size\t\t\t\t: %" PRIu16 "\n",
 	 function,
-	 index_value->data_size );
+	 index_value->key_data_size );
 
 	libcnotify_printf(
 	 "%s: flags\t\t\t\t\t: 0x%08" PRIx32 "\n",

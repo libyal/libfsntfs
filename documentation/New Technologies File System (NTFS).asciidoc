@@ -59,6 +59,7 @@ Switched to asccidoc format.
 | 0.0.11 | J.B. Metz | January 2016 | Additional information about common alternate data stream.
 | 0.0.12 | J.B. Metz | January 2016 | Additional information about extended attributes.
 | 0.0.13 | J.B. Metz | March 2016 | Small changes. 
+| 0.0.14 | J.B. Metz | April 2016 | Small changes. 
 |===
 
 :numbered:
@@ -1013,16 +1014,13 @@ Contains a GUID
 Droid in this context refers to CDomainRelativeObjId.
 
 === The security descriptor attribute
-[yellow-background]*TODO, need a NTFS volume with a security descriptor
-attribute. Also does this override any value in $Secure:$SDS?*
+[yellow-background]*TODO: does this override any value in $Secure:$SDS?*
 
-The security descriptor attribute ($SECURITY_DESCRIPTOR) contains 
-[yellow-background]*TODO*. It can be stored as either a resident (for a small 
-amount of data) and non-resident MFT attribute.
+The security descriptor attribute ($SECURITY_DESCRIPTOR) contains a Windows NT
+security descriptor. It can be stored as either a resident (for a small amount
+of data) and non-resident MFT attribute.
 
-The security descriptor data is variable of size and consists of:
-
-[yellow-background]*TODO add text.*
+See: https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
 
 === The volume name attribute
 The volume name attribute ($VOLUME_NAME) contains the name of the volume. It is 
@@ -1450,9 +1448,10 @@ If set the index value is the last in the index values array
 ==== Directory entry index value
 The MFT attribute name of the directory entry index is: $I30.
 
-The directory entry index value does not distinguish between key and value data 
-and contains a file name attribute. See section: <<file_name_attribute,The file 
-name attribute>>.
+The directory entry index value contains a file name attribute in the index
+key data. See section: <<file_name_attribute,The file name attribute>>.
+
+The index value data seems to contain remnant data.
 
 [NOTE]
 Both the short and long names of the same file have a separate index value. The 
@@ -1906,17 +1905,19 @@ Contains the mapping of the security descriptor identifier (in $STANDARD_INFORMA
 | 20 | 4 | | Security descriptor data size (in $SDS)
 |===
 
-=== Notes
-SDS
-....
-Offset	Size	Description
-0x00	4	Hash of Security Descriptor
-0x04	4	Security Id
-0x08	8	Offset of this entry in this file
-0x10	4	Size of this entry
-0x04	V	Self-relative Security Descriptor
-V+0x04	P16	Padding
-....
+=== Security descriptor ($SDS) data stream
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | Security descriptor hash
+| 4 | 4 | | Security descriptor identifier
+| 12 | 8 | | Security descriptor data offset (in $SDS)
+| 20 | 4 | | Security descriptor data size (in $SDS)
+| 24 | ... | | Security descriptor data +
+See: https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
+| ... | ... | | 16-bit alignment padding.
+|===
 
 == The object identifiers
 [yellow-background]*TODO add text*

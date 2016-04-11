@@ -39,6 +39,7 @@
 #include "libfsntfs_libcstring.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_volume.h"
 
@@ -116,6 +117,21 @@ int libfsntfs_volume_initialize(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_volume->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to intialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	*volume = (libfsntfs_volume_t *) internal_volume;
 
 	return( 1 );
@@ -173,6 +189,21 @@ int libfsntfs_volume_free(
 		}
 		*volume = NULL;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_volume->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		if( libfsntfs_io_handle_free(
 		     &( internal_volume->io_handle ),
 		     error ) != 1 )
@@ -615,7 +646,7 @@ int libfsntfs_volume_open_file_io_handle(
 		}
 		file_io_handle_opened_in_library = 1;
 	}
-	if( libfsntfs_volume_open_read(
+	if( libfsntfs_internal_volume_open_read(
 	     internal_volume,
 	     file_io_handle,
 	     error ) != 1 )
@@ -762,19 +793,35 @@ int libfsntfs_volume_close(
 
 		result = -1;
 	}
+	if( internal_volume->security_descriptor_index != NULL )
+	{
+		if( libfsntfs_security_descriptor_index_free(
+		     &( internal_volume->security_descriptor_index ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free security descriptor index.",
+			 function );
+
+			result = -1;
+		}
+	}
 	return( result );
 }
 
 /* Opens a volume for reading
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_volume_open_read(
+int libfsntfs_internal_volume_open_read(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_volume_open_read";
+	static char *function            = "libfsntfs_internal_volume_open_read";
 	size64_t mft_size                = 0;
 
 	if( internal_volume == NULL )
@@ -948,7 +995,7 @@ int libfsntfs_volume_open_read(
 		 "Reading MFT entry: 6 ($Bitmap):\n" );
 	}
 #endif
-	if( libfsntfs_volume_read_bitmap(
+	if( libfsntfs_internal_volume_read_bitmap(
 	     internal_volume,
 	     file_io_handle,
 	     error ) != 1 )
@@ -969,7 +1016,7 @@ int libfsntfs_volume_open_read(
 		 "Reading MFT entry: 9 ($Secure):\n" );
 	}
 #endif
-	if( libfsntfs_volume_read_security_descriptors(
+	if( libfsntfs_internal_volume_read_security_descriptors(
 	     internal_volume,
 	     file_io_handle,
 	     error ) != 1 )
@@ -1722,7 +1769,7 @@ int libfsntfs_volume_get_root_directory(
  * A new directory_entry is allocated if a match is found
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
-int libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
+int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
      libfsntfs_internal_volume_t *internal_volume,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
@@ -1733,7 +1780,7 @@ int libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
 	libcdata_btree_t *directory_entries_tree          = NULL;
 	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
 	uint8_t *utf8_string_segment                      = NULL;
-	static char *function                             = "libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path";
+	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path";
 	libuna_unicode_character_t unicode_character      = 0;
 	size_t utf8_string_index                          = 0;
 	size_t utf8_string_segment_length                 = 0;
@@ -2048,7 +2095,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-	result = libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          utf8_string,
 	          utf8_string_length,
@@ -2107,7 +2154,7 @@ on_error:
  * A new directory_entry is allocated if a match is found
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
-int libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path(
+int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
      libfsntfs_internal_volume_t *internal_volume,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
@@ -2118,7 +2165,7 @@ int libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path(
 	libcdata_btree_t *directory_entries_tree          = NULL;
 	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
 	uint16_t *utf16_string_segment                    = NULL;
-	static char *function                             = "libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path";
+	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path";
 	libuna_unicode_character_t unicode_character      = 0;
 	size_t utf16_string_index                         = 0;
 	size_t utf16_string_segment_length                = 0;
@@ -2433,7 +2480,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-	result = libfsntfs_volume_get_mft_and_directory_entry_by_utf16_path(
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	          internal_volume,
 	          utf16_string,
 	          utf16_string_length,
@@ -2491,7 +2538,7 @@ on_error:
 /* Reads the bitmap file entry
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_volume_read_bitmap(
+int libfsntfs_internal_volume_read_bitmap(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
@@ -2500,7 +2547,7 @@ int libfsntfs_volume_read_bitmap(
 	libfdata_vector_t *cluster_block_vector  = NULL;
 	libfsntfs_cluster_block_t *cluster_block = NULL;
 	libfsntfs_mft_entry_t *mft_entry         = NULL;
-	static char *function                    = "libfsntfs_volume_read_bitmap";
+	static char *function                    = "libfsntfs_internal_volume_read_bitmap";
 	off64_t bitmap_offset                    = 0;
 	off64_t start_offset                     = 0;
 	size_t cluster_block_data_offset         = 0;
@@ -2837,13 +2884,14 @@ on_error:
 /* Reads the security descriptors file entry
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_volume_read_security_descriptors(
+int libfsntfs_internal_volume_read_security_descriptors(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_volume_read_security_descriptors";
+	libfsntfs_attribute_t *data_attribute = NULL;
+	libfsntfs_mft_entry_t *mft_entry      = NULL;
+	static char *function                 = "libfsntfs_internal_volume_read_security_descriptors";
 
 	if( internal_volume == NULL )
 	{
@@ -2884,30 +2932,48 @@ int libfsntfs_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	if( mft_entry == NULL )
+	if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
+	     mft_entry,
+	     (uint8_t *) "$SDS",
+	     4,
+	     &data_attribute,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve $SDS data attribute.",
+		 function );
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_read_security_identifiers(
-	     mft_entry,
+	if( libfsntfs_security_descriptor_index_initialize(
+	     &( internal_volume->security_descriptor_index ),
 	     internal_volume->io_handle,
 	     file_io_handle,
-	     0,
+	     mft_entry,
+	     data_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create security descriptor index.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_security_descriptor_index_read(
+	     internal_volume->security_descriptor_index,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read security descriptors.",
+		 "%s: unable to read security descriptor index.",
 		 function );
 
 		goto on_error;
@@ -2915,6 +2981,12 @@ int libfsntfs_volume_read_security_descriptors(
 	return( 1 );
 
 on_error:
+	if( internal_volume->security_descriptor_index != NULL )
+	{
+		libfsntfs_security_descriptor_index_free(
+		 &( internal_volume->security_descriptor_index ),
+		 NULL );
+	}
 	return( -1 );
 }
 
@@ -2946,7 +3018,7 @@ int libfsntfs_volume_get_usn_change_journal(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	result = libfsntfs_volume_get_mft_and_directory_entry_by_utf8_path(
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          (uint8_t *) "\\$Extend\\$UsnJrnl",
 	          17,

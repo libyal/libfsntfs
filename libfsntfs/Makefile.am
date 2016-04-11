@@ -3,6 +3,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/common \
 	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
@@ -15,7 +16,8 @@ AM_CPPFLAGS = \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
 	@LIBFGUID_CPPFLAGS@ \
-	@LIBFWNT_CPPFLAGS@
+	@LIBFWNT_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@
 
 lib_LTLIBRARIES = libfsntfs.la
 
@@ -28,6 +30,7 @@ libfsntfs_la_SOURCES = \
 	fsntfs_mft_entry.h \
 	fsntfs_object_identifier.h \
 	fsntfs_reparse_point.h \
+	fsntfs_secure.h \
 	fsntfs_standard_information.h \
 	fsntfs_txf_data.h \
 	fsntfs_volume_header.h \
@@ -64,6 +67,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_libclocale.h \
 	libfsntfs_libcnotify.h \
 	libfsntfs_libcstring.h \
+	libfsntfs_libcthreads.h \
 	libfsntfs_libfcache.h \
 	libfsntfs_libfdata.h \
 	libfsntfs_libfdatetime.h \
@@ -79,6 +83,8 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_object_identifier_values.c libfsntfs_object_identifier_values.h \
 	libfsntfs_reparse_point_attribute.c libfsntfs_reparse_point_attribute.h \
 	libfsntfs_reparse_point_values.c libfsntfs_reparse_point_values.h \
+	libfsntfs_security_descriptor_index.c libfsntfs_security_descriptor_index.h \
+	libfsntfs_security_descriptor_index_value.c libfsntfs_security_descriptor_index_value.h \
 	libfsntfs_security_descriptor_values.c libfsntfs_security_descriptor_values.h \
 	libfsntfs_standard_information_attribute.c libfsntfs_standard_information_attribute.h \
 	libfsntfs_standard_information_values.c libfsntfs_standard_information_values.h \
@@ -96,6 +102,7 @@ libfsntfs_la_SOURCES = \
 libfsntfs_la_LIBADD = \
 	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
@@ -108,7 +115,8 @@ libfsntfs_la_LIBADD = \
 	@LIBFDATA_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
-	@LIBFWNT_LIBADD@
+	@LIBFWNT_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 libfsntfs_la_LDFLAGS = -no-undefined -version-info 1:0:0
 

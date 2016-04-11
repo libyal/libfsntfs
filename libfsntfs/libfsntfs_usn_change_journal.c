@@ -27,8 +27,8 @@
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
-#include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_types.h"
+#include "libfsntfs_usn_change_journal.h"
 
 /* Creates an USN change journal
  * Make sure the value usn_change_journal is referencing, is set to NULL

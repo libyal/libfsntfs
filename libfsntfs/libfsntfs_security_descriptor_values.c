@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
@@ -141,7 +140,11 @@ int libfsntfs_security_descriptor_values_read(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_security_descriptor_values_read";
+	static char *function                              = "libfsntfs_security_descriptor_values_read";
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libfwnt_security_descriptor_t *security_descriptor = NULL;
+#endif
 
 	if( security_descriptor_values == NULL )
 	{
@@ -165,6 +168,7 @@ int libfsntfs_security_descriptor_values_read(
 
 		return( -1 );
 	}
+/* TODO minimum size check */
 	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
@@ -188,8 +192,66 @@ int libfsntfs_security_descriptor_values_read(
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
-	/* TODO use libfwnt to print the security descriptor */
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( libfwnt_security_descriptor_initialize(
+		     &security_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create security descriptor.",
+			 function );
 
+			goto on_error;
+		}
+		if( libfwnt_security_descriptor_copy_from_byte_stream(
+		     security_descriptor,
+		     data,
+		     data_size,
+		     LIBFWNT_ENDIAN_LITTLE,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy security descriptor from byte stream.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfwnt_security_descriptor_free(
+		     &security_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	return( 1 );
+
+on_error:
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( security_descriptor != NULL )
+	{
+		libfwnt_security_descriptor_free(
+		 &security_descriptor,
+		 NULL );
+	}
+#endif
+	return( -1 );
 }
 
