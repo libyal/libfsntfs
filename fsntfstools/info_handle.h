@@ -60,7 +60,7 @@ struct info_handle
 	 */
 	libfsntfs_mft_metadata_file_t *input_mft_metadata_file;
 
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
 
