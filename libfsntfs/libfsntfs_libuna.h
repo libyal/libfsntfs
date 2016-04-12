@@ -53,7 +53,7 @@
 
 #include <libuna.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBUNA ) */
 
-#endif
+#endif /* !defined( _LIBFSNTFS_LIBUNA_H ) */
 

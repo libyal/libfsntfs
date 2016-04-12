@@ -23,8 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_libfwnt.h"
 #include "libfsntfs_security_descriptor_values.h"
 
@@ -168,7 +170,6 @@ int libfsntfs_security_descriptor_values_read(
 
 		return( -1 );
 	}
-/* TODO minimum size check */
 	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
@@ -252,6 +253,130 @@ on_error:
 		 NULL );
 	}
 #endif
+	return( -1 );
+}
+
+/* Reads the security descriptor values from the data stream
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_values_read_stream(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     libbfio_handle_t *file_io_handle,
+     libfdata_stream_t *data_stream,
+     libcerror_error_t **error )
+{
+	uint8_t *data         = NULL;
+	static char *function = "libfsntfs_security_descriptor_values_read_stream";
+	size64_t data_size    = 0;
+	ssize_t read_count    = 0;
+
+	if( security_descriptor_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_stream_get_size(
+	     data_stream,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data stream size.",
+		 function );
+
+		goto on_error;
+	}
+	if( data_size > (size64_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( data_size < 20 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported security descriptor data size: %" PRIzd "\n",
+		 function,
+		 data_size );
+
+		goto on_error;
+	}
+	data = (uint8_t *) memory_allocate(
+	                    sizeof( uint8_t ) * (size_t) data_size );
+
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create data.",
+		 function );
+
+		goto on_error;
+	}
+	read_count = libfdata_stream_read_buffer(
+	              data_stream,
+	              (intptr_t *) file_io_handle,
+	              data,
+	              (size_t) data_size,
+	              0,
+	              error );
+
+	if( read_count < 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security descriptor data.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_security_descriptor_values_read(
+	     security_descriptor_values,
+	     data,
+	     (size_t) data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security descriptor values.",
+		 function );
+
+		goto on_error;
+	}
+	memory_free(
+	 data );
+
+	return( 1 );
+
+on_error:
+	if( data != NULL )
+	{
+		memory_free(
+		 data );
+	}
 	return( -1 );
 }
 

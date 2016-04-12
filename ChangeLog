@@ -1,7 +1,4 @@
 TODO
-* libfsntfs_attribute_read_value
-  - read security descriptor data at once then parse (see: TODO_FIX)
-
 * USN change journal
   - add support for values in $Max
 * resident data
@@ -156,6 +153,9 @@ Debug:
 
 Deployment
 * write man pages
+
+20160412
+* Worked on security descriptor support
 
 20160411
 * Worked on security descriptor support

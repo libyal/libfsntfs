@@ -25,9 +25,9 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -54,6 +54,12 @@ int libfsntfs_security_descriptor_values_read(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_security_descriptor_values_read_stream(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     libbfio_handle_t *file_io_handle,
+     libfdata_stream_t *data_stream,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

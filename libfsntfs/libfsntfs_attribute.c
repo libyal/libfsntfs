@@ -31,6 +31,7 @@
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_cluster_block.h"
+#include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
@@ -1792,20 +1793,16 @@ int libfsntfs_attribute_read_value(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfcache_cache_t *cluster_block_cache                             = NULL;
-	libfdata_vector_t *cluster_block_vector                            = NULL;
-	libfsntfs_cluster_block_t *cluster_block                           = NULL;
-	libfsntfs_internal_attribute_t *internal_attribute                 = NULL;
-	static char *function                                              = "libfsntfs_attribute_read_value";
-	int cluster_block_index                                            = 0;
-	int number_of_cluster_blocks                                       = 0;
-	int number_of_data_runs                                            = 0;
-	int result                                                         = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	libfsntfs_bitmap_values_t *bitmap_values                           = NULL;
-	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
-#endif
+	libfcache_cache_t *cluster_block_cache             = NULL;
+	libfdata_stream_t *cluster_block_stream            = NULL;
+	libfdata_vector_t *cluster_block_vector            = NULL;
+	libfsntfs_cluster_block_t *cluster_block           = NULL;
+	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	static char *function                              = "libfsntfs_attribute_read_value";
+	int cluster_block_index                            = 0;
+	int number_of_cluster_blocks                       = 0;
+	int number_of_data_runs                            = 0;
+	int result                                         = 0;
 
 	if( attribute == NULL )
 	{
@@ -2273,196 +2270,212 @@ int libfsntfs_attribute_read_value(
 
 				goto on_error;
 			}
-			if( libcdata_array_get_number_of_entries(
-			     internal_attribute->data_runs_array,
-			     &number_of_data_runs,
-			     error ) != 1 )
+			if( internal_attribute->type == LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve number of data runs.",
-				 function );
+				if( libfsntfs_cluster_block_stream_initialize(
+				     &cluster_block_stream,
+				     io_handle,
+				     attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create cluster block stream.",
+					 function );
 
-				goto on_error;
-			}
-			if( libfsntfs_cluster_block_vector_initialize(
-			     &cluster_block_vector,
-			     io_handle,
-			     attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create cluster block vector.",
-				 function );
+					goto on_error;
+				}
+				if( libfsntfs_security_descriptor_values_read_stream(
+				     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
+				     file_io_handle,
+				     cluster_block_stream,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read security descriptor values from stream.",
+					 function );
 
-				goto on_error;
-			}
-			if( libfcache_cache_initialize(
-			     &cluster_block_cache,
-			     1,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create cluster block cache.",
-				 function );
+					goto on_error;
+				}
+				if( libfdata_stream_free(
+				     &cluster_block_stream,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free cluster block stream.",
+					 function );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
-			if( libfdata_vector_get_number_of_elements(
-			     cluster_block_vector,
-			     &number_of_cluster_blocks,
-			     error ) != 1 )
+			else
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve number of cluster blocks.",
-				 function );
-
-				goto on_error;
-			}
-			for( cluster_block_index = 0;
-			     cluster_block_index < number_of_cluster_blocks;
-			     cluster_block_index++ )
-			{
-				if( libfdata_vector_get_element_value_by_index(
-				     cluster_block_vector,
-				     (intptr_t *) file_io_handle,
-				     cluster_block_cache,
-				     cluster_block_index,
-				     (intptr_t **) &cluster_block,
-				     0,
+				if( libcdata_array_get_number_of_entries(
+				     internal_attribute->data_runs_array,
+				     &number_of_data_runs,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve cluster block: %d from vector.",
-					 function,
-					 cluster_block_index );
+					 "%s: unable to retrieve number of data runs.",
+					 function );
 
 					goto on_error;
 				}
-				if( cluster_block == NULL )
+				if( libfsntfs_cluster_block_vector_initialize(
+				     &cluster_block_vector,
+				     io_handle,
+				     attribute,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: missing cluster block: %d.",
-					 function,
-					 cluster_block_index );
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create cluster block vector.",
+					 function );
 
 					goto on_error;
 				}
-				if( cluster_block->data == NULL )
+				if( libfcache_cache_initialize(
+				     &cluster_block_cache,
+				     1,
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: invalid cluster block: %d - missing data.",
-					 function,
-					 cluster_block_index );
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create cluster block cache.",
+					 function );
 
 					goto on_error;
 				}
-				switch( internal_attribute->type )
+/* TODO refactor read from vector into bitmap values */
+				if( libfdata_vector_get_number_of_elements(
+				     cluster_block_vector,
+				     &number_of_cluster_blocks,
+				     error ) != 1 )
 				{
-					case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
-						if( libfsntfs_bitmap_values_read(
-						     (libfsntfs_bitmap_values_t *) internal_attribute->value,
-						     cluster_block->data,
-						     cluster_block->data_size,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read bitmap values.",
-							 function );
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve number of cluster blocks.",
+					 function );
 
-							goto on_error;
-						}
-						break;
-
-					case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
-#ifdef TODO_FIX
-						if( libfsntfs_security_descriptor_values_read(
-						     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
-						     cluster_block->data,
-						     cluster_block->data_size,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_IO,
-							 LIBCERROR_IO_ERROR_READ_FAILED,
-							 "%s: unable to read security descriptor values.",
-							 function );
-
-							goto on_error;
-						}
-#endif
-						break;
+					goto on_error;
 				}
-			}
-			if( libfdata_vector_free(
-			     &cluster_block_vector,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free cluster block vector.",
-				 function );
+				for( cluster_block_index = 0;
+				     cluster_block_index < number_of_cluster_blocks;
+				     cluster_block_index++ )
+				{
+					if( libfdata_vector_get_element_value_by_index(
+					     cluster_block_vector,
+					     (intptr_t *) file_io_handle,
+					     cluster_block_cache,
+					     cluster_block_index,
+					     (intptr_t **) &cluster_block,
+					     0,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve cluster block: %d from vector.",
+						 function,
+						 cluster_block_index );
 
-				goto on_error;
-			}
-			if( libfcache_cache_free(
-			     &cluster_block_cache,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free cluster block cache.",
-				 function );
+						goto on_error;
+					}
+					if( cluster_block == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 "%s: missing cluster block: %d.",
+						 function,
+						 cluster_block_index );
 
-				goto on_error;
+						goto on_error;
+					}
+					if( cluster_block->data == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+						 "%s: invalid cluster block: %d - missing data.",
+						 function,
+						 cluster_block_index );
+
+						goto on_error;
+					}
+					switch( internal_attribute->type )
+					{
+						case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
+							if( libfsntfs_bitmap_values_read(
+							     (libfsntfs_bitmap_values_t *) internal_attribute->value,
+							     cluster_block->data,
+							     cluster_block->data_size,
+							     error ) != 1 )
+							{
+								libcerror_error_set(
+								 error,
+								 LIBCERROR_ERROR_DOMAIN_IO,
+								 LIBCERROR_IO_ERROR_READ_FAILED,
+								 "%s: unable to read bitmap values.",
+								 function );
+
+								goto on_error;
+							}
+							break;
+					}
+				}
+				if( libfdata_vector_free(
+				     &cluster_block_vector,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free cluster block vector.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfcache_cache_free(
+				     &cluster_block_cache,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free cluster block cache.",
+					 function );
+
+					goto on_error;
+				}
 			}
 		}
 	}
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( security_descriptor_values != NULL )
-	{
-		libfsntfs_security_descriptor_values_free(
-		 &security_descriptor_values,
-		 NULL );
-	}
-	if( bitmap_values != NULL )
-	{
-		libfsntfs_bitmap_values_free(
-		 &bitmap_values,
-		 NULL );
-	}
-#endif
 	if( cluster_block_cache != NULL )
 	{
 		libfcache_cache_free(
@@ -2473,6 +2486,12 @@ on_error:
 	{
 		libfdata_vector_free(
 		 &cluster_block_vector,
+		 NULL );
+	}
+	if( cluster_block_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &cluster_block_stream,
 		 NULL );
 	}
 	if( ( internal_attribute->value != NULL )
