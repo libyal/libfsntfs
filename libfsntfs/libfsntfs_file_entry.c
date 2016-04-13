@@ -147,7 +147,7 @@ int libfsntfs_file_entry_initialize(
 	}
 	if( libcdata_btree_initialize(
 	     &( internal_file_entry->directory_entries_tree ),
-	     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+	     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

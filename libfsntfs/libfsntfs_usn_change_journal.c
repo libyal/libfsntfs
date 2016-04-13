@@ -38,7 +38,6 @@ int libfsntfs_usn_change_journal_initialize(
      libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      libfsntfs_attribute_t *data_attribute,
      libcerror_error_t **error )
@@ -64,17 +63,6 @@ int libfsntfs_usn_change_journal_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid USN change journal value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
 		 function );
 
 		return( -1 );
@@ -212,7 +200,6 @@ int libfsntfs_usn_change_journal_initialize(
 		goto on_error;
 	}
 	internal_usn_change_journal->file_io_handle  = file_io_handle;
-	internal_usn_change_journal->mft_entry       = mft_entry;
 	internal_usn_change_journal->directory_entry = directory_entry;
 	internal_usn_change_journal->data_attribute  = data_attribute;
 
@@ -262,7 +249,7 @@ int libfsntfs_usn_change_journal_free(
 		internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) *usn_change_journal;
 		*usn_change_journal         = NULL;
 
-		/* The file_io_handle, mft_entry and data_attribute references are freed elsewhere
+		/* The file_io_handle and data_attribute references are freed elsewhere
 		 */
 		if( libfsntfs_directory_entry_free(
 		     &( internal_usn_change_journal->directory_entry ),

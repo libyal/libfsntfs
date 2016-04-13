@@ -1469,13 +1469,13 @@ value.
 The MFT attribute name of the security descriptor hash index is: $SDH.
 It appears to only to be used by the $Secure metadata file.
 
-See section: <<security_descriptor_hash,The security descriptor hash>>
+See section: <<security_descriptor_hash_index_value,The security descriptor hash index value>>
 
 ==== Security descriptor identifier index value
 The MFT attribute name of the security descriptor identifier index is: $SII.
 It appears to only to be used by the $Secure metadata file.
 
-See section: <<security_descriptor_identifier,The security descriptor identifier>>
+See section: <<security_descriptor_identifier_index_value,The security descriptor identifier index value>>
 
 == [[compression]]Compression
 Typically NTFS compression groups 16 cluster blocks together. This group of 16 
@@ -1872,7 +1872,7 @@ Contains the mapping of the security descriptor identifier (in $STANDARD_INFORMA
 [yellow-background]*In the $SII index do the index values contain a 32-bit checksum?*
 
 === Security descriptor hash ($SDH) index
-==== [[security_descriptor_hash]]The security descriptor hash
+==== [[security_descriptor_hash_index_value]]The security descriptor hash index value
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1890,7 +1890,7 @@ Contains the mapping of the security descriptor identifier (in $STANDARD_INFORMA
 |===
 
 === Security descriptor identifier ($SII) index
-==== [[security_descriptor_identifier]]The security descriptor identifier
+==== [[security_descriptor_identifier_index_value]]The security descriptor identifier index value
 
 [cols="1,1,1,5",options="header"]
 |===

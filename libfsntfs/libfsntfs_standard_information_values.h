@@ -59,9 +59,9 @@ struct libfsntfs_standard_information_values
 	 */
 	uint32_t owner_identifier;
 
-	/* The security identifier
+	/* The security descriptor identifier
 	 */
-	uint32_t security_identifier;
+	uint32_t security_descriptor_identifier;
 
 	/* The update sequence number (USN)
 	 */

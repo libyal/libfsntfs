@@ -27,6 +27,7 @@
 
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 
 #if defined( __cplusplus )
@@ -37,17 +38,9 @@ typedef struct libfsntfs_security_descriptor_index libfsntfs_security_descriptor
 
 struct libfsntfs_security_descriptor_index
 {
-	/* The IO handle
+	/* The security descriptor index values tree
 	 */
-	libfsntfs_io_handle_t *io_handle;
-
-	/* The file IO handle
-	 */
-	libbfio_handle_t *file_io_handle;
-
-	/* The MFT entry
-	 */
-	libfsntfs_mft_entry_t *mft_entry;
+	libcdata_btree_t *security_descriptors_index_values_tree;
 
 	/* The $SDS $DATA attribute
 	 */
@@ -62,7 +55,6 @@ int libfsntfs_security_descriptor_index_initialize(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_attribute_t *data_attribute,
      libcerror_error_t **error );
 
@@ -70,8 +62,11 @@ int libfsntfs_security_descriptor_index_free(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libcerror_error_t **error );
 
-int libfsntfs_security_descriptor_index_read(
+int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

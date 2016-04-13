@@ -2309,7 +2309,7 @@ int info_handle_standard_information_attribute_fprint(
 		 "\tOwner identifier\t\t: %" PRIu32 "\n",
 		 value_32bit );
 	}
-	result = libfsntfs_standard_information_attribute_get_security_identifier(
+	result = libfsntfs_standard_information_attribute_get_security_descriptor_identifier(
 	          attribute,
 	          &value_32bit,
 	          error );
@@ -2320,7 +2320,7 @@ int info_handle_standard_information_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve security identifier.",
+		 "%s: unable to retrieve security descriptor identifier.",
 		 function );
 
 		goto on_error;
@@ -2329,7 +2329,7 @@ int info_handle_standard_information_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tSecurity identifier\t\t: %" PRIu32 "\n",
+		 "\tSecurity descriptor identifier\t: %" PRIu32 "\n",
 		 value_32bit );
 	}
 	result = libfsntfs_standard_information_attribute_get_update_sequence_number(

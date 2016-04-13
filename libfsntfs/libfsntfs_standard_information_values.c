@@ -494,8 +494,8 @@ int libfsntfs_standard_information_values_read(
 		 standard_information_values->owner_identifier );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_standard_information_t *) data )->security_identifier,
-		 standard_information_values->security_identifier );
+		 ( (fsntfs_standard_information_t *) data )->security_descriptor_identifier,
+		 standard_information_values->security_descriptor_identifier );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (fsntfs_standard_information_t *) data )->update_sequence_number,
@@ -510,9 +510,9 @@ int libfsntfs_standard_information_values_read(
 			 standard_information_values->owner_identifier );
 
 			libcnotify_printf(
-			 "%s: security identifier\t\t\t: %" PRIu32 "\n",
+			 "%s: security descriptor identifier\t\t: %" PRIu32 "\n",
 			 function,
-			 standard_information_values->security_identifier );
+			 standard_information_values->security_descriptor_identifier );
 
 			byte_stream_copy_to_uint64_little_endian(
 			 ( (fsntfs_standard_information_t *) data )->quota_charged,

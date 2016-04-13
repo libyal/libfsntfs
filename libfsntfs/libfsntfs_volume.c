@@ -1863,7 +1863,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free directory entries array.",
+				 "%s: unable to free directory entries tree.",
 				 function );
 
 				goto on_error;
@@ -1871,7 +1871,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 		}
 		if( libcdata_btree_initialize(
 		     &directory_entries_tree,
-		     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2019,7 +2019,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free directory entries array.",
+			 "%s: unable to free directory entries tree.",
 			 function );
 
 			goto on_error;
@@ -2248,7 +2248,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free directory entries array.",
+				 "%s: unable to free directory entries tree.",
 				 function );
 
 				goto on_error;
@@ -2256,7 +2256,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 		}
 		if( libcdata_btree_initialize(
 		     &directory_entries_tree,
-		     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2404,7 +2404,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free directory entries array.",
+			 "%s: unable to free directory entries tree.",
 			 function );
 
 			goto on_error;
@@ -2952,7 +2952,6 @@ int libfsntfs_internal_volume_read_security_descriptors(
 	     &( internal_volume->security_descriptor_index ),
 	     internal_volume->io_handle,
 	     file_io_handle,
-	     mft_entry,
 	     data_attribute,
 	     error ) != 1 )
 	{
@@ -2965,15 +2964,18 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_index_read(
+	if( libfsntfs_security_descriptor_index_read_sii_index(
 	     internal_volume->security_descriptor_index,
+	     internal_volume->io_handle,
+	     file_io_handle,
+	     mft_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read security descriptor index.",
+		 "%s: unable to read security descriptor identifier ($SII) index.",
 		 function );
 
 		goto on_error;
@@ -3082,7 +3084,6 @@ int libfsntfs_volume_get_usn_change_journal(
 	     usn_change_journal,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
-	     mft_entry,
 	     directory_entry,
 	     data_attribute,
 	     error ) != 1 )

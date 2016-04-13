@@ -2669,7 +2669,7 @@ int libfsntfs_mft_entry_get_index_by_name(
 	if( mft_entry->sii_index != NULL )
 	{
 		result = libuna_utf8_string_compare_with_utf16_stream(
-			  (uint8_t *) "$I30",
+			  (uint8_t *) "$SII",
 			  4,
 			  name,
 			  name_size,

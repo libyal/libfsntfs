@@ -383,7 +383,6 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 	char *usn_record_data     = NULL;
 	size_t journal_block_size = 0x1000;
 	ssize_t read_count        = 0;
-	int result                = 0;
 
 	if( pyfsntfs_usn_change_journal == NULL )
 	{

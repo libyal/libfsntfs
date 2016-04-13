@@ -235,3 +235,47 @@ int libfsntfs_security_descriptor_index_value_read(
 	return( 1 );
 }
 
+/* Compares 2 security descriptor index value by the identifier
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_index_value_compare(
+     libfsntfs_security_descriptor_index_value_t *first_security_descriptor_index_value,
+     libfsntfs_security_descriptor_index_value_t *second_security_descriptor_index_value,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_security_descriptor_index_value_compare";
+
+	if( first_security_descriptor_index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first security descriptor index value.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_security_descriptor_index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second security descriptor index value.",
+		 function );
+
+		return( -1 );
+	}
+
+	if( first_security_descriptor_index_value->identifier < second_security_descriptor_index_value->identifier )
+	{
+		return( LIBCDATA_COMPARE_LESS );
+	}
+	else if( first_security_descriptor_index_value->identifier > second_security_descriptor_index_value->identifier )
+	{
+		return( LIBCDATA_COMPARE_GREATER );
+	}
+	return( LIBCDATA_COMPARE_EQUAL );
+}
+

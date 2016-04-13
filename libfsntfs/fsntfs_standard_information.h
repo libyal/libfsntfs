@@ -82,10 +82,10 @@ struct fsntfs_standard_information
 	 */
 	uint8_t owner_identifier[ 4 ];
 
-	/* The security identifier
+	/* The security descriptor identifier
 	 * Consists of 4 bytes
 	 */
-	uint8_t security_identifier[ 4 ];
+	uint8_t security_descriptor_identifier[ 4 ];
 
 	/* The quota charged
 	 * Consists of 8 bytes

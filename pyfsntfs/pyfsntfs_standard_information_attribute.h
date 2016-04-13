@@ -76,7 +76,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
-PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
+PyObject *pyfsntfs_standard_information_attribute_get_security_descriptor_identifier(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 

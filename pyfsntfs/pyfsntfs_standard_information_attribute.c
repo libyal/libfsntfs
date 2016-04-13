@@ -110,12 +110,12 @@ PyMethodDef pyfsntfs_standard_information_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the owner identifier." },
 
-	{ "get_security_identifier",
-	  (PyCFunction) pyfsntfs_standard_information_attribute_get_security_identifier,
+	{ "get_security_descriptor_identifier",
+	  (PyCFunction) pyfsntfs_standard_information_attribute_get_security_descriptor_identifier,
 	  METH_NOARGS,
-	  "get_security_identifier() -> Integer\n"
+	  "get_security_descriptor_identifier() -> Integer\n"
 	  "\n"
-	  "Returns the security identifier." },
+	  "Returns the security descriptor identifier." },
 
 	{ "get_update_sequence_number",
 	  (PyCFunction) pyfsntfs_standard_information_attribute_get_update_sequence_number,
@@ -166,10 +166,10 @@ PyGetSetDef pyfsntfs_standard_information_attribute_object_get_set_definitions[]
 	  "The owner identifier.",
 	  NULL },
 
-	{ "security_identifier",
-	  (getter) pyfsntfs_standard_information_attribute_get_security_identifier,
+	{ "security_descriptor_identifier",
+	  (getter) pyfsntfs_standard_information_attribute_get_security_descriptor_identifier,
 	  (setter) 0,
-	  "The security identifier.",
+	  "The security descriptor identifier.",
 	  NULL },
 
 	{ "update_sequence_number",
@@ -856,15 +856,15 @@ PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
 /* Retrieves the security identifier
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
+PyObject *pyfsntfs_standard_information_attribute_get_security_descrptor_identifier(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error     = NULL;
-	PyObject *integer_object     = NULL;
-	static char *function        = "pyfsntfs_standard_information_attribute_get_security_identifier";
-	uint32_t security_identifier = 0;
-	int result                   = 0;
+	libcerror_error_t *error                = NULL;
+	PyObject *integer_object                = NULL;
+	static char *function                   = "pyfsntfs_standard_information_attribute_get_security_descrptor_identifier";
+	uint32_t security_descriptor_identifier = 0;
+	int result                              = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
@@ -879,9 +879,9 @@ PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_standard_information_attribute_get_security_identifier(
+	result = libfsntfs_standard_information_attribute_get_security_descriptor_identifier(
 	          pyfsntfs_attribute->attribute,
-	          &security_identifier,
+	          &security_descriptor_identifier,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -891,7 +891,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve security identifier.",
+		 "%s: unable to retrieve security descriptor identifier.",
 		 function );
 
 		libcerror_error_free(
@@ -900,7 +900,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_security_identifier(
 		return( NULL );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) security_identifier );
+	                  (uint64_t) security_descriptor_identifier );
 
 	return( integer_object );
 }

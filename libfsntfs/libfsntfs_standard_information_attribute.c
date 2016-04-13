@@ -423,17 +423,17 @@ int libfsntfs_standard_information_attribute_get_owner_identifier(
 	return( 1 );
 }
 
-/* Retrieves the security identifier
+/* Retrieves the security descriptor identifier
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_standard_information_attribute_get_security_identifier(
+int libfsntfs_standard_information_attribute_get_security_descriptor_identifier(
      libfsntfs_attribute_t *attribute,
-     uint32_t *security_identifier,
+     uint32_t *security_descriptor_identifier,
      libcerror_error_t **error )
 {
 	libfsntfs_standard_information_values_t *standard_information_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute                   = NULL;
-	static char *function                                                = "libfsntfs_standard_information_attribute_get_security_identifier";
+	static char *function                                                = "libfsntfs_standard_information_attribute_get_security_descriptor_identifier";
 
 	if( attribute == NULL )
 	{
@@ -472,13 +472,13 @@ int libfsntfs_standard_information_attribute_get_security_identifier(
 	}
 	standard_information_values = (libfsntfs_standard_information_values_t *) internal_attribute->value;
 
-	if( security_identifier == NULL )
+	if( security_descriptor_identifier == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid security identifier.",
+		 "%s: invalid security descriptor identifier.",
 		 function );
 
 		return( -1 );
@@ -487,7 +487,7 @@ int libfsntfs_standard_information_attribute_get_security_identifier(
 	{
 		return( 0 );
 	}
-	*security_identifier = standard_information_values->security_identifier;
+	*security_descriptor_identifier = standard_information_values->security_descriptor_identifier;
 
 	return( 1 );
 }

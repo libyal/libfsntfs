@@ -69,9 +69,9 @@ int libfsntfs_standard_information_attribute_get_owner_identifier(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_standard_information_attribute_get_security_identifier(
+int libfsntfs_standard_information_attribute_get_security_descriptor_identifier(
      libfsntfs_attribute_t *attribute,
-     uint32_t *security_identifier,
+     uint32_t *security_descriptor_identifier,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

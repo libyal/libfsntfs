@@ -42,10 +42,6 @@ struct libfsntfs_internal_usn_change_journal
 	 */
 	libbfio_handle_t *file_io_handle;
 
-	/* The MFT entry
-	 */
-	libfsntfs_mft_entry_t *mft_entry;
-
 	/* The directory entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
@@ -103,7 +99,6 @@ int libfsntfs_usn_change_journal_initialize(
      libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      libfsntfs_attribute_t *data_attribute,
      libcerror_error_t **error );
