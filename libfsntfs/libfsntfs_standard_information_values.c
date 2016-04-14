@@ -735,3 +735,77 @@ int libfsntfs_standard_information_values_get_file_attribute_flags(
 	return( 1 );
 }
 
+/* Retrieves the security descriptor identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_security_descriptor_identifier(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint32_t *security_descriptor_identifier,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_security_descriptor_identifier";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_identifier == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor identifier.",
+		 function );
+
+		return( -1 );
+	}
+	*security_descriptor_identifier = standard_information_values->security_descriptor_identifier;
+
+	return( 1 );
+}
+
+/* Retrieves the update sequence number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_standard_information_values_get_update_sequence_number(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *update_sequence_number,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_standard_information_values_get_update_sequence_number";
+
+	if( standard_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid standard information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( update_sequence_number == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid update sequence number.",
+		 function );
+
+		return( -1 );
+	}
+	*update_sequence_number = standard_information_values->update_sequence_number;
+
+	return( 1 );
+}
+

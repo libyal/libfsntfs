@@ -37,9 +37,13 @@ typedef struct libfsntfs_security_descriptor_values libfsntfs_security_descripto
 
 struct libfsntfs_security_descriptor_values
 {
-	/* Dummy
+	/* The data
 	 */
-	int dummy;
+	uint8_t *data;
+
+	/* The data size
+	 */
+	size_t data_size;
 };
 
 int libfsntfs_security_descriptor_values_initialize(
@@ -62,9 +66,20 @@ int libfsntfs_security_descriptor_values_read_stream(
      libfdata_stream_t *data_stream,
      libcerror_error_t **error );
 
+int libfsntfs_security_descriptor_values_get_data_size(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     size_t *data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_security_descriptor_values_get_data(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_SECURITY_DESCRIPTOR_VALUES_H ) */
 

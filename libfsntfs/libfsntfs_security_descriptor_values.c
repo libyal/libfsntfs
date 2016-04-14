@@ -125,6 +125,11 @@ int libfsntfs_security_descriptor_values_free(
 	}
 	if( *security_descriptor_values != NULL )
 	{
+		if( ( *security_descriptor_values )->data != NULL )
+		{
+			memory_free(
+			 ( *security_descriptor_values )->data );
+		}
 		memory_free(
 		 *security_descriptor_values );
 
@@ -265,7 +270,6 @@ int libfsntfs_security_descriptor_values_read_stream(
      libfdata_stream_t *data_stream,
      libcerror_error_t **error )
 {
-	uint8_t *data         = NULL;
 	static char *function = "libfsntfs_security_descriptor_values_read_stream";
 	size64_t data_size    = 0;
 	ssize_t read_count    = 0;
@@ -318,10 +322,10 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		goto on_error;
 	}
-	data = (uint8_t *) memory_allocate(
-	                    sizeof( uint8_t ) * (size_t) data_size );
+	security_descriptor_values->data = (uint8_t *) memory_allocate(
+	                                                sizeof( uint8_t ) * (size_t) data_size );
 
-	if( data == NULL )
+	if( security_descriptor_values->data == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -332,11 +336,13 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		goto on_error;
 	}
+	security_descriptor_values->data_size = (size_t) data_size;
+
 	read_count = libfdata_stream_read_buffer(
 	              data_stream,
 	              (intptr_t *) file_io_handle,
-	              data,
-	              (size_t) data_size,
+	              security_descriptor_values->data,
+	              security_descriptor_values->data_size,
 	              0,
 	              error );
 
@@ -353,8 +359,8 @@ int libfsntfs_security_descriptor_values_read_stream(
 	}
 	if( libfsntfs_security_descriptor_values_read(
 	     security_descriptor_values,
-	     data,
-	     (size_t) data_size,
+	     security_descriptor_values->data,
+	     security_descriptor_values->data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -366,17 +372,114 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		goto on_error;
 	}
-	memory_free(
-	 data );
-
 	return( 1 );
 
 on_error:
-	if( data != NULL )
+	if( security_descriptor_values->data != NULL )
 	{
 		memory_free(
-		 data );
+		 security_descriptor_values->data );
 	}
+	security_descriptor_values->data_size = 0;
+
 	return( -1 );
+}
+
+/* Retrieves the security descriptor data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_values_get_data_size(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     size_t *data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_security_descriptor_values_get_data_size";
+
+	if( security_descriptor_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor values.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data size.",
+		 function );
+
+		return( -1 );
+	}
+	*data_size = security_descriptor_values->data_size;
+
+	return( 1 );
+}
+
+/* Retrieves the security descriptor data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_values_get_data(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_security_descriptor_values_get_data";
+
+	if( security_descriptor_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor values.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size < security_descriptor_values->data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     data,
+	     security_descriptor_values->data,
+	     security_descriptor_values->data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to copy security descriptor data.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 

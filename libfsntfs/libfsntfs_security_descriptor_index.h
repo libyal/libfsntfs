@@ -29,6 +29,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_security_descriptor_values.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -67,6 +68,12 @@ int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     uint32_t security_descriptor_indentifier,
+     libfsntfs_security_descriptor_values_t **security_descriptor_values,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -1278,6 +1278,7 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 	     internal_mft_metadata_file->io_handle,
 	     internal_mft_metadata_file->file_io_handle,
 	     internal_mft_metadata_file->mft,
+	     NULL,
 	     mft_entry,
 	     NULL,
 	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,

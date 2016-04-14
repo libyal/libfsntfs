@@ -62,15 +62,15 @@ int libfsntfs_security_descriptor_index_value_free(
      libfsntfs_security_descriptor_index_value_t **security_descriptor_index_value,
      libcerror_error_t **error );
 
+int libfsntfs_security_descriptor_index_value_compare(
+     libfsntfs_security_descriptor_index_value_t *first_security_descriptor_index_value,
+     libfsntfs_security_descriptor_index_value_t *second_security_descriptor_index_value,
+     libcerror_error_t **error );
+
 int libfsntfs_security_descriptor_index_value_read(
      libfsntfs_security_descriptor_index_value_t *security_descriptor_index_value,
      const uint8_t *data,
      size_t data_size,
-     libcerror_error_t **error );
-
-int libfsntfs_security_descriptor_index_value_compare(
-     libfsntfs_security_descriptor_index_value_t *first_security_descriptor_index_value,
-     libfsntfs_security_descriptor_index_value_t *second_security_descriptor_index_value,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

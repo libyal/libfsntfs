@@ -42,6 +42,7 @@
 
 enum FSNTFSINFO_MODES
 {
+	FSNTFSINFO_MODE_FILE_ENTRY,
 	FSNTFSINFO_MODE_FILE_SYSTEM_HIERARCHY,
 	FSNTFSINFO_MODE_MFT_ENTRY,
 	FSNTFSINFO_MODE_USN_CHANGE_JOURNAL,
@@ -63,13 +64,14 @@ void usage_fprint(
 	fprintf( stream, "Use fsntfsinfo to determine information about a Windows NT\n"
 	                 " File System (NTFS) volume.\n\n" );
 
-	fprintf( stream, "Usage: fsntfsinfo [ -E mft_entry_index ] [ -o offset ]\n"
-	                 "                  [ -hHUvV ] source\n\n" );
+	fprintf( stream, "Usage: fsntfsinfo [ -E mft_entry_index ] [ -F file_entry ]\n"
+	                 "                  [ -o offset ] [ -hHUvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
 	fprintf( stream, "\t-E:     show information about a specific MFT entry index\n"
 	                 "\t        or \"all\".\n" );
+	fprintf( stream, "\t-F:     show information about a specific file entry path.\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
 	fprintf( stream, "\t-H:     shows the file system hierarcy\n" );
 	fprintf( stream, "\t-o:     specify the volume offset\n" );
@@ -126,6 +128,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libfsntfs_error_t *error                              = NULL;
+	libcstring_system_character_t *option_file_entry      = NULL;
 	libcstring_system_character_t *option_mft_entry_index = NULL;
 	libcstring_system_character_t *option_volume_offset   = NULL;
 	libcstring_system_character_t *source                 = NULL;
@@ -169,7 +172,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "E:hHo:UvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _LIBCSTRING_SYSTEM_STRING( "E:F:hHo:UvV" ) ) ) != (libcstring_system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -188,6 +191,12 @@ int main( int argc, char * const argv[] )
 			case (libcstring_system_integer_t) 'E':
 				option_mode            = FSNTFSINFO_MODE_MFT_ENTRY;
 				option_mft_entry_index = optarg;
+
+				break;
+
+			case (libcstring_system_integer_t) 'F':
+				option_mode       = FSNTFSINFO_MODE_FILE_ENTRY;
+				option_file_entry = optarg;
 
 				break;
 
@@ -287,6 +296,28 @@ int main( int argc, char * const argv[] )
 	}
 	switch( option_mode )
 	{
+		case FSNTFSINFO_MODE_FILE_ENTRY:
+			if( fsntfsinfo_info_handle->input_volume == NULL )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to print file entry information.\n" );
+
+				goto on_error;
+			}
+			if( info_handle_file_entry_fprint(
+			     fsntfsinfo_info_handle,
+			     option_file_entry,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to print file entry information.\n" );
+
+				goto on_error;
+			}
+			break;
+
 		case FSNTFSINFO_MODE_FILE_SYSTEM_HIERARCHY:
 			if( info_handle_file_system_hierarchy_fprint(
 			     fsntfsinfo_info_handle,

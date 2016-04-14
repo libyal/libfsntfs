@@ -2563,10 +2563,10 @@ on_error:
 	return( -1 );
 }
 
-/* Prints file entry information
+/* Prints file entry information as part of the file system hierarchy
  * Returns 1 if successful or -1 on error
  */
-int info_handle_file_entry_fprint(
+int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
      int indentation_level,
@@ -2576,7 +2576,7 @@ int info_handle_file_entry_fprint(
 	libcstring_system_character_t *file_entry_name  = NULL;
 	libfsntfs_data_stream_t *alternate_data_stream  = NULL;
 	libfsntfs_file_entry_t *sub_file_entry          = NULL;
-	static char *function                           = "info_handle_file_entry_fprint";
+	static char *function                           = "info_handle_file_system_hierarchy_fprint_file_entry";
 	size_t data_stream_name_size                    = 0;
 	size_t file_entry_name_size                     = 0;
 	uint32_t file_attribute_flags                   = 0;
@@ -2902,7 +2902,7 @@ int info_handle_file_entry_fprint(
 
 			goto on_error;
 		}
-		if( info_handle_file_entry_fprint(
+		if( info_handle_file_system_hierarchy_fprint_file_entry(
 		     info_handle,
 		     sub_file_entry,
 		     indentation_level + 1,
@@ -3324,7 +3324,432 @@ int info_handle_mft_entries_fprint(
 	return( 1 );
 }
 
-/* Prints the system hierarchy entry information
+/* Prints the file entry information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_file_entry_fprint(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *path,
+     libfsntfs_error_t **error )
+{
+	libcstring_system_character_t filetime_string[ 32 ];
+
+	libfdatetime_filetime_t *filetime  = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	static char *function              = "info_handle_file_entry_fprint";
+	size_t path_length                 = 0;
+	uint64_t value_64bit               = 0;
+	uint32_t value_32bit               = 0;
+	int result                         = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	path_length = libcstring_system_string_length(
+	               path );
+
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          info_handle->input_volume,
+	          (uint16_t *) path,
+	          path_length,
+	          &file_entry,
+	          error );
+#else
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          info_handle->input_volume,
+	          (uint8_t *) path,
+	          path_length,
+	          &file_entry,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: file entry not found.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "Windows NT File System information:\n\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "File entry:\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tPath\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	 path );
+
+	if( libfsntfs_file_entry_get_parent_file_reference(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent file reference.",
+		 function );
+
+		goto on_error;
+	}
+	if( value_64bit == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tParent file reference\t\t\t: %" PRIu64 "\n",
+		 value_64bit );
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tParent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 value_64bit & 0xffffffffffffUL,
+		 value_64bit >> 48 );
+	}
+	if( libfdatetime_filetime_initialize(
+	     &filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create filetime.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_creation_time(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_from_64bit(
+	     filetime,
+	     value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime from 64-bit.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfdatetime_filetime_copy_to_utf16_string(
+		  filetime,
+		  (uint16_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#else
+	result = libfdatetime_filetime_copy_to_utf8_string(
+		  filetime,
+		  (uint8_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime to string.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tCreation time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 filetime_string );
+
+	if( libfsntfs_file_entry_get_modification_time(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_from_64bit(
+	     filetime,
+	     value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime from 64-bit.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfdatetime_filetime_copy_to_utf16_string(
+		  filetime,
+		  (uint16_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#else
+	result = libfdatetime_filetime_copy_to_utf8_string(
+		  filetime,
+		  (uint8_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime to string.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tModification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 filetime_string );
+
+	if( libfsntfs_file_entry_get_access_time(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_from_64bit(
+	     filetime,
+	     value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime from 64-bit.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfdatetime_filetime_copy_to_utf16_string(
+		  filetime,
+		  (uint16_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#else
+	result = libfdatetime_filetime_copy_to_utf8_string(
+		  filetime,
+		  (uint8_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime to string.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tAccess time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 filetime_string );
+
+	if( libfsntfs_file_entry_get_entry_modification_time(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modifiation time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_from_64bit(
+	     filetime,
+	     value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime from 64-bit.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfdatetime_filetime_copy_to_utf16_string(
+		  filetime,
+		  (uint16_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#else
+	result = libfdatetime_filetime_copy_to_utf8_string(
+		  filetime,
+		  (uint8_t *) filetime_string,
+		  32,
+		  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+		  error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to copy filetime to string.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tEntry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 filetime_string );
+
+	if( libfdatetime_filetime_free(
+	     &filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free filetime.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_file_attribute_flags(
+	     file_entry,
+	     &value_32bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tFile attribute flags\t\t: 0x%08" PRIx32 "\n",
+	 value_32bit );
+	info_handle_file_attribute_flags_fprint(
+	 value_32bit,
+	 info_handle->notify_stream );
+	if( libfsntfs_file_entry_free(
+	     &file_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file entry.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO print attributes + ADS */
+/* TODO print security descriptor */
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
+
+	return( 1 );
+
+on_error:
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Prints the file system hierarchy entry information
  * Returns 1 if successful or -1 on error
  */
 int info_handle_file_system_hierarchy_fprint(
@@ -3367,7 +3792,7 @@ int info_handle_file_system_hierarchy_fprint(
 
 		goto on_error;
 	}
-	if( info_handle_file_entry_fprint(
+	if( info_handle_file_system_hierarchy_fprint_file_entry(
 	     info_handle,
 	     file_entry,
 	     0,

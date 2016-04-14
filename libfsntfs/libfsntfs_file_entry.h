@@ -34,6 +34,8 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_security_descriptor_index.h"
+#include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
 
@@ -65,6 +67,14 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
+	/* The security descriptor index
+	 */
+	libfsntfs_security_descriptor_index_t *security_descriptor_index;
+
+	/* The security descriptor values
+	 */
+	libfsntfs_security_descriptor_values_t *security_descriptor_values;
+
 	/* The data size
 	 */
 	size64_t data_size;
@@ -91,6 +101,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_t *mft,
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,
@@ -284,6 +295,19 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
      uint16_t *utf16_name,
      size_t utf16_name_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_security_descriptor_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *data_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_security_descriptor(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

@@ -3024,6 +3024,14 @@ int libfsntfs_mft_entry_append_attribute(
 			}
 			break;
 
+		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
+			if( ( mft_entry->security_descriptor_attribute == NULL )
+			 && ( attribute_has_name == 0 ) )
+			{
+				mft_entry->security_descriptor_attribute = attribute;
+			}
+			break;
+
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION:
 			if( ( mft_entry->volume_information_attribute == NULL )
 			 && ( attribute_has_name == 0 ) )

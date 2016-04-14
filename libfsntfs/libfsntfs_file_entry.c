@@ -38,6 +38,7 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_reparse_point_attribute.h"
+#include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
@@ -51,6 +52,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_t *mft,
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,
@@ -215,13 +217,14 @@ int libfsntfs_file_entry_initialize(
 			}
 		}
 	}
-	internal_file_entry->file_io_handle  = file_io_handle;
-	internal_file_entry->io_handle       = io_handle;
-	internal_file_entry->mft             = mft;
-	internal_file_entry->mft_entry       = mft_entry;
-	internal_file_entry->directory_entry = directory_entry;
-	internal_file_entry->data_attribute  = mft_entry->data_attribute;
-	internal_file_entry->flags           = flags;
+	internal_file_entry->file_io_handle            = file_io_handle;
+	internal_file_entry->io_handle                 = io_handle;
+	internal_file_entry->mft                       = mft;
+	internal_file_entry->mft_entry                 = mft_entry;
+	internal_file_entry->security_descriptor_index = security_descriptor_index;
+	internal_file_entry->directory_entry           = directory_entry;
+	internal_file_entry->data_attribute            = mft_entry->data_attribute;
+	internal_file_entry->flags                     = flags;
 
 	*file_entry = (libfsntfs_file_entry_t *) internal_file_entry;
 
@@ -270,8 +273,24 @@ int libfsntfs_file_entry_free(
 		internal_file_entry = (libfsntfs_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
-		/* The file_io_handle, io_handle, mft and mft_entry references are freed elsewhere
+		/* The file_io_handle, io_handle, mft, security_descriptor_index and mft_entry references are freed elsewhere
 		 */
+		if( internal_file_entry->security_descriptor_values != NULL )
+		{
+			if( libfsntfs_security_descriptor_values_free(
+			     &( internal_file_entry->security_descriptor_values ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free security descriptor values.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( internal_file_entry->data_cluster_block_stream != NULL )
 		{
 			if( libfdata_stream_free(
@@ -689,7 +708,7 @@ int libfsntfs_file_entry_get_creation_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 "%s: unable to retrieve standard information attribute value.",
 		 function );
 
 		return( -1 );
@@ -761,7 +780,7 @@ int libfsntfs_file_entry_get_modification_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 "%s: unable to retrieve standard information attribute value.",
 		 function );
 
 		return( -1 );
@@ -833,7 +852,7 @@ int libfsntfs_file_entry_get_access_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 "%s: unable to retrieve standard information attribute value.",
 		 function );
 
 		return( -1 );
@@ -905,7 +924,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 "%s: unable to retrieve standard information attribute value.",
 		 function );
 
 		return( -1 );
@@ -977,7 +996,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 "%s: unable to retrieve standard information attribute value.",
 		 function );
 
 		return( -1 );
@@ -2086,6 +2105,296 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
 	return( 1 );
 }
 
+/* Retrieves the security descriptor (data) size
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_security_descriptor_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *data_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_security_descriptor_values_t *security_descriptor_values   = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_security_descriptor_size";
+	uint32_t security_descriptor_identifier                              = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_file_entry->mft_entry->security_descriptor_attribute == NULL )
+	 && ( internal_file_entry->mft_entry->standard_information_attribute == NULL ) )
+	{
+		return( 0 );
+	}
+	if( ( internal_file_entry->mft_entry->security_descriptor_attribute != NULL )
+	 && ( internal_file_entry->security_descriptor_index == NULL ) )
+	{
+		return( 0 );
+	}
+	if( internal_file_entry->mft_entry->security_descriptor_attribute != NULL )
+	{
+		if( libfsntfs_attribute_get_value(
+		     internal_file_entry->mft_entry->security_descriptor_attribute,
+		     (intptr_t **) &security_descriptor_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve security descriptor attribute value.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		if( internal_file_entry->security_descriptor_values == NULL )
+		{
+			if( libfsntfs_attribute_get_value(
+			     internal_file_entry->mft_entry->standard_information_attribute,
+			     (intptr_t **) &standard_information_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve standard information attribute value.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_standard_information_values_get_security_descriptor_identifier(
+			     standard_information_values,
+			     &security_descriptor_identifier,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve security descriptor identifier from standard information attribute.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+			     internal_file_entry->security_descriptor_index,
+			     security_descriptor_identifier,
+			     &( internal_file_entry->security_descriptor_values ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve security descriptor from index for identifier: %" PRIu32 ".",
+				 function,
+				 security_descriptor_identifier );
+
+				goto on_error;
+			}
+			/* The file entry takes over management of security_descriptor_values
+			 */
+		}
+		security_descriptor_values = internal_file_entry->security_descriptor_values;
+	}
+	if( libfsntfs_security_descriptor_values_get_data_size(
+	     security_descriptor_values,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve security descriptor data size.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( internal_file_entry->security_descriptor_values != NULL )
+	{
+		libfsntfs_security_descriptor_values_free(
+		 &( internal_file_entry->security_descriptor_values ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Retrieves the security descriptor (data)
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_security_descriptor(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
+	libfsntfs_security_descriptor_values_t *security_descriptor_values   = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_file_entry_get_security_descriptor";
+	uint32_t security_descriptor_identifier                              = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file entry - missing MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_file_entry->mft_entry->security_descriptor_attribute == NULL )
+	 && ( internal_file_entry->mft_entry->standard_information_attribute == NULL ) )
+	{
+		return( 0 );
+	}
+	if( ( internal_file_entry->mft_entry->security_descriptor_attribute != NULL )
+	 && ( internal_file_entry->security_descriptor_index == NULL ) )
+	{
+		return( 0 );
+	}
+	if( internal_file_entry->mft_entry->security_descriptor_attribute != NULL )
+	{
+		if( libfsntfs_attribute_get_value(
+		     internal_file_entry->mft_entry->security_descriptor_attribute,
+		     (intptr_t **) &security_descriptor_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve security descriptor attribute value.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		if( internal_file_entry->security_descriptor_values == NULL )
+		{
+			if( libfsntfs_attribute_get_value(
+			     internal_file_entry->mft_entry->standard_information_attribute,
+			     (intptr_t **) &standard_information_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve standard information attribute value.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_standard_information_values_get_security_descriptor_identifier(
+			     standard_information_values,
+			     &security_descriptor_identifier,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve security descriptor identifier from standard information attribute.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+			     internal_file_entry->security_descriptor_index,
+			     security_descriptor_identifier,
+			     &( internal_file_entry->security_descriptor_values ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve security descriptor from index for identifier: %" PRIu32 ".",
+				 function,
+				 security_descriptor_identifier );
+
+				goto on_error;
+			}
+			/* The file entry takes over management of security_descriptor_values
+			 */
+		}
+		security_descriptor_values = internal_file_entry->security_descriptor_values;
+	}
+	if( libfsntfs_security_descriptor_values_get_data(
+	     security_descriptor_values,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve security descriptor data.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( internal_file_entry->security_descriptor_values != NULL )
+	{
+		libfsntfs_security_descriptor_values_free(
+		 &( internal_file_entry->security_descriptor_values ),
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Retrieves the number of attributes
  * Returns 1 if successful or -1 on error
  */
@@ -2840,6 +3149,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
+	     internal_file_entry->security_descriptor_index,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
@@ -2994,6 +3304,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
+	     internal_file_entry->security_descriptor_index,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
@@ -3147,6 +3458,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->mft,
+	     internal_file_entry->security_descriptor_index,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,

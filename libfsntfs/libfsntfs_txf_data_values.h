@@ -75,5 +75,5 @@ int libfsntfs_txf_data_values_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_TXF_DATA_VALUES_H ) */
 

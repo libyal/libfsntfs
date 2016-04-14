@@ -1,4 +1,4 @@
-.Dd May 4, 2015
+.Dd April 14, 2016
 .Dt fsntfsinfo
 .Os libfsntfs
 .Sh NAME
@@ -6,7 +6,10 @@
 .Nd determines information about a Windows NT File System (NTFS) volume
 .Sh SYNOPSIS
 .Nm fsntfsinfo
-.Op Fl ahvV
+.Op Fl E Ar mft_entry_index
+.Op Fl F Ar file_entry
+.Op Fl o Ar offset
+.Op Fl hHUvV
 .Va Ar source
 .Sh DESCRIPTION
 .Nm fsntfsinfo
@@ -26,8 +29,18 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl a
 shows allocation information
+.It Fl E Ar mft_entry_index
+show information about a specific MFT entry index or "all"
+.It Fl F Ar file_entry
+show information about a specific file entry path
 .It Fl h
 shows this help
+.It Fl H
+shows the file system hierarcy
+.It Fl o Ar offset
+specify the volume offset
+.It Fl U
+shows information from the USN change journal ($UsnJrnl)
 .It Fl v
 verbose output to stderr
 .It Fl V
@@ -39,11 +52,18 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# fsntfsinfo /dev/sda1
-fsntfsinfo 20100907
+# fsntfsinfo ntfs-img-kw-1.dd
+fsntfsinfo 20160414
 
-NTFS volume information:
-.Dl        ...
+Windows NT File System information:
+
+Volume information:
+	Name				: KW-SRCH-1
+	Version				: 3.1
+	Serial number			: ba50ed9250ed5623
+	Cluster block size		: 512
+	MFT entry size			: 1024
+	Index entry size		: 4096
 
 .Ed
 .Sh DIAGNOSTICS
@@ -55,6 +75,6 @@ https://github.com/libyal/libfsntfs/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2010-2015, Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2010-2016, Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO

@@ -136,7 +136,7 @@ int info_handle_volume_name_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error );
 
-int info_handle_file_entry_fprint(
+int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
      int indentation_level,
@@ -149,6 +149,11 @@ int info_handle_mft_entry_fprint(
 
 int info_handle_mft_entries_fprint(
      info_handle_t *info_handle,
+     libfsntfs_error_t **error );
+
+int info_handle_file_entry_fprint(
+     info_handle_t *info_handle,
+     const libcstring_system_character_t *path,
      libfsntfs_error_t **error );
 
 int info_handle_file_system_hierarchy_fprint(

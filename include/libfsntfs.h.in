@@ -736,6 +736,25 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
      size_t utf16_name_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the security descriptor (data) size
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_security_descriptor_size(
+     libfsntfs_file_entry_t *file_entry,
+     size_t *data_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the security descriptor (data)
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_security_descriptor(
+     libfsntfs_file_entry_t *file_entry,
+     uint8_t *data,
+     size_t data_size,
+     libfsntfs_error_t **error );
+
 /* Retrieves the number of attributes
  * Returns 1 if successful or -1 on error
  */

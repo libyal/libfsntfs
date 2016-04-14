@@ -95,10 +95,6 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
 
-	/* The standard information attribute
-	 */
-	libfsntfs_attribute_t *standard_information_attribute;
-
 	/* The object identifier attribute
 	 */
 	libfsntfs_attribute_t *object_identifier_attribute;
@@ -106,6 +102,14 @@ struct libfsntfs_mft_entry
 	/* The reparse point attribute
 	 */
 	libfsntfs_attribute_t *reparse_point_attribute;
+
+	/* The standard information attribute
+	 */
+	libfsntfs_attribute_t *standard_information_attribute;
+
+	/* The security descriptor attribute
+	 */
+	libfsntfs_attribute_t *security_descriptor_attribute;
 
 	/* The volume information attribute
 	 */

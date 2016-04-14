@@ -107,9 +107,19 @@ int libfsntfs_standard_information_values_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libcerror_error_t **error );
 
+int libfsntfs_standard_information_values_get_security_descriptor_identifier(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint32_t *security_descriptor_identifier,
+     libcerror_error_t **error );
+
+int libfsntfs_standard_information_values_get_update_sequence_number(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     uint64_t *update_sequence_number,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_STANDARD_INFORMATION_VALUES_H ) */
 
