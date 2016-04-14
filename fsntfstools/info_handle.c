@@ -31,6 +31,7 @@
 #include "fsntfstools_libcsystem.h"
 #include "fsntfstools_libfdatetime.h"
 #include "fsntfstools_libfguid.h"
+#include "fsntfstools_libfwnt.h"
 #include "fsntfstools_libfsntfs.h"
 #include "fsntfstools_libfusn.h"
 #include "info_handle.h"
@@ -3334,13 +3335,16 @@ int info_handle_file_entry_fprint(
 {
 	libcstring_system_character_t filetime_string[ 32 ];
 
-	libfdatetime_filetime_t *filetime  = NULL;
-	libfsntfs_file_entry_t *file_entry = NULL;
-	static char *function              = "info_handle_file_entry_fprint";
-	size_t path_length                 = 0;
-	uint64_t value_64bit               = 0;
-	uint32_t value_32bit               = 0;
-	int result                         = 0;
+	libfdatetime_filetime_t *filetime                  = NULL;
+	libfwnt_security_descriptor_t *security_descriptor = NULL;
+	libfsntfs_file_entry_t *file_entry                 = NULL;
+	static char *function                              = "info_handle_file_entry_fprint";
+	uint8_t *data                                      = NULL;
+	size_t data_size                                   = 0;
+	size_t path_length                                 = 0;
+	uint64_t value_64bit                               = 0;
+	uint32_t value_32bit                               = 0;
+	int result                                         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3718,6 +3722,104 @@ int info_handle_file_entry_fprint(
 	info_handle_file_attribute_flags_fprint(
 	 value_32bit,
 	 info_handle->notify_stream );
+
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          &data_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve security descriptor size.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		data = (uint8_t *) memory_allocate(
+		                    sizeof( uint8_t ) * data_size );
+
+		if( data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_entry_get_security_descriptor(
+		     file_entry,
+		     data,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfwnt_security_descriptor_initialize(
+		     &security_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfwnt_security_descriptor_copy_from_byte_stream(
+		     security_descriptor,
+		     data,
+		     data_size,
+		     LIBFWNT_ENDIAN_LITTLE,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy security descriptor from byte stream.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO print security descriptor */
+		if( libfwnt_security_descriptor_free(
+		     &security_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		memory_free(
+		 data );
+
+		data = NULL;
+	}
+/* TODO print attributes + ADS */
+
 	if( libfsntfs_file_entry_free(
 	     &file_entry,
 	     error ) != 1 )
@@ -3731,8 +3833,6 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-/* TODO print attributes + ADS */
-/* TODO print security descriptor */
 	fprintf(
 	 info_handle->notify_stream,
 	 "\n" );
@@ -3740,6 +3840,17 @@ int info_handle_file_entry_fprint(
 	return( 1 );
 
 on_error:
+	if( security_descriptor != NULL )
+	{
+		libfwnt_security_descriptor_free(
+		 &security_descriptor,
+		 NULL );
+	}
+	if( data != NULL )
+	{
+		memory_free(
+		 data );
+	}
 	if( file_entry != NULL )
 	{
 		libfsntfs_file_entry_free(

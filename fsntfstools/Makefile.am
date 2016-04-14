@@ -46,6 +46,7 @@ fsntfsinfo_SOURCES = \
 
 fsntfsinfo_LDADD = \
 	@LIBCSYSTEM_LIBADD@ \
+	@LIBFWNT_LIBADD@ \
 	@LIBFUSN_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
@@ -54,10 +55,10 @@ fsntfsinfo_LDADD = \
 	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
-	../libfsntfs/libfsntfs.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
