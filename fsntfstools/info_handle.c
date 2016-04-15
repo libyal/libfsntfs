@@ -37,6 +37,7 @@
 #include "info_handle.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
+
 extern \
 int libfsntfs_check_volume_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
@@ -55,7 +56,8 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
 #define INFO_HANDLE_NOTIFY_STREAM	stdout
 
@@ -788,7 +790,7 @@ int info_handle_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to retrieve name string size.",
 		 function );
 
 		goto on_error;
@@ -828,7 +830,7 @@ int info_handle_attribute_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve name.",
+			 "%s: unable to retrieve name string.",
 			 function );
 
 			goto on_error;
@@ -1471,7 +1473,7 @@ int info_handle_file_name_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to retrieve name string size.",
 		 function );
 
 		goto on_error;
@@ -1511,7 +1513,7 @@ int info_handle_file_name_attribute_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve name.",
+			 "%s: unable to retrieve name string.",
 			 function );
 
 			goto on_error;
@@ -1931,7 +1933,7 @@ int info_handle_reparse_point_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve print name size.",
+		 "%s: unable to retrieve print name string size.",
 		 function );
 
 		goto on_error;
@@ -1972,7 +1974,7 @@ int info_handle_reparse_point_attribute_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve print name.",
+			 "%s: unable to retrieve print name string.",
 			 function );
 
 			goto on_error;
@@ -2498,7 +2500,7 @@ int info_handle_volume_name_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to retrieve name string size.",
 		 function );
 
 		goto on_error;
@@ -2538,7 +2540,7 @@ int info_handle_volume_name_attribute_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve name.",
+			 "%s: unable to retrieve name string.",
 			 function );
 
 			goto on_error;
@@ -2694,7 +2696,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file entry name size.",
+		 "%s: unable to retrieve file entry name string size.",
 		 function );
 
 		goto on_error;
@@ -2735,7 +2737,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file entry name.",
+			 "%s: unable to retrieve file entry name string.",
 			 function );
 
 			goto on_error;
@@ -2796,7 +2798,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve alternate data stream: %d name size.",
+				 "%s: unable to retrieve alternate data stream: %d name string size.",
 				 function,
 				 alternate_data_stream_index );
 
@@ -2838,7 +2840,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve alternate data stream: %d name.",
+					 "%s: unable to retrieve alternate data stream: %d name string.",
 					 function,
 					 alternate_data_stream_index );
 
@@ -3335,13 +3337,16 @@ int info_handle_file_entry_fprint(
 {
 	libcstring_system_character_t filetime_string[ 32 ];
 
+	libcstring_system_character_t *value_string        = NULL;
 	libfdatetime_filetime_t *filetime                  = NULL;
 	libfwnt_security_descriptor_t *security_descriptor = NULL;
+	libfwnt_security_identifier_t *security_identifier = NULL;
 	libfsntfs_file_entry_t *file_entry                 = NULL;
 	static char *function                              = "info_handle_file_entry_fprint";
 	uint8_t *data                                      = NULL;
 	size_t data_size                                   = 0;
 	size_t path_length                                 = 0;
+	size_t value_string_size                           = 0;
 	uint64_t value_64bit                               = 0;
 	uint32_t value_32bit                               = 0;
 	int result                                         = 0;
@@ -3799,7 +3804,209 @@ int info_handle_file_entry_fprint(
 
 			goto on_error;
 		}
-/* TODO print security descriptor */
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tSecurity descriptor:\n" );
+
+		result = libfwnt_security_descriptor_get_owner(
+		          security_descriptor,
+		          &security_identifier,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve owner SID.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			if( libfwnt_security_identifier_get_string_size(
+			     security_identifier,
+			     &value_string_size,
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve owner SID string size.",
+				 function );
+
+				goto on_error;
+			}
+			if( value_string_size > 0 )
+			{
+				value_string = libcstring_system_string_allocate(
+				                value_string_size );
+
+				if( value_string == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create owner SID string.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libfwnt_security_identifier_copy_to_utf16_string(
+					  security_identifier,
+					  (uint16_t *) value_string,
+					  value_string_size,
+					  0,
+					  error );
+#else
+				result = libfwnt_security_identifier_copy_to_utf8_string(
+					  security_identifier,
+					  (uint8_t *) value_string,
+					  value_string_size,
+					  0,
+					  error );
+#endif
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve owner SID string.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfwnt_security_identifier_free(
+				     &security_identifier,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free security identifier.",
+					 function );
+
+					goto on_error;
+				}
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\tOwner SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 value_string );
+
+				memory_free(
+				 value_string );
+
+				value_string = NULL;
+			}
+		}
+		result = libfwnt_security_descriptor_get_group(
+		          security_descriptor,
+		          &security_identifier,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve group SID.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			if( libfwnt_security_identifier_get_string_size(
+			     security_identifier,
+			     &value_string_size,
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve group SID string size.",
+				 function );
+
+				goto on_error;
+			}
+			if( value_string_size > 0 )
+			{
+				value_string = libcstring_system_string_allocate(
+				                value_string_size );
+
+				if( value_string == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create group SID string.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libfwnt_security_identifier_copy_to_utf16_string(
+					  security_identifier,
+					  (uint16_t *) value_string,
+					  value_string_size,
+					  0,
+					  error );
+#else
+				result = libfwnt_security_identifier_copy_to_utf8_string(
+					  security_identifier,
+					  (uint8_t *) value_string,
+					  value_string_size,
+					  0,
+					  error );
+#endif
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve group SID string.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfwnt_security_identifier_free(
+				     &security_identifier,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free security identifier.",
+					 function );
+
+					goto on_error;
+				}
+				fprintf(
+				 info_handle->notify_stream,
+				 "\t\tGroup SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 value_string );
+
+				memory_free(
+				 value_string );
+
+				value_string = NULL;
+			}
+		}
+/* TODO print security descriptor ACLs */
 		if( libfwnt_security_descriptor_free(
 		     &security_descriptor,
 		     error ) != 1 )
@@ -3818,7 +4025,7 @@ int info_handle_file_entry_fprint(
 
 		data = NULL;
 	}
-/* TODO print attributes + ADS */
+/* TODO print attributes + ADS ? */
 
 	if( libfsntfs_file_entry_free(
 	     &file_entry,
@@ -3840,6 +4047,12 @@ int info_handle_file_entry_fprint(
 	return( 1 );
 
 on_error:
+	if( security_identifier != NULL )
+	{
+		libfwnt_security_identifier_free(
+		 &security_identifier,
+		 NULL );
+	}
 	if( security_descriptor != NULL )
 	{
 		libfwnt_security_descriptor_free(
@@ -4326,7 +4539,7 @@ int info_handle_usn_record_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to retrieve name string size.",
 		 function );
 
 		goto on_error;
@@ -4366,7 +4579,7 @@ int info_handle_usn_record_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve name.",
+			 "%s: unable to retrieve name string.",
 			 function );
 
 			goto on_error;
@@ -4774,7 +4987,7 @@ int info_handle_volume_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve volume name size.",
+		 "%s: unable to retrieve volume name string size.",
 		 function );
 
 		goto on_error;
@@ -4833,7 +5046,7 @@ int info_handle_volume_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve volume name.",
+			 "%s: unable to retrieve volume name string.",
 			 function );
 
 			goto on_error;

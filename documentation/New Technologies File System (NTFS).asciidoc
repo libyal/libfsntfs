@@ -805,7 +805,7 @@ Contains the entry number in the security ID index ($Secure:$SII) +
 See section: <<access_control,Access Control>>
 | 56 | 8 | | Quota charged +
 [yellow-background]*What does it contain and what is it used for?*
-| 64 | 8 | | Update Sequence Number (USN)
+| 64 | 8 | | Update Sequence Number (USN) +
 [yellow-background]*What does it contain and what is it used for?*
 |===
 
