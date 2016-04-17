@@ -856,13 +856,13 @@ PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
 /* Retrieves the security identifier
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_standard_information_attribute_get_security_descrptor_identifier(
+PyObject *pyfsntfs_standard_information_attribute_get_security_descriptor_identifier(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error                = NULL;
 	PyObject *integer_object                = NULL;
-	static char *function                   = "pyfsntfs_standard_information_attribute_get_security_descrptor_identifier";
+	static char *function                   = "pyfsntfs_standard_information_attribute_get_security_descriptor_identifier";
 	uint32_t security_descriptor_identifier = 0;
 	int result                              = 0;
 
