@@ -174,6 +174,44 @@ void info_handle_file_attribute_flags_fprint(
 	}
 }
 
+/* Retrieves a string containing the access control entry type
+ */
+const char *info_handle_get_access_control_entry_type(
+             uint8_t entry_type )
+{
+	switch( entry_type )
+	{
+		case 0x00:
+		case 0x04:
+		case 0x05:
+		case 0x09:
+		case 0x0b:
+			return( "Access allowed" );
+
+		case 0x01:
+		case 0x06:
+		case 0x0a:
+		case 0x0c:
+			return( "Access denied" );
+
+		case 0x02:
+		case 0x07:
+		case 0x0d:
+		case 0x0f:
+			return( "System-audit" );
+
+		case 0x03:
+		case 0x08:
+		case 0x0e:
+		case 0x10:
+			return( "System-alarm" );
+
+		case 0x11:
+			return( "Mandatory label" );
+	}
+	return( "UNKNOWN" );
+}
+
 /* Retrieves the attribute type description
  */
 const char *info_handle_get_attribute_type_description(
@@ -721,6 +759,642 @@ int info_handle_close_input(
 	return( 0 );
 }
 
+/* Prints a security descriptor
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_security_descriptor_fprint(
+     info_handle_t *info_handle,
+     const uint8_t *data,
+     size_t data_size,
+     libfsntfs_error_t **error )
+{
+	libfwnt_access_control_entry_t *access_control_entry = NULL;
+	libfwnt_access_control_list_t *access_control_list   = NULL;
+	libfwnt_security_descriptor_t *security_descriptor   = NULL;
+	libfwnt_security_identifier_t *security_identifier   = NULL;
+	libcstring_system_character_t *value_string          = NULL;
+	static char *function                                = "info_handle_security_descriptor_fprint";
+	size_t value_string_size                             = 0;
+	uint32_t access_mask                                 = 0;
+	uint8_t access_control_entry_flags                   = 0;
+	uint8_t access_control_entry_type                    = 0;
+	int entry_index                                      = 0;
+	int number_of_entries                                = 0;
+	int result                                           = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfwnt_security_descriptor_initialize(
+	     &security_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create security descriptor.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfwnt_security_descriptor_copy_from_byte_stream(
+	     security_descriptor,
+	     data,
+	     data_size,
+	     LIBFWNT_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy security descriptor from byte stream.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tSecurity descriptor:\n" );
+
+	result = libfwnt_security_descriptor_get_owner(
+		  security_descriptor,
+		  &security_identifier,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve owner SID.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfwnt_security_identifier_get_string_size(
+		     security_identifier,
+		     &value_string_size,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve owner SID string size.",
+			 function );
+
+			goto on_error;
+		}
+		if( value_string_size > 0 )
+		{
+			value_string = libcstring_system_string_allocate(
+					value_string_size );
+
+			if( value_string == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create owner SID string.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfwnt_security_identifier_copy_to_utf16_string(
+				  security_identifier,
+				  (uint16_t *) value_string,
+				  value_string_size,
+				  0,
+				  error );
+#else
+			result = libfwnt_security_identifier_copy_to_utf8_string(
+				  security_identifier,
+				  (uint8_t *) value_string,
+				  value_string_size,
+				  0,
+				  error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve owner SID string.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfwnt_security_identifier_free(
+			     &security_identifier,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free owner SID.",
+				 function );
+
+				goto on_error;
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\tOwner SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 value_string );
+
+			memory_free(
+			 value_string );
+
+			value_string = NULL;
+		}
+	}
+	result = libfwnt_security_descriptor_get_group(
+		  security_descriptor,
+		  &security_identifier,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve group SID.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfwnt_security_identifier_get_string_size(
+		     security_identifier,
+		     &value_string_size,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve group SID string size.",
+			 function );
+
+			goto on_error;
+		}
+		if( value_string_size > 0 )
+		{
+			value_string = libcstring_system_string_allocate(
+					value_string_size );
+
+			if( value_string == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create group SID string.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfwnt_security_identifier_copy_to_utf16_string(
+				  security_identifier,
+				  (uint16_t *) value_string,
+				  value_string_size,
+				  0,
+				  error );
+#else
+			result = libfwnt_security_identifier_copy_to_utf8_string(
+				  security_identifier,
+				  (uint8_t *) value_string,
+				  value_string_size,
+				  0,
+				  error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve group SID string.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfwnt_security_identifier_free(
+			     &security_identifier,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free group SID.",
+				 function );
+
+				goto on_error;
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "\t\tGroup SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 value_string );
+
+			memory_free(
+			 value_string );
+
+			value_string = NULL;
+		}
+	}
+	result = libfwnt_security_descriptor_get_discretionary_acl(
+		  security_descriptor,
+		  &access_control_list,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve discretionary access control list (ACL).",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tDiscretionary ACL:\n" );
+
+		if( libfwnt_access_control_list_get_number_of_entries(
+		     access_control_list,
+		     &number_of_entries,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of discretionary access control entries (ACE).",
+			 function );
+
+			goto on_error;
+		}
+		for( entry_index = 0;
+		     entry_index < number_of_entries;
+		     entry_index++ )
+		{
+			if( libfwnt_access_control_list_get_entry_by_index(
+			     access_control_list,
+			     entry_index,
+			     &access_control_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve discretionary access control entry (ACE): %d.",
+				 function,
+				 entry_index );
+
+				goto on_error;
+			}
+/* TODO print ACE */
+			if( libfwnt_access_control_entry_free(
+			     &access_control_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free discretionary access control entry (ACE): %d.",
+				 function,
+				 entry_index );
+
+				goto on_error;
+			}
+		}
+		if( libfwnt_access_control_list_free(
+		     &access_control_list,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free discretionary access control list.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	result = libfwnt_security_descriptor_get_system_acl(
+		  security_descriptor,
+		  &access_control_list,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve system access control list (ACL).",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tSystem ACL:\n" );
+
+		if( libfwnt_access_control_list_get_number_of_entries(
+		     access_control_list,
+		     &number_of_entries,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of system access control entries (ACE).",
+			 function );
+
+			goto on_error;
+		}
+		for( entry_index = 0;
+		     entry_index < number_of_entries;
+		     entry_index++ )
+		{
+			if( libfwnt_access_control_list_get_entry_by_index(
+			     access_control_list,
+			     entry_index,
+			     &access_control_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve system access control entry (ACE): %d.",
+				 function,
+				 entry_index );
+
+				goto on_error;
+			}
+			if( libfwnt_access_control_entry_get_type(
+			     access_control_entry,
+			     &access_control_entry_type,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve system access control entry (ACE): %d type.",
+				 function,
+				 entry_index );
+
+
+				goto on_error;
+			}
+			if( libfwnt_access_control_entry_get_flags(
+			     access_control_entry,
+			     &access_control_entry_flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve system access control entry (ACE): %d flags.",
+				 function,
+				 entry_index );
+
+
+				goto on_error;
+			}
+			result = libfwnt_access_control_entry_get_access_mask(
+			          access_control_entry,
+			          &access_mask,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve access mask.",
+				 function );
+
+				goto on_error;
+			}
+/* TODO ignore ACE without access mask? */
+			result = libfwnt_access_control_entry_get_security_identifier(
+			          access_control_entry,
+			          &security_identifier,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve security identifier.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result != 0 )
+			{
+				if( libfwnt_security_identifier_get_string_size(
+				     security_identifier,
+				     &value_string_size,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve security identifier string size.",
+					 function );
+
+					goto on_error;
+				}
+				if( value_string_size > 0 )
+				{
+					value_string = libcstring_system_string_allocate(
+							value_string_size );
+
+					if( value_string == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+						 "%s: unable to create security identifier string.",
+						 function );
+
+						goto on_error;
+					}
+#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+					result = libfwnt_security_identifier_copy_to_utf16_string(
+						  security_identifier,
+						  (uint16_t *) value_string,
+						  value_string_size,
+						  0,
+						  error );
+#else
+					result = libfwnt_security_identifier_copy_to_utf8_string(
+						  security_identifier,
+						  (uint8_t *) value_string,
+						  value_string_size,
+						  0,
+						  error );
+#endif
+					if( result != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve security identifier string.",
+						 function );
+
+						goto on_error;
+					}
+					if( libfwnt_security_identifier_free(
+					     &security_identifier,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 "%s: unable to free security identifier.",
+						 function );
+
+						goto on_error;
+					}
+					fprintf(
+					 info_handle->notify_stream,
+					 "\t\t\t%s, flags: 0x%" PRIx8 ", access mask: 0x%04" PRIx32 ", SID: %" PRIs_LIBCSTRING_SYSTEM "\n",
+					 info_handle_get_access_control_entry_type(
+					  access_control_entry_type ),
+					 access_control_entry_flags,
+					 access_mask,
+					 value_string );
+
+					memory_free(
+					 value_string );
+
+					value_string = NULL;
+				}
+			}
+			if( libfwnt_access_control_entry_free(
+			     &access_control_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free system access control entry (ACE): %d.",
+				 function,
+				 entry_index );
+
+				goto on_error;
+			}
+		}
+		if( libfwnt_access_control_list_free(
+		     &access_control_list,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free system access control list.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfwnt_security_descriptor_free(
+	     &security_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free security descriptor.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
+	if( access_control_entry != NULL )
+	{
+		libfwnt_access_control_entry_free(
+		 &access_control_entry,
+		 NULL );
+	}
+	if( access_control_list != NULL )
+	{
+		libfwnt_access_control_list_free(
+		 &access_control_list,
+		 NULL );
+	}
+	if( security_identifier != NULL )
+	{
+		libfwnt_security_identifier_free(
+		 &security_identifier,
+		 NULL );
+	}
+	if( security_descriptor != NULL )
+	{
+		libfwnt_security_descriptor_free(
+		 &security_descriptor,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Prints attribute information
  * Returns 1 if successful or -1 on error
  */
@@ -935,6 +1609,21 @@ int info_handle_attribute_fprint(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
+			if( info_handle_security_descriptor_attribute_fprint(
+			     info_handle,
+			     attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print security descriptor attribute: %d information.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
@@ -1161,7 +1850,7 @@ int info_handle_file_name_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t\t: %" PRIu64 "\n",
+		 "\tParent file reference\t\t: %" PRIu64 "\n",
 		 value_64bit );
 	}
 	else
@@ -1996,6 +2685,108 @@ on_error:
 	{
 		memory_free(
 		 value_string );
+	}
+	return( -1 );
+}
+
+/* Prints $SECURITY_DESCRIPTOR attribute information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_security_descriptor_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error )
+{
+	static char *function = "info_handle_security_descriptor_attribute_fprint";
+	uint8_t *data         = NULL;
+	size_t data_size      = 0;
+	int result            = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_standard_information_attribute_get_security_descriptor_size(
+	          attribute,
+	          &data_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve security descriptor size.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		data = (uint8_t *) memory_allocate(
+		                    sizeof( uint8_t ) * data_size );
+
+		if( data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_standard_information_attribute_get_security_descriptor(
+		     attribute,
+		     data,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle_security_descriptor_fprint(
+		     info_handle,
+		     data,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		memory_free(
+		 data );
+
+		data = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( data != NULL )
+	{
+		memory_free(
+		 data );
 	}
 	return( -1 );
 }
@@ -3337,19 +4128,15 @@ int info_handle_file_entry_fprint(
 {
 	libcstring_system_character_t filetime_string[ 32 ];
 
-	libcstring_system_character_t *value_string        = NULL;
-	libfdatetime_filetime_t *filetime                  = NULL;
-	libfwnt_security_descriptor_t *security_descriptor = NULL;
-	libfwnt_security_identifier_t *security_identifier = NULL;
-	libfsntfs_file_entry_t *file_entry                 = NULL;
-	static char *function                              = "info_handle_file_entry_fprint";
-	uint8_t *data                                      = NULL;
-	size_t data_size                                   = 0;
-	size_t path_length                                 = 0;
-	size_t value_string_size                           = 0;
-	uint64_t value_64bit                               = 0;
-	uint32_t value_32bit                               = 0;
-	int result                                         = 0;
+	libfdatetime_filetime_t *filetime  = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	static char *function              = "info_handle_file_entry_fprint";
+	uint8_t *data                      = NULL;
+	size_t data_size                   = 0;
+	size_t path_length                 = 0;
+	uint64_t value_64bit               = 0;
+	uint32_t value_32bit               = 0;
+	int result                         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3415,6 +4202,26 @@ int info_handle_file_entry_fprint(
 	 "\tPath\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
 	 path );
 
+	if( libfsntfs_file_entry_get_file_reference(
+	     file_entry,
+	     &value_64bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+	 value_64bit & 0xffffffffffffUL,
+	 value_64bit >> 48 );
+
 	if( libfsntfs_file_entry_get_parent_file_reference(
 	     file_entry,
 	     &value_64bit,
@@ -3433,7 +4240,7 @@ int info_handle_file_entry_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t\t: %" PRIu64 "\n",
+		 "\tParent file reference\t\t: %" PRIu64 "\n",
 		 value_64bit );
 	}
 	else
@@ -3775,247 +4582,17 @@ int info_handle_file_entry_fprint(
 
 			goto on_error;
 		}
-		if( libfwnt_security_descriptor_initialize(
-		     &security_descriptor,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create security descriptor.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfwnt_security_descriptor_copy_from_byte_stream(
-		     security_descriptor,
+		if( info_handle_security_descriptor_fprint(
+		     info_handle,
 		     data,
 		     data_size,
-		     LIBFWNT_ENDIAN_LITTLE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy security descriptor from byte stream.",
-			 function );
-
-			goto on_error;
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tSecurity descriptor:\n" );
-
-		result = libfwnt_security_descriptor_get_owner(
-		          security_descriptor,
-		          &security_identifier,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve owner SID.",
-			 function );
-
-			goto on_error;
-		}
-		else if( result != 0 )
-		{
-			if( libfwnt_security_identifier_get_string_size(
-			     security_identifier,
-			     &value_string_size,
-			     0,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve owner SID string size.",
-				 function );
-
-				goto on_error;
-			}
-			if( value_string_size > 0 )
-			{
-				value_string = libcstring_system_string_allocate(
-				                value_string_size );
-
-				if( value_string == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create owner SID string.",
-					 function );
-
-					goto on_error;
-				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libfwnt_security_identifier_copy_to_utf16_string(
-					  security_identifier,
-					  (uint16_t *) value_string,
-					  value_string_size,
-					  0,
-					  error );
-#else
-				result = libfwnt_security_identifier_copy_to_utf8_string(
-					  security_identifier,
-					  (uint8_t *) value_string,
-					  value_string_size,
-					  0,
-					  error );
-#endif
-				if( result != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve owner SID string.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfwnt_security_identifier_free(
-				     &security_identifier,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free security identifier.",
-					 function );
-
-					goto on_error;
-				}
-				fprintf(
-				 info_handle->notify_stream,
-				 "\t\tOwner SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 value_string );
-
-				memory_free(
-				 value_string );
-
-				value_string = NULL;
-			}
-		}
-		result = libfwnt_security_descriptor_get_group(
-		          security_descriptor,
-		          &security_identifier,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve group SID.",
-			 function );
-
-			goto on_error;
-		}
-		else if( result != 0 )
-		{
-			if( libfwnt_security_identifier_get_string_size(
-			     security_identifier,
-			     &value_string_size,
-			     0,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve group SID string size.",
-				 function );
-
-				goto on_error;
-			}
-			if( value_string_size > 0 )
-			{
-				value_string = libcstring_system_string_allocate(
-				                value_string_size );
-
-				if( value_string == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create group SID string.",
-					 function );
-
-					goto on_error;
-				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libfwnt_security_identifier_copy_to_utf16_string(
-					  security_identifier,
-					  (uint16_t *) value_string,
-					  value_string_size,
-					  0,
-					  error );
-#else
-				result = libfwnt_security_identifier_copy_to_utf8_string(
-					  security_identifier,
-					  (uint8_t *) value_string,
-					  value_string_size,
-					  0,
-					  error );
-#endif
-				if( result != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve group SID string.",
-					 function );
-
-					goto on_error;
-				}
-				if( libfwnt_security_identifier_free(
-				     &security_identifier,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free security identifier.",
-					 function );
-
-					goto on_error;
-				}
-				fprintf(
-				 info_handle->notify_stream,
-				 "\t\tGroup SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
-				 value_string );
-
-				memory_free(
-				 value_string );
-
-				value_string = NULL;
-			}
-		}
-/* TODO print security descriptor ACLs */
-		if( libfwnt_security_descriptor_free(
-		     &security_descriptor,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free security descriptor.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print security descriptor.",
 			 function );
 
 			goto on_error;
@@ -4047,18 +4624,6 @@ int info_handle_file_entry_fprint(
 	return( 1 );
 
 on_error:
-	if( security_identifier != NULL )
-	{
-		libfwnt_security_identifier_free(
-		 &security_identifier,
-		 NULL );
-	}
-	if( security_descriptor != NULL )
-	{
-		libfwnt_security_descriptor_free(
-		 &security_descriptor,
-		 NULL );
-	}
 	if( data != NULL )
 	{
 		memory_free(

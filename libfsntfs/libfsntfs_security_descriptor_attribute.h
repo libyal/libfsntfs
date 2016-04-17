@@ -1,5 +1,5 @@
 /*
- * The libfwnt header wrapper
+ * Security descriptor attribute ($SECURITY_DESCRIPTOR) functions
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,36 +19,35 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFSTOOLS_LIBFWNT_H )
-#define _FSNTFSTOOLS_LIBFWNT_H
+#if !defined( _LIBFSNTFS_SECURITY_DESCRIPTOR_ATTRIBUTE_H )
+#define _LIBFSNTFS_SECURITY_DESCRIPTOR_ATTRIBUTE_H
 
 #include <common.h>
+#include <types.h>
 
-/* Define HAVE_LOCAL_LIBFWNT for local use of libfwnt
- */
-#if defined( HAVE_LOCAL_LIBFWNT )
+#include "libfsntfs_extern.h"
+#include "libfsntfs_types.h"
 
-#include <libfwnt_access_control_entry.h>
-#include <libfwnt_access_control_list.h>
-#include <libfwnt_definitions.h>
-#include <libfwnt_lznt1.h>
-#include <libfwnt_lzxpress.h>
-#include <libfwnt_security_descriptor.h>
-#include <libfwnt_security_identifier.h>
-#include <libfwnt_types.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBFWNT_DLL_IMPORT
- * before including libfwnt.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFWNT_DLL_IMPORT
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#include <libfwnt.h>
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_security_descriptor_size(
+     libfsntfs_attribute_t *attribute,
+     size_t *data_size,
+     libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
+int libfsntfs_standard_information_attribute_get_security_descriptor(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+#if defined( __cplusplus )
+}
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_SECURITY_DESCRIPTOR_ATTRIBUTE_H ) */
 

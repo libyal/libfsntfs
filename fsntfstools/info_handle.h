@@ -95,6 +95,12 @@ int info_handle_close_input(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
+int info_handle_security_descriptor_fprint(
+     info_handle_t *info_handle,
+     const uint8_t *data,
+     size_t data_size,
+     libfsntfs_error_t **error );
+
 int info_handle_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
@@ -117,6 +123,11 @@ int info_handle_object_identifier_attribute_fprint(
      libfsntfs_error_t **error );
 
 int info_handle_reparse_point_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libfsntfs_error_t **error );
+
+int info_handle_security_descriptor_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error );
@@ -185,5 +196,5 @@ int info_handle_volume_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _INFO_HANDLE_H ) */
 

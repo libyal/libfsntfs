@@ -84,5 +84,5 @@ int libfsntfs_standard_information_attribute_get_update_sequence_number(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_STANDARD_INFORMATION_ATTRIBUTE_H ) */
 

@@ -478,6 +478,19 @@ int libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
 
 		goto on_error;
 	}
+	if( libfsntfs_security_descriptor_index_value_free(
+	     &search_index_value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free search security descriptor index value.",
+		 function );
+
+		goto on_error;
+	}
 	if( security_descriptor_index_value == NULL )
 	{
 		libcerror_error_set(
