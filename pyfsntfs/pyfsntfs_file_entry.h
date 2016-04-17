@@ -197,6 +197,10 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_print_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_security_descriptor_data(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_number_of_attributes(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
@@ -262,5 +266,5 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entries(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_FILE_ENTRY_H ) */
 

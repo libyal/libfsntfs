@@ -46,6 +46,7 @@
 #include "pyfsntfs_object_identifier_attribute.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_reparse_point_attribute.h"
+#include "pyfsntfs_security_descriptor_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_usn_change_journal.h"
@@ -484,6 +485,7 @@ PyMODINIT_FUNC initpyfsntfs(
 	PyTypeObject *mft_metadata_file_entries_type_object      = NULL;
 	PyTypeObject *object_identifier_attribute_type_object    = NULL;
 	PyTypeObject *reparse_point_attribute_type_object        = NULL;
+	PyTypeObject *security_descriptor_attribute_type_object  = NULL;
 	PyTypeObject *standard_information_attribute_type_object = NULL;
 	PyTypeObject *usn_change_journal_type_object             = NULL;
 	PyTypeObject *volume_type_object                         = NULL;
@@ -676,6 +678,25 @@ PyMODINIT_FUNC initpyfsntfs(
 	 module,
 	 "reparse_point_attribute",
 	 (PyObject *) reparse_point_attribute_type_object );
+
+	/* Setup the $SECURITY_DESCRIPTOR attribute type object
+	 */
+	pyfsntfs_security_descriptor_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_security_descriptor_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_security_descriptor_attribute_type_object );
+
+	security_descriptor_attribute_type_object = &pyfsntfs_attribute_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "security_descriptor_attribute",
+	 (PyObject *) security_descriptor_attribute_type_object );
 
 	/* Setup the $STANDARD_INFORMATION attribute type object
 	 */

@@ -290,6 +290,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the reparse point print name." },
 
+	{ "get_security_descriptor_data",
+	  (PyCFunction) pyfsntfs_file_entry_get_security_descriptor_data,
+	  METH_NOARGS,
+	  "get_security_descriptor_data() -> String or None\n"
+	  "\n"
+	  "Returns the security descriptor data." },
+
 	/* Functions to access the attributes */
 
 	{ "get_number_of_attributes",
@@ -446,6 +453,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_reparse_point_print_name,
 	  (setter) 0,
 	  "The reparse point print name.",
+	  NULL },
+
+	{ "security_descriptor_data",
+	  (getter) pyfsntfs_file_entry_get_security_descriptor_data,
+	  (setter) 0,
+	  "The security descriptor data.",
 	  NULL },
 
 	{ "number_of_attributes",
@@ -3258,6 +3271,104 @@ on_error:
 		 name );
 	}
 	return( NULL );
+}
+
+/* Retrieves the security descriptor data
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_security_descriptor_data(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error            = NULL;
+	PyObject *string_object             = NULL;
+	static char *function               = "pyfsntfs_file_entry_get_security_descriptor_data";
+	char *security_desciptor_data       = NULL;
+	size_t security_desciptor_data_size = 0;
+	int result                          = 0;
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          pyfsntfs_file_entry->file_entry,
+	          &security_desciptor_data_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine security descriptor data size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+#if PY_MAJOR_VERSION >= 3
+	string_object = PyBytes_FromStringAndSize(
+	                 NULL,
+	                 security_desciptor_data_size );
+
+	security_desciptor_data = PyBytes_AsString(
+	                           string_object );
+#else
+	/* Note that a size of 0 is not supported
+	 */
+	string_object = PyString_FromStringAndSize(
+	                 NULL,
+	                 security_desciptor_data_size );
+
+	security_desciptor_data = PyString_AsString(
+	                           string_object );
+#endif
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          pyfsntfs_file_entry->file_entry,
+	          (uint8_t *) security_desciptor_data,
+	          security_desciptor_data_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve security descriptor data.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		Py_DecRef(
+		 (PyObject *) string_object );
+
+		return( NULL );
+	}
+	return( string_object );
 }
 
 /* Retrieves the number of attributes
