@@ -48,6 +48,7 @@ BUILT_SOURCES = \
 	pyfsntfs_object_identifier_attribute.c pyfsntfs_object_identifier_attribute.h \
 	pyfsntfs_python.h \
 	pyfsntfs_reparse_point_attribute.c pyfsntfs_reparse_point_attribute.h \
+	pyfsntfs_security_descriptor_attribute.c pyfsntfs_security_descriptor_attribute.h \
 	pyfsntfs_standard_information_attribute.c pyfsntfs_standard_information_attribute.h \
 	pyfsntfs_usn_change_journal.c pyfsntfs_usn_change_journal.h \
 	pyfsntfs_unused.h \

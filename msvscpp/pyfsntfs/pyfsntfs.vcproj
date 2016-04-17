@@ -246,6 +246,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_security_descriptor_attribute.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_standard_information_attribute.c"
 				>
 			</File>
@@ -377,6 +381,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_reparse_point_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_security_descriptor_attribute.h"
 				>
 			</File>
 			<File

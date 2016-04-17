@@ -41,6 +41,7 @@
 #include "pyfsntfs_object_identifier_attribute.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_reparse_point_attribute.h"
+#include "pyfsntfs_security_descriptor_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume_information_attribute.h"
@@ -3509,6 +3510,10 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
 			type_object = &pyfsntfs_reparse_point_attribute_type_object;
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
+			type_object = &pyfsntfs_security_descriptor_attribute_type_object;
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
