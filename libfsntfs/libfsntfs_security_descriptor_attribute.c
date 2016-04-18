@@ -32,13 +32,13 @@
 /* Retrieves the security descriptor (data) size
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_standard_information_attribute_get_security_descriptor_size(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
      libfsntfs_attribute_t *attribute,
      size_t *data_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_standard_information_attribute_get_security_descriptor_size";
+	static char *function                              = "libfsntfs_security_descriptor_attribute_get_security_descriptor_size";
 
 	if( attribute == NULL )
 	{
@@ -95,14 +95,14 @@ int libfsntfs_standard_information_attribute_get_security_descriptor_size(
 /* Retrieves the security descriptor (data)
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_standard_information_attribute_get_security_descriptor(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor(
      libfsntfs_attribute_t *attribute,
      uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_standard_information_attribute_get_security_descriptor";
+	static char *function                              = "libfsntfs_security_descriptor_attribute_get_security_descriptor";
 
 	if( attribute == NULL )
 	{

@@ -33,13 +33,13 @@ extern "C" {
 #endif
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_standard_information_attribute_get_security_descriptor_size(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
      libfsntfs_attribute_t *attribute,
      size_t *data_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_standard_information_attribute_get_security_descriptor(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor(
      libfsntfs_attribute_t *attribute,
      uint8_t *data,
      size_t data_size,

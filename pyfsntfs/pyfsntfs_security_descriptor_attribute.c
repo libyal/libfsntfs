@@ -181,7 +181,7 @@ PyObject *pyfsntfs_security_descriptor_attribute_get_data(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_security_descriptor_size(
+	result = libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
 	          pyfsntfs_attribute->attribute,
 	          &security_desciptor_data_size,
 	          &error );
@@ -220,7 +220,7 @@ PyObject *pyfsntfs_security_descriptor_attribute_get_data(
 #endif
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_security_descriptor(
+	result = libfsntfs_security_descriptor_attribute_get_security_descriptor(
 	          pyfsntfs_attribute->attribute,
 	          (uint8_t *) security_desciptor_data,
 	          security_desciptor_data_size,

@@ -2713,7 +2713,7 @@ int info_handle_security_descriptor_attribute_fprint(
 
 		return( -1 );
 	}
-	result = libfsntfs_standard_information_attribute_get_security_descriptor_size(
+	result = libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
 	          attribute,
 	          &data_size,
 	          error );
@@ -2745,7 +2745,7 @@ int info_handle_security_descriptor_attribute_fprint(
 
 			goto on_error;
 		}
-		if( libfsntfs_standard_information_attribute_get_security_descriptor(
+		if( libfsntfs_security_descriptor_attribute_get_security_descriptor(
 		     attribute,
 		     data,
 		     data_size,

@@ -1302,7 +1302,7 @@ int libfsntfs_reparse_point_attribute_get_utf16_print_name(
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_standard_information_attribute_get_security_descriptor_size(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
      libfsntfs_attribute_t *attribute,
      size_t *data_size,
      libfsntfs_error_t **error );
@@ -1311,7 +1311,7 @@ int libfsntfs_standard_information_attribute_get_security_descriptor_size(
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_standard_information_attribute_get_security_descriptor(
+int libfsntfs_security_descriptor_attribute_get_security_descriptor(
      libfsntfs_attribute_t *attribute,
      uint8_t *data,
      size_t data_size,
