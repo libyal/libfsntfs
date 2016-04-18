@@ -60,6 +60,12 @@ int libfsntfs_security_descriptor_values_read(
      size_t data_size,
      libcerror_error_t **error );
 
+int libfsntfs_security_descriptor_values_read_buffer(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
 int libfsntfs_security_descriptor_values_read_stream(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
      libbfio_handle_t *file_io_handle,

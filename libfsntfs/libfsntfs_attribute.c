@@ -2073,7 +2073,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_security_descriptor_values_read(
+				if( libfsntfs_security_descriptor_values_read_buffer(
 				     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,

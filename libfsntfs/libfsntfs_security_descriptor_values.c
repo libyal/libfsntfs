@@ -261,6 +261,120 @@ on_error:
 	return( -1 );
 }
 
+/* Reads the security descriptor values from the buffer
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_values_read_buffer(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_security_descriptor_values_read_buffer";
+
+	if( security_descriptor_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor values.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	if( data_size < 20 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported security descriptor data size: %" PRIzd "\n",
+		 function,
+		 data_size );
+
+		goto on_error;
+	}
+	security_descriptor_values->data = (uint8_t *) memory_allocate(
+	                                                sizeof( uint8_t ) * data_size );
+
+	if( security_descriptor_values->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create data.",
+		 function );
+
+		goto on_error;
+	}
+	security_descriptor_values->data_size = data_size;
+
+	if( memory_copy(
+	     security_descriptor_values->data,
+	     data,
+	     data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to copy data.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_security_descriptor_values_read(
+	     security_descriptor_values,
+	     security_descriptor_values->data,
+	     security_descriptor_values->data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security descriptor values.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( security_descriptor_values->data != NULL )
+	{
+		memory_free(
+		 security_descriptor_values->data );
+	}
+	security_descriptor_values->data_size = 0;
+
+	return( -1 );
+}
+
 /* Reads the security descriptor values from the data stream
  * Returns 1 if successful or -1 on error
  */
