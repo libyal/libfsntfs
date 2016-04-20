@@ -48,7 +48,7 @@
 
 #include <libbfio.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBBFIO ) */
 
-#endif
+#endif /* !defined( _FSNTFSTOOLS_LIBBFIO_H ) */
 

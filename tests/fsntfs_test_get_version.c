@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #endif
 
-#include "fsntfs_test_libcstring.h"
 #include "fsntfs_test_libfsntfs.h"
+#include "fsntfs_test_libcstring.h"
 #include "fsntfs_test_unused.h"
 
 /* The main program

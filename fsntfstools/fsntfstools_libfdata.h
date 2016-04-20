@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSBTFSTOOLS_LIBFDATA_H )
-#define _FSBTFSTOOLS_LIBFDATA_H
+#if !defined( _FSNTFSTOOLS_LIBFDATA_H )
+#define _FSNTFSTOOLS_LIBFDATA_H
 
 #include <common.h>
 
@@ -49,7 +49,7 @@
 
 #include <libfdata.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBFDATA ) */
 
-#endif
+#endif /* !defined( _FSNTFSTOOLS_LIBFDATA_H ) */
 

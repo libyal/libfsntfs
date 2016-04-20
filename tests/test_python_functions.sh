@@ -1,7 +1,7 @@
 #!/bin/bash
 # Python module functions testing script
 #
-# Version: 20160407
+# Version: 20160420
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -62,15 +62,6 @@ then
 	exit ${EXIT_IGNORE};
 fi
 
-PYTHON=`which python${PYTHON_VERSION} 2> /dev/null`;
-
-if ! test -x ${PYTHON};
-then
-	echo "Missing executable: ${PYTHON}";
-
-	exit ${EXIT_FAILURE};
-fi
-
 TEST_RUNNER="tests/test_runner.sh";
 
 if ! test -f "${TEST_RUNNER}";
@@ -100,7 +91,7 @@ do
 	fi
 done
 
-if test ${RESULT} -ne ${EXIT_SUCCESS};
+if test ${RESULT} -ne ${EXIT_SUCCESS} && test ${RESULT} -ne ${EXIT_IGNORE};
 then
 	exit ${RESULT};
 fi

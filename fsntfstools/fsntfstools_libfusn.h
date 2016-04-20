@@ -43,7 +43,7 @@
 
 #include <libfusn.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBFUSN ) */
 
-#endif
+#endif /* !defined( _FSNTFSTOOLS_LIBFUSN_H ) */
 

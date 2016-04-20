@@ -1,4 +1,4 @@
-.Dd March 30, 2016
+.Dd April 18, 2016
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -165,6 +165,10 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name "libfsntfs_file_entry_t *file_entry, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
 .Ft int
+.Fn libfsntfs_file_entry_get_security_descriptor_size "libfsntfs_file_entry_t *file_entry, size_t *data_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_get_security_descriptor "libfsntfs_file_entry_t *file_entry, uint8_t *data, size_t data_size, libfsntfs_error_t **error"
+.Ft int
 .Fn libfsntfs_file_entry_get_number_of_attributes "libfsntfs_file_entry_t *file_entry, int *number_of_attributes, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_attribute_by_index "libfsntfs_file_entry_t *file_entry, int attribute_index, libfsntfs_attribute_t **attribute, libfsntfs_error_t **error"
@@ -251,11 +255,15 @@ $FILE_NAME attribute functions
 .Ft int
 .Fn libfsntfs_file_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute, uint16_t *utf16_name, size_t utf16_name_size, libfsntfs_error_t **error"
 .Pp
-$OBJECT_ID attribute functions
-.Pp
 $REPARSE_POINT attribute functions
 .Ft int
 .Fn libfsntfs_reparse_point_attribute_get_tag "libfsntfs_attribute_t *attribute, uint32_t *tag, libfsntfs_error_t **error"
+.Pp
+$SECURITY_DESCRIPTOR attribute functions
+.Ft int
+.Fn libfsntfs_security_descriptor_attribute_get_security_descriptor_size "libfsntfs_attribute_t *attribute, size_t *data_size, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_security_descriptor_attribute_get_security_descriptor "libfsntfs_attribute_t *attribute, uint8_t *data, size_t data_size, libfsntfs_error_t **error"
 .Pp
 $STANDARD_INFORMATION attribute functions
 .Ft int

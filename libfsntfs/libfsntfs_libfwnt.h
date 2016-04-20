@@ -31,6 +31,7 @@
 #include <libfwnt_access_control_entry.h>
 #include <libfwnt_access_control_list.h>
 #include <libfwnt_definitions.h>
+#include <libfwnt_locale_identifier.h>
 #include <libfwnt_lznt1.h>
 #include <libfwnt_lzxpress.h>
 #include <libfwnt_security_descriptor.h>
