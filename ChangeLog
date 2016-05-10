@@ -1,4 +1,6 @@
 TODO
+* libfsntfs/pyfsntfs attribute
+  - expose raw attribute data?
 * USN change journal
   - add support for values in $Max
 * resident data
@@ -47,8 +49,6 @@ TODO
   - how to handle file-like object functions for non-data file entry
 * pyfsntfs file entry/data stream
   - add extents iterator?
-* libfsntfs/pyfsntfs attribute
-  - expose raw attribute data?
 * libfsntfs/pyfsntfs file entry
   - expose default data stream
   - add support for short file name

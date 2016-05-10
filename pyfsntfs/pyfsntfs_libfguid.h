@@ -45,5 +45,5 @@
 
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_LIBFGUID_H ) */
 
