@@ -30,15 +30,29 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	fsntfs_test_error \
 	fsntfs_test_get_version \
 	fsntfs_test_open_close \
 	fsntfs_test_read \
 	fsntfs_test_seek
 
-fsntfs_test_get_version_SOURCES = \
+fsntfs_test_error_SOURCES = \
+	fsntfs_test_error.c \
 	fsntfs_test_libcstring.h \
 	fsntfs_test_libfsntfs.h \
-	fsntfs_test_get_version.c
+	fsntfs_test_macros.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_error_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCSTRING_LIBADD@
+
+fsntfs_test_get_version_SOURCES = \
+	fsntfs_test_get_version.c \
+	fsntfs_test_libcstring.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_unused.h
 
 fsntfs_test_get_version_LDADD = \
 	../libfsntfs/libfsntfs.la \

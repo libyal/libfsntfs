@@ -1,5 +1,5 @@
 /*
- * The libfusn header wrapper
+ * Memory allocation functions for testing
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,31 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFSTOOLS_LIBFUSN_H )
-#define _FSNTFSTOOLS_LIBFUSN_H
+#if !defined( _FSNTFS_TEST_MEMORY_H )
+#define _FSNTFS_TEST_MEMORY_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFUSN for local use of libfusn
- */
-#if defined( HAVE_LOCAL_LIBFUSN )
-
-#include <libfusn_definitions.h>
-#include <libfusn_record.h>
-#include <libfusn_types.h>
-
-#else
-
-/* If libtool DLL support is enabled set LIBFUSN_DLL_IMPORT
- * before including libfusn.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
-#define LIBFUSN_DLL_IMPORT
+#if defined( __cplusplus )
+extern "C" {
 #endif
 
-#include <libfusn.h>
+#if defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ )
 
-#endif /* defined( HAVE_LOCAL_LIBFUSN ) */
+#define HAVE_FSNTFS_TEST_MEMORY		1
 
-#endif /* !defined( _FSNTFSTOOLS_LIBFUSN_H ) */
+extern int fsntfs_test_malloc_attempts_before_fail;
+
+extern int fsntfs_test_memcpy_attempts_before_fail;
+
+extern int fsntfs_test_memset_attempts_before_fail;
+
+extern int fsntfs_test_realloc_attempts_before_fail;
+
+#endif /* defined( HAVE_GNU_DL_DLSYM ) && defined( __GNUC__ ) && !defined( __clang__ ) */
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif /* !defined( _FSNTFS_TEST_MEMORY_H ) */
 
