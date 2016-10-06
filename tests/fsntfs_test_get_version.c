@@ -74,7 +74,7 @@ int main(
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_get_version",
-	 fsntfs_test_get_version() )
+	 fsntfs_test_get_version );
 
 	return( EXIT_SUCCESS );
 

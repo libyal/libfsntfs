@@ -123,23 +123,23 @@ int main(
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_error_free",
-	 fsntfs_test_error_free() )
+	 fsntfs_test_error_free );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_error_fprint",
-	 fsntfs_test_error_fprint() )
+	 fsntfs_test_error_fprint );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_error_sprint",
-	 fsntfs_test_error_sprint() )
+	 fsntfs_test_error_sprint );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_error_backtrace_fprint",
-	 fsntfs_test_error_backtrace_fprint() )
+	 fsntfs_test_error_backtrace_fprint );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_error_backtrace_sprint",
-	 fsntfs_test_error_backtrace_sprint() )
+	 fsntfs_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 
