@@ -208,6 +208,17 @@ enum LIBFSNTFS_MEMORY_ERROR
 	LIBFSNTFS_MEMORY_ERROR_SET_FAILED		= 3
 };
 
+/* The output error codes
+ */
+enum LIBFSNTFS_OUTPUT_ERROR
+{
+	LIBFSNTFS_OUTPUT_ERROR_GENERIC			= 0,
+
+	/* There is insuficient space to write the output
+	 */
+	LIBFSNTFS_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
+};
+
 /* The runtime error codes
  * to signify errors regarding runtime processing
  */
@@ -276,16 +287,5 @@ enum LIBFSNTFS_RUNTIME_ERROR
 	LIBFSNTFS_RUNTIME_ERROR_ABORT_REQUESTED		= 15
 };
 
-/* The output error codes
- */
-enum LIBFSNTFS_OUTPUT_ERROR
-{
-	LIBFSNTFS_OUTPUT_ERROR_GENERIC			= 0,
-
-	/* There is insuficient space to write the output
-	 */
-	LIBFSNTFS_OUTPUT_ERROR_INSUFFICIENT_SPACE	= 1
-};
-
-#endif
+#endif /* !defined( _LIBFSNTFS_ERROR_H ) */
 

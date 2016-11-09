@@ -35,7 +35,6 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_unused.h"

@@ -22,12 +22,14 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "fsntfstools_libbfio.h"
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
-#include "fsntfstools_libcstring.h"
 #include "fsntfstools_libcsystem.h"
 #include "fsntfstools_libfdatetime.h"
 #include "fsntfstools_libfguid.h"
@@ -489,7 +491,7 @@ int info_handle_signal_abort(
  */
 int info_handle_set_volume_offset(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function = "info_handle_set_volume_offset";
@@ -507,7 +509,7 @@ int info_handle_set_volume_offset(
 
 		return( -1 );
 	}
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
 	if( libcsystem_string_decimal_copy_to_64_bit(
@@ -535,7 +537,7 @@ int info_handle_set_volume_offset(
  */
 int info_handle_open_input(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
 	static char *function  = "info_handle_open_input";
@@ -553,10 +555,10 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-	filename_length = libcstring_system_string_length(
+	filename_length = system_string_length(
 	                   filename );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libbfio_file_range_set_name_wide(
 	     info_handle->input_file_io_handle,
 	     filename,
@@ -772,7 +774,7 @@ int info_handle_security_descriptor_fprint(
 	libfwnt_access_control_list_t *access_control_list   = NULL;
 	libfwnt_security_descriptor_t *security_descriptor   = NULL;
 	libfwnt_security_identifier_t *security_identifier   = NULL;
-	libcstring_system_character_t *value_string          = NULL;
+	system_character_t *value_string                     = NULL;
 	static char *function                                = "info_handle_security_descriptor_fprint";
 	size_t value_string_size                             = 0;
 	uint32_t access_mask                                 = 0;
@@ -861,7 +863,7 @@ int info_handle_security_descriptor_fprint(
 		}
 		if( value_string_size > 0 )
 		{
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 					value_string_size );
 
 			if( value_string == NULL )
@@ -875,7 +877,7 @@ int info_handle_security_descriptor_fprint(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfwnt_security_identifier_copy_to_utf16_string(
 				  security_identifier,
 				  (uint16_t *) value_string,
@@ -916,7 +918,7 @@ int info_handle_security_descriptor_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t\tOwner SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\t\tOwner SID\t\t: %" PRIs_SYSTEM "\n",
 			 value_string );
 
 			memory_free(
@@ -960,7 +962,7 @@ int info_handle_security_descriptor_fprint(
 		}
 		if( value_string_size > 0 )
 		{
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 					value_string_size );
 
 			if( value_string == NULL )
@@ -974,7 +976,7 @@ int info_handle_security_descriptor_fprint(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfwnt_security_identifier_copy_to_utf16_string(
 				  security_identifier,
 				  (uint16_t *) value_string,
@@ -1015,7 +1017,7 @@ int info_handle_security_descriptor_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "\t\tGroup SID\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\t\tGroup SID\t\t: %" PRIs_SYSTEM "\n",
 			 value_string );
 
 			memory_free(
@@ -1250,7 +1252,7 @@ int info_handle_security_descriptor_fprint(
 				}
 				if( value_string_size > 0 )
 				{
-					value_string = libcstring_system_string_allocate(
+					value_string = system_string_allocate(
 							value_string_size );
 
 					if( value_string == NULL )
@@ -1264,7 +1266,7 @@ int info_handle_security_descriptor_fprint(
 
 						goto on_error;
 					}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 					result = libfwnt_security_identifier_copy_to_utf16_string(
 						  security_identifier,
 						  (uint16_t *) value_string,
@@ -1305,7 +1307,7 @@ int info_handle_security_descriptor_fprint(
 					}
 					fprintf(
 					 info_handle->notify_stream,
-					 "\t\t\t%s, flags: 0x%" PRIx8 ", access mask: 0x%04" PRIx32 ", SID: %" PRIs_LIBCSTRING_SYSTEM "\n",
+					 "\t\t\t%s, flags: 0x%" PRIx8 ", access mask: 0x%04" PRIx32 ", SID: %" PRIs_SYSTEM "\n",
 					 info_handle_get_access_control_entry_type(
 					  access_control_entry_type ),
 					 access_control_entry_flags,
@@ -1404,11 +1406,11 @@ int info_handle_attribute_fprint(
      int attribute_index,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	static char *function                       = "info_handle_attribute_fprint";
-	size_t value_string_size                    = 0;
-	uint32_t attribute_type                     = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	static char *function            = "info_handle_attribute_fprint";
+	size_t value_string_size         = 0;
+	uint32_t attribute_type          = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1447,7 +1449,7 @@ int info_handle_attribute_fprint(
 	  attribute_type ),
 	 attribute_type );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_attribute_get_utf16_name_size(
 	          attribute,
 	          &value_string_size,
@@ -1471,7 +1473,7 @@ int info_handle_attribute_fprint(
 	}
 	if( value_string_size > 0 )
 	{
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -1485,7 +1487,7 @@ int info_handle_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_attribute_get_utf16_name(
 		          attribute,
 		          (uint16_t *) value_string,
@@ -1511,7 +1513,7 @@ int info_handle_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tName\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tName\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -1811,15 +1813,15 @@ int info_handle_file_name_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
-	libcstring_system_character_t *value_string = NULL;
-	libfdatetime_filetime_t *filetime           = NULL;
-	static char *function                       = "info_handle_file_name_attribute_fprint";
-	size_t value_string_size                    = 0;
-	uint64_t value_64bit                        = 0;
-	uint32_t value_32bit                        = 0;
-	int result                                  = 0;
+	libfdatetime_filetime_t *filetime = NULL;
+	system_character_t *value_string  = NULL;
+	static char *function             = "info_handle_file_name_attribute_fprint";
+	size_t value_string_size          = 0;
+	uint64_t value_64bit              = 0;
+	uint32_t value_32bit              = 0;
+	int result                        = 0;
 
 	if( info_handle == NULL )
 	{
@@ -1902,7 +1904,7 @@ int info_handle_file_name_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -1930,7 +1932,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tCreation time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tCreation time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_name_attribute_get_modification_time(
@@ -1961,7 +1963,7 @@ int info_handle_file_name_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -1989,7 +1991,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tModification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tModification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_name_attribute_get_access_time(
@@ -2020,7 +2022,7 @@ int info_handle_file_name_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -2048,7 +2050,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tAccess time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tAccess time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_name_attribute_get_entry_modification_time(
@@ -2079,7 +2081,7 @@ int info_handle_file_name_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -2107,7 +2109,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tEntry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tEntry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfdatetime_filetime_free(
@@ -2145,7 +2147,7 @@ int info_handle_file_name_attribute_fprint(
 	 value_32bit,
 	 info_handle->notify_stream );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_file_name_attribute_get_utf16_name_size(
 	          attribute,
 	          &value_string_size,
@@ -2169,7 +2171,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	if( value_string_size > 0 )
 	{
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -2183,7 +2185,7 @@ int info_handle_file_name_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_file_name_attribute_get_utf16_name(
 		          attribute,
 		          (uint16_t *) value_string,
@@ -2209,7 +2211,7 @@ int info_handle_file_name_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tName\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tName\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -2244,7 +2246,7 @@ int info_handle_object_identifier_attribute_fprint(
 {
 	uint8_t guid_data[ 16 ];
 
-	libcstring_system_character_t guid_string[ 48 ];
+	system_character_t guid_string[ 48 ];
 
 	libfguid_identifier_t *guid = NULL;
 	static char *function       = "info_handle_object_identifier_attribute_fprint";
@@ -2305,7 +2307,7 @@ int info_handle_object_identifier_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfguid_identifier_copy_to_utf16_string(
 		  guid,
 		  (uint16_t *) guid_string,
@@ -2333,7 +2335,7 @@ int info_handle_object_identifier_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tDroid file identifier\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	 "\tDroid file identifier\t\t: %" PRIs_SYSTEM "\n",
 	 guid_string );
 
 	result = libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
@@ -2371,7 +2373,7 @@ int info_handle_object_identifier_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -2399,7 +2401,7 @@ int info_handle_object_identifier_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tBirth droid volume identifier\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tBirth droid volume identifier\t: %" PRIs_SYSTEM "\n",
 		 guid_string );
 	}
 	result = libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
@@ -2437,7 +2439,7 @@ int info_handle_object_identifier_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -2465,7 +2467,7 @@ int info_handle_object_identifier_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tBirth droid file identifier\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tBirth droid file identifier\t: %" PRIs_SYSTEM "\n",
 		 guid_string );
 	}
 	result = libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
@@ -2503,7 +2505,7 @@ int info_handle_object_identifier_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -2531,7 +2533,7 @@ int info_handle_object_identifier_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tBirth droid domain identifier\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tBirth droid domain identifier\t: %" PRIs_SYSTEM "\n",
 		 guid_string );
 	}
 	if( libfguid_identifier_free(
@@ -2567,11 +2569,11 @@ int info_handle_reparse_point_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	static char *function                       = "info_handle_reparse_point_attribute_fprint";
-	size_t value_string_size                    = 0;
-	uint32_t value_32bit                        = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	static char *function            = "info_handle_reparse_point_attribute_fprint";
+	size_t value_string_size         = 0;
+	uint32_t value_32bit             = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2605,7 +2607,7 @@ int info_handle_reparse_point_attribute_fprint(
 
 /* TODO print sanitized substitute name */
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
 	          attribute,
 	          &value_string_size,
@@ -2630,7 +2632,7 @@ int info_handle_reparse_point_attribute_fprint(
 	if( ( result != 0 )
 	 && ( value_string_size > 0 ) )
 	{
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -2644,7 +2646,7 @@ int info_handle_reparse_point_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
 		          attribute,
 		          (uint16_t *) value_string,
@@ -2670,7 +2672,7 @@ int info_handle_reparse_point_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tPrint name\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tPrint name\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -2799,7 +2801,7 @@ int info_handle_standard_information_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
 	libfdatetime_filetime_t *filetime = NULL;
 	static char *function             = "info_handle_standard_information_attribute_fprint";
@@ -2859,7 +2861,7 @@ int info_handle_standard_information_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -2887,7 +2889,7 @@ int info_handle_standard_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tCreation time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tCreation time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_standard_information_attribute_get_modification_time(
@@ -2918,7 +2920,7 @@ int info_handle_standard_information_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -2946,7 +2948,7 @@ int info_handle_standard_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tModification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tModification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_standard_information_attribute_get_access_time(
@@ -2977,7 +2979,7 @@ int info_handle_standard_information_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -3005,7 +3007,7 @@ int info_handle_standard_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tAccess time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tAccess time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_standard_information_attribute_get_entry_modification_time(
@@ -3036,7 +3038,7 @@ int info_handle_standard_information_attribute_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -3064,7 +3066,7 @@ int info_handle_standard_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tEntry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tEntry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfdatetime_filetime_free(
@@ -3258,10 +3260,10 @@ int info_handle_volume_name_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	static char *function                       = "info_handle_volume_name_attribute_fprint";
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	static char *function            = "info_handle_volume_name_attribute_fprint";
+	size_t value_string_size         = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3274,7 +3276,7 @@ int info_handle_volume_name_attribute_fprint(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_volume_name_attribute_get_utf16_name_size(
 	          attribute,
 	          &value_string_size,
@@ -3298,7 +3300,7 @@ int info_handle_volume_name_attribute_fprint(
 	}
 	if( value_string_size > 0 )
 	{
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -3312,7 +3314,7 @@ int info_handle_volume_name_attribute_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_volume_name_attribute_get_utf16_name(
 		          attribute,
 		          (uint16_t *) value_string,
@@ -3338,7 +3340,7 @@ int info_handle_volume_name_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tName\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tName\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -3366,22 +3368,22 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
      int indentation_level,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t *data_stream_name = NULL;
-	libcstring_system_character_t *file_entry_name  = NULL;
-	libfsntfs_data_stream_t *alternate_data_stream  = NULL;
-	libfsntfs_file_entry_t *sub_file_entry          = NULL;
-	static char *function                           = "info_handle_file_system_hierarchy_fprint_file_entry";
-	size_t data_stream_name_size                    = 0;
-	size_t file_entry_name_size                     = 0;
-	uint32_t file_attribute_flags                   = 0;
-	int alternate_data_stream_index                 = 0;
-	int has_default_data_stream                     = 0;
-	int has_directory_entries_index                 = 0;
-	int indentation_level_iterator                  = 0;
-	int number_of_alternate_data_streams            = 0;
-	int number_of_sub_file_entries                  = 0;
-	int result                                      = 0;
-	int sub_file_entry_index                        = 0;
+	libfsntfs_data_stream_t *alternate_data_stream = NULL;
+	libfsntfs_file_entry_t *sub_file_entry         = NULL;
+	system_character_t *data_stream_name           = NULL;
+	system_character_t *file_entry_name            = NULL;
+	static char *function                          = "info_handle_file_system_hierarchy_fprint_file_entry";
+	size_t data_stream_name_size                   = 0;
+	size_t file_entry_name_size                    = 0;
+	uint32_t file_attribute_flags                  = 0;
+	int alternate_data_stream_index                = 0;
+	int has_default_data_stream                    = 0;
+	int has_directory_entries_index                = 0;
+	int indentation_level_iterator                 = 0;
+	int number_of_alternate_data_streams           = 0;
+	int number_of_sub_file_entries                 = 0;
+	int result                                     = 0;
+	int sub_file_entry_index                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -3470,7 +3472,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_file_entry_get_utf16_name_size(
 	          file_entry,
 	          &file_entry_name_size,
@@ -3495,7 +3497,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 	if( ( result == 1 )
 	 && ( file_entry_name_size > 0 ) )
 	{
-		file_entry_name = libcstring_system_string_allocate(
+		file_entry_name = system_string_allocate(
 		                   file_entry_name_size );
 
 		if( file_entry_name == NULL )
@@ -3509,7 +3511,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_file_entry_get_utf16_name(
 		          file_entry,
 		          (uint16_t *) file_entry_name,
@@ -3549,7 +3551,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%" PRIs_SYSTEM "\n",
 			 file_entry_name );
 		}
 		for( alternate_data_stream_index = 0;
@@ -3572,7 +3574,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfsntfs_data_stream_get_utf16_name_size(
 			          alternate_data_stream,
 			          &data_stream_name_size,
@@ -3597,7 +3599,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 			}
 			if( data_stream_name_size > 0 )
 			{
-				data_stream_name = libcstring_system_string_allocate(
+				data_stream_name = system_string_allocate(
 				                    data_stream_name_size );
 
 				if( data_stream_name == NULL )
@@ -3612,7 +3614,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libfsntfs_data_stream_get_utf16_name(
 					  alternate_data_stream,
 					  (uint16_t *) data_stream_name,
@@ -3647,7 +3649,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				}
 				fprintf(
 				 info_handle->notify_stream,
-				 "%" PRIs_LIBCSTRING_SYSTEM ":%" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "%" PRIs_SYSTEM ":%" PRIs_SYSTEM "\n",
 				 file_entry_name,
 				 data_stream_name );
 
@@ -4123,10 +4125,10 @@ int info_handle_mft_entries_fprint(
  */
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *path,
+     const system_character_t *path,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
 	libfdatetime_filetime_t *filetime  = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
@@ -4149,10 +4151,10 @@ int info_handle_file_entry_fprint(
 
 		return( -1 );
 	}
-	path_length = libcstring_system_string_length(
+	path_length = system_string_length(
 	               path );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_volume_get_file_entry_by_utf16_path(
 	          info_handle->input_volume,
 	          (uint16_t *) path,
@@ -4199,7 +4201,7 @@ int info_handle_file_entry_fprint(
 
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tPath\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	 "\tPath\t\t\t\t: %" PRIs_SYSTEM "\n",
 	 path );
 
 	if( libfsntfs_file_entry_get_file_reference(
@@ -4292,7 +4294,7 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -4320,7 +4322,7 @@ int info_handle_file_entry_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tCreation time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tCreation time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_entry_get_modification_time(
@@ -4351,7 +4353,7 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -4379,7 +4381,7 @@ int info_handle_file_entry_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tModification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tModification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_entry_get_access_time(
@@ -4410,7 +4412,7 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -4438,7 +4440,7 @@ int info_handle_file_entry_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tAccess time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tAccess time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfsntfs_file_entry_get_entry_modification_time(
@@ -4469,7 +4471,7 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -4497,7 +4499,7 @@ int info_handle_file_entry_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tEntry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tEntry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfdatetime_filetime_free(
@@ -4904,15 +4906,15 @@ int info_handle_usn_record_fprint(
      libfusn_record_t *usn_record,
      libfsntfs_error_t **error )
 {
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
-	libcstring_system_character_t *value_string = NULL;
-	libfdatetime_filetime_t *filetime           = NULL;
-	static char *function                       = "info_handle_usn_record_fprint";
-	size_t value_string_size                    = 0;
-	uint64_t value_64bit                        = 0;
-	uint32_t value_32bit                        = 0;
-	int result                                  = 0;
+	libfdatetime_filetime_t *filetime = NULL;
+	system_character_t *value_string  = NULL;
+	static char *function             = "info_handle_usn_record_fprint";
+	size_t value_string_size          = 0;
+	uint64_t value_64bit              = 0;
+	uint32_t value_32bit              = 0;
+	int result                        = 0;
 
 	if( info_handle == NULL )
 	{
@@ -4970,7 +4972,7 @@ int info_handle_usn_record_fprint(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfdatetime_filetime_copy_to_utf16_string(
 		  filetime,
 		  (uint16_t *) filetime_string,
@@ -4998,7 +5000,7 @@ int info_handle_usn_record_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tUpdate time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+	 "\tUpdate time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 	 filetime_string );
 
 	if( libfdatetime_filetime_free(
@@ -5087,7 +5089,7 @@ int info_handle_usn_record_fprint(
 	 info_handle->notify_stream,
 	 "\tName\t\t\t\t: " );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfusn_record_get_utf16_name_size(
 	          usn_record,
 	          &value_string_size,
@@ -5111,7 +5113,7 @@ int info_handle_usn_record_fprint(
 	}
 	if( value_string_size > 0 )
 	{
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -5125,7 +5127,7 @@ int info_handle_usn_record_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfusn_record_get_utf16_name(
 		          usn_record,
 		          (uint16_t *) value_string,
@@ -5151,7 +5153,7 @@ int info_handle_usn_record_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 "%" PRIs_SYSTEM "",
 		 value_string );
 
 		memory_free(
@@ -5484,16 +5486,16 @@ int info_handle_volume_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *volume_name = NULL;
-	static char *function                      = "info_handle_volume_fprint";
-	size32_t index_entry_size                  = 0;
-	size32_t mft_entry_size                    = 0;
-	size_t cluster_block_size                  = 0;
-	size_t volume_name_size                    = 0;
-	uint64_t serial_number                     = 0;
-	uint8_t major_version                      = 0;
-	uint8_t minor_version                      = 0;
-	int result                                 = 0;
+	system_character_t *volume_name = NULL;
+	static char *function           = "info_handle_volume_fprint";
+	size32_t index_entry_size       = 0;
+	size32_t mft_entry_size         = 0;
+	size_t cluster_block_size       = 0;
+	size_t volume_name_size         = 0;
+	uint64_t serial_number          = 0;
+	uint8_t major_version           = 0;
+	uint8_t minor_version           = 0;
+	int result                      = 0;
 
 	if( info_handle == NULL )
 	{
@@ -5520,7 +5522,7 @@ int info_handle_volume_fprint(
 
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 		          info_handle->input_mft_metadata_file,
 		          &volume_name_size,
@@ -5534,7 +5536,7 @@ int info_handle_volume_fprint(
 	}
 	else if( info_handle->input_volume != NULL )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_volume_get_utf16_name_size(
 		          info_handle->input_volume,
 		          &volume_name_size,
@@ -5559,7 +5561,7 @@ int info_handle_volume_fprint(
 	}
 	if( volume_name_size > 0 )
 	{
-		volume_name = libcstring_system_string_allocate(
+		volume_name = system_string_allocate(
 		               volume_name_size );
 
 		if( volume_name == NULL )
@@ -5575,7 +5577,7 @@ int info_handle_volume_fprint(
 		}
 		if( info_handle->input_mft_metadata_file != NULL )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
 			          info_handle->input_mft_metadata_file,
 			          (uint16_t *) volume_name,
@@ -5591,7 +5593,7 @@ int info_handle_volume_fprint(
 		}
 		else if( info_handle->input_volume != NULL )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfsntfs_volume_get_utf16_name(
 			          info_handle->input_volume,
 			          (uint16_t *) volume_name,
@@ -5618,7 +5620,7 @@ int info_handle_volume_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 "%" PRIs_SYSTEM "",
 		 volume_name );
 
 		memory_free(

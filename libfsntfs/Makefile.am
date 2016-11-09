@@ -1,7 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
@@ -66,7 +65,6 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_libcerror.h \
 	libfsntfs_libclocale.h \
 	libfsntfs_libcnotify.h \
-	libfsntfs_libcstring.h \
 	libfsntfs_libcthreads.h \
 	libfsntfs_libfcache.h \
 	libfsntfs_libfdata.h \
@@ -101,7 +99,6 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_volume_name_values.c libfsntfs_volume_name_values.h
 
 libfsntfs_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \

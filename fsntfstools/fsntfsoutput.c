@@ -29,7 +29,6 @@
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
 #include "fsntfstools_libcnotify.h"
-#include "fsntfstools_libcstring.h"
 #include "fsntfstools_libcsystem.h"
 #include "fsntfstools_libfcache.h"
 #include "fsntfstools_libfdata.h"

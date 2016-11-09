@@ -27,7 +27,6 @@
 
 #include "pyfsntfs_libbfio.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_python.h"
 
 #if defined( __cplusplus )

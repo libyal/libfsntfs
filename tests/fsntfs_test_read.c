@@ -21,12 +21,12 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include "fsntfs_test_libcstring.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libcthreads.h"
 #include "fsntfs_test_libfsntfs.h"
@@ -852,18 +852,18 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
-	libcstring_system_character_t *source = NULL;
-	libfsntfs_file_entry_t *file_entry    = NULL;
-	libfsntfs_volume_t *volume            = NULL;
-	size64_t file_size                    = 0;
-	int result                            = 0;
+	libcerror_error_t *error           = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	libfsntfs_volume_t *volume         = NULL;
+	system_character_t *source         = NULL;
+	size64_t file_size                 = 0;
+	int result                         = 0;
 
 	if( argc < 2 )
 	{
@@ -894,7 +894,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libfsntfs_volume_open_wide(
 	     volume,
 	     argv[ 1 ],

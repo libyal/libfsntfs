@@ -28,7 +28,6 @@
 
 #include "fsntfstools_libbfio.h"
 #include "fsntfstools_libcerror.h"
-#include "fsntfstools_libcstring.h"
 #include "fsntfstools_libfsntfs.h"
 #include "fsntfstools_libfusn.h"
 
@@ -83,12 +82,12 @@ int info_handle_signal_abort(
 
 int info_handle_set_volume_offset(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int info_handle_open_input(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int info_handle_close_input(
@@ -164,7 +163,7 @@ int info_handle_mft_entries_fprint(
 
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *path,
+     const system_character_t *path,
      libfsntfs_error_t **error );
 
 int info_handle_file_system_hierarchy_fprint(

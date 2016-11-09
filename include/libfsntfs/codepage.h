@@ -118,5 +118,5 @@ enum LIBFSNTFS_CODEPAGES
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_CODEPAGE_H ) */
 

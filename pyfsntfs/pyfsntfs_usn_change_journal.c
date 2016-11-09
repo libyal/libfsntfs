@@ -29,7 +29,6 @@
 #include "pyfsntfs_error.h"
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"

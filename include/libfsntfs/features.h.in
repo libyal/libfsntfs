@@ -24,9 +24,12 @@
 
 /* The libfsntfs type support features
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( WINAPI ) || @HAVE_WIDE_CHARACTER_TYPE@
 #define LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE	1
+#endif
 
+#if defined( WINAPI ) || @HAVE_MULTI_THREAD_SUPPORT@
+#define LIBFSNTFS_HAVE_MULTI_THREAD_SUPPORT	1
 #endif
 
 #if defined( HAVE_LIBBFIO ) || ( !defined( WINAPI ) && @HAVE_LIBBFIO@ )
@@ -43,5 +46,5 @@
 #endif
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_FEATURES_H ) */
 

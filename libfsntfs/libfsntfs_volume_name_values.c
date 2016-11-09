@@ -21,11 +21,13 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_volume_name_values.h"
 
@@ -146,12 +148,12 @@ int libfsntfs_volume_name_values_read(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function                       = "libfsntfs_volume_name_values_read";
+	static char *function            = "libfsntfs_volume_name_values_read";
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string = NULL;
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	size_t value_string_size         = 0;
+	int result                       = 0;
 #endif
 
 	if( volume_name_values == NULL )
@@ -240,7 +242,7 @@ int libfsntfs_volume_name_values_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  volume_name_values->name,
 				  volume_name_values->name_size,
@@ -266,7 +268,7 @@ int libfsntfs_volume_name_values_read(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -280,7 +282,7 @@ int libfsntfs_volume_name_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -309,7 +311,7 @@ int libfsntfs_volume_name_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: name\t\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

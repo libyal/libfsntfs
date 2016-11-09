@@ -21,20 +21,20 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include "fsntfs_test_libcerror.h"
-#include "fsntfs_test_libcstring.h"
 #include "fsntfs_test_libfsntfs.h"
 
 /* Tests single open and close of a volume
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int fsntfs_test_single_open_close_volume(
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      int access_flags,
      int expected_result )
 {
@@ -57,7 +57,7 @@ int fsntfs_test_single_open_close_volume(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_volume_open_wide(
 	          volume,
 	          filename,
@@ -149,7 +149,7 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int fsntfs_test_multi_open_close_volume(
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      int access_flags,
      int expected_result )
 {
@@ -172,7 +172,7 @@ int fsntfs_test_multi_open_close_volume(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_volume_open_wide(
 	          volume,
 	          filename,
@@ -200,7 +200,7 @@ int fsntfs_test_multi_open_close_volume(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_volume_open_wide(
 		          volume,
 		          filename,
@@ -291,14 +291,14 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcerror_error_t *error              = NULL;
-	libcstring_system_character_t *source = NULL;
+	libcerror_error_t *error   = NULL;
+	system_character_t *source = NULL;
 
 	if( argc != 2 )
 	{

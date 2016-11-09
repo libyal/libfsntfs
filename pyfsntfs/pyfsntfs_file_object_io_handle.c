@@ -28,7 +28,6 @@
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libbfio.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_python.h"
 
 /* Creates a file object IO handle

@@ -22,7 +22,10 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
@@ -121,23 +124,23 @@ void fsntfsinfo_signal_handler(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libfsntfs_error_t *error                              = NULL;
-	libcstring_system_character_t *option_file_entry      = NULL;
-	libcstring_system_character_t *option_mft_entry_index = NULL;
-	libcstring_system_character_t *option_volume_offset   = NULL;
-	libcstring_system_character_t *source                 = NULL;
-	char *program                                         = "fsntfsinfo";
-	libcstring_system_integer_t option                    = 0;
-	size_t string_length                                  = 0;
-	uint64_t mft_entry_index                              = 0;
-	int option_mode                                       = FSNTFSINFO_MODE_VOLUME;
-	int verbose                                           = 0;
+	libfsntfs_error_t *error                   = NULL;
+	system_character_t *option_file_entry      = NULL;
+	system_character_t *option_mft_entry_index = NULL;
+	system_character_t *option_volume_offset   = NULL;
+	system_character_t *source                 = NULL;
+	char *program                              = "fsntfsinfo";
+	system_integer_t option                    = 0;
+	size_t string_length                       = 0;
+	uint64_t mft_entry_index                   = 0;
+	int option_mode                            = FSNTFSINFO_MODE_VOLUME;
+	int verbose                                = 0;
 
 	libcnotify_stream_set(
 	 stderr,
@@ -172,15 +175,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "E:F:hHo:UvV" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "E:F:hHo:UvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind - 1 ] );
 
 				usage_fprint(
@@ -188,45 +191,45 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libcstring_system_integer_t) 'E':
+			case (system_integer_t) 'E':
 				option_mode            = FSNTFSINFO_MODE_MFT_ENTRY;
 				option_mft_entry_index = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'F':
+			case (system_integer_t) 'F':
 				option_mode       = FSNTFSINFO_MODE_FILE_ENTRY;
 				option_file_entry = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'H':
+			case (system_integer_t) 'H':
 				option_mode = FSNTFSINFO_MODE_FILE_SYSTEM_HIERARCHY;
 
 				break;
 
-			case (libcstring_system_integer_t) 'o':
+			case (system_integer_t) 'o':
 				option_volume_offset = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'U':
+			case (system_integer_t) 'U':
 				option_mode = FSNTFSINFO_MODE_USN_CHANGE_JOURNAL;
 
 				break;
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				fsntfsoutput_copyright_fprint(
 				 stdout );
 
@@ -289,7 +292,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to open: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+		 "Unable to open: %" PRIs_SYSTEM ".\n",
 		 source );
 
 		goto on_error;
@@ -340,13 +343,13 @@ int main( int argc, char * const argv[] )
 
 				goto on_error;
 			}
-			string_length = libcstring_system_string_length(
+			string_length = system_string_length(
 					 option_mft_entry_index );
 
 			if( ( string_length == 3 )
-			 && ( libcstring_system_string_compare(
+			 && ( system_string_compare(
 			       option_mft_entry_index,
-			       _LIBCSTRING_SYSTEM_STRING( "all" ),
+			       _SYSTEM_STRING( "all" ),
 			       3 ) == 0 ) )
 			{
 				if( info_handle_mft_entries_fprint(

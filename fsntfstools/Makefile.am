@@ -1,7 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -32,7 +31,6 @@ fsntfsinfo_SOURCES = \
 	fsntfstools_libcerror.h \
 	fsntfstools_libclocale.h \
 	fsntfstools_libcnotify.h \
-	fsntfstools_libcstring.h \
 	fsntfstools_libcsystem.h \
 	fsntfstools_libfcache.h \
 	fsntfstools_libfdata.h \
@@ -60,7 +58,6 @@ fsntfsinfo_LDADD = \
 	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 MAINTAINERCLEANFILES = \

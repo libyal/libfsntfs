@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
@@ -39,7 +40,6 @@
 #include "pyfsntfs_file_name_attribute.h"
 #include "pyfsntfs_file_object_io_handle.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_mft_metadata_file.h"
 #include "pyfsntfs_mft_metadata_file_entries.h"
@@ -127,7 +127,7 @@ PyObject *pyfsntfs_get_version(
 
 	Py_END_ALLOW_THREADS
 
-	version_string_length = libcstring_narrow_string_length(
+	version_string_length = narrow_string_length(
 	                         version_string );
 
 	/* Pass the string length to PyUnicode_DecodeUTF8
@@ -155,7 +155,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	const char *filename_narrow  = NULL;
 	int result                   = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	const wchar_t *filename_wide = NULL;
 #else
 	PyObject *utf8_string_object = NULL;
@@ -196,7 +196,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	{
 		PyErr_Clear();
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
 		Py_BEGIN_ALLOW_THREADS

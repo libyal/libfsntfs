@@ -22,13 +22,13 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libfdatetime.h"
 #include "libfsntfs_standard_information_values.h"
 
@@ -149,7 +149,7 @@ int libfsntfs_standard_information_values_read(
 	static char *function             = "libfsntfs_standard_information_values_read";
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
 	libfdatetime_filetime_t *filetime = NULL;
 	uint64_t value_64bit              = 0;
@@ -267,7 +267,7 @@ int libfsntfs_standard_information_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -294,7 +294,7 @@ int libfsntfs_standard_information_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: creation time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: creation time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -314,7 +314,7 @@ int libfsntfs_standard_information_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -341,7 +341,7 @@ int libfsntfs_standard_information_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: modification time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: modification time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -361,7 +361,7 @@ int libfsntfs_standard_information_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -388,7 +388,7 @@ int libfsntfs_standard_information_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: entry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: entry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -408,7 +408,7 @@ int libfsntfs_standard_information_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -435,7 +435,7 @@ int libfsntfs_standard_information_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: access time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: access time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -510,7 +510,7 @@ int libfsntfs_standard_information_values_read(
 			 standard_information_values->owner_identifier );
 
 			libcnotify_printf(
-			 "%s: security descriptor identifier\t\t: %" PRIu32 "\n",
+			 "%s: security descriptor identifier\t: %" PRIu32 "\n",
 			 function,
 			 standard_information_values->security_descriptor_identifier );
 

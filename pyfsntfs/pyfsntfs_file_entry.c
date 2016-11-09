@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -3900,7 +3901,7 @@ PyObject *pyfsntfs_file_entry_has_alternate_data_stream_by_name(
 	{
 		return( NULL );
 	}
-	data_stream_name_length = libcstring_narrow_string_length(
+	data_stream_name_length = narrow_string_length(
 	                           data_stream_name );
 
 	Py_BEGIN_ALLOW_THREADS
@@ -3976,7 +3977,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_name(
 	{
 		goto on_error;
 	}
-	data_stream_name_length = libcstring_narrow_string_length(
+	data_stream_name_length = narrow_string_length(
 	                           data_stream_name );
 
 	Py_BEGIN_ALLOW_THREADS

@@ -22,14 +22,16 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libfsntfs_debug.h"
 #include "libfsntfs_file_name_values.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libfdatetime.h"
 #include "libfsntfs_libuna.h"
 
@@ -246,19 +248,19 @@ int libfsntfs_file_name_values_read(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function                       = "libfsntfs_file_name_values_read";
-	size_t data_offset                          = 0;
-	uint16_t name_size                          = 0;
+	static char *function             = "libfsntfs_file_name_values_read";
+	size_t data_offset                = 0;
+	uint16_t name_size                = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
-	libcstring_system_character_t *value_string = NULL;
-	libfdatetime_filetime_t *filetime           = NULL;
-	size_t value_string_size                    = 0;
-	uint64_t value_64bit                        = 0;
-	uint32_t value_32bit                        = 0;
-	int result                                  = 0;
+	libfdatetime_filetime_t *filetime = NULL;
+	system_character_t *value_string  = NULL;
+	size_t value_string_size          = 0;
+	uint64_t value_64bit              = 0;
+	uint32_t value_32bit              = 0;
+	int result                        = 0;
 #endif
 
 	if( file_name_values == NULL )
@@ -372,7 +374,7 @@ int libfsntfs_file_name_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -399,7 +401,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: creation time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: creation time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -419,7 +421,7 @@ int libfsntfs_file_name_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -446,7 +448,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: modification time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: modification time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -466,7 +468,7 @@ int libfsntfs_file_name_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -493,7 +495,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: entry modification time\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: entry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -513,7 +515,7 @@ int libfsntfs_file_name_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 			  filetime,
 			  (uint16_t *) filetime_string,
@@ -540,7 +542,7 @@ int libfsntfs_file_name_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: access time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: access time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -628,7 +630,7 @@ int libfsntfs_file_name_values_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  file_name_values->name,
 				  file_name_values->name_size,
@@ -654,7 +656,7 @@ int libfsntfs_file_name_values_read(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -668,7 +670,7 @@ int libfsntfs_file_name_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -697,7 +699,7 @@ int libfsntfs_file_name_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: name\t\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

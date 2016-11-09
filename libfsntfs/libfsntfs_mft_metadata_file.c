@@ -21,7 +21,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
@@ -29,7 +31,6 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_mft_metadata_file.h"
@@ -315,7 +316,7 @@ int libfsntfs_mft_metadata_file_open(
 	if( libbfio_file_set_name(
 	     file_io_handle,
 	     filename,
-	     libcstring_narrow_string_length(
+	     narrow_string_length(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
@@ -452,7 +453,7 @@ int libfsntfs_mft_metadata_file_open_wide(
 	if( libbfio_file_set_name_wide(
 	     file_io_handle,
 	     filename,
-	     libcstring_wide_string_length(
+	     wide_string_length(
 	      filename ) + 1,
 	     error ) != 1 )
 	{

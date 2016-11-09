@@ -22,12 +22,12 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libfguid.h"
 #include "libfsntfs_object_identifier_values.h"
 
@@ -148,7 +148,7 @@ int libfsntfs_object_identifier_values_read(
 	static char *function       = "libfsntfs_object_identifier_read";
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t guid_string[ 48 ];
+	system_character_t guid_string[ 48 ];
 
         libfguid_identifier_t *guid = NULL;
 	int result                  = 0;
@@ -258,7 +258,7 @@ int libfsntfs_object_identifier_values_read(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfguid_identifier_copy_to_utf16_string(
 			  guid,
 			  (uint16_t *) guid_string,
@@ -285,7 +285,7 @@ int libfsntfs_object_identifier_values_read(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: droid file identifier\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "%s: droid file identifier\t\t\t: %" PRIs_SYSTEM "\n",
 		 function,
 		 guid_string );
 
@@ -380,7 +380,7 @@ int libfsntfs_object_identifier_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfguid_identifier_copy_to_utf16_string(
 				  guid,
 				  (uint16_t *) guid_string,
@@ -407,7 +407,7 @@ int libfsntfs_object_identifier_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: birth droid volume identifier\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: birth droid volume identifier\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 guid_string );
 
@@ -427,7 +427,7 @@ int libfsntfs_object_identifier_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfguid_identifier_copy_to_utf16_string(
 				  guid,
 				  (uint16_t *) guid_string,
@@ -454,7 +454,7 @@ int libfsntfs_object_identifier_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: birth droid file identifier\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: birth droid file identifier\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 guid_string );
 
@@ -474,7 +474,7 @@ int libfsntfs_object_identifier_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libfguid_identifier_copy_to_utf16_string(
 				  guid,
 				  (uint16_t *) guid_string,
@@ -501,7 +501,7 @@ int libfsntfs_object_identifier_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: birth droid domain identifier\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: birth droid domain identifier\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 guid_string );
 

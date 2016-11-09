@@ -22,7 +22,10 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libfsntfs_debug.h"
 #include "libfsntfs_libcerror.h"
@@ -149,13 +152,13 @@ int libfsntfs_reparse_point_values_read(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function                       = "libfsntfs_reparse_point_values_read";
-	uint32_t flags                              = 0;
+	static char *function            = "libfsntfs_reparse_point_values_read";
+	uint32_t flags                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string = NULL;
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	size_t value_string_size         = 0;
+	int result                       = 0;
 #endif
 
 	if( reparse_point_values == NULL )
@@ -386,7 +389,7 @@ int libfsntfs_reparse_point_values_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
 				  (size_t) reparse_point_values->substitute_name_size,
@@ -412,7 +415,7 @@ int libfsntfs_reparse_point_values_read(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 					value_string_size );
 
 			if( value_string == NULL )
@@ -426,7 +429,7 @@ int libfsntfs_reparse_point_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -455,7 +458,7 @@ int libfsntfs_reparse_point_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: substitute name\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: substitute name\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 
@@ -493,7 +496,7 @@ int libfsntfs_reparse_point_values_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
 				  (size_t) reparse_point_values->print_name_size,
@@ -519,7 +522,7 @@ int libfsntfs_reparse_point_values_read(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 					value_string_size );
 
 			if( value_string == NULL )
@@ -533,7 +536,7 @@ int libfsntfs_reparse_point_values_read(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -562,7 +565,7 @@ int libfsntfs_reparse_point_values_read(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: print name\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: print name\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

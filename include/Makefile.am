@@ -11,7 +11,6 @@ pkginclude_HEADERS = \
 
 EXTRA_DIST = \
 	libfsntfs.h.in \
-	libfsntfs/codepage.h \
 	libfsntfs/definitions.h.in \
 	libfsntfs/features.h.in \
 	libfsntfs/types.h.in

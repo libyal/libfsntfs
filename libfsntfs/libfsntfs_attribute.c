@@ -22,7 +22,10 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_WCTYPE_H )
 #include <wctype.h>
@@ -42,7 +45,6 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libcstring.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
@@ -318,15 +320,14 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	uint8_t *mft_attribute_non_resident_data           = NULL;
 	uint8_t *mft_attribute_resident_data               = NULL;
 	static char *function                              = "libfsntfs_attribute_read_from_mft";
-	off64_t data_block_offset                          = 0;
-	off64_t data_run_offset                            = 0;
 	size64_t data_run_size                             = 0;
 	size_t header_data_size                            = 0;
 	size_t non_resident_data_size                      = 0;
 	size_t unknown_data_size                           = 0;
+	off64_t data_block_offset                          = 0;
+	off64_t data_run_offset                            = 0;
 	uint64_t data_run_number_of_cluster_blocks         = 0;
 	uint64_t last_data_run_cluster_block_number        = 0;
-	int64_t data_run_cluster_block_number              = 0;
 	uint32_t attribute_data_size                       = 0;
 	uint32_t range_flags                               = 0;
 	uint16_t attribute_data_offset                     = 0;
@@ -337,11 +338,12 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	uint8_t data_run_value_size                        = 0;
 	uint8_t data_run_value_size_tuple                  = 0;
 	uint8_t non_resident_flag                          = 0;
+	int64_t data_run_cluster_block_number              = 0;
 	int data_run_index                                 = 0;
 	int entry_index                                    = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string        = NULL;
+	system_character_t *value_string                   = NULL;
 	size_t value_string_size                           = 0;
 	uint64_t value_64bit                               = 0;
 	uint32_t value_32bit                               = 0;
@@ -925,7 +927,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_size_from_utf16_stream(
 					  internal_attribute->name,
 					  (size_t) internal_attribute->name_size,
@@ -951,7 +953,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 					goto on_error;
 				}
-				value_string = libcstring_system_string_allocate(
+				value_string = system_string_allocate(
 				                value_string_size );
 
 				if( value_string == NULL )
@@ -965,7 +967,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_copy_from_utf16_stream(
 					  (libuna_utf16_character_t *) value_string,
 					  value_string_size,
@@ -994,7 +996,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					goto on_error;
 				}
 				libcnotify_printf(
-				 "%s: name\t\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "%s: name\t\t\t\t\t: %" PRIs_SYSTEM "\n",
 				 function,
 				 value_string );
 
@@ -1402,7 +1404,7 @@ ssize_t libfsntfs_attribute_read_from_list(
 	uint8_t attribute_name_offset                      = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string        = NULL;
+	system_character_t *value_string                   = NULL;
 	size_t value_string_size                           = 0;
 	int result                                         = 0;
 #endif
@@ -1662,7 +1664,7 @@ ssize_t libfsntfs_attribute_read_from_list(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  internal_attribute->name,
 				  (size_t) internal_attribute->name_size,
@@ -1688,7 +1690,7 @@ ssize_t libfsntfs_attribute_read_from_list(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -1702,7 +1704,7 @@ ssize_t libfsntfs_attribute_read_from_list(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -1731,7 +1733,7 @@ ssize_t libfsntfs_attribute_read_from_list(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: name\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
@@ -32,7 +33,6 @@
 #include "pyfsntfs_integer.h"
 #include "pyfsntfs_libbfio.h"
 #include "pyfsntfs_libcerror.h"
-#include "pyfsntfs_libcstring.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 #include "pyfsntfs_unused.h"
@@ -513,7 +513,7 @@ PyObject *pyfsntfs_volume_open(
 	char *mode                   = NULL;
 	int result                   = 0;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	const wchar_t *filename_wide = NULL;
 #else
 	PyObject *utf8_string_object = NULL;
@@ -573,7 +573,7 @@ PyObject *pyfsntfs_volume_open(
 	{
 		PyErr_Clear();
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
 		Py_BEGIN_ALLOW_THREADS
@@ -1387,7 +1387,7 @@ PyObject *pyfsntfs_volume_get_file_entry_by_path(
 	{
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	Py_BEGIN_ALLOW_THREADS

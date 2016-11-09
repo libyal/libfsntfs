@@ -1,5 +1,5 @@
 /*
- * Library get version test program
+ * Library file_entry type testing program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,46 +20,60 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include "fsntfs_test_libcstring.h"
+#include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
+#include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-/* Tests retrieving the library version
+/* Tests the libfsntfs_file_entry_free function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_get_version(
+int fsntfs_test_file_entry_free(
      void )
 {
-	const char *version_string = NULL;
-	int result                 = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
-	version_string = libfsntfs_get_version();
-
-	result = libcstring_narrow_string_compare(
-	          version_string,
-	          LIBFSNTFS_VERSION_STRING,
-	          9 );
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_free(
+	          NULL,
+	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
+
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
 on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
 	return( 0 );
 }
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc FSNTFS_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
@@ -73,8 +87,8 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_get_version",
-	 fsntfs_test_get_version );
+	 "libfsntfs_file_entry_free",
+	 fsntfs_test_file_entry_free );
 
 	return( EXIT_SUCCESS );
 

@@ -2,7 +2,6 @@ if HAVE_PYTHON
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -34,7 +33,6 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_libbfio.h \
 	pyfsntfs_libcerror.h \
 	pyfsntfs_libclocale.h \
-	pyfsntfs_libcstring.h \
 	pyfsntfs_libfguid.h \
 	pyfsntfs_libfsntfs.h \
 	pyfsntfs_mft_metadata_file.c pyfsntfs_mft_metadata_file.h \
@@ -52,7 +50,6 @@ pyfsntfs_la_SOURCES = \
 	pyfsntfs_volume_name_attribute.c pyfsntfs_volume_name_attribute.h
 
 pyfsntfs_la_LIBADD = \
-	@LIBCSTRING_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCDATA_LIBADD@ \

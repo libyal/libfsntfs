@@ -28,22 +28,19 @@
  */
 #if !defined( HAVE_LOCAL_LIBFSNTFS )
 
-/* If Cygwin libtool DLL support is enabled set LIBFSNTFS_DLL_EXPORT
+/* If libtool DLL support is enabled set LIBFSNTFS_DLL_EXPORT
  * before including libfsntfs/extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#if !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBFSNTFS_DLL_EXPORT
-#endif
 #endif
 
 #include <libfsntfs/extern.h>
 
 #else
-
-#define LIBFSNTFS_EXTERN  extern
-
-#endif
+#define LIBFSNTFS_EXTERN	extern
 
 #endif
+
+#endif /* !defined( _LIBFSNTFS_INTERNAL_EXTERN_H ) */
 
