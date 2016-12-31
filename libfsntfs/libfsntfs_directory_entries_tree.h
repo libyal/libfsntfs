@@ -65,5 +65,5 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H ) */
 

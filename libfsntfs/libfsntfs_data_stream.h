@@ -149,5 +149,5 @@ int libfsntfs_data_stream_get_extent_by_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_DATA_STREAM_H ) */
 

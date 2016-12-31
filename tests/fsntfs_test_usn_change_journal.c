@@ -1,5 +1,5 @@
 /*
- * Library usn_change_journal type testing program
+ * Library usn_change_journal type test program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,10 @@
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
+
+#include "../libfsntfs/libfsntfs_directory_entry.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_usn_change_journal.h"
 
 /* Tests the libfsntfs_usn_change_journal_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +75,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +94,23 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_usn_change_journal_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_usn_change_journal_free",
 	 fsntfs_test_usn_change_journal_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_usn_change_journal_get_offset */
+
+	/* TODO: add tests for libfsntfs_usn_change_journal_read_usn_record */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

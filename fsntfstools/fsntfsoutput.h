@@ -45,5 +45,5 @@ void fsntfsoutput_version_detailed_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFSOUTPUT_H ) */
 

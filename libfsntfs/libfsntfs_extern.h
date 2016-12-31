@@ -38,9 +38,9 @@
 #include <libfsntfs/extern.h>
 
 #else
-#define LIBFSNTFS_EXTERN	extern
+#define LIBFSNTFS_EXTERN	/* extern */
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBFSNTFS ) */
 
 #endif /* !defined( _LIBFSNTFS_INTERNAL_EXTERN_H ) */
 

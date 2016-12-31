@@ -96,5 +96,5 @@ int libfsntfs_io_handle_read_volume_header(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_IO_HANDLE_H ) */
 

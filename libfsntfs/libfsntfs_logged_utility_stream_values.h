@@ -58,5 +58,5 @@ int libfsntfs_logged_utility_stream_values_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_LOGGED_UTILITY_STREAM_VALUES_H ) */
 

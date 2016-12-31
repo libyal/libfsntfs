@@ -45,5 +45,5 @@ int libfsntfs_index_entry_vector_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INDEX_ENTRY_VECTOR_H ) */
 

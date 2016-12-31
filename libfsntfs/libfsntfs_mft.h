@@ -131,5 +131,5 @@ int libfsntfs_mft_get_mft_entry_by_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_MFT_H ) */
 

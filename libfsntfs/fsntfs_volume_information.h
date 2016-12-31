@@ -58,5 +58,5 @@ struct fsntfs_volume_information
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_VOLUME_INFORMATION_H ) */
 

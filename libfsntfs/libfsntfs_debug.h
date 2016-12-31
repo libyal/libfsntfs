@@ -68,5 +68,5 @@ int libfsntfs_debug_print_read_offsets(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_DEBUG_H ) */
 

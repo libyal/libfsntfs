@@ -458,5 +458,5 @@ int libfsntfs_file_entry_get_extent_by_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_FILE_ENTRY_H ) */
 

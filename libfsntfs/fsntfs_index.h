@@ -150,5 +150,5 @@ struct fsntfs_index_value
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_INDEX_H ) */
 

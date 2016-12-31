@@ -1,5 +1,5 @@
 /*
- * Library mft_metadata_file type testing program
+ * Library mft_metadata_file type test program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -30,15 +30,15 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_getopt.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libclocale.h"
-#include "fsntfs_test_libcsystem.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_libuna.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 
-#if SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
 #error Unsupported size of wchar_t
 #endif
 
@@ -256,8 +256,8 @@ int fsntfs_test_mft_metadata_file_get_wide_source(
      libcerror_error_t **error )
 {
 	static char *function   = "fsntfs_test_mft_metadata_file_get_wide_source";
-	size_t wide_source_size = 0;
 	size_t source_length    = 0;
+	size_t wide_source_size = 0;
 
 #if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	int result              = 0;
@@ -584,11 +584,17 @@ int fsntfs_test_mft_metadata_file_close_source(
 int fsntfs_test_mft_metadata_file_initialize(
      void )
 {
-	libcerror_error_t *error = NULL;
-	libfsntfs_mft_metadata_file_t *mft_metadata_file      = NULL;
-	int result               = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	int result                                       = 0;
 
-	/* Test libfsntfs_mft_metadata_file_initialize
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests                  = 1;
+	int number_of_memset_fail_tests                  = 1;
+	int test_number                                  = 0;
+#endif
+
+	/* Test regular cases
 	 */
 	result = libfsntfs_mft_metadata_file_initialize(
 	          &mft_metadata_file,
@@ -664,79 +670,89 @@ int fsntfs_test_mft_metadata_file_initialize(
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
-	/* Test libfsntfs_mft_metadata_file_initialize with malloc failing
-	 */
-	fsntfs_test_malloc_attempts_before_fail = 0;
-
-	result = libfsntfs_mft_metadata_file_initialize(
-	          &mft_metadata_file,
-	          &error );
-
-	if( fsntfs_test_malloc_attempts_before_fail != -1 )
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
 	{
-		fsntfs_test_malloc_attempts_before_fail = -1;
+		/* Test libfsntfs_mft_metadata_file_initialize with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
 
-		if( mft_metadata_file != NULL )
+		result = libfsntfs_mft_metadata_file_initialize(
+		          &mft_metadata_file,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
 		{
-			libfsntfs_mft_metadata_file_free(
-			 &mft_metadata_file,
-			 NULL );
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( mft_metadata_file != NULL )
+			{
+				libfsntfs_mft_metadata_file_free(
+				 &mft_metadata_file,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "mft_metadata_file",
+			 mft_metadata_file );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
 		}
 	}
-	else
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
 	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		/* Test libfsntfs_mft_metadata_file_initialize with memset failing
+		 */
+		fsntfs_test_memset_attempts_before_fail = test_number;
 
-		FSNTFS_TEST_ASSERT_IS_NULL(
-		 "mft_metadata_file",
-		 mft_metadata_file );
+		result = libfsntfs_mft_metadata_file_initialize(
+		          &mft_metadata_file,
+		          &error );
 
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_mft_metadata_file_initialize with memset failing
-	 */
-	fsntfs_test_memset_attempts_before_fail = 0;
-
-	result = libfsntfs_mft_metadata_file_initialize(
-	          &mft_metadata_file,
-	          &error );
-
-	if( fsntfs_test_memset_attempts_before_fail != -1 )
-	{
-		fsntfs_test_memset_attempts_before_fail = -1;
-
-		if( mft_metadata_file != NULL )
+		if( fsntfs_test_memset_attempts_before_fail != -1 )
 		{
-			libfsntfs_mft_metadata_file_free(
-			 &mft_metadata_file,
-			 NULL );
+			fsntfs_test_memset_attempts_before_fail = -1;
+
+			if( mft_metadata_file != NULL )
+			{
+				libfsntfs_mft_metadata_file_free(
+				 &mft_metadata_file,
+				 NULL );
+			}
 		}
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
 
-		FSNTFS_TEST_ASSERT_IS_NULL(
-		 "mft_metadata_file",
-		 mft_metadata_file );
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "mft_metadata_file",
+			 mft_metadata_file );
 
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
 
-		libcerror_error_free(
-		 &error );
+			libcerror_error_free(
+			 &error );
+		}
 	}
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
@@ -795,7 +811,7 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_mft_metadata_file_open functions
+/* Tests the libfsntfs_mft_metadata_file_open function
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_metadata_file_open(
@@ -803,9 +819,9 @@ int fsntfs_test_mft_metadata_file_open(
 {
 	char narrow_source[ 256 ];
 
-	libcerror_error_t *error = NULL;
-	libfsntfs_mft_metadata_file_t *mft_metadata_file      = NULL;
-	int result               = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	int result                                       = 0;
 
 	/* Initialize test
 	 */
@@ -858,21 +874,28 @@ int fsntfs_test_mft_metadata_file_open(
          "error",
          error );
 
-	/* Clean up
+	/* Test error cases
 	 */
-	result = libfsntfs_mft_metadata_file_close(
+	result = libfsntfs_mft_metadata_file_open(
 	          mft_metadata_file,
+	          narrow_source,
+	          LIBFSNTFS_OPEN_READ,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
          "error",
          error );
 
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
 	result = libfsntfs_mft_metadata_file_free(
 	          &mft_metadata_file,
 	          &error );
@@ -909,7 +932,7 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-/* Tests the libfsntfs_mft_metadata_file_open_wide functions
+/* Tests the libfsntfs_mft_metadata_file_open_wide function
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_metadata_file_open_wide(
@@ -917,9 +940,9 @@ int fsntfs_test_mft_metadata_file_open_wide(
 {
 	wchar_t wide_source[ 256 ];
 
-	libcerror_error_t *error = NULL;
-	libfsntfs_mft_metadata_file_t *mft_metadata_file      = NULL;
-	int result               = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	int result                                       = 0;
 
 	/* Initialize test
 	 */
@@ -972,21 +995,28 @@ int fsntfs_test_mft_metadata_file_open_wide(
          "error",
          error );
 
-	/* Clean up
+	/* Test error cases
 	 */
-	result = libfsntfs_mft_metadata_file_close(
+	result = libfsntfs_mft_metadata_file_open_wide(
 	          mft_metadata_file,
+	          wide_source,
+	          LIBFSNTFS_OPEN_READ,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 0 );
+	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
          "error",
          error );
 
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
 	result = libfsntfs_mft_metadata_file_free(
 	          &mft_metadata_file,
 	          &error );
@@ -1023,51 +1053,18 @@ on_error:
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-/* Tests the libfsntfs_mft_metadata_file_get_number_of_file_entries functions
+/* Tests the libfsntfs_mft_metadata_file_close function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_mft_metadata_file_get_number_of_file_entries(
-     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+int fsntfs_test_mft_metadata_file_close(
+     void )
 {
 	libcerror_error_t *error = NULL;
-	int number_of_file_entries    = 0;
 	int result               = 0;
-
-	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
-	          mft_metadata_file,
-	          &number_of_file_entries,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
 
 	/* Test error cases
 	 */
-	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
-	          NULL,
-	          &number_of_file_entries,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
-	          mft_metadata_file,
+	result = libfsntfs_mft_metadata_file_close(
 	          NULL,
 	          &error );
 
@@ -1094,6 +1091,670 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_mft_metadata_file_open and libfsntfs_mft_metadata_file_close functions
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_open_close(
+     const system_character_t *source )
+{
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	int result                                       = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_mft_metadata_file_initialize(
+	          &mft_metadata_file,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+         "mft_metadata_file",
+         mft_metadata_file );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_mft_metadata_file_open_wide(
+	          mft_metadata_file,
+	          source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+#else
+	result = libfsntfs_mft_metadata_file_open(
+	          mft_metadata_file,
+	          source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+#endif
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libfsntfs_mft_metadata_file_close(
+	          mft_metadata_file,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test open and close a second time to validate clean up on close
+	 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_mft_metadata_file_open_wide(
+	          mft_metadata_file,
+	          source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+#else
+	result = libfsntfs_mft_metadata_file_open(
+	          mft_metadata_file,
+	          source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+#endif
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libfsntfs_mft_metadata_file_close(
+	          mft_metadata_file,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_mft_metadata_file_free(
+	          &mft_metadata_file,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "mft_metadata_file",
+         mft_metadata_file );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( mft_metadata_file != NULL )
+	{
+		libfsntfs_mft_metadata_file_free(
+		 &mft_metadata_file,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_signal_abort function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_signal_abort(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_signal_abort(
+	          mft_metadata_file,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_signal_abort(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+         "error",
+         error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_get_utf8_volume_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_get_utf8_volume_name_size(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	libcerror_error_t *error         = NULL;
+	size_t utf8_volume_name_size     = 0;
+	int result                       = 0;
+	int utf8_volume_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+	          mft_metadata_file,
+	          &utf8_volume_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_volume_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+	          NULL,
+	          &utf8_volume_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_volume_name_size_is_set != 0 )
+	{
+		result = libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
+		          mft_metadata_file,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_get_utf8_volume_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_get_utf8_volume_name(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	uint8_t utf8_volume_name[ 512 ];
+
+	libcerror_error_t *error    = NULL;
+	int result                  = 0;
+	int utf8_volume_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+	          mft_metadata_file,
+	          utf8_volume_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_volume_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+	          NULL,
+	          utf8_volume_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_volume_name_is_set != 0 )
+	{
+		result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+		          mft_metadata_file,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+		          mft_metadata_file,
+		          utf8_volume_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_mft_metadata_file_get_utf8_volume_name(
+		          mft_metadata_file,
+		          utf8_volume_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_get_utf16_volume_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_get_utf16_volume_name_size(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	libcerror_error_t *error          = NULL;
+	size_t utf16_volume_name_size     = 0;
+	int result                        = 0;
+	int utf16_volume_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
+	          mft_metadata_file,
+	          &utf16_volume_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_volume_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
+	          NULL,
+	          &utf16_volume_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_volume_name_size_is_set != 0 )
+	{
+		result = libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
+		          mft_metadata_file,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_get_utf16_volume_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_get_utf16_volume_name(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	uint16_t utf16_volume_name[ 512 ];
+
+	libcerror_error_t *error     = NULL;
+	int result                   = 0;
+	int utf16_volume_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+	          mft_metadata_file,
+	          utf16_volume_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_volume_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+	          NULL,
+	          utf16_volume_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_volume_name_is_set != 0 )
+	{
+		result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+		          mft_metadata_file,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+		          mft_metadata_file,
+		          utf16_volume_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	         "error",
+	         error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_mft_metadata_file_get_utf16_volume_name(
+		          mft_metadata_file,
+		          utf16_volume_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_metadata_file_get_number_of_file_entries function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_metadata_file_get_number_of_file_entries(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file )
+{
+	libcerror_error_t *error          = NULL;
+	uint64_t number_of_file_entries   = 0;
+	int number_of_file_entries_is_set = 0;
+	int result                        = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+	          mft_metadata_file,
+	          &number_of_file_entries,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	number_of_file_entries_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+	          NULL,
+	          &number_of_file_entries,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( number_of_file_entries_is_set != 0 )
+	{
+		result = libfsntfs_mft_metadata_file_get_number_of_file_entries(
+		          mft_metadata_file,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -1106,13 +1767,13 @@ int main(
      char * const argv[] )
 #endif
 {
-	libcerror_error_t *error   = NULL;
-	system_character_t *source = NULL;
-	libfsntfs_mft_metadata_file_t *mft_metadata_file        = NULL;
-	system_integer_t option    = 0;
-	int result                 = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	system_character_t *source                       = NULL;
+	system_integer_t option                          = 0;
+	int result                                       = 0;
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = fsntfs_test_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
@@ -1172,7 +1833,14 @@ int main(
 
 #endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
 
-		/* TODO add test for libfsntfs_mft_metadata_file_close */
+		FSNTFS_TEST_RUN(
+		 "libfsntfs_mft_metadata_file_close",
+		 fsntfs_test_mft_metadata_file_close );
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_mft_metadata_file_open_close",
+		 fsntfs_test_mft_metadata_file_open_close,
+		 source );
 
 		/* Initialize test
 		 */
@@ -1195,14 +1863,44 @@ int main(
 	         error );
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
-		 "libfsntfs_mft_metadata_file_open",
-		 fsntfs_test_mft_metadata_file_open,
+		 "libfsntfs_mft_metadata_file_signal_abort",
+		 fsntfs_test_mft_metadata_file_signal_abort,
 		 mft_metadata_file );
+
+#if defined( __GNUC__ )
+
+		/* TODO: add tests for libfsntfs_mft_metadata_file_open_read */
+
+#endif /* defined( __GNUC__ ) */
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_mft_metadata_file_get_utf8_volume_name_size",
+		 fsntfs_test_mft_metadata_file_get_utf8_volume_name_size,
+		 mft_metadata_file );
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_mft_metadata_file_get_utf8_volume_name",
+		 fsntfs_test_mft_metadata_file_get_utf8_volume_name,
+		 mft_metadata_file );
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_mft_metadata_file_get_utf16_volume_name_size",
+		 fsntfs_test_mft_metadata_file_get_utf16_volume_name_size,
+		 mft_metadata_file );
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_mft_metadata_file_get_utf16_volume_name",
+		 fsntfs_test_mft_metadata_file_get_utf16_volume_name,
+		 mft_metadata_file );
+
+		/* TODO: add tests for libfsntfs_mft_metadata_file_get_volume_version */
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_mft_metadata_file_get_number_of_file_entries",
 		 fsntfs_test_mft_metadata_file_get_number_of_file_entries,
 		 mft_metadata_file );
+
+		/* TODO: add tests for libfsntfs_mft_metadata_file_get_file_entry_by_index */
 
 		/* Clean up
 		 */

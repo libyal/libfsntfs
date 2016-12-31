@@ -44,5 +44,5 @@ int libfsntfs_cluster_block_vector_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_VECTOR_H ) */
 

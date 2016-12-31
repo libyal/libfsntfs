@@ -1,9 +1,36 @@
 MSVSCPP_FILES = \
+	fsntfs_test_attribute/fsntfs_test_attribute.vcproj \
+	fsntfs_test_bitmap_values/fsntfs_test_bitmap_values.vcproj \
+	fsntfs_test_cluster_block/fsntfs_test_cluster_block.vcproj \
+	fsntfs_test_compressed_block_descriptor/fsntfs_test_compressed_block_descriptor.vcproj \
+	fsntfs_test_data_run/fsntfs_test_data_run.vcproj \
+	fsntfs_test_data_stream/fsntfs_test_data_stream.vcproj \
+	fsntfs_test_directory_entry/fsntfs_test_directory_entry.vcproj \
 	fsntfs_test_error/fsntfs_test_error.vcproj \
-	fsntfs_test_open_close/fsntfs_test_open_close.vcproj \
-	fsntfs_test_read/fsntfs_test_read.vcproj \
-	fsntfs_test_seek/fsntfs_test_seek.vcproj \
+	fsntfs_test_file_entry/fsntfs_test_file_entry.vcproj \
+	fsntfs_test_file_name_values/fsntfs_test_file_name_values.vcproj \
+	fsntfs_test_index/fsntfs_test_index.vcproj \
+	fsntfs_test_index_entry/fsntfs_test_index_entry.vcproj \
+	fsntfs_test_index_node/fsntfs_test_index_node.vcproj \
+	fsntfs_test_index_value/fsntfs_test_index_value.vcproj \
+	fsntfs_test_io_handle/fsntfs_test_io_handle.vcproj \
+	fsntfs_test_logged_utility_stream_values/fsntfs_test_logged_utility_stream_values.vcproj \
+	fsntfs_test_mft/fsntfs_test_mft.vcproj \
+	fsntfs_test_mft_entry/fsntfs_test_mft_entry.vcproj \
+	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \
+	fsntfs_test_notify/fsntfs_test_notify.vcproj \
+	fsntfs_test_object_identifier_values/fsntfs_test_object_identifier_values.vcproj \
+	fsntfs_test_reparse_point_values/fsntfs_test_reparse_point_values.vcproj \
+	fsntfs_test_security_descriptor_index/fsntfs_test_security_descriptor_index.vcproj \
+	fsntfs_test_security_descriptor_index_value/fsntfs_test_security_descriptor_index_value.vcproj \
+	fsntfs_test_security_descriptor_values/fsntfs_test_security_descriptor_values.vcproj \
+	fsntfs_test_standard_information_values/fsntfs_test_standard_information_values.vcproj \
 	fsntfs_test_support/fsntfs_test_support.vcproj \
+	fsntfs_test_txf_data_values/fsntfs_test_txf_data_values.vcproj \
+	fsntfs_test_usn_change_journal/fsntfs_test_usn_change_journal.vcproj \
+	fsntfs_test_volume/fsntfs_test_volume.vcproj \
+	fsntfs_test_volume_information_values/fsntfs_test_volume_information_values.vcproj \
+	fsntfs_test_volume_name_values/fsntfs_test_volume_name_values.vcproj \
 	fsntfsinfo/fsntfsinfo.vcproj \
 	libbfio/libbfio.vcproj \
 	libcdata/libcdata.vcproj \

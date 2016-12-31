@@ -101,5 +101,5 @@ int libfsntfs_index_value_print(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INDEX_VALUE_H ) */
 

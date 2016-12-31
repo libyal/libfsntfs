@@ -159,5 +159,5 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H ) */
 

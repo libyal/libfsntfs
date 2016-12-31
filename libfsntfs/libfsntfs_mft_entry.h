@@ -326,5 +326,5 @@ int libfsntfs_mft_entry_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_MFT_ENTRY_H ) */
 

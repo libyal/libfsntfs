@@ -163,5 +163,5 @@ int libfsntfs_file_name_values_compare_short_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_FILE_NAME_VALUES_H ) */
 

@@ -99,5 +99,5 @@ int libfsntfs_compressed_block_descriptor_print(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_COMPRESSED_BLOCK_DESCRIPTOR_H ) */
 

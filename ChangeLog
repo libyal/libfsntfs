@@ -1,4 +1,5 @@
 TODO
+* tests: pass mft_metadata_file different input files
 * look into handling directories with high number of entries
 * libfsntfs/pyfsntfs attribute
   - expose raw attribute data?

@@ -1,5 +1,5 @@
 /*
- * Library data_stream type testing program
+ * Library data_stream type test program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,8 @@
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
+
+#include "../libfsntfs/libfsntfs_data_stream.h"
 
 /* Tests the libfsntfs_data_stream_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +73,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +92,41 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_data_stream_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_data_stream_free",
 	 fsntfs_test_data_stream_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_data_stream_get_utf8_name_size */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_utf8_name */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_utf16_name_size */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_utf16_name */
+
+	/* TODO: add tests for libfsntfs_data_stream_read_buffer */
+
+	/* TODO: add tests for libfsntfs_data_stream_read_buffer_at_offset */
+
+	/* TODO: add tests for libfsntfs_data_stream_seek_offset */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_offset */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_size */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_number_of_extents */
+
+	/* TODO: add tests for libfsntfs_data_stream_get_extent_by_index */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

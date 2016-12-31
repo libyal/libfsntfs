@@ -102,5 +102,5 @@ struct fsntfs_standard_information
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_STANDARD_INFORMATION_H ) */
 

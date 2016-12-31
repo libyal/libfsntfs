@@ -70,5 +70,5 @@ int libfsntfs_object_identifier_values_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_OBJECT_IDENTIFIER_VALUES_H ) */
 

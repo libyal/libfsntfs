@@ -292,5 +292,5 @@ int libfsntfs_attribute_append_to_chain(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INTERNAL_ATTRIBUTE_H ) */
 

@@ -74,5 +74,5 @@ int libfsntfs_cluster_block_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_H ) */
 

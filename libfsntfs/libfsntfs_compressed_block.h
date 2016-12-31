@@ -74,5 +74,5 @@ int libfsntfs_compressed_block_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_COMPRESSED_BLOCK_H ) */
 

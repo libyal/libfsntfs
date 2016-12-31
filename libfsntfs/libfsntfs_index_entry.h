@@ -101,5 +101,5 @@ int libfsntfs_index_entry_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INDEX_ENTRY_H ) */
 

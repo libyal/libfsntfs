@@ -123,5 +123,5 @@ int libfsntfs_cluster_block_stream_initialize(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_STREAM_H ) */
 

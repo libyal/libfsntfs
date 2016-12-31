@@ -62,5 +62,5 @@ struct fsntfs_object_identifier
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_OBJECT_IDENTIFIER_H ) */
 

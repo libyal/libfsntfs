@@ -109,5 +109,5 @@ struct fsntfs_mft_entry_header
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_MFT_ENTRY_H ) */
 

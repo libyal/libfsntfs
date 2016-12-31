@@ -1772,5 +1772,5 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_H ) */
 

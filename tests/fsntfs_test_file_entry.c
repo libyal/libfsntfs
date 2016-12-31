@@ -1,5 +1,5 @@
 /*
- * Library file_entry type testing program
+ * Library file_entry type test program
  *
  * Copyright (C) 2010-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,8 @@
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
+
+#include "../libfsntfs/libfsntfs_file_entry.h"
 
 /* Tests the libfsntfs_file_entry_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +73,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +92,123 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_file_entry_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_file_entry_free",
 	 fsntfs_test_file_entry_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libfsntfs_file_entry_is_empty */
+
+	/* TODO: add tests for libfsntfs_file_entry_is_allocated */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_file_reference */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_base_record_file_reference */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_parent_file_reference */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_parent_file_reference_by_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_journal_sequence_number */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_creation_time */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_modification_time */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_access_time */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_entry_modification_time */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_file_attribute_flags */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_name_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name_size_by_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name_by_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name_size_by_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name_by_attribute_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_substitute_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_substitute_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_print_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_print_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_print_name_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_print_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_security_descriptor_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_security_descriptor */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_number_of_attributes */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_attribute_by_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_has_directory_entries_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_has_default_data_stream */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_number_of_alternate_data_streams */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_number_of_sub_file_entries */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_index */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_utf8_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_utf16_name */
+
+	/* TODO: add tests for libfsntfs_file_entry_read_buffer */
+
+	/* TODO: add tests for libfsntfs_file_entry_read_buffer_at_offset */
+
+	/* TODO: add tests for libfsntfs_file_entry_seek_offset */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_offset */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_size */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_number_of_extents */
+
+	/* TODO: add tests for libfsntfs_file_entry_get_extent_by_index */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

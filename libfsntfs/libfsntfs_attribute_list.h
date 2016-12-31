@@ -52,5 +52,5 @@ int libfsntfs_attribute_list_read_from_attribute(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_ATTRIBUTE_LIST_H ) */
 

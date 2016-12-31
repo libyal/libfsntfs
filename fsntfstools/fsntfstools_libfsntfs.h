@@ -27,11 +27,11 @@
 /* If Cygwin libtool DLL support is enabled set LIBFSNTFS_DLL_IMPORT
  * before including libfsntfs.h
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBFSNTFS_DLL_IMPORT
 #endif
 
 #include <libfsntfs.h>
 
-#endif
+#endif /* !defined( _FSNTFSTOOLS_LIBFSNTFS_H ) */
 

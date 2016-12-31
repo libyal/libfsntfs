@@ -62,5 +62,5 @@ int libfsntfs_volume_name_attribute_get_utf16_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_VOLUME_NAME_ATTRIBUTE_H ) */
 

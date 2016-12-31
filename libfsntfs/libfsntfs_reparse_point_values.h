@@ -131,5 +131,5 @@ int libfsntfs_reparse_point_values_get_utf16_print_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_REPARSE_POINT_VALUES_H ) */
 

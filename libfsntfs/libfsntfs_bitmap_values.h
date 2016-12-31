@@ -58,5 +58,5 @@ int libfsntfs_bitmap_values_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_BITMAP_VALUES_H ) */
 

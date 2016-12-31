@@ -108,5 +108,5 @@ struct fsntfs_symbolic_link_reparse_data
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_REPARSE_POINT_H ) */
 

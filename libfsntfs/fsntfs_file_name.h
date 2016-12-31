@@ -98,5 +98,5 @@ struct fsntfs_file_name
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_FILE_NAME_H ) */
 

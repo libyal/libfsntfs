@@ -148,5 +148,5 @@ struct fsntfs_volume_header
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_VOLUME_HEADER_H ) */
 

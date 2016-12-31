@@ -79,5 +79,5 @@ struct fsntfs_txf_data
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_TXF_DATA_H ) */
 

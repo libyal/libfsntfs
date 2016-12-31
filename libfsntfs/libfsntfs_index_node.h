@@ -67,5 +67,5 @@ size_t libfsntfs_index_node_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_INDEX_NODE_H ) */
 

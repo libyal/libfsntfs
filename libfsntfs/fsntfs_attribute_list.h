@@ -73,5 +73,5 @@ struct fsntfs_attribute_list_entry_header
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_ATTRIBUTE_LIST_H ) */
 

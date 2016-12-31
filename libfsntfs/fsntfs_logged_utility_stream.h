@@ -53,5 +53,5 @@ struct fsntfs_logged_utility_stream
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_LOGGED_UTILITY_STREAM_H ) */
 

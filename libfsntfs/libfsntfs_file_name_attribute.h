@@ -98,5 +98,5 @@ int libfsntfs_file_name_attribute_get_utf16_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_FILE_NAME_ATTRIBUTE_H ) */
 

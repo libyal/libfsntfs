@@ -76,5 +76,5 @@ int libfsntfs_directory_entry_get_mft_entry_index(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_DIRECTORY_ENTRY_H ) */
 

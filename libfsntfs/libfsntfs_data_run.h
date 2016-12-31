@@ -60,5 +60,5 @@ int libfsntfs_data_run_free(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_DATA_RUN_H ) */
 

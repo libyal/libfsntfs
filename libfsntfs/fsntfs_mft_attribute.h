@@ -193,5 +193,5 @@ struct fsntfs_mft_attribute_non_resident_compressed
 }
 #endif
 
-#endif
+#endif /* !defined( _FSNTFS_MFT_ATTRIBUTE_H ) */
 

@@ -66,5 +66,5 @@ int libfsntfs_volume_information_values_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBFSNTFS_VOLUME_INFORMATION_VALUES_H ) */
 
