@@ -16,7 +16,6 @@ AM_CPPFLAGS = \
 	@LIBFGUID_CPPFLAGS@ \
 	@LIBFUSN_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
@@ -26,12 +25,12 @@ bin_PROGRAMS = \
 
 fsntfsinfo_SOURCES = \
 	fsntfsinfo.c \
-	fsntfsoutput.c fsntfsoutput.h \
+	fsntfstools_getopt.c fsntfstools_getopt.h \
+	fsntfstools_i18n.h \
 	fsntfstools_libbfio.h \
 	fsntfstools_libcerror.h \
 	fsntfstools_libclocale.h \
 	fsntfstools_libcnotify.h \
-	fsntfstools_libcsystem.h \
 	fsntfstools_libfcache.h \
 	fsntfstools_libfdata.h \
 	fsntfstools_libfdatetime.h \
@@ -40,10 +39,12 @@ fsntfsinfo_SOURCES = \
 	fsntfstools_libfusn.h \
 	fsntfstools_libfwnt.h \
 	fsntfstools_libuna.h \
+	fsntfstools_output.c fsntfstools_output.h \
+	fsntfstools_signal.c fsntfstools_signal.h \
+	fsntfstools_unused.h \
 	info_handle.c info_handle.h
 
 fsntfsinfo_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
 	@LIBFWNT_LIBADD@ \
 	@LIBFUSN_LIBADD@ \
 	@LIBFGUID_LIBADD@ \

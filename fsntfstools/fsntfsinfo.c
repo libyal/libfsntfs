@@ -35,12 +35,14 @@
 #include <stdlib.h>
 #endif
 
-#include "fsntfsoutput.h"
+#include "fsntfstools_getopt.h"
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
 #include "fsntfstools_libcnotify.h"
-#include "fsntfstools_libcsystem.h"
 #include "fsntfstools_libfsntfs.h"
+#include "fsntfstools_output.h"
+#include "fsntfstools_signal.h"
+#include "fsntfstools_unused.h"
 #include "info_handle.h"
 
 enum FSNTFSINFO_MODES
@@ -86,12 +88,12 @@ void usage_fprint(
 /* Signal handler for fsntfsinfo
  */
 void fsntfsinfo_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      fsntfstools_signal_t signal FSNTFSTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "fsntfsinfo_signal_handler";
+	static char *function    = "fsntfsinfo_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	FSNTFSTOOLS_UNREFERENCED_PARAMETER( signal )
 
 	fsntfsinfo_abort = 1;
 
@@ -113,8 +115,13 @@ void fsntfsinfo_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -158,13 +165,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-        if( libcsystem_initialize(
+        if( fsntfstools_output_initialize(
              _IONBF,
              &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
@@ -172,7 +179,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = fsntfstools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "E:F:hHo:UvV" ) ) ) != (system_integer_t) -1 )
@@ -363,7 +370,7 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-			else if( libcsystem_string_decimal_copy_to_64_bit(
+			else if( fsntfstools_system_string_copy_from_64_bit_in_decimal(
 			          option_mft_entry_index,
 			          string_length + 1,
 			          &mft_entry_index,

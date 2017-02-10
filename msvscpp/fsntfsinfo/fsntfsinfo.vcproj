@@ -41,8 +41,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfdatetime;..\..\libfguid;..\..\libfusn;..\..\libfwnt;..\..\libcsystem"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFDATETIME;HAVE_LOCAL_LIBFGUID;HAVE_LOCAL_LIBFUSN;HAVE_LOCAL_LIBFWNT;HAVE_LOCAL_LIBCSYSTEM;LIBFSNTFS_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfdatetime;..\..\libfguid;..\..\libfusn;..\..\libfwnt"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFDATETIME;HAVE_LOCAL_LIBFGUID;HAVE_LOCAL_LIBFUSN;HAVE_LOCAL_LIBFWNT;LIBFSNTFS_DLL_IMPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -114,8 +114,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfdatetime;..\..\libfguid;..\..\libfusn;..\..\libfwnt;..\..\libcsystem"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFDATETIME;HAVE_LOCAL_LIBFGUID;HAVE_LOCAL_LIBFUSN;HAVE_LOCAL_LIBFWNT;HAVE_LOCAL_LIBCSYSTEM;LIBFSNTFS_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\libcerror;..\..\libcdata;..\..\libclocale;..\..\libcnotify;..\..\libcsplit;..\..\libuna;..\..\libcfile;..\..\libcpath;..\..\libbfio;..\..\libfcache;..\..\libfdata;..\..\libfdatetime;..\..\libfguid;..\..\libfusn;..\..\libfwnt"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBCERROR;HAVE_LOCAL_LIBCDATA;HAVE_LOCAL_LIBCLOCALE;HAVE_LOCAL_LIBCNOTIFY;HAVE_LOCAL_LIBCSPLIT;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBCFILE;HAVE_LOCAL_LIBCPATH;HAVE_LOCAL_LIBBFIO;HAVE_LOCAL_LIBFCACHE;HAVE_LOCAL_LIBFDATA;HAVE_LOCAL_LIBFDATETIME;HAVE_LOCAL_LIBFGUID;HAVE_LOCAL_LIBFUSN;HAVE_LOCAL_LIBFWNT;LIBFSNTFS_DLL_IMPORT"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -180,7 +180,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\fsntfstools\fsntfsoutput.c"
+				RelativePath="..\..\fsntfstools\fsntfstools_getopt.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_output.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_signal.c"
 				>
 			</File>
 			<File
@@ -194,7 +202,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\fsntfstools\fsntfsoutput.h"
+				RelativePath="..\..\fsntfstools\fsntfstools_getopt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_i18n.h"
 				>
 			</File>
 			<File
@@ -211,10 +223,6 @@
 			</File>
 			<File
 				RelativePath="..\..\fsntfstools\fsntfstools_libcnotify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\fsntfstools_libcsystem.h"
 				>
 			</File>
 			<File
@@ -247,6 +255,18 @@
 			</File>
 			<File
 				RelativePath="..\..\fsntfstools\fsntfstools_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_output.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_signal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\fsntfstools_unused.h"
 				>
 			</File>
 			<File

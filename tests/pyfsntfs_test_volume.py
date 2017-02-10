@@ -30,6 +30,12 @@ import pyfsntfs
 class VolumeTypeTests(unittest.TestCase):
   """Tests the volume type."""
 
+  def test_signal_abort(self):
+    """Tests the signal_abort function."""
+    fsntfs_volume = pyfsntfs.volume()
+
+    fsntfs_volume.signal_abort()
+
   def test_open(self):
     """Tests the open function."""
     if not unittest.source:
@@ -61,9 +67,9 @@ class VolumeTypeTests(unittest.TestCase):
 
     fsntfs_volume.open_file_object(file_object)
 
-    # TODO: change MemoryError into IOError
+    # TODO: fix.
     with self.assertRaises(MemoryError):
-      fsntfs_volume.open_file_object(file_object)
+       fsntfs_volume.open_file_object(file_object)
 
     fsntfs_volume.close()
 
@@ -81,9 +87,8 @@ class VolumeTypeTests(unittest.TestCase):
 
     fsntfs_volume = pyfsntfs.volume()
 
-    # TODO: fix.
     # with self.assertRaises(IOError):
-    #  fsntfs_volume.close()
+    #   fsntfs_volume.close()
 
   def test_open_close(self):
     """Tests the open and close functions."""

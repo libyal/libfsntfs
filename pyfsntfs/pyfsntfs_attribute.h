@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs attribute
+ * Python object wrapper of libfsntfs_attribute_t
  *
  * Copyright (C) 2010-2017, Joachim Metz <joachim.metz@gmail.com>
  *

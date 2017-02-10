@@ -20,7 +20,6 @@ SUBDIRS = \
 	libfwnt \
 	libfsntfs \
 	libfusn \
-	libcsystem \
 	fsntfstools \
 	pyfsntfs \
 	pyfsntfs-python2 \
@@ -129,7 +128,6 @@ splint:
 	(cd $(srcdir)/libfwnt && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfsntfs && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfusn && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/fsntfstools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/pyfsntfs && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) splint $(AM_MAKEFLAGS))

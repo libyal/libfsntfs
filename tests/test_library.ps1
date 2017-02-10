@@ -1,6 +1,6 @@
-# Library API type testing script
+# Tests C library functions and types.
 #
-# Version: 20161110
+# Version: 20170115
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -10,17 +10,17 @@ $TestPrefix = Split-Path -path ${Pwd}.Path -parent
 $TestPrefix = Split-Path -path ${TestPrefix} -leaf
 $TestPrefix = ${TestPrefix}.Substring(3)
 
-$TestTypes = "attribute bitmap_values cluster_block compressed_block_descriptor data_run data_stream directory_entry file_entry file_name_values index index_entry index_node index_value io_handle logged_utility_stream_values mft mft_entry mft_metadata_file object_identifier_values reparse_point_values security_descriptor_index security_descriptor_index_value security_descriptor_values standard_information_values txf_data_values usn_change_journal volume_information_values volume_name_values"
-$TestTypesWithInput = "volume"
+$LibraryTests = "attribute bitmap_values cluster_block compressed_block_descriptor data_run data_stream directory_entry error file_entry file_name_values index index_entry index_node index_value io_handle logged_utility_stream_values mft mft_entry notify object_identifier_values reparse_point_values security_descriptor_index security_descriptor_index_value security_descriptor_values standard_information_values txf_data_values usn_change_journal volume_information_values volume_name_values"
+$LibraryTestsWithInput = "mft_metadata_file support volume"
 
 $TestToolDirectory = "..\msvscpp\Release"
 
-Function TestAPIType
+Function RunTest
 {
 	param( [string]$TestType )
 
-	$TestDescription = "Testing API type: ${TestType}"
-	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestType}.exe"
+	$TestDescription = "Testing: ${TestName}"
+	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestName}.exe"
 
 	$Output = Invoke-Expression ${TestExecutable}
 	$Result = ${LastExitCode}
@@ -55,9 +55,9 @@ If (-Not (Test-Path ${TestToolDirectory}))
 
 $Result = ${ExitIgnore}
 
-Foreach (${TestType} in ${TestTypes} -split " ")
+Foreach (${TestName} in ${LibraryTests} -split " ")
 {
-	$Result = TestAPIType ${TestType}
+	$Result = RunTest ${TestName}
 
 	If (${Result} -ne ${ExitSuccess})
 	{
@@ -65,9 +65,10 @@ Foreach (${TestType} in ${TestTypes} -split " ")
 	}
 }
 
-Foreach (${TestType} in ${TestTypesWithInput} -split " ")
+Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 {
-	$Result = TestAPIType ${TestType}
+	# TODO: add RunTestWithInput
+	$Result = RunTest ${TestName}
 
 	If (${Result} -ne ${ExitSuccess})
 	{

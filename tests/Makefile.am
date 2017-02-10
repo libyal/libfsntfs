@@ -21,12 +21,11 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON_TESTS
 TESTS_PYFSNTFS = \
-	test_python_functions.sh
+	test_python_module.sh
 endif
 
 TESTS = \
-	test_api_functions.sh \
-	test_api_types.sh \
+	test_library.sh \
 	test_fsntfsinfo.sh \
 	$(TESTS_PYFSNTFS)
 
@@ -34,10 +33,9 @@ check_SCRIPTS = \
 	pyfsntfs_test_read.py \
 	pyfsntfs_test_support.py \
 	pyfsntfs_test_volume.py \
-	test_api_functions.sh \
-	test_api_types.sh \
 	test_fsntfsinfo.sh \
-	test_python_functions.sh \
+	test_library.sh \
+	test_python_module.sh \
 	test_runner.sh
 
 EXTRA_DIST = \

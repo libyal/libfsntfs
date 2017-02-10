@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs attribute
+ * Python object wrapper of libfsntfs_attribute_t
  *
  * Copyright (C) 2010-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -22,7 +22,7 @@
 #include <common.h>
 #include <types.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
 #include <stdlib.h>
 #endif
 

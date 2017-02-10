@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libfsntfs],
- [20161231],
+ [20170209],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -108,17 +108,8 @@ AX_LIBFSNTFS_CHECK_LOCAL
 dnl Check for enabling libfusn for file Update Sequence Number (USN) Journal type support
 AX_LIBFUSN_CHECK_ENABLE
 
-dnl Check for enabling libcsystem for cross-platform C generic system functions
-AX_LIBCSYSTEM_CHECK_ENABLE
-
-dnl Check if fsntfstools should be build as static executables
-AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
-
-dnl Check if libfsntfs should be build with verbose output
-AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
-
-dnl Check if libfsntfs should be build with debug output
-AX_COMMON_CHECK_ENABLE_DEBUG_OUTPUT
+dnl Check for fsntfstools function support
+AX_FSNTFSTOOLS_CHECK_LOCAL
 
 dnl Check if libfsext python bindings (pyfsext) should be build
 AX_PYTHON_CHECK_PYPREFIX
@@ -181,7 +172,7 @@ AS_IF(
  ])
 
 AS_IF(
- [test "x$ac_cv_libfusn" = xyes || test "x$ac_cv_libcsystem" = xyes],
+ [test "x$ac_cv_libfusn" = xyes],
  [AC_SUBST(
   [libfsntfs_spec_tools_build_requires],
   [BuildRequires:])
@@ -223,7 +214,6 @@ AC_CONFIG_FILES([libfguid/Makefile])
 AC_CONFIG_FILES([libfwnt/Makefile])
 AC_CONFIG_FILES([libfsntfs/Makefile])
 AC_CONFIG_FILES([libfusn/Makefile])
-AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([fsntfstools/Makefile])
 AC_CONFIG_FILES([pyfsntfs/Makefile])
 AC_CONFIG_FILES([pyfsntfs-python2/Makefile])
@@ -270,7 +260,6 @@ Building:
    libfguid support:                            $ac_cv_libfguid
    libfwnt support:                             $ac_cv_libfwnt
    libfusn support:                             $ac_cv_libfusn
-   libcsystem support:                          $ac_cv_libcsystem
 
 Features:
    Multi-threading support:                     $ac_cv_libcthreads_multi_threading
