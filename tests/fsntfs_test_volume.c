@@ -2347,6 +2347,18 @@ int main(
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
 	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_check_volume_signature_wide(
+		          source,
+		          &error );
+#else
+		result = libfsntfs_check_volume_signature(
+		          source,
+		          &error );
+#endif
+	}
+	if( result != 0 )
+	{
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_open",
 		 fsntfs_test_volume_open,
