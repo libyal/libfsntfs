@@ -29,6 +29,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 
 #if defined( __cplusplus )
