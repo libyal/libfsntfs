@@ -74,6 +74,25 @@ int libfsntfs_check_volume_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature(
+     const char *filename,
+     libcerror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature_wide(
+     const wchar_t *filename,
+     libcerror_error_t **error );
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

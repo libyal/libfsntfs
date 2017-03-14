@@ -105,6 +105,38 @@ int libfsntfs_check_volume_signature_file_io_handle(
 
 #endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
 
+/* Determines if a file contains a NTFS MFT signature
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature(
+     const char *filename,
+     libfsntfs_error_t **error );
+
+#if defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE )
+
+/* Determines if a file contains a NTFS MFT signature
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature_wide(
+     const wchar_t *filename,
+     libfsntfs_error_t **error );
+
+#endif /* defined( LIBFSNTFS_HAVE_WIDE_CHARACTER_TYPE ) */
+
+#if defined( LIBFSNTFS_HAVE_BFIO )
+
+/* Determines if a file contains a NTFS MFT signature using a Basic File IO (bfio) handle
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_error_t **error );
+
+#endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
+
 /* -------------------------------------------------------------------------
  * Notify functions
  * ------------------------------------------------------------------------- */
