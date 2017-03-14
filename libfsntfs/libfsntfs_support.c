@@ -444,15 +444,15 @@ on_error:
 	return( -1 );
 }
 
-/* Determines if a file contains a NTFS MFT signature
+/* Determines if a file contains a NTFS MFT metadata file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
-int libfsntfs_check_mft_signature(
+int libfsntfs_check_mft_metadata_file_signature(
      const char *filename,
      libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libfsntfs_check_mft_signature";
+	static char *function            = "libfsntfs_check_mft_metadata_file_signature";
 	size_t filename_length           = 0;
 	int result                       = 0;
 
@@ -509,7 +509,7 @@ int libfsntfs_check_mft_signature(
 
 		goto on_error;
 	}
-	result = libfsntfs_check_mft_signature_file_io_handle(
+	result = libfsntfs_check_mft_metadata_file_signature_file_io_handle(
 	          file_io_handle,
 	          error );
 
@@ -551,15 +551,15 @@ on_error:
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-/* Determines if a file contains a NTFS MFT signature
+/* Determines if a file contains a NTFS MFT metadata file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
-int libfsntfs_check_mft_signature_wide(
+int libfsntfs_check_mft_metadata_file_signature_wide(
      const wchar_t *filename,
      libcerror_error_t **error )
 {
 	libbfio_handle_t *file_io_handle = NULL;
-	static char *function            = "libfsntfs_check_mft_signature_wide";
+	static char *function            = "libfsntfs_check_mft_metadata_file_signature_wide";
 	size_t filename_length           = 0;
 	int result                       = 0;
 
@@ -616,7 +616,7 @@ int libfsntfs_check_mft_signature_wide(
 
 		goto on_error;
 	}
-	result = libfsntfs_check_mft_signature_file_io_handle(
+	result = libfsntfs_check_mft_metadata_file_signature_file_io_handle(
 	          file_io_handle,
 	          error );
 
@@ -658,16 +658,16 @@ on_error:
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-/* Determines if a file contains a NTFS MFT signature using a Basic File IO (bfio) handle
+/* Determines if a file contains a NTFS MFT metadata file signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
-int libfsntfs_check_mft_signature_file_io_handle(
+int libfsntfs_check_mft_metadata_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	uint8_t signature[ 4 ];
 
-	static char *function      = "libfsntfs_check_mft_signature_file_io_handle";
+	static char *function      = "libfsntfs_check_mft_metadata_file_signature_file_io_handle";
 	ssize_t read_count         = 0;
 	int file_io_handle_is_open = 0;
 

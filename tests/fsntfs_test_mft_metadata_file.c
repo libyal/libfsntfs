@@ -1761,14 +1761,23 @@ int main(
 	if( source != NULL )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfsntfs_check_mft_signature_wide(
+		result = libfsntfs_check_mft_metadata_file_signature_wide(
 		          source,
 		          &error );
 #else
-		result = libfsntfs_check_mft_signature(
+		result = libfsntfs_check_mft_metadata_file_signature(
 		          source,
 		          &error );
 #endif
+
+		FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
 	}
 	if( result != 0 )
 	{

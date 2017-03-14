@@ -2356,6 +2356,15 @@ int main(
 		          source,
 		          &error );
 #endif
+
+		FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
 	}
 	if( result != 0 )
 	{
