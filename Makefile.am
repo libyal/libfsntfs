@@ -35,13 +35,12 @@ DPKG_FILES = \
 	dpkg/compat \
 	dpkg/control \
 	dpkg/copyright \
-	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libfsntfs.docs \
-	dpkg/libfsntfs-dev.docs \
-	dpkg/libfsntfs-python.docs \
-	dpkg/libfsntfs-python3.docs \
-	dpkg/libfsntfs-tools.docs \
+	dpkg/libfsntfs.install \
+	dpkg/libfsntfs-dev.install \
+	dpkg/libfsntfs-python.install \
+	dpkg/libfsntfs-python3.install \
+	dpkg/libfsntfs-tools.install \
 	dpkg/source/format
 
 GETTEXT_FILES = \
