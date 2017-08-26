@@ -1,14 +1,10 @@
 # Tests C library functions and types.
 #
-# Version: 20170115
+# Version: 20170807
 
 $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
-
-$TestPrefix = Split-Path -path ${Pwd}.Path -parent
-$TestPrefix = Split-Path -path ${TestPrefix} -leaf
-$TestPrefix = ${TestPrefix}.Substring(3)
 
 $LibraryTests = "attribute bitmap_values cluster_block compressed_block_descriptor data_run data_stream directory_entry error file_entry file_name_values index index_entry index_node index_value io_handle logged_utility_stream_values mft mft_entry notify object_identifier_values reparse_point_values security_descriptor_index security_descriptor_index_value security_descriptor_values standard_information_values txf_data_values usn_change_journal volume_information_values volume_name_values"
 $LibraryTestsWithInput = "mft_metadata_file support volume"
@@ -20,7 +16,7 @@ Function RunTest
 	param( [string]$TestType )
 
 	$TestDescription = "Testing: ${TestName}"
-	$TestExecutable = "${TestToolDirectory}\${TestPrefix}_test_${TestName}.exe"
+	$TestExecutable = "${TestToolDirectory}\fsntfs_test_${TestName}.exe"
 
 	$Output = Invoke-Expression ${TestExecutable}
 	$Result = ${LastExitCode}
@@ -44,7 +40,15 @@ Function RunTest
 
 If (-Not (Test-Path ${TestToolDirectory}))
 {
+	$TestToolDirectory = "..\msvscpp\VSDebug"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
 	$TestToolDirectory = "..\vs2010\Release"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
+	$TestToolDirectory = "..\vs2010\VSDebug"
 }
 If (-Not (Test-Path ${TestToolDirectory}))
 {
@@ -52,11 +56,23 @@ If (-Not (Test-Path ${TestToolDirectory}))
 }
 If (-Not (Test-Path ${TestToolDirectory}))
 {
+	$TestToolDirectory = "..\vs2012\VSDebug"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
 	$TestToolDirectory = "..\vs2013\Release"
 }
 If (-Not (Test-Path ${TestToolDirectory}))
 {
+	$TestToolDirectory = "..\vs2013\VSDebug"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
 	$TestToolDirectory = "..\vs2015\Release"
+}
+If (-Not (Test-Path ${TestToolDirectory}))
+{
+	$TestToolDirectory = "..\vs2015\VSDebug"
 }
 If (-Not (Test-Path ${TestToolDirectory}))
 {

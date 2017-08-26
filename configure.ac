@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libfsntfs],
- [20170627],
+ [20170826],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(

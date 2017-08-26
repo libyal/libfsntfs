@@ -72,8 +72,8 @@ int fsntfs_test_attribute_initialize(
          "error",
          error );
 
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -147,8 +147,8 @@ int fsntfs_test_attribute_initialize(
 
 			if( attribute != NULL )
 			{
-				libfsntfs_attribute_free(
-				 &attribute,
+				libfsntfs_internal_attribute_free(
+				 (libfsntfs_internal_attribute_t **) &attribute,
 				 NULL );
 			}
 		}
@@ -189,8 +189,8 @@ int fsntfs_test_attribute_initialize(
 
 			if( attribute != NULL )
 			{
-				libfsntfs_attribute_free(
-				 &attribute,
+				libfsntfs_internal_attribute_free(
+				 (libfsntfs_internal_attribute_t **) &attribute,
 				 NULL );
 			}
 		}
@@ -225,8 +225,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -363,8 +363,8 @@ int fsntfs_test_attribute_get_type(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -390,8 +390,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -486,8 +486,8 @@ int fsntfs_test_attribute_get_data_flags(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -513,8 +513,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -609,8 +609,8 @@ int fsntfs_test_attribute_get_value(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -636,8 +636,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -732,8 +732,8 @@ int fsntfs_test_attribute_get_utf8_name_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -759,8 +759,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -895,8 +895,8 @@ int fsntfs_test_attribute_get_utf8_name(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -922,8 +922,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1018,8 +1018,8 @@ int fsntfs_test_attribute_get_utf16_name_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1045,8 +1045,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1181,8 +1181,8 @@ int fsntfs_test_attribute_get_utf16_name(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1208,8 +1208,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1304,8 +1304,8 @@ int fsntfs_test_attribute_get_compression_unit_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1331,8 +1331,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1427,8 +1427,8 @@ int fsntfs_test_attribute_get_data_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1454,8 +1454,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1550,8 +1550,8 @@ int fsntfs_test_attribute_get_valid_data_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1577,8 +1577,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1673,8 +1673,8 @@ int fsntfs_test_attribute_get_number_of_data_runs(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1700,8 +1700,8 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
@@ -1762,8 +1762,8 @@ int fsntfs_test_attribute_get_chained_attribute(
 		 "chained_attribute",
 		 chained_attribute );
 
-		result = libfsntfs_attribute_free(
-		          &chained_attribute,
+		result = libfsntfs_internal_attribute_free(
+		          (libfsntfs_internal_attribute_t **) &chained_attribute,
 		          &error );
 
 		FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1823,8 +1823,8 @@ int fsntfs_test_attribute_get_chained_attribute(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1850,14 +1850,14 @@ on_error:
 	}
 	if( chained_attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &chained_attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &chained_attribute,
 		 NULL );
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
 		 NULL );
 	}
 	return( 0 );
