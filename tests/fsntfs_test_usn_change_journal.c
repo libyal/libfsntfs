@@ -75,9 +75,9 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -94,23 +94,23 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	/* TODO: add tests for libfsntfs_usn_change_journal_initialize */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_usn_change_journal_free",
 	 fsntfs_test_usn_change_journal_free );
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	/* TODO: add tests for libfsntfs_usn_change_journal_get_offset */
 
 	/* TODO: add tests for libfsntfs_usn_change_journal_read_usn_record */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

@@ -35,7 +35,7 @@
 
 #include "../libfsntfs/libfsntfs_file_name_values.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_file_name_values_initialize function
  * Returns 1 if successful or 0 if not
@@ -1726,7 +1726,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -1743,7 +1743,7 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_file_name_values_initialize",
@@ -1809,7 +1809,7 @@ int main(
 
 #endif /* defined( TODO ) */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

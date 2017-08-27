@@ -1830,11 +1830,11 @@ int main(
 	         "error",
 	         error );
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 		/* TODO: add tests for libfsntfs_mft_metadata_file_open_read */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_mft_metadata_file_get_utf8_volume_name_size",

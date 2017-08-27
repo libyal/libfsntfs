@@ -73,9 +73,9 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -92,17 +92,17 @@ int main(
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	/* TODO: add tests for libfsntfs_file_entry_initialize */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_file_entry_free",
 	 fsntfs_test_file_entry_free );
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	/* TODO: add tests for libfsntfs_file_entry_is_empty */
 
@@ -208,7 +208,7 @@ int main(
 
 	/* TODO: add tests for libfsntfs_file_entry_get_extent_by_index */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
