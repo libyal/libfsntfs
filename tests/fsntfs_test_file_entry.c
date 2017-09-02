@@ -55,9 +55,9 @@ int fsntfs_test_file_entry_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

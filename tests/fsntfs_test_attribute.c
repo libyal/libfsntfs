@@ -64,13 +64,13 @@ int fsntfs_test_attribute_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "attribute",
-         attribute );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "attribute",
+	 attribute );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_internal_attribute_free(
 	          (libfsntfs_internal_attribute_t **) &attribute,
@@ -81,13 +81,13 @@ int fsntfs_test_attribute_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "attribute",
-         attribute );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "attribute",
+	 attribute );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int fsntfs_test_attribute_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int fsntfs_test_attribute_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -254,9 +254,9 @@ int fsntfs_test_attribute_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

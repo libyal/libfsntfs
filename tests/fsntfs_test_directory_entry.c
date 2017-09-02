@@ -65,13 +65,13 @@ int fsntfs_test_directory_entry_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "directory_entry",
-         directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entry",
+	 directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_directory_entry_free(
 	          &directory_entry,
@@ -82,13 +82,13 @@ int fsntfs_test_directory_entry_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "directory_entry",
-         directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entry",
+	 directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -101,9 +101,9 @@ int fsntfs_test_directory_entry_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -119,9 +119,9 @@ int fsntfs_test_directory_entry_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -253,9 +253,9 @@ int fsntfs_test_directory_entry_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -293,13 +293,13 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "source_directory_entry",
-         source_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "source_directory_entry",
+	 source_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -313,13 +313,13 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "destination_directory_entry",
-         destination_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_directory_entry",
+	 destination_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_directory_entry_free(
 	          &destination_directory_entry,
@@ -330,13 +330,13 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "destination_directory_entry",
-         destination_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_directory_entry",
+	 destination_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_directory_entry_clone(
 	          &destination_directory_entry,
@@ -348,13 +348,13 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "destination_directory_entry",
-         destination_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_directory_entry",
+	 destination_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -368,9 +368,9 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -386,13 +386,13 @@ int fsntfs_test_directory_entry_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "source_directory_entry",
-         source_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "source_directory_entry",
+	 source_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -439,13 +439,13 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "first_directory_entry",
-         first_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "first_directory_entry",
+	 first_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_directory_entry_initialize(
 	          &second_directory_entry,
@@ -456,13 +456,13 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "second_directory_entry",
-         second_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "second_directory_entry",
+	 second_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -476,9 +476,9 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 LIBCDATA_COMPARE_EQUAL );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -492,9 +492,9 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -509,9 +509,9 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -527,13 +527,13 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "second_directory_entry",
-         second_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "second_directory_entry",
+	 second_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_directory_entry_free(
 	          &first_directory_entry,
@@ -544,13 +544,13 @@ int fsntfs_test_directory_entry_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "first_directory_entry",
-         first_directory_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "first_directory_entry",
+	 first_directory_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

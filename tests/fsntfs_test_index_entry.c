@@ -64,13 +64,13 @@ int fsntfs_test_index_entry_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "index_entry",
-         index_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "index_entry",
+	 index_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_index_entry_free(
 	          &index_entry,
@@ -81,13 +81,13 @@ int fsntfs_test_index_entry_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "index_entry",
-         index_entry );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "index_entry",
+	 index_entry );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int fsntfs_test_index_entry_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int fsntfs_test_index_entry_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int fsntfs_test_index_entry_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

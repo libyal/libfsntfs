@@ -64,13 +64,13 @@ int fsntfs_test_security_descriptor_index_value_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "security_descriptor_index_value",
-         security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "security_descriptor_index_value",
+	 security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_security_descriptor_index_value_free(
 	          &security_descriptor_index_value,
@@ -81,13 +81,13 @@ int fsntfs_test_security_descriptor_index_value_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "security_descriptor_index_value",
-         security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "security_descriptor_index_value",
+	 security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int fsntfs_test_security_descriptor_index_value_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int fsntfs_test_security_descriptor_index_value_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int fsntfs_test_security_descriptor_index_value_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -292,13 +292,13 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "first_security_descriptor_index_value",
-         first_security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "first_security_descriptor_index_value",
+	 first_security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_security_descriptor_index_value_initialize(
 	          &second_security_descriptor_index_value,
@@ -309,13 +309,13 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "second_security_descriptor_index_value",
-         second_security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "second_security_descriptor_index_value",
+	 second_security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -329,9 +329,9 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 LIBCDATA_COMPARE_EQUAL );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -345,9 +345,9 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -362,9 +362,9 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -380,13 +380,13 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "second_security_descriptor_index_value",
-         second_security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "second_security_descriptor_index_value",
+	 second_security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_security_descriptor_index_value_free(
 	          &first_security_descriptor_index_value,
@@ -397,13 +397,13 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "first_security_descriptor_index_value",
-         first_security_descriptor_index_value );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "first_security_descriptor_index_value",
+	 first_security_descriptor_index_value );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 

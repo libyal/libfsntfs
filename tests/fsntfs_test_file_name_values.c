@@ -64,13 +64,13 @@ int fsntfs_test_file_name_values_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "file_name_values",
-         file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_name_values",
+	 file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_file_name_values_free(
 	          &file_name_values,
@@ -81,13 +81,13 @@ int fsntfs_test_file_name_values_initialize(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "file_name_values",
-         file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_name_values",
+	 file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int fsntfs_test_file_name_values_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int fsntfs_test_file_name_values_initialize(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int fsntfs_test_file_name_values_free(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -292,13 +292,13 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "source_file_name_values",
-         source_file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "source_file_name_values",
+	 source_file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
@@ -312,13 +312,13 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "destination_file_name_values",
-         destination_file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_file_name_values",
+	 destination_file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_file_name_values_free(
 	          &destination_file_name_values,
@@ -329,13 +329,13 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "destination_file_name_values",
-         destination_file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_file_name_values",
+	 destination_file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_file_name_values_clone(
 	          &destination_file_name_values,
@@ -347,13 +347,13 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "destination_file_name_values",
-         destination_file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_file_name_values",
+	 destination_file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -367,9 +367,9 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 -1 );
 
-        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -385,13 +385,13 @@ int fsntfs_test_file_name_values_clone(
 	 result,
 	 1 );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "source_file_name_values",
-         source_file_name_values );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "source_file_name_values",
+	 source_file_name_values );
 
-        FSNTFS_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
