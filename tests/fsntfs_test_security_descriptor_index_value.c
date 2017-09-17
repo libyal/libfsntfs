@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_libcdata.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
