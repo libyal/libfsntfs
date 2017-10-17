@@ -149,7 +149,7 @@ int libfsntfs_file_entry_initialize(
 	}
 	if( libcdata_btree_initialize(
 	     &( internal_file_entry->directory_entries_tree ),
-	     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+	     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3028,7 +3028,6 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 	}
 	return( 1 );
 }
-
 
 /* Retrieves the sub file entry for the specific index
  * Returns 1 if successful or -1 on error
