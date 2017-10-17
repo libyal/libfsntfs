@@ -156,25 +156,25 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_access_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_entry_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

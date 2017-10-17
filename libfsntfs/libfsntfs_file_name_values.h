@@ -85,7 +85,7 @@ int libfsntfs_file_name_values_clone(
      libfsntfs_file_name_values_t *source_file_name_values,
      libcerror_error_t **error );
 
-int libfsntfs_file_name_values_read(
+int libfsntfs_file_name_values_read_data(
      libfsntfs_file_name_values_t *file_name_values,
      const uint8_t *data,
      size_t data_size,
@@ -103,22 +103,22 @@ int libfsntfs_file_name_values_get_parent_file_reference(
 
 int libfsntfs_file_name_values_get_creation_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_modification_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_access_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_entry_modification_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_file_attribute_flags(

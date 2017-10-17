@@ -48,7 +48,7 @@ int libfsntfs_bitmap_values_free(
      libfsntfs_bitmap_values_t **bitmap_values,
      libcerror_error_t **error );
 
-int libfsntfs_bitmap_values_read(
+int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
      const uint8_t *data,
      size_t data_size,

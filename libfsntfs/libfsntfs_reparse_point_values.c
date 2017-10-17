@@ -146,13 +146,13 @@ int libfsntfs_reparse_point_values_free(
 /* Reads the reparse point values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_reparse_point_values_read(
+int libfsntfs_reparse_point_values_read_data(
      libfsntfs_reparse_point_values_t *reparse_point_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function            = "libfsntfs_reparse_point_values_read";
+	static char *function            = "libfsntfs_reparse_point_values_read_data";
 	uint32_t flags                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )

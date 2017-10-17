@@ -349,7 +349,7 @@ int libfsntfs_security_descriptor_index_read_sii_index(
 
 			goto on_error;
 		}
-		if( libfsntfs_security_descriptor_index_value_read(
+		if( libfsntfs_security_descriptor_index_value_read_data(
 		     security_descriptor_index_value,
 		     index_value->value_data,
 		     (size_t) index_value->value_data_size,
@@ -650,7 +650,7 @@ int libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_values_read(
+	if( libfsntfs_security_descriptor_values_read_data(
 	     *security_descriptor_values,
 	     ( *security_descriptor_values )->data,
 	     ( *security_descriptor_values )->data_size,

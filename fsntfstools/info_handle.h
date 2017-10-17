@@ -100,81 +100,87 @@ int info_handle_close_input(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
+int info_handle_filetime_value_fprint(
+     info_handle_t *info_handle,
+     const char *value_name,
+     uint64_t value_64bit,
+     libcerror_error_t **error );
+
 int info_handle_security_descriptor_fprint(
      info_handle_t *info_handle,
      const uint8_t *data,
      size_t data_size,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
      int attribute_index,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_data_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_file_name_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_object_identifier_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_reparse_point_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_security_descriptor_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_standard_information_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_volume_information_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_volume_name_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_attribute_t *attribute,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
      int indentation_level,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_mft_entry_fprint(
      info_handle_t *info_handle,
      uint64_t mft_entry_index,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_mft_entries_fprint(
      info_handle_t *info_handle,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_file_entry_fprint(
      info_handle_t *info_handle,
      const system_character_t *path,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_file_system_hierarchy_fprint(
      info_handle_t *info_handle,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 void info_handle_usn_record_update_reason_flags_fprint(
       uint32_t update_reason_flags,
@@ -187,7 +193,7 @@ void info_handle_usn_record_update_source_flags_fprint(
 int info_handle_usn_record_fprint(
      info_handle_t *info_handle,
      libfusn_record_t *usn_record,
-     libfsntfs_error_t **error );
+     libcerror_error_t **error );
 
 int info_handle_usn_change_journal_fprint(
      info_handle_t *info_handle,

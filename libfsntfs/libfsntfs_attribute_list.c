@@ -39,14 +39,14 @@
 /* Reads the attribute list
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_attribute_list_read(
+int libfsntfs_attribute_list_read_data(
      libcdata_array_t *attribute_list,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *list_attribute = NULL;
-	static char *function                 = "libfsntfs_attribute_list_read";
+	static char *function                 = "libfsntfs_attribute_list_read_data";
 	size_t attribute_data_offset          = 0;
 	ssize_t read_count                    = 0;
 	int attribute_index                   = 0;
@@ -262,7 +262,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_list_read(
+		if( libfsntfs_attribute_list_read_data(
 		     attribute_list,
 		     data,
 		     (size_t) data_size,
@@ -415,7 +415,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 			{
 				cluster_block_data_size = (size_t) data_size;
 			}
-			if( libfsntfs_attribute_list_read(
+			if( libfsntfs_attribute_list_read_data(
 			     attribute_list,
 			     cluster_block->data,
 			     cluster_block_data_size,

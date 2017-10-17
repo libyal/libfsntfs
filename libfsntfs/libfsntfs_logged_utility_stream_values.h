@@ -48,7 +48,7 @@ int libfsntfs_logged_utility_stream_values_free(
      libfsntfs_logged_utility_stream_values_t **logged_utility_stream_values,
      libcerror_error_t **error );
 
-int libfsntfs_logged_utility_stream_values_read(
+int libfsntfs_logged_utility_stream_values_read_data(
      libfsntfs_logged_utility_stream_values_t *logged_utility_stream_values,
      const uint8_t *data,
      size_t data_size,

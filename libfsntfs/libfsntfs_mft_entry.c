@@ -1733,7 +1733,7 @@ int libfsntfs_mft_entry_read_directory_entries_tree(
 			 "\n" );
 		}
 #endif
-		if( libfsntfs_file_name_values_read(
+		if( libfsntfs_file_name_values_read_data(
 		     file_name_values,
 		     index_value->key_data,
 		     (size_t) index_value->key_data_size,

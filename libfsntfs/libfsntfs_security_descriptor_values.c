@@ -141,13 +141,13 @@ int libfsntfs_security_descriptor_values_free(
 /* Reads the security descriptor values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_security_descriptor_values_read(
+int libfsntfs_security_descriptor_values_read_data(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function                              = "libfsntfs_security_descriptor_values_read";
+	static char *function                              = "libfsntfs_security_descriptor_values_read_data";
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libfwnt_security_descriptor_t *security_descriptor = NULL;
@@ -347,7 +347,7 @@ int libfsntfs_security_descriptor_values_read_buffer(
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_values_read(
+	if( libfsntfs_security_descriptor_values_read_data(
 	     security_descriptor_values,
 	     security_descriptor_values->data,
 	     security_descriptor_values->data_size,
@@ -471,7 +471,7 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_values_read(
+	if( libfsntfs_security_descriptor_values_read_data(
 	     security_descriptor_values,
 	     security_descriptor_values->data,
 	     security_descriptor_values->data_size,

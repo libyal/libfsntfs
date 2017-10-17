@@ -664,7 +664,7 @@ int libfsntfs_file_entry_get_journal_sequence_number(
  */
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
@@ -715,7 +715,7 @@ int libfsntfs_file_entry_get_creation_time(
 	}
 	if( libfsntfs_standard_information_values_get_creation_time(
 	     standard_information_values,
-	     creation_time,
+	     filetime,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -736,7 +736,7 @@ int libfsntfs_file_entry_get_creation_time(
  */
 int libfsntfs_file_entry_get_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
@@ -787,7 +787,7 @@ int libfsntfs_file_entry_get_modification_time(
 	}
 	if( libfsntfs_standard_information_values_get_modification_time(
 	     standard_information_values,
-	     modification_time,
+	     filetime,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -808,7 +808,7 @@ int libfsntfs_file_entry_get_modification_time(
  */
 int libfsntfs_file_entry_get_access_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
@@ -859,7 +859,7 @@ int libfsntfs_file_entry_get_access_time(
 	}
 	if( libfsntfs_standard_information_values_get_access_time(
 	     standard_information_values,
-	     access_time,
+	     filetime,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -880,7 +880,7 @@ int libfsntfs_file_entry_get_access_time(
  */
 int libfsntfs_file_entry_get_entry_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry                 = NULL;
@@ -931,7 +931,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 	}
 	if( libfsntfs_standard_information_values_get_entry_modification_time(
 	     standard_information_values,
-	     entry_modification_time,
+	     filetime,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

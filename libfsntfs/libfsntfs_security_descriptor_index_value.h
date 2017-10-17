@@ -67,7 +67,7 @@ int libfsntfs_security_descriptor_index_value_compare(
      libfsntfs_security_descriptor_index_value_t *second_security_descriptor_index_value,
      libcerror_error_t **error );
 
-int libfsntfs_security_descriptor_index_value_read(
+int libfsntfs_security_descriptor_index_value_read_data(
      libfsntfs_security_descriptor_index_value_t *security_descriptor_index_value,
      const uint8_t *data,
      size_t data_size,

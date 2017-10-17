@@ -35,25 +35,25 @@ extern "C" {
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_creation_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_access_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_entry_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

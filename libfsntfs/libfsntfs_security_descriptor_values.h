@@ -54,7 +54,7 @@ int libfsntfs_security_descriptor_values_free(
      libfsntfs_security_descriptor_values_t **security_descriptor_values,
      libcerror_error_t **error );
 
-int libfsntfs_security_descriptor_values_read(
+int libfsntfs_security_descriptor_values_read_data(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
      const uint8_t *data,
      size_t data_size,

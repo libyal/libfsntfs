@@ -52,7 +52,7 @@ int libfsntfs_volume_name_values_free(
      libfsntfs_volume_name_values_t **volume_name_values,
      libcerror_error_t **error );
 
-int libfsntfs_volume_name_values_read(
+int libfsntfs_volume_name_values_read_data(
      libfsntfs_volume_name_values_t *volume_name_values,
      const uint8_t *data,
      size_t data_size,

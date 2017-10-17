@@ -25,6 +25,7 @@
 #include <system_string.h>
 #include <types.h>
 
+#include "libfsntfs_debug.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
@@ -139,20 +140,13 @@ int libfsntfs_object_identifier_values_free(
 /* Reads the object identifier values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_object_identifier_values_read(
+int libfsntfs_object_identifier_values_read_data(
      libfsntfs_object_identifier_values_t *object_identifier_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function       = "libfsntfs_object_identifier_read";
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t guid_string[ 48 ];
-
-        libfguid_identifier_t *guid = NULL;
-	int result                  = 0;
-#endif
+	static char *function = "libfsntfs_object_identifier_read_data";
 
 	if( object_identifier_values == NULL )
 	{
@@ -210,7 +204,7 @@ int libfsntfs_object_identifier_values_read(
 		 function,
 		 data_size );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( memory_copy(
 	     object_identifier_values->droid_file_identifier,
@@ -224,83 +218,28 @@ int libfsntfs_object_identifier_values_read(
 		 "%s: unable to copy droid file identifier.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( libfguid_identifier_initialize(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create GUID.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfguid_identifier_copy_from_byte_stream(
-		     guid,
+		if( libfsntfs_debug_print_guid_value(
+		     function,
+		     "droid file identifier\t\t\t",
 		     object_identifier_values->droid_file_identifier,
 		     16,
 		     LIBFGUID_ENDIAN_LITTLE,
+		     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy byte stream to GUID.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print GUID value.",
 			 function );
 
-			goto on_error;
-		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfguid_identifier_copy_to_utf16_string(
-			  guid,
-			  (uint16_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#else
-		result = libfguid_identifier_copy_to_utf8_string(
-			  guid,
-			  (uint8_t *) guid_string,
-			  48,
-			  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy GUID to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: droid file identifier\t\t\t: %" PRIs_SYSTEM "\n",
-		 function,
-		 guid_string );
-
-		if( libfguid_identifier_free(
-		     &guid,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free GUID.",
-			 function );
-
-			goto on_error;
+			return( -1 );
 		}
 	}
 #endif
@@ -318,7 +257,7 @@ int libfsntfs_object_identifier_values_read(
 			 "%s: unable to copy birth droid volume identifier.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 		if( memory_copy(
 		     object_identifier_values->birth_droid_file_identifier,
@@ -332,7 +271,7 @@ int libfsntfs_object_identifier_values_read(
 			 "%s: unable to copy birth droid file identifier.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 		if( memory_copy(
 		     object_identifier_values->birth_droid_domain_identifier,
@@ -346,177 +285,64 @@ int libfsntfs_object_identifier_values_read(
 			 "%s: unable to copy birth droid domain identifier.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			if( libfguid_identifier_initialize(
-			     &guid,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create GUID.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfguid_identifier_copy_from_byte_stream(
-			     guid,
+			if( libfsntfs_debug_print_guid_value(
+			     function,
+			     "birth droid volume identifier\t\t",
 			     object_identifier_values->birth_droid_volume_identifier,
 			     16,
 			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy byte stream to GUID.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libfguid_identifier_copy_to_utf16_string(
-				  guid,
-				  (uint16_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#else
-			result = libfguid_identifier_copy_to_utf8_string(
-				  guid,
-				  (uint8_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy GUID to string.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: birth droid volume identifier\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 guid_string );
-
-			if( libfguid_identifier_copy_from_byte_stream(
-			     guid,
+			if( libfsntfs_debug_print_guid_value(
+			     function,
+			     "birth droid file identifier\t\t",
 			     object_identifier_values->birth_droid_file_identifier,
 			     16,
 			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy byte stream to GUID.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
 				 function );
 
-				goto on_error;
+				return( -1 );
 			}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libfguid_identifier_copy_to_utf16_string(
-				  guid,
-				  (uint16_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#else
-			result = libfguid_identifier_copy_to_utf8_string(
-				  guid,
-				  (uint8_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy GUID to string.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: birth droid file identifier\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 guid_string );
-
-			if( libfguid_identifier_copy_from_byte_stream(
-			     guid,
+			if( libfsntfs_debug_print_guid_value(
+			     function,
+			     "birth droid domain identifier\t\t",
 			     object_identifier_values->birth_droid_domain_identifier,
 			     16,
 			     LIBFGUID_ENDIAN_LITTLE,
+			     LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy byte stream to GUID.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print GUID value.",
 				 function );
 
-				goto on_error;
-			}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libfguid_identifier_copy_to_utf16_string(
-				  guid,
-				  (uint16_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#else
-			result = libfguid_identifier_copy_to_utf8_string(
-				  guid,
-				  (uint8_t *) guid_string,
-				  48,
-				  LIBFGUID_STRING_FORMAT_FLAG_USE_LOWER_CASE,
-				  error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy GUID to string.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: birth droid domain identifier\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 guid_string );
-
-			if( libfguid_identifier_free(
-			     &guid,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free GUID.",
-				 function );
-
-				goto on_error;
+				return( -1 );
 			}
 		}
 #endif
@@ -529,16 +355,5 @@ int libfsntfs_object_identifier_values_read(
 	}
 #endif
 	return( 1 );
-
-on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( guid != NULL )
-	{
-		libfguid_identifier_free(
-		 &guid,
-		 NULL );
-	}
-#endif
-	return( -1 );
 }
 

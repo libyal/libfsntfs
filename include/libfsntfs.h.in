@@ -532,7 +532,7 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_creation_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the modification date and time
@@ -542,7 +542,7 @@ int libfsntfs_file_entry_get_creation_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the access date and time
@@ -552,7 +552,7 @@ int libfsntfs_file_entry_get_modification_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_access_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the entry modification date and time
@@ -562,7 +562,7 @@ int libfsntfs_file_entry_get_access_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_entry_modification_time(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the file attribute flags
@@ -1115,7 +1115,7 @@ int libfsntfs_file_name_attribute_get_parent_file_reference(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_creation_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the modification date and time
@@ -1124,7 +1124,7 @@ int libfsntfs_file_name_attribute_get_creation_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the access date and time
@@ -1133,7 +1133,7 @@ int libfsntfs_file_name_attribute_get_modification_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_access_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the entry modification date and time
@@ -1142,7 +1142,7 @@ int libfsntfs_file_name_attribute_get_access_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_entry_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the file attribute flags
@@ -1359,7 +1359,7 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor(
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_creation_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the modification date and time
@@ -1368,7 +1368,7 @@ int libfsntfs_standard_information_attribute_get_creation_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the access date and time
@@ -1377,7 +1377,7 @@ int libfsntfs_standard_information_attribute_get_modification_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_access_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the entry modification date and time
@@ -1386,7 +1386,7 @@ int libfsntfs_standard_information_attribute_get_access_time(
 LIBFSNTFS_EXTERN \
 int libfsntfs_standard_information_attribute_get_entry_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libfsntfs_error_t **error );
 
 /* Retrieves the file attribute flags

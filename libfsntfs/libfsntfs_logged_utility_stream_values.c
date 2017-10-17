@@ -137,13 +137,13 @@ int libfsntfs_logged_utility_stream_values_free(
 /* Reads the logged utility stream values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_logged_utility_stream_values_read(
+int libfsntfs_logged_utility_stream_values_read_data(
      libfsntfs_logged_utility_stream_values_t *logged_utility_stream_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_logged_utility_stream_values_read";
+	static char *function = "libfsntfs_logged_utility_stream_values_read_data";
 
 	if( logged_utility_stream_values == NULL )
 	{

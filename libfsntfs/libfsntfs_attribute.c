@@ -1855,7 +1855,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_bitmap_values_read(
+				if( libfsntfs_bitmap_values_read_data(
 				     (libfsntfs_bitmap_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -1888,7 +1888,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_file_name_values_read(
+				if( libfsntfs_file_name_values_read_data(
 				     (libfsntfs_file_name_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -1942,7 +1942,7 @@ int libfsntfs_attribute_read_value(
 
 						goto on_error;
 					}
-					if( libfsntfs_txf_data_values_read(
+					if( libfsntfs_txf_data_values_read_data(
 					     (libfsntfs_txf_data_values_t *) internal_attribute->value,
 					     internal_attribute->data,
 					     (size_t) internal_attribute->data_size,
@@ -1975,7 +1975,7 @@ int libfsntfs_attribute_read_value(
 
 						goto on_error;
 					}
-					if( libfsntfs_logged_utility_stream_values_read(
+					if( libfsntfs_logged_utility_stream_values_read_data(
 					     (libfsntfs_logged_utility_stream_values_t *) internal_attribute->value,
 					     internal_attribute->data,
 					     (size_t) internal_attribute->data_size,
@@ -2009,7 +2009,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_object_identifier_values_read(
+				if( libfsntfs_object_identifier_values_read_data(
 				     (libfsntfs_object_identifier_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -2042,7 +2042,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_reparse_point_values_read(
+				if( libfsntfs_reparse_point_values_read_data(
 				     (libfsntfs_reparse_point_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -2108,7 +2108,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_standard_information_values_read(
+				if( libfsntfs_standard_information_values_read_data(
 				     (libfsntfs_standard_information_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -2141,7 +2141,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_volume_information_values_read(
+				if( libfsntfs_volume_information_values_read_data(
 				     (libfsntfs_volume_information_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -2174,7 +2174,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				if( libfsntfs_volume_name_values_read(
+				if( libfsntfs_volume_name_values_read_data(
 				     (libfsntfs_volume_name_values_t *) internal_attribute->value,
 				     internal_attribute->data,
 				     (size_t) internal_attribute->data_size,
@@ -2428,7 +2428,7 @@ int libfsntfs_attribute_read_value(
 					switch( internal_attribute->type )
 					{
 						case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
-							if( libfsntfs_bitmap_values_read(
+							if( libfsntfs_bitmap_values_read_data(
 							     (libfsntfs_bitmap_values_t *) internal_attribute->value,
 							     cluster_block->data,
 							     cluster_block->data_size,

@@ -137,13 +137,13 @@ int libfsntfs_volume_information_values_free(
 /* Reads the volume information values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_volume_information_values_read(
+int libfsntfs_volume_information_values_read_data(
      libfsntfs_volume_information_values_t *volume_information_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_volume_information_values_read";
+	static char *function = "libfsntfs_volume_information_values_read_data";
 
 	if( volume_information_values == NULL )
 	{

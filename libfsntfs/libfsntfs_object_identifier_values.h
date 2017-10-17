@@ -60,7 +60,7 @@ int libfsntfs_object_identifier_values_free(
      libfsntfs_object_identifier_values_t **object_identifier_values,
      libcerror_error_t **error );
 
-int libfsntfs_object_identifier_values_read(
+int libfsntfs_object_identifier_values_read_data(
      libfsntfs_object_identifier_values_t *object_identifier_values,
      const uint8_t *data,
      size_t data_size,

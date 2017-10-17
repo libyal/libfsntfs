@@ -65,7 +65,7 @@ int libfsntfs_txf_data_values_free(
      libfsntfs_txf_data_values_t **txf_data_values,
      libcerror_error_t **error );
 
-int libfsntfs_txf_data_values_read(
+int libfsntfs_txf_data_values_read_data(
      libfsntfs_txf_data_values_t *txf_data_values,
      const uint8_t *data,
      size_t data_size,

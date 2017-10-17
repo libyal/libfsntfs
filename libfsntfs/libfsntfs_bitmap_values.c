@@ -134,13 +134,13 @@ int libfsntfs_bitmap_values_free(
 /* Reads the bitmap values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_bitmap_values_read(
+int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function             = "libfsntfs_bitmap_values_read";
+	static char *function             = "libfsntfs_bitmap_values_read_data";
 	size_t data_offset                = 0;
 	uint8_t bit_index                 = 0;
 	uint8_t byte_value                = 0;

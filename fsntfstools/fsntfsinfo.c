@@ -137,7 +137,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libfsntfs_error_t *error                   = NULL;
+	libcerror_error_t *error                   = NULL;
 	system_character_t *option_file_entry      = NULL;
 	system_character_t *option_mft_entry_index = NULL;
 	system_character_t *option_volume_offset   = NULL;

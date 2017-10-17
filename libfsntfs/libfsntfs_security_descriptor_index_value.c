@@ -181,13 +181,13 @@ int libfsntfs_security_descriptor_index_value_compare(
 /* Reads the security descriptor index value
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_security_descriptor_index_value_read(
+int libfsntfs_security_descriptor_index_value_read_data(
      libfsntfs_security_descriptor_index_value_t *security_descriptor_index_value,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_security_descriptor_index_value_read";
+	static char *function = "libfsntfs_security_descriptor_index_value_read_data";
 
 	if( security_descriptor_index_value == NULL )
 	{

@@ -138,13 +138,13 @@ int libfsntfs_txf_data_values_free(
 /* Reads the TxF data values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_txf_data_values_read(
+int libfsntfs_txf_data_values_read_data(
      libfsntfs_txf_data_values_t *txf_data_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_txf_data_values_read";
+	static char *function = "libfsntfs_txf_data_values_read_data";
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint64_t value_64bit  = 0;

@@ -35,7 +35,7 @@
 extern "C" {
 #endif
 
-int libfsntfs_attribute_list_read(
+int libfsntfs_attribute_list_read_data(
      libcdata_array_t *attribute_list,
      const uint8_t *data,
      size_t data_size,

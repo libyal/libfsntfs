@@ -34,7 +34,7 @@
  */
 int libfsntfs_standard_information_attribute_get_creation_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_standard_information_values_t *standard_information_values = NULL;
@@ -78,18 +78,18 @@ int libfsntfs_standard_information_attribute_get_creation_time(
 	}
 	standard_information_values = (libfsntfs_standard_information_values_t *) internal_attribute->value;
 
-	if( creation_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid creation time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*creation_time = standard_information_values->creation_time;
+	*filetime = standard_information_values->creation_time;
 
 	return( 1 );
 }
@@ -99,7 +99,7 @@ int libfsntfs_standard_information_attribute_get_creation_time(
  */
 int libfsntfs_standard_information_attribute_get_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_standard_information_values_t *standard_information_values = NULL;
@@ -143,18 +143,18 @@ int libfsntfs_standard_information_attribute_get_modification_time(
 	}
 	standard_information_values = (libfsntfs_standard_information_values_t *) internal_attribute->value;
 
-	if( modification_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid modification time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*modification_time = standard_information_values->modification_time;
+	*filetime = standard_information_values->modification_time;
 
 	return( 1 );
 }
@@ -164,7 +164,7 @@ int libfsntfs_standard_information_attribute_get_modification_time(
  */
 int libfsntfs_standard_information_attribute_get_access_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_standard_information_values_t *standard_information_values = NULL;
@@ -208,18 +208,18 @@ int libfsntfs_standard_information_attribute_get_access_time(
 	}
 	standard_information_values = (libfsntfs_standard_information_values_t *) internal_attribute->value;
 
-	if( access_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid access time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*access_time = standard_information_values->access_time;
+	*filetime = standard_information_values->access_time;
 
 	return( 1 );
 }
@@ -229,7 +229,7 @@ int libfsntfs_standard_information_attribute_get_access_time(
  */
 int libfsntfs_standard_information_attribute_get_entry_modification_time(
      libfsntfs_attribute_t *attribute,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libfsntfs_standard_information_values_t *standard_information_values = NULL;
@@ -273,18 +273,18 @@ int libfsntfs_standard_information_attribute_get_entry_modification_time(
 	}
 	standard_information_values = (libfsntfs_standard_information_values_t *) internal_attribute->value;
 
-	if( entry_modification_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid entry modification time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*entry_modification_time = standard_information_values->entry_modification_time;
+	*filetime = standard_information_values->entry_modification_time;
 
 	return( 1 );
 }

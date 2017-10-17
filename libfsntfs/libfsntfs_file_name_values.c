@@ -242,25 +242,22 @@ on_error:
 /* Reads the file name values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_file_name_values_read(
+int libfsntfs_file_name_values_read_data(
      libfsntfs_file_name_values_t *file_name_values,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function             = "libfsntfs_file_name_values_read";
-	size_t data_offset                = 0;
-	uint16_t name_size                = 0;
+	static char *function            = "libfsntfs_file_name_values_read_data";
+	size_t data_offset               = 0;
+	uint16_t name_size               = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t filetime_string[ 32 ];
-
-	libfdatetime_filetime_t *filetime = NULL;
-	system_character_t *value_string  = NULL;
-	size_t value_string_size          = 0;
-	uint64_t value_64bit              = 0;
-	uint32_t value_32bit              = 0;
-	int result                        = 0;
+	system_character_t *value_string = NULL;
+	size_t value_string_size         = 0;
+	uint64_t value_64bit             = 0;
+	uint32_t value_32bit             = 0;
+	int result                       = 0;
 #endif
 
 	if( file_name_values == NULL )
@@ -345,207 +342,78 @@ int libfsntfs_file_name_values_read(
 		 file_name_values->parent_file_reference & 0xffffffffffffUL,
 		 file_name_values->parent_file_reference >> 48 );
 
-		if( libfdatetime_filetime_initialize(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create filetime.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfdatetime_filetime_copy_from_byte_stream(
-		     filetime,
+		if( libfsntfs_debug_print_filetime_value(
+		     function,
+		     "creation time\t\t\t\t",
 		     ( (fsntfs_file_name_t *) data )->creation_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from byte stream.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print filetime value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-			  filetime,
-			  (uint16_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-			  filetime,
-			  (uint8_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: creation time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
-		if( libfdatetime_filetime_copy_from_byte_stream(
-		     filetime,
+		if( libfsntfs_debug_print_filetime_value(
+		     function,
+		     "modification time\t\t\t",
 		     ( (fsntfs_file_name_t *) data )->modification_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from byte stream.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print filetime value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-			  filetime,
-			  (uint16_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-			  filetime,
-			  (uint8_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: modification time\t\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
-		if( libfdatetime_filetime_copy_from_byte_stream(
-		     filetime,
+		if( libfsntfs_debug_print_filetime_value(
+		     function,
+		     "entry modification time\t\t",
 		     ( (fsntfs_file_name_t *) data )->entry_modification_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from byte stream.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print filetime value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-			  filetime,
-			  (uint16_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-			  filetime,
-			  (uint8_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: entry modification time\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
-		if( libfdatetime_filetime_copy_from_byte_stream(
-		     filetime,
+		if( libfsntfs_debug_print_filetime_value(
+		     function,
+		     "access time\t\t\t\t",
 		     ( (fsntfs_file_name_t *) data )->access_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from byte stream.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print filetime value.",
 			 function );
 
 			goto on_error;
 		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-			  filetime,
-			  (uint16_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-			  filetime,
-			  (uint8_t *) filetime_string,
-			  32,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: access time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (fsntfs_file_name_t *) data )->allocated_file_size,
 		 value_64bit );
@@ -590,20 +458,6 @@ int libfsntfs_file_name_values_read(
 		 file_name_values->name_namespace,
 		 libfsntfs_debug_print_file_name_attribute_namespace(
 		  file_name_values->name_namespace ) );
-
-		if( libfdatetime_filetime_free(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free filetime.",
-			 function );
-
-			goto on_error;
-		}
 	}
 #endif
 	data_offset = sizeof( fsntfs_file_name_t );
@@ -738,12 +592,6 @@ on_error:
 		memory_free(
 		 value_string );
 	}
-	if( filetime != NULL )
-	{
-		libfdatetime_filetime_free(
-		 &filetime,
-		 NULL );
-	}
 #endif
 	if( file_name_values->name != NULL )
 	{
@@ -799,7 +647,7 @@ int libfsntfs_file_name_values_get_parent_file_reference(
  */
 int libfsntfs_file_name_values_get_creation_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *creation_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_creation_time";
@@ -815,18 +663,18 @@ int libfsntfs_file_name_values_get_creation_time(
 
 		return( -1 );
 	}
-	if( creation_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid creation time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*creation_time = file_name_values->creation_time;
+	*filetime = file_name_values->creation_time;
 
 	return( 1 );
 }
@@ -836,7 +684,7 @@ int libfsntfs_file_name_values_get_creation_time(
  */
 int libfsntfs_file_name_values_get_modification_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_modification_time";
@@ -852,18 +700,18 @@ int libfsntfs_file_name_values_get_modification_time(
 
 		return( -1 );
 	}
-	if( modification_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid modification time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*modification_time = file_name_values->modification_time;
+	*filetime = file_name_values->modification_time;
 
 	return( 1 );
 }
@@ -873,7 +721,7 @@ int libfsntfs_file_name_values_get_modification_time(
  */
 int libfsntfs_file_name_values_get_access_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *access_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_access_time";
@@ -889,18 +737,18 @@ int libfsntfs_file_name_values_get_access_time(
 
 		return( -1 );
 	}
-	if( access_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid access time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*access_time = file_name_values->access_time;
+	*filetime = file_name_values->access_time;
 
 	return( 1 );
 }
@@ -910,7 +758,7 @@ int libfsntfs_file_name_values_get_access_time(
  */
 int libfsntfs_file_name_values_get_entry_modification_time(
      libfsntfs_file_name_values_t *file_name_values,
-     uint64_t *entry_modification_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_entry_modification_time";
@@ -926,18 +774,18 @@ int libfsntfs_file_name_values_get_entry_modification_time(
 
 		return( -1 );
 	}
-	if( entry_modification_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid entry modification time.",
+		 "%s: invalid FILETIME.",
 		 function );
 
 		return( -1 );
 	}
-	*entry_modification_time = file_name_values->entry_modification_time;
+	*filetime = file_name_values->entry_modification_time;
 
 	return( 1 );
 }
