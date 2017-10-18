@@ -153,6 +153,11 @@ int libfsntfs_mft_entry_free(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_clone(
+     libfsntfs_mft_entry_t **destination_mft_entry,
+     libfsntfs_mft_entry_t *source_mft_entry,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_read(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,

@@ -850,9 +850,9 @@ int fsntfs_test_attribute_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -868,9 +868,9 @@ int fsntfs_test_attribute_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -886,9 +886,9 @@ int fsntfs_test_attribute_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1136,9 +1136,9 @@ int fsntfs_test_attribute_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1154,9 +1154,9 @@ int fsntfs_test_attribute_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1172,9 +1172,9 @@ int fsntfs_test_attribute_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );

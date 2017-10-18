@@ -25,11 +25,11 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_directory.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
@@ -67,6 +67,10 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
+	/* The directory
+	 */
+	libfsntfs_directory_t *directory;
+
 	/* The security descriptor index
 	 */
 	libfsntfs_security_descriptor_index_t *security_descriptor_index;
@@ -86,10 +90,6 @@ struct libfsntfs_internal_file_entry
 	/* The default (nameless) $DATA attribute cluster block stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
-
-	/* The directory entries tree
-	 */
-	libcdata_btree_t *directory_entries_tree;
 
 	/* The flags
 	 */

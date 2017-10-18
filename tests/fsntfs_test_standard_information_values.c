@@ -1158,7 +1158,7 @@ int main(
 	 "libfsntfs_standard_information_values_free",
 	 fsntfs_test_standard_information_values_free );
 
-	/* TODO: add tests for libfsntfs_standard_information_values_read */
+	/* TODO: add tests for libfsntfs_standard_information_values_read_data */
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_standard_information_values_get_creation_time",

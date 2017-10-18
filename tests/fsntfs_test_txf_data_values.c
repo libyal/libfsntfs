@@ -297,7 +297,7 @@ int main(
 	 "libfsntfs_txf_data_values_free",
 	 fsntfs_test_txf_data_values_free );
 
-	/* TODO: add tests for libfsntfs_txf_data_values_read */
+	/* TODO: add tests for libfsntfs_txf_data_values_read_data */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

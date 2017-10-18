@@ -833,7 +833,7 @@ int libfsntfs_file_name_values_get_file_attribute_flags(
  */
 int libfsntfs_file_name_values_get_utf8_name_size(
      libfsntfs_file_name_values_t *file_name_values,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_utf8_name_size";
@@ -853,7 +853,7 @@ int libfsntfs_file_name_values_get_utf8_name_size(
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
 	     LIBUNA_ENDIAN_LITTLE,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -874,8 +874,8 @@ int libfsntfs_file_name_values_get_utf8_name_size(
  */
 int libfsntfs_file_name_values_get_utf8_name(
      libfsntfs_file_name_values_t *file_name_values,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_utf8_name";
@@ -892,8 +892,8 @@ int libfsntfs_file_name_values_get_utf8_name(
 		return( -1 );
 	}
 	if( libuna_utf8_string_copy_from_utf16_stream(
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
 	     LIBUNA_ENDIAN_LITTLE,
@@ -917,7 +917,7 @@ int libfsntfs_file_name_values_get_utf8_name(
  */
 int libfsntfs_file_name_values_get_utf16_name_size(
      libfsntfs_file_name_values_t *file_name_values,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_utf16_name_size";
@@ -937,7 +937,7 @@ int libfsntfs_file_name_values_get_utf16_name_size(
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
 	     LIBUNA_ENDIAN_LITTLE,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -958,8 +958,8 @@ int libfsntfs_file_name_values_get_utf16_name_size(
  */
 int libfsntfs_file_name_values_get_utf16_name(
      libfsntfs_file_name_values_t *file_name_values,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_file_name_values_get_utf16_name";
@@ -976,8 +976,8 @@ int libfsntfs_file_name_values_get_utf16_name(
 		return( -1 );
 	}
 	if( libuna_utf16_string_copy_from_utf16_stream(
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
 	     LIBUNA_ENDIAN_LITTLE,

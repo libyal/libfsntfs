@@ -477,9 +477,9 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -495,9 +495,9 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -513,9 +513,9 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -763,9 +763,9 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -781,9 +781,9 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -799,9 +799,9 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -869,7 +869,7 @@ int main(
 	 "libfsntfs_volume_name_values_free",
 	 fsntfs_test_volume_name_values_free );
 
-	/* TODO: add tests for libfsntfs_volume_name_values_read */
+	/* TODO: add tests for libfsntfs_volume_name_values_read_data */
 
 	/* TODO: add tests for libfsntfs_volume_name_values_read_from_attribute */
 

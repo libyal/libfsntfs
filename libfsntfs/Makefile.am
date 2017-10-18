@@ -38,15 +38,16 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_attribute.c libfsntfs_attribute.h \
 	libfsntfs_attribute_list.c libfsntfs_attribute_list.h \
 	libfsntfs_bitmap_values.c libfsntfs_bitmap_values.h \
-	libfsntfs_data_run.c libfsntfs_data_run.h \
-	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_cluster_block.c libfsntfs_cluster_block.h \
 	libfsntfs_cluster_block_stream.c libfsntfs_cluster_block_stream.h \
 	libfsntfs_cluster_block_vector.c libfsntfs_cluster_block_vector.h \
 	libfsntfs_compressed_block.c libfsntfs_compressed_block.h \
 	libfsntfs_compressed_block_descriptor.c libfsntfs_compressed_block_descriptor.h \
+	libfsntfs_data_run.c libfsntfs_data_run.h \
+	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_debug.c libfsntfs_debug.h \
 	libfsntfs_definitions.h \
+	libfsntfs_directory.c libfsntfs_directory.h \
 	libfsntfs_directory_entries_tree.c libfsntfs_directory_entries_tree.h \
 	libfsntfs_directory_entry.c libfsntfs_directory_entry.h \
 	libfsntfs_error.c libfsntfs_error.h \

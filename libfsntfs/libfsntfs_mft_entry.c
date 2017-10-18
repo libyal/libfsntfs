@@ -369,6 +369,71 @@ int libfsntfs_mft_entry_free(
 	return( result );
 }
 
+/* Clones a MFT entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_clone(
+     libfsntfs_mft_entry_t **destination_mft_entry,
+     libfsntfs_mft_entry_t *source_mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_clone";
+
+	if( destination_mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_mft_entry != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination MFT entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_mft_entry == NULL )
+	{
+		*destination_mft_entry = source_mft_entry;
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_entry_initialize(
+	     destination_mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination MFT entry.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO clone values */
+
+	return( 1 );
+
+on_error:
+	if( *destination_mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 destination_mft_entry,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Reads a specific MFT entry
  * Returns 1 if successful or -1 on error
  */

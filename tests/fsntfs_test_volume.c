@@ -578,6 +578,8 @@ int fsntfs_test_volume_close_source(
 	return( result );
 }
 
+#include "../libfsntfs/libfsntfs_volume.h"
+
 /* Tests the libfsntfs_volume_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -1679,9 +1681,9 @@ int fsntfs_test_volume_get_utf8_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1875,9 +1877,9 @@ int fsntfs_test_volume_get_utf16_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -2362,9 +2364,9 @@ int main(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 	}
 	if( result != 0 )
 	{
@@ -2409,13 +2411,13 @@ int main(
 		 result,
 		 1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "volume",
-	         volume );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "volume",
+		 volume );
 
-	        FSNTFS_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_signal_abort",
@@ -2501,12 +2503,12 @@ int main(
 		 0 );
 
 		FSNTFS_TEST_ASSERT_IS_NULL(
-	         "volume",
-	         volume );
+		 "volume",
+		 volume );
 
-	        FSNTFS_TEST_ASSERT_IS_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
 	}
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 

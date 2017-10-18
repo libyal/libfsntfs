@@ -1,4 +1,4 @@
-.Dd April 18, 2016
+.Dd October 18, 2017
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -20,14 +20,20 @@ Support functions
 .Fn libfsntfs_set_codepage "int codepage, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_check_volume_signature "const char *filename, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_check_mft_metadata_file_signature "const char *filename, libfsntfs_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
 .Fn libfsntfs_check_volume_signature_wide "const wchar_t *filename, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_check_mft_metadata_file_signature_wide "const wchar_t *filename, libfsntfs_error_t **error"
 .Pp
 Available when compiled with libbfio support:
 .Ft int
 .Fn libfsntfs_check_volume_signature_file_io_handle "libbfio_handle_t *file_io_handle, libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_check_mft_metadata_file_signature_file_io_handle "libbfio_handle_t *file_io_handle, libfsntfs_error_t **error"
 .Pp
 Notify functions
 .Ft void
@@ -121,13 +127,13 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_journal_sequence_number "libfsntfs_file_entry_t *file_entry, uint64_t *journal_sequence_number, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_creation_time "libfsntfs_file_entry_t *file_entry, uint64_t *creation_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_creation_time "libfsntfs_file_entry_t *file_entry, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_modification_time "libfsntfs_file_entry_t *file_entry, uint64_t *modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_modification_time "libfsntfs_file_entry_t *file_entry, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_access_time "libfsntfs_file_entry_t *file_entry, uint64_t *access_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_access_time "libfsntfs_file_entry_t *file_entry, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_entry_modification_time "libfsntfs_file_entry_t *file_entry, uint64_t *entry_modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_entry_modification_time "libfsntfs_file_entry_t *file_entry, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_file_attribute_flags "libfsntfs_file_entry_t *file_entry, uint32_t *file_attribute_flags, libfsntfs_error_t **error"
 .Ft int
@@ -237,13 +243,13 @@ $FILE_NAME attribute functions
 .Ft int
 .Fn libfsntfs_file_name_attribute_get_parent_file_reference "libfsntfs_attribute_t *attribute, uint64_t *parent_file_reference, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_creation_time "libfsntfs_attribute_t *attribute, uint64_t *creation_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_creation_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_modification_time "libfsntfs_attribute_t *attribute, uint64_t *modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_modification_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_access_time "libfsntfs_attribute_t *attribute, uint64_t *access_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_access_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_entry_modification_time "libfsntfs_attribute_t *attribute, uint64_t *entry_modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_entry_modification_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_name_attribute_get_file_attribute_flags "libfsntfs_attribute_t *attribute, uint32_t *file_attribute_flags, libfsntfs_error_t **error"
 .Ft int
@@ -267,13 +273,13 @@ $SECURITY_DESCRIPTOR attribute functions
 .Pp
 $STANDARD_INFORMATION attribute functions
 .Ft int
-.Fn libfsntfs_standard_information_attribute_get_creation_time "libfsntfs_attribute_t *attribute, uint64_t *creation_time, libfsntfs_error_t **error"
+.Fn libfsntfs_standard_information_attribute_get_creation_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_standard_information_attribute_get_modification_time "libfsntfs_attribute_t *attribute, uint64_t *modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_standard_information_attribute_get_modification_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_standard_information_attribute_get_access_time "libfsntfs_attribute_t *attribute, uint64_t *access_time, libfsntfs_error_t **error"
+.Fn libfsntfs_standard_information_attribute_get_access_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_standard_information_attribute_get_entry_modification_time "libfsntfs_attribute_t *attribute, uint64_t *entry_modification_time, libfsntfs_error_t **error"
+.Fn libfsntfs_standard_information_attribute_get_entry_modification_time "libfsntfs_attribute_t *attribute, uint64_t *filetime, libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_standard_information_attribute_get_file_attribute_flags "libfsntfs_attribute_t *attribute, uint32_t *file_attribute_flags, libfsntfs_error_t **error"
 .Ft int

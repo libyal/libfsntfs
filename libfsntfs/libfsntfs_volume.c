@@ -31,6 +31,7 @@
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_directory.h"
 #include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_file_entry.h"
@@ -1659,6 +1660,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		return( -1 );
 	}
+/* TODO clone MFT entry */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_volume->io_handle,
@@ -1745,6 +1747,18 @@ int libfsntfs_volume_get_root_directory(
 
 		return( -1 );
 	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: 5.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO clone MFT entry */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_volume->io_handle,
@@ -2119,6 +2133,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 	}
 	else if( result != 0 )
 	{
+/* TODO clone MFT entry */
 		/* libfsntfs_file_entry_initialize takes over management of directory_entry
 		 */
 		if( libfsntfs_file_entry_initialize(
@@ -2505,6 +2520,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	}
 	else if( result != 0 )
 	{
+/* TODO clone MFT entry */
 		/* libfsntfs_file_entry_initialize takes over management of directory_entry
 		 */
 		if( libfsntfs_file_entry_initialize(

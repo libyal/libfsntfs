@@ -1,4 +1,10 @@
 TODO
+* create directory type and wrap directory_entries_tree
+
+* Check if mft_entry should be cloned before passing to
+  libfsntfs_file_entry_initialize in case it is cached out
+  otherwise remove it from file_entry
+
 * tests: pass mft_metadata_file different input files
 * look into handling directories with high number of entries
 * libfsntfs/pyfsntfs attribute

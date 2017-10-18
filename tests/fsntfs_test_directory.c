@@ -1,5 +1,5 @@
 /*
- * Library security_descriptor_values type test program
+ * Library directory type test program
  *
  * Copyright (C) 2010-2017, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,30 +33,30 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_security_descriptor_values.h"
+#include "../libfsntfs/libfsntfs_directory.h"
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-/* Tests the libfsntfs_security_descriptor_values_initialize function
+/* Tests the libfsntfs_directory_initialize function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_security_descriptor_values_initialize(
+int fsntfs_test_directory_initialize(
      void )
 {
-	libcerror_error_t *error                                           = NULL;
-	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
-	int result                                                         = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_directory_t *directory = NULL;
+	int result                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests                                    = 1;
-	int number_of_memset_fail_tests                                    = 1;
-	int test_number                                                    = 0;
+	int number_of_malloc_fail_tests  = 1;
+	int number_of_memset_fail_tests  = 1;
+	int test_number                  = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_security_descriptor_values_initialize(
-	          &security_descriptor_values,
+	result = libfsntfs_directory_initialize(
+	          &directory,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -65,15 +65,15 @@ int fsntfs_test_security_descriptor_values_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "security_descriptor_values",
-	 security_descriptor_values );
+	 "directory",
+	 directory );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libfsntfs_security_descriptor_values_free(
-	          &security_descriptor_values,
+	result = libfsntfs_directory_free(
+	          &directory,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -82,8 +82,8 @@ int fsntfs_test_security_descriptor_values_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "security_descriptor_values",
-	 security_descriptor_values );
+	 "directory",
+	 directory );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -91,7 +91,7 @@ int fsntfs_test_security_descriptor_values_initialize(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_security_descriptor_values_initialize(
+	result = libfsntfs_directory_initialize(
 	          NULL,
 	          &error );
 
@@ -107,10 +107,10 @@ int fsntfs_test_security_descriptor_values_initialize(
 	libcerror_error_free(
 	 &error );
 
-	security_descriptor_values = (libfsntfs_security_descriptor_values_t *) 0x12345678UL;
+	directory = (libfsntfs_directory_t *) 0x12345678UL;
 
-	result = libfsntfs_security_descriptor_values_initialize(
-	          &security_descriptor_values,
+	result = libfsntfs_directory_initialize(
+	          &directory,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -125,7 +125,7 @@ int fsntfs_test_security_descriptor_values_initialize(
 	libcerror_error_free(
 	 &error );
 
-	security_descriptor_values = NULL;
+	directory = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
@@ -133,22 +133,22 @@ int fsntfs_test_security_descriptor_values_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_security_descriptor_values_initialize with malloc failing
+		/* Test libfsntfs_directory_initialize with malloc failing
 		 */
 		fsntfs_test_malloc_attempts_before_fail = test_number;
 
-		result = libfsntfs_security_descriptor_values_initialize(
-		          &security_descriptor_values,
+		result = libfsntfs_directory_initialize(
+		          &directory,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
 		{
 			fsntfs_test_malloc_attempts_before_fail = -1;
 
-			if( security_descriptor_values != NULL )
+			if( directory != NULL )
 			{
-				libfsntfs_security_descriptor_values_free(
-				 &security_descriptor_values,
+				libfsntfs_directory_free(
+				 &directory,
 				 NULL );
 			}
 		}
@@ -160,8 +160,8 @@ int fsntfs_test_security_descriptor_values_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "security_descriptor_values",
-			 security_descriptor_values );
+			 "directory",
+			 directory );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -175,22 +175,22 @@ int fsntfs_test_security_descriptor_values_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_security_descriptor_values_initialize with memset failing
+		/* Test libfsntfs_directory_initialize with memset failing
 		 */
 		fsntfs_test_memset_attempts_before_fail = test_number;
 
-		result = libfsntfs_security_descriptor_values_initialize(
-		          &security_descriptor_values,
+		result = libfsntfs_directory_initialize(
+		          &directory,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
 		{
 			fsntfs_test_memset_attempts_before_fail = -1;
 
-			if( security_descriptor_values != NULL )
+			if( directory != NULL )
 			{
-				libfsntfs_security_descriptor_values_free(
-				 &security_descriptor_values,
+				libfsntfs_directory_free(
+				 &directory,
 				 NULL );
 			}
 		}
@@ -202,8 +202,8 @@ int fsntfs_test_security_descriptor_values_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "security_descriptor_values",
-			 security_descriptor_values );
+			 "directory",
+			 directory );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -223,19 +223,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( security_descriptor_values != NULL )
+	if( directory != NULL )
 	{
-		libfsntfs_security_descriptor_values_free(
-		 &security_descriptor_values,
+		libfsntfs_directory_free(
+		 &directory,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_security_descriptor_values_free function
+/* Tests the libfsntfs_directory_free function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_security_descriptor_values_free(
+int fsntfs_test_directory_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -243,7 +243,7 @@ int fsntfs_test_security_descriptor_values_free(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_security_descriptor_values_free(
+	result = libfsntfs_directory_free(
 	          NULL,
 	          &error );
 
@@ -270,22 +270,22 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_security_descriptor_values_get_data_size function
+/* Tests the libfsntfs_directory_get_number_of_entries function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_security_descriptor_values_get_data_size(
+int fsntfs_test_directory_get_number_of_entries(
      void )
 {
-	libcerror_error_t *error                                           = NULL;
-	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
-	size_t data_size                                                   = 0;
-	int data_size_is_set                                               = 0;
-	int result                                                         = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_directory_t *directory = NULL;
+	int number_of_entries            = 0;
+	int number_of_entries_is_set     = 0;
+	int result                       = 0;
 
 	/* Initialize test
 	 */
-	result = libfsntfs_security_descriptor_values_initialize(
-	          &security_descriptor_values,
+	result = libfsntfs_directory_initialize(
+	          &directory,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -294,8 +294,8 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "security_descriptor_values",
-	 security_descriptor_values );
+	 "directory",
+	 directory );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -303,9 +303,9 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_security_descriptor_values_get_data_size(
-	          security_descriptor_values,
-	          &data_size,
+	result = libfsntfs_directory_get_number_of_entries(
+	          directory,
+	          &number_of_entries,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
@@ -317,13 +317,13 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	 "error",
 	 error );
 
-	data_size_is_set = result;
+	number_of_entries_is_set = result;
 
 	/* Test error cases
 	 */
-	result = libfsntfs_security_descriptor_values_get_data_size(
+	result = libfsntfs_directory_get_number_of_entries(
 	          NULL,
-	          &data_size,
+	          &number_of_entries,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -338,10 +338,10 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	libcerror_error_free(
 	 &error );
 
-	if( data_size_is_set != 0 )
+	if( number_of_entries_is_set != 0 )
 	{
-		result = libfsntfs_security_descriptor_values_get_data_size(
-		          security_descriptor_values,
+		result = libfsntfs_directory_get_number_of_entries(
+		          directory,
 		          NULL,
 		          &error );
 
@@ -359,8 +359,8 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	}
 	/* Clean up
 	 */
-	result = libfsntfs_security_descriptor_values_free(
-	          &security_descriptor_values,
+	result = libfsntfs_directory_free(
+	          &directory,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -369,8 +369,8 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "security_descriptor_values",
-	 security_descriptor_values );
+	 "directory",
+	 directory );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -384,10 +384,10 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( security_descriptor_values != NULL )
+	if( directory != NULL )
 	{
-		libfsntfs_security_descriptor_values_free(
-		 &security_descriptor_values,
+		libfsntfs_directory_free(
+		 &directory,
 		 NULL );
 	}
 	return( 0 );
@@ -413,24 +413,24 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_security_descriptor_values_initialize",
-	 fsntfs_test_security_descriptor_values_initialize );
+	 "libfsntfs_directory_initialize",
+	 fsntfs_test_directory_initialize );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_security_descriptor_values_free",
-	 fsntfs_test_security_descriptor_values_free );
+	 "libfsntfs_directory_free",
+	 fsntfs_test_directory_free );
 
-	/* TODO: add tests for libfsntfs_security_descriptor_values_read_data */
-
-	/* TODO: add tests for fsntfs_test_security_descriptor_values_read_buffer */
-
-	/* TODO: add tests for libfsntfs_security_descriptor_values_read_stream */
+	/* TODO: add tests for libfsntfs_directory_read_file_io_handle */
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_security_descriptor_values_get_data_size",
-	 fsntfs_test_security_descriptor_values_get_data_size );
+	 "libfsntfs_directory_get_number_of_entries",
+	 fsntfs_test_directory_get_number_of_entries );
 
-	/* TODO: add tests for libfsntfs_security_descriptor_values_get_data */
+	/* TODO: add tests for libfsntfs_directory_get_entry_by_index */
+
+	/* TODO: add tests for libfsntfs_directory_get_entry_by_utf8_name */
+
+	/* TODO: add tests for libfsntfs_directory_get_entry_by_utf16_name */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

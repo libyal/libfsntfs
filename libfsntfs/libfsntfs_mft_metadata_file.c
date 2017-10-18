@@ -1274,6 +1274,7 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 
 		return( -1 );
 	}
+/* TODO clone MFT entry */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_mft_metadata_file->io_handle,

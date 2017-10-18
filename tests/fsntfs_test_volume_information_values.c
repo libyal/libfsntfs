@@ -297,7 +297,7 @@ int main(
 	 "libfsntfs_volume_information_values_free",
 	 fsntfs_test_volume_information_values_free );
 
-	/* TODO: add tests for libfsntfs_volume_information_values_read */
+	/* TODO: add tests for libfsntfs_volume_information_values_read_data */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

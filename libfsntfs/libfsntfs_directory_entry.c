@@ -89,7 +89,12 @@ int libfsntfs_directory_entry_initialize(
 		 "%s: unable to clear directory entry.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *directory_entry );
+
+		*directory_entry = NULL;
+
+		return( -1 );
 	}
 	return( 1 );
 

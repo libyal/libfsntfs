@@ -600,9 +600,9 @@ int fsntfs_test_reparse_point_values_get_utf8_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -618,9 +618,9 @@ int fsntfs_test_reparse_point_values_get_utf8_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -636,9 +636,9 @@ int fsntfs_test_reparse_point_values_get_utf8_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -886,9 +886,9 @@ int fsntfs_test_reparse_point_values_get_utf16_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -904,9 +904,9 @@ int fsntfs_test_reparse_point_values_get_utf16_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -922,9 +922,9 @@ int fsntfs_test_reparse_point_values_get_utf16_substitute_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1172,9 +1172,9 @@ int fsntfs_test_reparse_point_values_get_utf8_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1190,9 +1190,9 @@ int fsntfs_test_reparse_point_values_get_utf8_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1208,9 +1208,9 @@ int fsntfs_test_reparse_point_values_get_utf8_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1458,9 +1458,9 @@ int fsntfs_test_reparse_point_values_get_utf16_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1476,9 +1476,9 @@ int fsntfs_test_reparse_point_values_get_utf16_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1494,9 +1494,9 @@ int fsntfs_test_reparse_point_values_get_utf16_print_name(
 		 result,
 		 -1 );
 
-	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	         "error",
-	         error );
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
 
 		libcerror_error_free(
 		 &error );
@@ -1564,7 +1564,7 @@ int main(
 	 "libfsntfs_reparse_point_values_free",
 	 fsntfs_test_reparse_point_values_free );
 
-	/* TODO: add tests for libfsntfs_reparse_point_values_read */
+	/* TODO: add tests for libfsntfs_reparse_point_values_read_data */
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_reparse_point_values_get_tag",
