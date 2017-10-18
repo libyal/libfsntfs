@@ -1,5 +1,5 @@
 /*
- * The cluster block stream functions
+ * Cluster block stream functions
  *
  * Copyright (C) 2010-2017, Joachim Metz <joachim.metz@gmail.com>
  *

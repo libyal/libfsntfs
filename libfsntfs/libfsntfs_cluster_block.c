@@ -267,17 +267,6 @@ int libfsntfs_cluster_block_read_element_data(
 	}
 	else
 	{
-		if( cluster_block_size == 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid cluster block size value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{

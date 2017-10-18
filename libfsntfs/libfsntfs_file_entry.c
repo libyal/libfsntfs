@@ -1025,7 +1025,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
  */
 int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1061,7 +1061,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 	}
 	if( libfsntfs_file_name_values_get_utf8_name_size(
 	     internal_file_entry->directory_entry->file_name_values,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1083,8 +1083,8 @@ int libfsntfs_file_entry_get_utf8_name_size(
  */
 int libfsntfs_file_entry_get_utf8_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1120,8 +1120,8 @@ int libfsntfs_file_entry_get_utf8_name(
 	}
 	if( libfsntfs_file_name_values_get_utf8_name(
 	     internal_file_entry->directory_entry->file_name_values,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1143,7 +1143,7 @@ int libfsntfs_file_entry_get_utf8_name(
  */
 int libfsntfs_file_entry_get_utf16_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1179,7 +1179,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 	}
 	if( libfsntfs_file_name_values_get_utf16_name_size(
 	     internal_file_entry->directory_entry->file_name_values,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1201,8 +1201,8 @@ int libfsntfs_file_entry_get_utf16_name_size(
  */
 int libfsntfs_file_entry_get_utf16_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1238,8 +1238,8 @@ int libfsntfs_file_entry_get_utf16_name(
 	}
 	if( libfsntfs_file_name_values_get_utf16_name(
 	     internal_file_entry->directory_entry->file_name_values,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1396,7 +1396,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *attribute                     = NULL;
@@ -1434,7 +1434,7 @@ int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
 	}
 	if( libfsntfs_file_name_attribute_get_utf8_name_size(
 	     attribute,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1456,8 +1456,8 @@ int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
 int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *attribute                     = NULL;
@@ -1495,8 +1495,8 @@ int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
 	}
 	if( libfsntfs_file_name_attribute_get_utf8_name(
 	     attribute,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1518,7 +1518,7 @@ int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
 int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *attribute                     = NULL;
@@ -1556,7 +1556,7 @@ int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
 	}
 	if( libfsntfs_file_name_attribute_get_utf16_name_size(
 	     attribute,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1578,8 +1578,8 @@ int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
 int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *attribute                     = NULL;
@@ -1617,8 +1617,8 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 	}
 	if( libfsntfs_file_name_attribute_get_utf16_name(
 	     attribute,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1640,7 +1640,7 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
  */
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1676,7 +1676,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1698,8 +1698,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
  */
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1735,8 +1735,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1758,7 +1758,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
  */
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1794,7 +1794,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1816,8 +1816,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
  */
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1853,8 +1853,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1876,7 +1876,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
  */
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1912,7 +1912,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1934,8 +1934,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
  */
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -1971,8 +1971,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf8_print_name(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1994,7 +1994,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
  */
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -2030,7 +2030,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2052,8 +2052,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
  */
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
@@ -2089,8 +2089,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
 	}
 	if( libfsntfs_reparse_point_attribute_get_utf16_print_name(
 	     internal_file_entry->mft_entry->reparse_point_attribute,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

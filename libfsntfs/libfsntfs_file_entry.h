@@ -186,27 +186,27 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -219,82 +219,82 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

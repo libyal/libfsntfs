@@ -1,5 +1,5 @@
 /*
- * The cluster block vector functions
+ * Cluster block vector functions
  *
  * Copyright (C) 2010-2017, Joachim Metz <joachim.metz@gmail.com>
  *
