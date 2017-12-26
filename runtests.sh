@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script that runs the tests
 #
-# Version: 20170717
+# Version: 20171210
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -174,6 +174,13 @@ run_configure_make_check_python()
 
 run_setup_py_tests()
 {
+	# Skip this test when running Cygwin on AppVeyor.
+	if test -n "${APPVEYOR}" && test ${TARGET} = "cygwin";
+	then
+		echo "Running: 'setup.py build' skipped";
+
+		return ${EXIT_SUCCESS};
+	fi
 	PYTHON=$1;
 
 	${PYTHON} setup.py build;
@@ -206,7 +213,12 @@ echo "${CONFIGURE_HELP}" | grep -- '--enable-python' > /dev/null;
 
 HAVE_ENABLE_PYTHON=$?;
 
-PYTHON_CONFIG=`whereis python-config | sed 's/^.*:[ ]*//' 2> /dev/null`;
+PYTHON_CONFIG="";
+
+if test -x /usr/bin/whereis;
+then
+	PYTHON_CONFIG=`/usr/bin/whereis python-config | sed 's/^.*:[ ]*//' 2> /dev/null`;
+fi
 
 # Test "./configure && make && make check" without options.
 
@@ -260,7 +272,7 @@ then
 	PYTHON2=`which python2 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON2} && test -x ${PYTHON2};
+	if test -n "${PYTHON2}" && test -x ${PYTHON2};
 	then
 		export PYTHON_VERSION=2;
 
@@ -291,7 +303,7 @@ then
 	PYTHON3=`which python3 2> /dev/null`;
 
         # Note that "test -x" on Mac OS X will succeed if the argument is not set.
-	if test ! -z ${PYTHON3} && test -x ${PYTHON3};
+	if test -n "${PYTHON3}" && test -x ${PYTHON3};
 	then
 		export PYTHON_VERSION=3;
 
