@@ -35,6 +35,13 @@
 
 #include "../libfsntfs/libfsntfs_standard_information_values.h"
 
+uint8_t fsntfs_test_standard_information_values_data1[ 72 ] = {
+	0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01, 0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01,
+	0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01, 0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01,
+	0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_standard_information_values_initialize function
@@ -266,6 +273,162 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_standard_information_values_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_standard_information_values_read_data(
+     void )
+{
+	libcerror_error_t *error                                             = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	int result                                                           = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_standard_information_values_initialize(
+	          &standard_information_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "standard_information_values",
+	 standard_information_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_standard_information_values_read_data(
+	          standard_information_values,
+	          fsntfs_test_standard_information_values_data1,
+	          72,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_standard_information_values_read_data(
+	          NULL,
+	          fsntfs_test_standard_information_values_data1,
+	          72,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_standard_information_values_read_data(
+	          standard_information_values,
+	          NULL,
+	          72,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_standard_information_values_read_data(
+	          standard_information_values,
+	          fsntfs_test_standard_information_values_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_standard_information_values_read_data(
+	          standard_information_values,
+	          fsntfs_test_standard_information_values_data1,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_standard_information_values_free(
+	          &standard_information_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "standard_information_values",
+	 standard_information_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( standard_information_values != NULL )
+	{
+		libfsntfs_standard_information_values_free(
+		 &standard_information_values,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -1158,7 +1321,9 @@ int main(
 	 "libfsntfs_standard_information_values_free",
 	 fsntfs_test_standard_information_values_free );
 
-	/* TODO: add tests for libfsntfs_standard_information_values_read_data */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_standard_information_values_read_data",
+	 fsntfs_test_standard_information_values_read_data );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_standard_information_values_get_creation_time",

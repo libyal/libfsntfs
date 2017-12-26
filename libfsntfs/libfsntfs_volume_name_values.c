@@ -311,7 +311,7 @@ int libfsntfs_volume_name_values_read_data(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t\t: %" PRIs_SYSTEM "\n",
+			 "%s: name\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

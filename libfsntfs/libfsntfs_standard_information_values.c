@@ -254,7 +254,7 @@ int libfsntfs_standard_information_values_read_data(
 		}
 		if( libfsntfs_debug_print_filetime_value(
 		     function,
-		     "modification time\t\t\t",
+		     "modification time\t\t",
 		     ( (fsntfs_standard_information_t *) data )->modification_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
@@ -272,7 +272,7 @@ int libfsntfs_standard_information_values_read_data(
 		}
 		if( libfsntfs_debug_print_filetime_value(
 		     function,
-		     "entry modification time\t\t",
+		     "entry modification time\t",
 		     ( (fsntfs_standard_information_t *) data )->entry_modification_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
@@ -290,7 +290,7 @@ int libfsntfs_standard_information_values_read_data(
 		}
 		if( libfsntfs_debug_print_filetime_value(
 		     function,
-		     "access time\t\t\t\t",
+		     "access time\t\t\t",
 		     ( (fsntfs_standard_information_t *) data )->access_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
@@ -319,7 +319,7 @@ int libfsntfs_standard_information_values_read_data(
 		 ( (fsntfs_standard_information_t *) data )->maximum_number_of_versions,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: maximum number of versions\t\t: %" PRIu32 "\n",
+		 "%s: maximum number of versions\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -335,7 +335,7 @@ int libfsntfs_standard_information_values_read_data(
 		 ( (fsntfs_standard_information_t *) data )->class_identifier,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: class identifier\t\t\t: %" PRIu32 "\n",
+		 "%s: class identifier\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 	}
@@ -358,7 +358,7 @@ int libfsntfs_standard_information_values_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: owner identifier\t\t\t: %" PRIu32 "\n",
+			 "%s: owner identifier\t\t: %" PRIu32 "\n",
 			 function,
 			 standard_information_values->owner_identifier );
 

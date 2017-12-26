@@ -337,14 +337,14 @@ int libfsntfs_file_name_values_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: parent file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: parent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
 		 file_name_values->parent_file_reference & 0xffffffffffffUL,
 		 file_name_values->parent_file_reference >> 48 );
 
 		if( libfsntfs_debug_print_filetime_value(
 		     function,
-		     "creation time\t\t\t\t",
+		     "creation time\t\t\t",
 		     ( (fsntfs_file_name_t *) data )->creation_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
@@ -398,7 +398,7 @@ int libfsntfs_file_name_values_read_data(
 		}
 		if( libfsntfs_debug_print_filetime_value(
 		     function,
-		     "access time\t\t\t\t",
+		     "access time\t\t\t",
 		     ( (fsntfs_file_name_t *) data )->access_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
@@ -418,7 +418,7 @@ int libfsntfs_file_name_values_read_data(
 		 ( (fsntfs_file_name_t *) data )->allocated_file_size,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: allocated file size\t\t\t: %" PRIu64 "\n",
+		 "%s: allocated file size\t\t: %" PRIu64 "\n",
 		 function,
 		 value_64bit );
 
@@ -431,7 +431,7 @@ int libfsntfs_file_name_values_read_data(
 		 value_64bit );
 
 		libcnotify_printf(
-		 "%s: file attribute flags\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: file attribute flags\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 file_name_values->file_attribute_flags );
 		libfsntfs_debug_print_file_attribute_flags(
@@ -443,7 +443,7 @@ int libfsntfs_file_name_values_read_data(
 		 ( (fsntfs_file_name_t *) data )->extended_data,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: extended data\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: extended data\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -453,7 +453,7 @@ int libfsntfs_file_name_values_read_data(
 		 name_size );
 
 		libcnotify_printf(
-		 "%s: name namespace\t\t\t\t: %" PRIu8 " (%s)\n",
+		 "%s: name namespace\t\t\t: %" PRIu8 " (%s)\n",
 		 function,
 		 file_name_values->name_namespace,
 		 libfsntfs_debug_print_file_name_attribute_namespace(
@@ -553,7 +553,7 @@ int libfsntfs_file_name_values_read_data(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: name\t\t\t\t\t: %" PRIs_SYSTEM "\n",
+			 "%s: name\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

@@ -35,6 +35,13 @@
 
 #include "../libfsntfs/libfsntfs_file_name_values.h"
 
+uint8_t fsntfs_test_file_name_values_data1[ 74 ] = {
+	0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01,
+	0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01, 0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01,
+	0x50, 0x33, 0xce, 0xe8, 0x88, 0x99, 0xc3, 0x01, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x04, 0x03, 0x24, 0x00, 0x4d, 0x00, 0x46, 0x00, 0x54, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_file_name_values_initialize function
@@ -374,6 +381,108 @@ int fsntfs_test_file_name_values_clone(
 	libcerror_error_free(
 	 &error );
 
+	destination_file_name_values = (libfsntfs_file_name_values_t *) 0x12345678UL;
+
+	result = libfsntfs_file_name_values_clone(
+	          &destination_file_name_values,
+	          source_file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	destination_file_name_values = NULL;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	/* Test libfsntfs_file_name_values_clone with malloc failing
+	 */
+	fsntfs_test_malloc_attempts_before_fail = 0;
+
+	result = libfsntfs_file_name_values_clone(
+	          &destination_file_name_values,
+	          source_file_name_values,
+	          &error );
+
+	if( fsntfs_test_malloc_attempts_before_fail != -1 )
+	{
+		fsntfs_test_malloc_attempts_before_fail = -1;
+
+		if( destination_file_name_values != NULL )
+		{
+			libfsntfs_file_name_values_free(
+			 &destination_file_name_values,
+			 NULL );
+		}
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "destination_file_name_values",
+		 destination_file_name_values );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+
+	/* Test libfsntfs_file_name_values_clone with memcpy failing
+	 */
+	fsntfs_test_memcpy_attempts_before_fail = 0;
+
+	result = libfsntfs_file_name_values_clone(
+	          &destination_file_name_values,
+	          source_file_name_values,
+	          &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+
+		if( destination_file_name_values != NULL )
+		{
+			libfsntfs_file_name_values_free(
+			 &destination_file_name_values,
+			 NULL );
+		}
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "destination_file_name_values",
+		 destination_file_name_values );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libfsntfs_file_name_values_free(
@@ -411,6 +520,162 @@ on_error:
 	{
 		libfsntfs_file_name_values_free(
 		 &source_file_name_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_name_values_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_name_values_read_data(
+     void )
+{
+	libcerror_error_t *error                       = NULL;
+	libfsntfs_file_name_values_t *file_name_values = NULL;
+	int result                                     = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_file_name_values_initialize(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          fsntfs_test_file_name_values_data1,
+	          74,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_name_values_read_data(
+	          NULL,
+	          fsntfs_test_file_name_values_data1,
+	          74,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          NULL,
+	          74,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          fsntfs_test_file_name_values_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          fsntfs_test_file_name_values_data1,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_file_name_values_free(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
 		 NULL );
 	}
 	return( 0 );
@@ -1759,7 +2024,9 @@ int main(
 
 #if defined( TODO )
 
-	/* TODO: add tests for libfsntfs_file_name_values_read_data */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_file_name_values_read_data",
+	 fsntfs_test_file_name_values_read_data );
 
 	/* TODO: add tests for libfsntfs_file_name_values_read_from_attribute */
 
