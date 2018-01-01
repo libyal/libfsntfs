@@ -30,6 +30,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_txf_data_values/fsntfs_test_txf_data_values.vcproj \
 	fsntfs_test_usn_change_journal/fsntfs_test_usn_change_journal.vcproj \
 	fsntfs_test_volume/fsntfs_test_volume.vcproj \
+	fsntfs_test_volume_header/fsntfs_test_volume_header.vcproj \
 	fsntfs_test_volume_information_values/fsntfs_test_volume_information_values.vcproj \
 	fsntfs_test_volume_name_values/fsntfs_test_volume_name_values.vcproj \
 	fsntfsinfo/fsntfsinfo.vcproj \

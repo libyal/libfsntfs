@@ -94,6 +94,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_unused.h \
 	libfsntfs_usn_change_journal.c libfsntfs_usn_change_journal.h \
 	libfsntfs_volume.c libfsntfs_volume.h \
+	libfsntfs_volume_header.c libfsntfs_volume_header.h \
 	libfsntfs_volume_information_attribute.c libfsntfs_volume_information_attribute.h \
 	libfsntfs_volume_information_values.c libfsntfs_volume_information_values.h \
 	libfsntfs_volume_name_attribute.c libfsntfs_volume_name_attribute.h \
