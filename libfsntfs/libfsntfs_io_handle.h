@@ -42,33 +42,17 @@ struct libfsntfs_io_handle
 	 */
 	size_t cluster_block_size;
 
-	/* The number of bytes per sector
+	/* The index entry size
 	 */
-	uint16_t bytes_per_sector;
-
-	/* The volume size
-	 */
-	size64_t volume_size;
-
-	/* The volume serial number
-	 */
-	uint64_t volume_serial_number;
+	uint32_t index_entry_size;
 
 	/* The MFT entry size
 	 */
 	uint32_t mft_entry_size;
 
-	/* The index entry size
+	/* The number of bytes per sector
 	 */
-	uint32_t index_entry_size;
-
-	/* The offset of the MFT
-	 */
-	off64_t mft_offset;
-
-	/* The offset of the mirror MFT
-	 */
-	off64_t mirror_mft_offset;
+	uint16_t bytes_per_sector;
 
 	/* Value to indicate if abort was signalled
 	 */
@@ -85,11 +69,6 @@ int libfsntfs_io_handle_free(
 
 int libfsntfs_io_handle_clear(
      libfsntfs_io_handle_t *io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_io_handle_read_volume_header(
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

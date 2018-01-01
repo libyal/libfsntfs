@@ -823,7 +823,6 @@ int libfsntfs_mft_metadata_file_open_read(
 /* TODO allow to set the values */
 /* TODO scan for signature to determine MFT entry size */
 	internal_mft_metadata_file->io_handle->bytes_per_sector   = 512;
-	internal_mft_metadata_file->io_handle->mft_offset         = 0;
 /* TODO if not set FILE signature try scan? */
 	internal_mft_metadata_file->io_handle->mft_entry_size     = 1024;
 /* TODO if not set INDX signature try scan? */
@@ -840,7 +839,7 @@ int libfsntfs_mft_metadata_file_open_read(
 	if( libfsntfs_mft_initialize(
 	     &( internal_mft_metadata_file->mft ),
 	     internal_mft_metadata_file->io_handle,
-	     internal_mft_metadata_file->io_handle->mft_offset,
+	     0,
 	     file_size,
 	     (size64_t) internal_mft_metadata_file->io_handle->mft_entry_size,
 	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
@@ -872,7 +871,7 @@ int libfsntfs_mft_metadata_file_open_read(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->io_handle,
 	     file_io_handle,
-	     internal_mft_metadata_file->io_handle->mft_offset,
+	     0,
 	     0,
 	     mft_entry,
 	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,

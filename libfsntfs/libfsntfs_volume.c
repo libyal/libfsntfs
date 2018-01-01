@@ -44,6 +44,7 @@
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_volume.h"
+#include "libfsntfs_volume_header.h"
 
 /* Creates a volume
  * Make sure the value volume is referencing, is set to NULL
@@ -822,9 +823,10 @@ int libfsntfs_internal_volume_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_internal_volume_open_read";
-	size64_t mft_size                = 0;
+	libfsntfs_mft_entry_t *mft_entry         = NULL;
+	libfsntfs_volume_header_t *volume_header = NULL;
+	static char *function                    = "libfsntfs_internal_volume_open_read";
+	size64_t mft_size                        = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -866,20 +868,41 @@ int libfsntfs_internal_volume_open_read(
 		 "Reading volume header:\n" );
 	}
 #endif
-	if( libfsntfs_io_handle_read_volume_header(
-	     internal_volume->io_handle,
+	if( libfsntfs_volume_header_initialize(
+	     &volume_header,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create volume header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_read_file_io_handle(
+	     volume_header,
 	     file_io_handle,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read volume header.",
+		 "%s: unable to read volume header at offset: 0 (0x00000000).",
 		 function );
 
 		goto on_error;
 	}
+	internal_volume->io_handle->cluster_block_size = volume_header->cluster_block_size;
+	internal_volume->io_handle->index_entry_size   = volume_header->index_entry_size;
+	internal_volume->io_handle->mft_entry_size     = volume_header->mft_entry_size;
+	internal_volume->io_handle->bytes_per_sector   = volume_header->bytes_per_sector;
+
+	internal_volume->volume_serial_number          = volume_header->volume_serial_number;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -887,8 +910,8 @@ int libfsntfs_internal_volume_open_read(
 		 "Reading MFT entry: 0:\n" );
 	}
 #endif
-	if( ( internal_volume->io_handle->mft_offset < 0 )
-	 || ( (size64_t) internal_volume->io_handle->mft_offset >= internal_volume->io_handle->volume_size ) )
+	if( ( volume_header->mft_offset < 0 )
+	 || ( (size64_t) volume_header->mft_offset >= volume_header->volume_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -899,7 +922,7 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-	mft_size = internal_volume->io_handle->volume_size - internal_volume->io_handle->mft_offset;
+	mft_size = volume_header->volume_size - volume_header->mft_offset;
 
 	/* Since MFT entry 0 can contain an attribute list
 	 * we define MFT entry vector before knowning all the data runs
@@ -907,7 +930,7 @@ int libfsntfs_internal_volume_open_read(
 	if( libfsntfs_mft_initialize(
 	     &( internal_volume->mft ),
 	     internal_volume->io_handle,
-	     internal_volume->io_handle->mft_offset,
+	     volume_header->mft_offset,
 	     mft_size,
 	     (size64_t) internal_volume->io_handle->mft_entry_size,
 	     0,
@@ -939,7 +962,7 @@ int libfsntfs_internal_volume_open_read(
 	     internal_volume->mft,
 	     internal_volume->io_handle,
 	     file_io_handle,
-	     internal_volume->io_handle->mft_offset,
+	     volume_header->mft_offset,
 	     0,
 	     mft_entry,
 	     0,
@@ -950,6 +973,19 @@ int libfsntfs_internal_volume_open_read(
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read MFT entry: 0.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_free(
+	     &volume_header,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free volume header.",
 		 function );
 
 		goto on_error;
@@ -1045,6 +1081,12 @@ on_error:
 	{
 		libfsntfs_mft_entry_free(
 		 &mft_entry,
+		 NULL );
+	}
+	if( volume_header != NULL )
+	{
+		libfsntfs_volume_header_free(
+		 &volume_header,
 		 NULL );
 	}
 	return( -1 );
@@ -1549,7 +1591,7 @@ int libfsntfs_volume_get_serial_number(
 
 		return( -1 );
 	}
-	*serial_number = internal_volume->io_handle->volume_serial_number;
+	*serial_number = internal_volume->volume_serial_number;
 
 	return( 1 );
 }

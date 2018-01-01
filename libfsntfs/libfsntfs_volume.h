@@ -60,6 +60,10 @@ struct libfsntfs_internal_volume
 	 */
 	uint8_t file_io_handle_opened_in_library;
 
+	/* The volume serial number
+	 */
+	uint64_t volume_serial_number;
+
 	/* The MFT
 	 */
 	libfsntfs_mft_t *mft;

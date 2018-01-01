@@ -443,6 +443,7 @@ int fsntfs_test_file_name_values_clone(
 		 &error );
 	}
 
+#ifdef TODO
 	/* Test libfsntfs_file_name_values_clone with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
@@ -481,6 +482,7 @@ int fsntfs_test_file_name_values_clone(
 		libcerror_error_free(
 		 &error );
 	}
+#endif /* TODO */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up
