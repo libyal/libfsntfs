@@ -325,13 +325,15 @@ fsntfs_test_mft_metadata_file_LDADD = \
 	@PTHREAD_LIBADD@
 
 fsntfs_test_notify_SOURCES = \
+	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
 	fsntfs_test_notify.c \
 	fsntfs_test_unused.h
 
 fsntfs_test_notify_LDADD = \
-	../libfsntfs/libfsntfs.la
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
 
 fsntfs_test_object_identifier_values_SOURCES = \
 	fsntfs_test_libcerror.h \
@@ -407,6 +409,7 @@ fsntfs_test_standard_information_values_LDADD = \
 
 fsntfs_test_support_SOURCES = \
 	fsntfs_test_getopt.c fsntfs_test_getopt.h \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libclocale.h \
@@ -414,7 +417,9 @@ fsntfs_test_support_SOURCES = \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_libuna.h \
 	fsntfs_test_macros.h \
-	fsntfs_test_support.c
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_support.c \
+	fsntfs_test_unused.h
 
 fsntfs_test_support_LDADD = \
 	@LIBBFIO_LIBADD@ \
@@ -454,6 +459,7 @@ fsntfs_test_usn_change_journal_LDADD = \
 
 fsntfs_test_volume_SOURCES = \
 	fsntfs_test_getopt.c fsntfs_test_getopt.h \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libclocale.h \
 	fsntfs_test_libcnotify.h \
@@ -461,10 +467,15 @@ fsntfs_test_volume_SOURCES = \
 	fsntfs_test_libuna.h \
 	fsntfs_test_macros.h \
 	fsntfs_test_memory.c fsntfs_test_memory.h \
-	fsntfs_test_volume.c
+	fsntfs_test_volume.c \
+	fsntfs_test_unused.h
 
 fsntfs_test_volume_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
