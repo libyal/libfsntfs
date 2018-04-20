@@ -1,5 +1,5 @@
 /*
- * Library to access the Windows NT File System (NTFS) format
+ * Library to access the Windows New Technology File System (NTFS) format
  *
  * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
  *

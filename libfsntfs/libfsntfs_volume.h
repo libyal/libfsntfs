@@ -212,7 +212,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_root_directory(
      libfsntfs_volume_t *volume,
-     libfsntfs_file_entry_t **root_directory_file_entry,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(

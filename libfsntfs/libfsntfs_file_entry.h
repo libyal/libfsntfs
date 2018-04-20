@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_FILE_ENTRY_H )
-#define _LIBFSNTFS_INTERNAL_FILE_ENTRY_H
+#if !defined( _LIBFSNTFS_FILE_ENTRY_H )
+#define _LIBFSNTFS_FILE_ENTRY_H
 
 #include <common.h>
 #include <types.h>
@@ -458,5 +458,5 @@ int libfsntfs_file_entry_get_extent_by_index(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INTERNAL_FILE_ENTRY_H ) */
+#endif /* !defined( _LIBFSNTFS_FILE_ENTRY_H ) */
 

@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_DATA_STREAM_H )
-#define _LIBFSNTFS_INTERNAL_DATA_STREAM_H
+#if !defined( _LIBFSNTFS_DATA_STREAM_H )
+#define _LIBFSNTFS_DATA_STREAM_H
 
 #include <common.h>
 #include <types.h>
@@ -149,5 +149,5 @@ int libfsntfs_data_stream_get_extent_by_index(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INTERNAL_DATA_STREAM_H ) */
+#endif /* !defined( _LIBFSNTFS_DATA_STREAM_H ) */
 

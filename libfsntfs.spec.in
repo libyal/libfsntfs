@@ -1,7 +1,7 @@
 Name: libfsntfs
 Version: @VERSION@
 Release: 1
-Summary: Library to access the Windows NT File System (NTFS) format
+Summary: Library to access the Windows New Technology File System (NTFS) format
 Group: System Environment/Libraries
 License: LGPL
 Source: %{name}-%{version}.tar.gz
@@ -11,7 +11,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libfsntfs_spec_build_requires@ @ax_libbfio_spec_build_requires@ @ax_libcdata_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcfile_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcpath_spec_build_requires@ @ax_libcsplit_spec_build_requires@ @ax_libcthreads_spec_build_requires@ @ax_libfcache_spec_build_requires@ @ax_libfdata_spec_build_requires@ @ax_libfdatetime_spec_build_requires@ @ax_libfguid_spec_build_requires@ @ax_libfwnt_spec_build_requires@ @ax_libuna_spec_build_requires@
 
 %description
-Library to access the Windows NT File System (NTFS) format
+Library to access the Windows New Technology File System (NTFS) format
 
 %package devel
 Summary: Header files and libraries for developing applications for libfsntfs
@@ -40,13 +40,13 @@ BuildRequires: python3-devel
 Python 3 bindings for libfsntfs
 
 %package tools
-Summary: Several tools for reading Windows NT File System (NTFS) volumes
+Summary: Several tools for reading Windows New Technology File System (NTFS) volumes
 Group: Applications/System
 Requires: libfsntfs = %{version}-%{release} @ax_libfusn_spec_requires@
 @libfsntfs_spec_tools_build_requires@ @ax_libfusn_spec_build_requires@
 
 %description tools
-Several tools for reading Windows NT File System (NTFS) volumes
+Several tools for reading Windows New Technology File System (NTFS) volumes
 
 %prep
 %setup -q

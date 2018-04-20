@@ -1,5 +1,5 @@
 /*
- * Alternate data stream functions
+ * Data stream functions
  *
  * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
  *

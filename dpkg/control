@@ -10,8 +10,8 @@ Package: libfsntfs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Suggests: libfsntfs-dbg
-Description: Library to access the Windows NT File System (NTFS) format
- libfsntfs is a library to access the Windows NT File System (NTFS) format.
+Description: Library to access the Windows New Technology File System (NTFS) format
+ libfsntfs is a library to access the Windows New Technology File System (NTFS) format.
 
 Package: libfsntfs-dbg
 Architecture: any
@@ -31,8 +31,8 @@ Package: libfsntfs-tools
 Section: utils
 Architecture: any
 Depends: libfsntfs (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: Several tools for reading Windows NT File System (NTFS) volumes
- Several tools for reading Windows NT File System (NTFS) volumes.
+Description: Several tools for reading Windows New Technology File System (NTFS) volumes
+ Several tools for reading Windows New Technology File System (NTFS) volumes.
 
 Package: libfsntfs-tools-dbg
 Section: debug
