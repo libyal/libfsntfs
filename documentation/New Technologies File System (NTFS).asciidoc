@@ -27,7 +27,7 @@ type of file system.
 [preface]
 == License
 ....
-Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -60,6 +60,7 @@ Switched to asccidoc format.
 | 0.0.12 | J.B. Metz | January 2016 | Additional information about extended attributes.
 | 0.0.13 | J.B. Metz | March 2016 | Small changes.
 | 0.0.14 | J.B. Metz | April 2016 | Small changes.
+| 0.0.15 | J.B. Metz | June 2018 | Corrected typos.
 |===
 
 :numbered:
@@ -2112,7 +2113,7 @@ variable of size and consists of:
 | 8 | 8 | | File reference
 | 16 | 8 | | Parent file reference
 | 24 | 8 | | Update sequence number (USN) +
-Contains the file offset of the USN chagne journal entry which is used as a unique identifier
+Contains the file offset of the USN change journal entry which is used as a unique identifier
 | 32 | 8 | | Update date and time +
 Contains a FILETIME
 | 40 | 4 | | Update reason flags +
@@ -2127,7 +2128,7 @@ See section: <<file_attribute_flags,File attribute flags>>
 | 56 | 2 | | Name size +
 Contains the byte size of the name
 | 58 | 2 | | Name offset +
-The offset is relative from the start of the USN chagne journal entry
+The offset is relative from the start of the USN change journal entry
 4+| _Common_
 | 60 | (name size) | | Name
 | ... | ... | 0x00 | Padding
@@ -2138,7 +2139,7 @@ The offset is relative from the start of the USN chagne journal entry
 record is actually used by NTFS. For now it is assumed that it is likely used
 by ReFS.*
 
-The USN chagne journal entry version 3 (USN_RECORD_V3) is variable of size and
+The USN change journal entry version 3 (USN_RECORD_V3) is variable of size and
 consists of:
 
 [cols="1,1,1,5",options="header"]

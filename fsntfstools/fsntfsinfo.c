@@ -78,7 +78,7 @@ void usage_fprint(
 	                 "\t        or \"all\".\n" );
 	fprintf( stream, "\t-F:     show information about a specific file entry path.\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
-	fprintf( stream, "\t-H:     shows the file system hierarcy\n" );
+	fprintf( stream, "\t-H:     shows the file system hierarchy\n" );
 	fprintf( stream, "\t-o:     specify the volume offset\n" );
 	fprintf( stream, "\t-U:     shows information from the USN change journal ($UsnJrnl)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
@@ -376,6 +376,14 @@ int main( int argc, char * const argv[] )
 			          &mft_entry_index,
 			          &error ) == 1 )
 			{
+				if( mft_entry_index > (uint64_t) INT64_MAX )
+				{
+					fprintf(
+					 stderr,
+					 "Invalid MFT entry index value out of bounds." );
+
+					goto on_error;
+				}
 				if( info_handle_mft_entry_fprint(
 				     fsntfsinfo_info_handle,
 				     mft_entry_index,

@@ -3706,6 +3706,12 @@ int info_handle_mft_entry_fprint(
 	}
 	if( result != 1 )
 	{
+		if( ( error != NULL )
+		 && ( *error != NULL ) )
+		{
+			libcnotify_print_error_backtrace(
+			 *error );
+		}
 		libcerror_error_free(
 		 error );
 
@@ -3991,7 +3997,7 @@ int info_handle_mft_entries_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid nubmer of file entries value out of bounds.",
+		 "%s: invalid number of file entries value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -4000,12 +4006,10 @@ int info_handle_mft_entries_fprint(
 	     file_entry_index < number_of_file_entries;
 	     file_entry_index++ )
 	{
-		result = info_handle_mft_entry_fprint(
-		          info_handle,
-		          file_entry_index,
-		          error );
-
-		if( result == -1 )
+		if( info_handle_mft_entry_fprint(
+		     info_handle,
+		     file_entry_index,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4392,7 +4396,7 @@ on_error:
 	return( -1 );
 }
 
-/* Prints the file system hierarchy entry information
+/* Prints the file system hierarchy information
  * Returns 1 if successful or -1 on error
  */
 int info_handle_file_system_hierarchy_fprint(

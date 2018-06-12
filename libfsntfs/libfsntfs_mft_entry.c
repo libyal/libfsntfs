@@ -501,6 +501,7 @@ int libfsntfs_mft_entry_read(
 
 			return( -1 );
 		}
+		mft_entry->is_empty = 0;
 	}
 	return( 1 );
 }
