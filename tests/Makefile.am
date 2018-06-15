@@ -79,6 +79,7 @@ check_PROGRAMS = \
 
 fsntfs_test_attribute_SOURCES = \
 	fsntfs_test_attribute.c \
+	fsntfs_test_libcdata.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \

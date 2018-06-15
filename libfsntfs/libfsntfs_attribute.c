@@ -531,22 +531,22 @@ ssize_t libfsntfs_attribute_read_mft_attribute_resident_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: data size\t\t\t\t: %" PRIu64 "\n",
+		 "%s: data size\t\t: %" PRIu64 "\n",
 		 function,
 		 internal_attribute->data_size );
 
 		libcnotify_printf(
-		 "%s: data offset\t\t\t\t: %" PRIu16 "\n",
+		 "%s: data offset\t: %" PRIu16 "\n",
 		 function,
 		 internal_attribute->data_offset );
 
 		libcnotify_printf(
-		 "%s: indexed flag\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: indexed flag\t: 0x%02" PRIx8 "\n",
 		 function,
 		 ( (fsntfs_mft_attribute_resident_t *) data )->indexed_flag );
 
 		libcnotify_printf(
-		 "%s: padding\t\t\t\t: 0x%02" PRIx8 "\n",
+		 "%s: padding\t\t: 0x%02" PRIx8 "\n",
 		 function,
 		 ( (fsntfs_mft_attribute_resident_t *) data )->padding );
 
@@ -698,22 +698,22 @@ ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: data first VCN\t\t\t: %" PRIi64 "\n",
+		 "%s: data first VCN\t: %" PRIi64 "\n",
 		 function,
 		 (int64_t) internal_attribute->data_first_vcn );
 
 		libcnotify_printf(
-		 "%s: data last VCN\t\t\t: %" PRIi64 "\n",
+		 "%s: data last VCN\t\t: %" PRIi64 "\n",
 		 function,
 		 (int64_t) internal_attribute->data_last_vcn );
 
 		libcnotify_printf(
-		 "%s: data runs offset\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: data runs offset\t: 0x%04" PRIx16 "\n",
 		 function,
 		 internal_attribute->data_runs_offset );
 
 		libcnotify_printf(
-		 "%s: compression unit size\t\t: %" PRIu16 " (%" PRIzd ")\n",
+		 "%s: compression unit size\t: %" PRIu16 " (%" PRIzd ")\n",
 		 function,
 		 compression_unit_size,
 		 internal_attribute->compression_unit_size );
@@ -722,22 +722,22 @@ ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
 		 ( (fsntfs_mft_attribute_non_resident_t *) data )->padding,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: padding\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: padding\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: allocated data size\t\t\t: %" PRIu64 "\n",
+		 "%s: allocated data size\t: %" PRIu64 "\n",
 		 function,
 		 internal_attribute->allocated_data_size );
 
 		libcnotify_printf(
-		 "%s: data size\t\t\t\t: %" PRIu64 "\n",
+		 "%s: data size\t\t: %" PRIu64 "\n",
 		 function,
 		 internal_attribute->data_size );
 
 		libcnotify_printf(
-		 "%s: valid data size\t\t\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
+		 "%s: valid data size\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
 		 function,
 		 internal_attribute->valid_data_size,
 		 internal_attribute->valid_data_size );
@@ -748,7 +748,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
 			 ( (fsntfs_mft_attribute_non_resident_compressed_t *) data )->total_data_size,
 			 value_64bit );
 			libcnotify_printf(
-			 "%s: total data size\t\t\t: %" PRIu64 "\n",
+			 "%s: total data size\t: %" PRIu64 "\n",
 			 function,
 			 value_64bit );
 		}
