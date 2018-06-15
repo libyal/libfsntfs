@@ -284,7 +284,7 @@ int libfsntfs_txf_data_values_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	return( 1 );
 }
 

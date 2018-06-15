@@ -224,14 +224,14 @@ int libfsntfs_bitmap_values_read_data(
 					if( first_allocated_element_index == ( allocated_element_index - 1 ) )
 					{
 						libcnotify_printf(
-						 "%s: allocated element\t\t\t\t: %d\n",
+						 "%s: allocated element\t\t\t: %d\n",
 						 function,
 						 first_allocated_element_index );
 					}
 					else
 					{
 						libcnotify_printf(
-						 "%s: allocated element\t\t\t\t: %d - %d\n",
+						 "%s: allocated element\t\t\t: %d - %d\n",
 						 function,
 						 first_allocated_element_index,
 						 allocated_element_index - 1 );
@@ -253,14 +253,14 @@ int libfsntfs_bitmap_values_read_data(
 			if( first_allocated_element_index == ( allocated_element_index - 1 ) )
 			{
 				libcnotify_printf(
-				 "%s: allocated element\t\t\t\t: %d\n",
+				 "%s: allocated element\t\t\t: %d\n",
 				 function,
 				 first_allocated_element_index );
 			}
 			else
 			{
 				libcnotify_printf(
-				 "%s: allocated element\t\t\t\t: %d - %d\n",
+				 "%s: allocated element\t\t\t: %d - %d\n",
 				 function,
 				 first_allocated_element_index,
 				 allocated_element_index - 1 );

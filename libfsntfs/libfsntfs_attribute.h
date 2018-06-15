@@ -51,6 +51,10 @@ struct libfsntfs_internal_attribute
 	 */
 	uint32_t type;
 
+	/* The non-resident flag
+	 */
+	uint8_t non_resident_flag;
+
 	/* Value to indicate the attribute is resident
 	 */
 	uint8_t is_resident;
@@ -66,6 +70,10 @@ struct libfsntfs_internal_attribute
 	/* The name size
 	 */
 	uint16_t name_size;
+
+	/* The name offset
+	 */
+	uint16_t name_offset;
 
 	/* The data first VCN
 	 */
@@ -98,6 +106,14 @@ struct libfsntfs_internal_attribute
 	/* The data size
 	 */
 	size64_t data_size;
+
+	/* The data offset
+	 */
+	uint16_t data_offset;
+
+	/* The data runs offset
+	 */
+	uint16_t data_runs_offset;
 
 	/* The data runs array
 	 */
@@ -140,6 +156,25 @@ int libfsntfs_attribute_compare_by_file_reference(
      libfsntfs_internal_attribute_t *second_attribute,
      libcerror_error_t **error );
 
+int libfsntfs_attribute_read_mft_attribute_header(
+     libfsntfs_internal_attribute_t *internal_attribute,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+ssize_t libfsntfs_attribute_read_mft_attribute_resident_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         const uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error );
+
+ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         libfsntfs_io_handle_t *io_handle,
+         const uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error );
+
 ssize_t libfsntfs_attribute_read_from_mft(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
@@ -148,6 +183,12 @@ ssize_t libfsntfs_attribute_read_from_mft(
          size_t mft_attribute_data_offset,
          uint8_t flags,
          libcerror_error_t **error );
+
+int libfsntfs_attribute_read_attribute_list_entry_header(
+     libfsntfs_internal_attribute_t *internal_attribute,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
 
 ssize_t libfsntfs_attribute_read_from_list(
          libfsntfs_attribute_t *attribute,

@@ -221,24 +221,25 @@ int libfsntfs_volume_information_values_read_data(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: major version\t\t\t: %" PRIu8 "\n",
+		 "%s: major version\t\t: %" PRIu8 "\n",
 		 function,
 		 volume_information_values->major_version );
 
 		libcnotify_printf(
-		 "%s: minor version\t\t\t: %" PRIu8 "\n",
+		 "%s: minor version\t\t: %" PRIu8 "\n",
 		 function,
 		 volume_information_values->minor_version );
 
 		libcnotify_printf(
-		 "%s: flags\t\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: flags\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
 		 volume_information_values->flags );
 
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 }
 
