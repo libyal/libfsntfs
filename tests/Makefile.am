@@ -103,6 +103,8 @@ fsntfs_test_bitmap_values_LDADD = \
 
 fsntfs_test_cluster_block_SOURCES = \
 	fsntfs_test_cluster_block.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -110,6 +112,14 @@ fsntfs_test_cluster_block_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_cluster_block_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

@@ -176,6 +176,77 @@ int libfsntfs_cluster_block_free(
 }
 
 /* Reads a cluster block
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_cluster_block_read_file_io_handle(
+     libfsntfs_cluster_block_t *cluster_block,
+     libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_cluster_block_read_file_io_handle";
+	ssize_t read_count    = 0;
+
+	if( cluster_block == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cluster block.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading cluster block at offset: %" PRIi64 " (0x%08" PRIx64 ") with size: %" PRIu64 ".\n",
+		 function,
+		 file_offset,
+		 file_offset,
+		 cluster_block->data_size );
+	}
+#endif
+	if( libbfio_handle_seek_offset(
+	     file_io_handle,
+	     file_offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 file_offset,
+		 file_offset );
+
+		return( -1 );
+	}
+	read_count = libbfio_handle_read_buffer(
+		      file_io_handle,
+		      cluster_block->data,
+		      cluster_block->data_size,
+		      error );
+
+	if( read_count != (ssize_t) cluster_block->data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read cluster block.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Reads a cluster block
  * Callback function for the cluster block vector
  * Returns 1 if successful or -1 on error
  */
@@ -267,39 +338,11 @@ int libfsntfs_cluster_block_read_element_data(
 	}
 	else
 	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: reading cluster block at offset: 0x%08" PRIx64 " with size: %" PRIu64 ".\n",
-			 function,
-			 cluster_block_offset,
-			 cluster_block_size );
-		}
-#endif
-		if( libbfio_handle_seek_offset(
+		if( libfsntfs_cluster_block_read_file_io_handle(
+		     cluster_block,
 		     file_io_handle,
 		     cluster_block_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek offset: 0x%08" PRIx64 ".",
-			 function,
-			 cluster_block_offset );
-
-			goto on_error;
-		}
-		read_count = libbfio_handle_read_buffer(
-		              file_io_handle,
-		              cluster_block->data,
-		              cluster_block->data_size,
-		              error );
-
-		if( read_count != (ssize_t) cluster_block->data_size )
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
