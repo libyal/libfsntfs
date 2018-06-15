@@ -30,6 +30,7 @@
 #include "fsntfstools_libbfio.h"
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
+#include "fsntfstools_libcnotify.h"
 #include "fsntfstools_libfdatetime.h"
 #include "fsntfstools_libfguid.h"
 #include "fsntfstools_libfwnt.h"
