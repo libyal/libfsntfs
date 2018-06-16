@@ -537,8 +537,8 @@ int main(
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_free(
-	          &attribute,
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -586,9 +586,9 @@ on_error:
 	}
 	if( attribute != NULL )
 	{
-		libfsntfs_attribute_free(
-		 &attribute,
-		 NULL );
+		libfsntfs_internal_attribute_free(
+	         (libfsntfs_internal_attribute_t **) &attribute,
+	         &error );
 	}
 	if( io_handle != NULL )
 	{
