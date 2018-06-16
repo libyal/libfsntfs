@@ -383,72 +383,70 @@ int libfsntfs_attribute_read_mft_attribute_header(
 		  internal_attribute->type ) );
 	}
 #endif
-	if( internal_attribute->type == LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
+	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
 	{
-		return( 1 );
-	}
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_mft_attribute_header_t *) data )->size,
-	 internal_attribute->size );
-
-	internal_attribute->non_resident_flag = ( (fsntfs_mft_attribute_header_t *) data )->non_resident_flag;
-
-	internal_attribute->name_size = (uint16_t) ( (fsntfs_mft_attribute_header_t *) data )->name_size;
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_header_t *) data )->name_offset,
-	 internal_attribute->name_offset );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_header_t *) data )->data_flags,
-	 internal_attribute->data_flags );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_header_t *) data )->identifier,
-	 internal_attribute->identifier );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: size\t\t\t: %" PRIu32 "\n",
-		 function,
+		byte_stream_copy_to_uint32_little_endian(
+		 ( (fsntfs_mft_attribute_header_t *) data )->size,
 		 internal_attribute->size );
 
-		libcnotify_printf(
-		 "%s: non resident flag\t: 0x%02" PRIx8 "\n",
-		 function,
-		 internal_attribute->non_resident_flag );
+		internal_attribute->non_resident_flag = ( (fsntfs_mft_attribute_header_t *) data )->non_resident_flag;
 
-		libcnotify_printf(
-		 "%s: name size\t\t: %" PRIu16 "\n",
-		 function,
-		 internal_attribute->name_size );
+		internal_attribute->name_size = (uint16_t) ( (fsntfs_mft_attribute_header_t *) data )->name_size;
 
-		libcnotify_printf(
-		 "%s: name offset\t\t: %" PRIu16 "\n",
-		 function,
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mft_attribute_header_t *) data )->name_offset,
 		 internal_attribute->name_offset );
 
-		libcnotify_printf(
-		 "%s: data flags\t\t: 0x%04" PRIx16 "\n",
-		 function,
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mft_attribute_header_t *) data )->data_flags,
 		 internal_attribute->data_flags );
-		libfsntfs_debug_print_mft_attribute_data_flags(
-		 internal_attribute->data_flags );
-		libcnotify_printf(
-		 "\n" );
 
-		libcnotify_printf(
-		 "%s: identifier\t\t: %" PRIu16 "\n",
-		 function,
+		byte_stream_copy_to_uint16_little_endian(
+		 ( (fsntfs_mft_attribute_header_t *) data )->identifier,
 		 internal_attribute->identifier );
 
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: size\t\t\t: %" PRIu32 "\n",
+			 function,
+			 internal_attribute->size );
 
+			libcnotify_printf(
+			 "%s: non resident flag\t: 0x%02" PRIx8 "\n",
+			 function,
+			 internal_attribute->non_resident_flag );
+
+			libcnotify_printf(
+			 "%s: name size\t\t: %" PRIu16 "\n",
+			 function,
+			 internal_attribute->name_size );
+
+			libcnotify_printf(
+			 "%s: name offset\t\t: %" PRIu16 "\n",
+			 function,
+			 internal_attribute->name_offset );
+
+			libcnotify_printf(
+			 "%s: data flags\t\t: 0x%04" PRIx16 "\n",
+			 function,
+			 internal_attribute->data_flags );
+			libfsntfs_debug_print_mft_attribute_data_flags(
+			 internal_attribute->data_flags );
+			libcnotify_printf(
+			 "\n" );
+
+			libcnotify_printf(
+			 "%s: identifier\t\t: %" PRIu16 "\n",
+			 function,
+			 internal_attribute->identifier );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+	}
 	return( 1 );
 }
 
