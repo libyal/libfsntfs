@@ -156,6 +156,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_usn_change_journal
 /tests/fsntfs_test_volume
 /tests/fsntfs_test_volume_header
+/tests/fsntfs_test_volume_information_attribute
 /tests/fsntfs_test_volume_information_values
 /tests/fsntfs_test_volume_name_attribute
 /tests/fsntfs_test_volume_name_values

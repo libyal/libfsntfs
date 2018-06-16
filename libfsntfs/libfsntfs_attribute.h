@@ -189,11 +189,11 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
          uint8_t flags,
          libcerror_error_t **error );
 
-ssize_t libfsntfs_attribute_read_from_mft(
+ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
-         uint8_t *mft_entry_data,
-         size_t mft_entry_data_size,
+         uint8_t *data,
+         size_t data_size,
          size_t mft_attribute_data_offset,
          uint8_t flags,
          libcerror_error_t **error );

@@ -1119,7 +1119,7 @@ int libfsntfs_mft_entry_read_attributes(
 
 			goto on_error;
 		}
-		read_count = libfsntfs_attribute_read_from_mft(
+		read_count = libfsntfs_attribute_read_from_mft_entry_data(
 			      attribute,
 			      io_handle,
 			      mft_entry->data,
@@ -1128,7 +1128,7 @@ int libfsntfs_mft_entry_read_attributes(
 			      flags,
 			      error );
 
-		if( read_count < 0 )
+		if( read_count <= -1 )
 		{
 			libcerror_error_set(
 			 error,

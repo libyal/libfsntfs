@@ -1018,7 +1018,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: MFT attribute data size value too small.",
+		 "%s: data size value too small.",
 		 function );
 
 		return( -1 );
@@ -1077,7 +1077,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: MFT attribute data size value too small.",
+			 "%s: data size value too small.",
 			 function );
 
 			goto on_error;
@@ -1188,7 +1188,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: MFT attribute data size value too small.",
+			 "%s: data size value too small.",
 			 function );
 
 			goto on_error;
@@ -1262,20 +1262,20 @@ on_error:
 	return( -1 );
 }
 
-/* Reads the attribute from the MFT attributes data in a MFT entry
+/* Reads the attribute from MFT entry data
  * Returns the number of bytes read if successful or -1 on error
  */
-ssize_t libfsntfs_attribute_read_from_mft(
+ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
-         uint8_t *mft_entry_data,
-         size_t mft_entry_data_size,
+         uint8_t *data,
+         size_t data_size,
          size_t mft_attribute_data_offset,
          uint8_t flags,
          libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_read_from_mft";
+	static char *function                              = "libfsntfs_attribute_read_from_mft_entry_data";
 	size_t header_data_size                            = 0;
 	size_t unknown_data_size                           = 0;
 	ssize_t read_count                                 = 0;
@@ -1304,24 +1304,24 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 		return( -1 );
 	}
-	if( mft_entry_data == NULL )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry data.",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
 	}
-	if( mft_entry_data_size > (size_t) SSIZE_MAX )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: MFT entry data size value exceeds maximum.",
+		 "%s: data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1337,7 +1337,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 
 		return( -1 );
 	}
-	if( mft_attribute_data_offset >= mft_entry_data_size )
+	if( mft_attribute_data_offset >= data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -1350,8 +1350,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	}
 	if( libfsntfs_attribute_read_mft_attribute_header(
 	     internal_attribute,
-	     &( mft_entry_data[ mft_attribute_data_offset ] ),
-	     mft_entry_data_size - mft_attribute_data_offset,
+	     &( data[ mft_attribute_data_offset ] ),
+	     data_size - mft_attribute_data_offset,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1366,20 +1366,20 @@ ssize_t libfsntfs_attribute_read_from_mft(
 /* TODO check size of LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES */
 	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
 	{
-		if( internal_attribute->size > ( mft_entry_data_size - mft_attribute_data_offset ) )
+		if( internal_attribute->size > ( data_size - mft_attribute_data_offset ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: attribute size value too small.",
+			 "%s: data size value too small.",
 			 function );
 
 			goto on_error;
 		}
 		if( internal_attribute->name_size > 0 )
 		{
-			if( internal_attribute->name_offset >= ( mft_entry_data_size - mft_attribute_data_offset ) )
+			if( internal_attribute->name_offset >= ( data_size - mft_attribute_data_offset ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -1421,13 +1421,13 @@ ssize_t libfsntfs_attribute_read_from_mft(
 		}
 		mft_attribute_data_offset += sizeof( fsntfs_mft_attribute_header_t );
 
-		if( mft_attribute_data_offset >= mft_entry_data_size )
+		if( mft_attribute_data_offset >= data_size )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: MFT attribute data size value too small.",
+			 "%s: data size value too small.",
 			 function );
 
 			goto on_error;
@@ -1436,8 +1436,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 		{
 			read_count = libfsntfs_attribute_read_mft_attribute_resident_data(
 			              internal_attribute,
-			              &( mft_entry_data[ mft_attribute_data_offset ] ),
-			              mft_entry_data_size - mft_attribute_data_offset,
+			              &( data[ mft_attribute_data_offset ] ),
+			              data_size - mft_attribute_data_offset,
 			              error );
 
 			if( read_count <= -1 )
@@ -1456,7 +1456,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + read_count;
 
 				if( ( internal_attribute->data_offset < header_data_size )
-				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( mft_entry_data_size - header_data_size ) ) )
+				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( data_size - header_data_size ) ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1476,8 +1476,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			read_count = libfsntfs_attribute_read_mft_attribute_non_resident_data(
 			              internal_attribute,
 			              io_handle,
-			              &( mft_entry_data[ mft_attribute_data_offset ] ),
-			              mft_entry_data_size - mft_attribute_data_offset,
+			              &( data[ mft_attribute_data_offset ] ),
+			              data_size - mft_attribute_data_offset,
 			              error );
 
 			if( read_count <= -1 )
@@ -1496,7 +1496,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + read_count;
 
 				if( ( internal_attribute->data_runs_offset < header_data_size )
-				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( mft_entry_data_size - header_data_size ) ) )
+				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( data_size - header_data_size ) ) )
 				{
 					libcerror_error_set(
 					 error,
@@ -1524,7 +1524,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					 "%s: unknown data:\n",
 					 function );
 					libcnotify_print_data(
-					 &( mft_entry_data[ mft_attribute_data_offset ] ),
+					 &( data[ mft_attribute_data_offset ] ),
 					 unknown_data_size,
 					 0 );
 				}
@@ -1533,8 +1533,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			}
 			read_count = libfsntfs_attribute_read_mft_attribute_name_data(
 			              internal_attribute,
-			              &( mft_entry_data[ mft_attribute_data_offset ] ),
-			              mft_entry_data_size - mft_attribute_data_offset,
+			              &( data[ mft_attribute_data_offset ] ),
+			              data_size - mft_attribute_data_offset,
 			              error );
 
 			if( read_count <= -1 )
@@ -1563,7 +1563,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					 "%s: unknown data:\n",
 					 function );
 					libcnotify_print_data(
-					 &( mft_entry_data[ mft_attribute_data_offset ] ),
+					 &( data[ mft_attribute_data_offset ] ),
 					 unknown_data_size,
 					 0 );
 				}
@@ -1573,8 +1573,8 @@ ssize_t libfsntfs_attribute_read_from_mft(
 			read_count = libfsntfs_attribute_read_mft_attribute_data_runs_data(
 			              internal_attribute,
 			              io_handle,
-			              &( mft_entry_data[ mft_attribute_data_offset ] ),
-			              mft_entry_data_size - mft_attribute_data_offset,
+			              &( data[ mft_attribute_data_offset ] ),
+			              data_size - mft_attribute_data_offset,
 			              flags,
 			              error );
 
@@ -1602,7 +1602,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 					 "%s: unknown data:\n",
 					 function );
 					libcnotify_print_data(
-					 &( mft_entry_data[ mft_attribute_data_offset ] ),
+					 &( data[ mft_attribute_data_offset ] ),
 					 (size_t) internal_attribute->data_offset - mft_attribute_data_offset,
 					 0 );
 				}
@@ -1643,14 +1643,14 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 "%s: resident data:\n",
 				 function );
 				libcnotify_print_data(
-				 &( mft_entry_data[ mft_attribute_data_offset ] ),
+				 &( data[ mft_attribute_data_offset ] ),
 				 (size_t) internal_attribute->data_size,
 				 0 );
 			}
 #endif
 			if( memory_copy(
 			     internal_attribute->data,
-			     &( mft_entry_data[ mft_attribute_data_offset ] ),
+			     &( data[ mft_attribute_data_offset ] ),
 			     (size_t) internal_attribute->data_size ) == NULL )
 			{
 				libcerror_error_set(
@@ -1673,7 +1673,7 @@ ssize_t libfsntfs_attribute_read_from_mft(
 				 "%s: trailing data:\n",
 				 function );
 				libcnotify_print_data(
-				 &( mft_entry_data[ mft_attribute_data_offset ] ),
+				 &( data[ mft_attribute_data_offset ] ),
 				 (size_t) internal_attribute->size - mft_attribute_data_offset,
 				 0 );
 			}

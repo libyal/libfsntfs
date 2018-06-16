@@ -54,6 +54,11 @@ uint8_t fsntfs_test_mft_attribute_name_data1[ 8 ] = {
 uint8_t fsntfs_test_mft_attribute_data_runs_data1[ 8 ] = {
 	0x33, 0x80, 0x8f, 0x00, 0x00, 0x00, 0x0c, 0x00 };
 
+uint8_t fsntfs_test_mft_attribute1[ 48 ] = {
+	0x60, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x04, 0x00,
+	0x12, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x4b, 0x00, 0x57, 0x00, 0x2d, 0x00, 0x53, 0x00,
+	0x52, 0x00, 0x43, 0x00, 0x48, 0x00, 0x2d, 0x00, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 uint8_t fsntfs_test_attribute_list_entry_header_data1[ 26 ] = {
 	0x10, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x1a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00 };
@@ -1337,7 +1342,7 @@ int fsntfs_test_attribute_read_mft_attribute_data_runs_data(
 	              (libfsntfs_internal_attribute_t *) attribute,
 	              io_handle,
 	              NULL,
-	              7,
+	              8,
 	              0,
 	              &error );
 
@@ -1377,6 +1382,240 @@ int fsntfs_test_attribute_read_mft_attribute_data_runs_data(
 	              (libfsntfs_internal_attribute_t *) attribute,
 	              io_handle,
 	              fsntfs_test_mft_attribute_data_runs_data1,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "attribute",
+	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( attribute != NULL )
+	{
+		libfsntfs_internal_attribute_free(
+		 (libfsntfs_internal_attribute_t **) &attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_attribute_read_from_mft_entry_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_attribute_read_from_mft_entry_data(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_attribute_t *attribute = NULL;
+	libfsntfs_io_handle_t *io_handle = NULL;
+	ssize_t read_count               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_initialize(
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "attribute",
+	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              attribute,
+	              io_handle,
+	              fsntfs_test_mft_attribute1,
+	              48,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 48 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              NULL,
+	              io_handle,
+	              fsntfs_test_mft_attribute1,
+	              48,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              attribute,
+	              NULL,
+	              fsntfs_test_mft_attribute1,
+	              48,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              attribute,
+	              io_handle,
+	              NULL,
+	              48,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              attribute,
+	              io_handle,
+	              fsntfs_test_mft_attribute1,
+	              (size_t) SSIZE_MAX + 1,
+	              0,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_attribute_read_from_mft_entry_data(
+	              attribute,
+	              io_handle,
+	              fsntfs_test_mft_attribute1,
+	              0,
 	              0,
 	              0,
 	              &error );
@@ -3256,7 +3495,9 @@ int main(
 	 "libfsntfs_attribute_read_mft_attribute_data_runs_data",
 	 fsntfs_test_attribute_read_mft_attribute_data_runs_data );
 
-	/* TODO: add tests for libfsntfs_attribute_read_from_mft */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_attribute_read_from_mft_entry_data",
+	 fsntfs_test_attribute_read_from_mft_entry_data );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_attribute_read_attribute_list_entry_header",

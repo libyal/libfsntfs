@@ -74,6 +74,7 @@ check_PROGRAMS = \
 	fsntfs_test_usn_change_journal \
 	fsntfs_test_volume \
 	fsntfs_test_volume_header \
+	fsntfs_test_volume_information_attribute \
 	fsntfs_test_volume_information_values \
 	fsntfs_test_volume_name_attribute \
 	fsntfs_test_volume_name_values
@@ -505,6 +506,18 @@ fsntfs_test_volume_header_SOURCES = \
 	fsntfs_test_volume_header.c
 
 fsntfs_test_volume_header_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_volume_information_attribute_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h \
+	fsntfs_test_volume_information_attribute.c
+
+fsntfs_test_volume_information_attribute_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
