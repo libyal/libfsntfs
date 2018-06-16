@@ -473,7 +473,7 @@ int libfsntfs_volume_header_read_data(
 		 ( (fsntfs_volume_header_t *) data )->sector_signature,
 		 value_16bit );
 		libcnotify_printf(
-		 "%s: sector signature\t\t: 0x%04" PRIx16 "\n",
+		 "%s: sector signature\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
 		 value_16bit );
 
@@ -626,12 +626,12 @@ int libfsntfs_volume_header_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: calculated MFT entry size\t: %" PRIu32 "\n",
+		 "%s: calculated MFT entry size\t\t: %" PRIu32 "\n",
 		 function,
 		 volume_header->mft_entry_size );
 
 		libcnotify_printf(
-		 "%s: calculated index entry size\t: %" PRIu32 "\n",
+		 "%s: calculated index entry size\t\t: %" PRIu32 "\n",
 		 function,
 		 volume_header->index_entry_size );
 
@@ -641,14 +641,15 @@ int libfsntfs_volume_header_read_data(
 		 volume_header->mft_offset );
 
 		libcnotify_printf(
-		 "%s: calculated mirror MFT offset\t: 0x%08" PRIx64 "\n",
+		 "%s: calculated mirror MFT offset\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 volume_header->mirror_mft_offset );
 
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 }
 

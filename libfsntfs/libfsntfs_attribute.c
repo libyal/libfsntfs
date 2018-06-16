@@ -447,6 +447,19 @@ int libfsntfs_attribute_read_mft_attribute_header(
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
+	if( internal_attribute->name_size > (uint16_t) INT16_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: attribute name size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	internal_attribute->name_size *= 2;
+
 	return( 1 );
 }
 
@@ -791,6 +804,464 @@ ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
 	return( (ssize_t) non_resident_data_size );
 }
 
+/* Reads the MFT attribute name data
+ * Returns the number of bytes read if successful or -1 on error
+ */
+ssize_t libfsntfs_attribute_read_mft_attribute_name_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         const uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_read_mft_attribute_name_data";
+
+	if( internal_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size < internal_attribute->name_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: unsupported data size value too small.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: MFT attribute name data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 (size_t) internal_attribute->name_size,
+		 0 );
+	}
+#endif
+	if( internal_attribute->name_size > 0 )
+	{
+		internal_attribute->name = (uint8_t *) memory_allocate(
+		                                        sizeof( uint8_t ) * (size_t) internal_attribute->name_size );
+
+		if( internal_attribute->name == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create attribute name.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     internal_attribute->name,
+		     data,
+		     (size_t) internal_attribute->name_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy attribute name.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( libfsntfs_debug_print_utf16_string_value(
+			     function,
+			     "name\t\t\t",
+			     internal_attribute->name,
+			     (size_t) internal_attribute->name_size,
+			     LIBUNA_ENDIAN_LITTLE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print UTF-16 string value.",
+				 function );
+
+				goto on_error;
+			}
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+	}
+	return( (ssize_t) internal_attribute->name_size );
+
+on_error:
+	if( internal_attribute->name != NULL )
+	{
+		memory_free(
+		 internal_attribute->name );
+
+		internal_attribute->name = NULL;
+	}
+	internal_attribute->name_size = 0;
+
+	return( -1 );
+}
+
+/* Reads the MFT attribute data runs data
+ * Returns the number of bytes read if successful or -1 on error
+ */
+ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         libfsntfs_io_handle_t *io_handle,
+         const uint8_t *data,
+         size_t data_size,
+         uint8_t flags,
+         libcerror_error_t **error )
+{
+	libfsntfs_data_run_t *data_run              = NULL;
+	static char *function                       = "libfsntfs_attribute_read_mft_attribute_data_runs_data";
+	size64_t data_run_size                      = 0;
+	size_t data_offset                          = 0;
+	off64_t data_block_offset                   = 0;
+	off64_t data_run_offset                     = 0;
+	uint64_t data_run_number_of_cluster_blocks  = 0;
+	uint64_t last_data_run_cluster_block_number = 0;
+	int64_t data_run_cluster_block_number       = 0;
+	uint32_t range_flags                        = 0;
+	uint8_t data_run_value_index                = 0;
+	uint8_t data_run_value_size                 = 0;
+	uint8_t data_run_value_size_tuple           = 0;
+	int data_run_index                          = 0;
+	int entry_index                             = 0;
+
+	if( internal_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_offset >= data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: MFT attribute data size value too small.",
+		 function );
+
+		return( -1 );
+	}
+	while( data[ data_offset ] != 0 )
+	{
+		data_run_value_size_tuple = data[ data_offset ];
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: data run: %02d data:\n",
+			 function,
+			 data_run_index );
+			libcnotify_print_data(
+			 &( data[ data_offset ] ),
+			 (size_t) ( 1 + ( data_run_value_size_tuple & 0x0f ) + ( ( data_run_value_size_tuple >> 4 ) & 0x0f ) ),
+			 0 );
+
+			libcnotify_printf(
+			 "%s: data run: %02d value sizes\t\t\t: %" PRIu8 ", %" PRIu8 "\n",
+			 function,
+			 data_run_index,
+			 data_run_value_size_tuple & 0x0f,
+			 ( data_run_value_size_tuple >> 4 ) & 0x0f );
+		}
+#endif
+		data_offset++;
+
+		data_run_number_of_cluster_blocks = 0;
+		range_flags                       = 0;
+
+		data_run_value_size = data_run_value_size_tuple & 0x0f;
+
+/* TODO determine if is this a corrupt data run */
+		/* Determine the number of cluster blocks value */
+		if( data_run_value_size == 0 )
+		{
+			/* An empty number of cluster blocks value size indicates the end of the data runs.
+			 */
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: detected empty number of cluster blocks value size.\n",
+				 function );
+			}
+#endif
+			break;
+		}
+		if( ( data_offset >= data_size )
+		 || ( data_run_value_size > ( data_size - data_offset ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: MFT attribute data size value too small.",
+			 function );
+
+			goto on_error;
+		}
+		for( data_run_value_index = data_run_value_size;
+		     data_run_value_index > 0;
+		     data_run_value_index-- )
+		{
+			data_run_number_of_cluster_blocks <<= 8;
+			data_run_number_of_cluster_blocks  |= data[ data_offset + data_run_value_index - 1 ];
+		}
+		data_offset += data_run_value_size;
+
+		/* Determine the cluster block number value */
+		data_run_value_size = ( data_run_value_size_tuple >> 4 ) & 0x0f;
+
+		if( data_run_value_size == 0 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+				 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
+				{
+					libcnotify_printf(
+					 "%s: data run is sparse but no flags set.\n",
+					 function );
+				}
+			}
+#endif
+/* TODO: assuming a data run is sparse even if LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE or LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK is not set ? */
+			range_flags |= LIBFDATA_RANGE_FLAG_IS_SPARSE;
+		}
+		else
+		{
+			if( ( data_offset >= data_size )
+			 || ( data_run_value_size > ( data_size - data_offset ) ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: MFT data run value size value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			if( ( last_data_run_cluster_block_number != 0 )
+			 && ( ( data[ data_offset + data_run_value_size - 1 ] & 0x80 ) != 0 ) )
+			{
+				data_run_cluster_block_number = -1;
+			}
+			else
+			{
+				data_run_cluster_block_number = 0;
+			}
+			for( data_run_value_index = data_run_value_size;
+			     data_run_value_index > 0;
+			     data_run_value_index-- )
+			{
+				data_run_cluster_block_number <<= 8;
+				data_run_cluster_block_number  |= data[ data_offset + data_run_value_index - 1 ];
+			}
+			data_offset += data_run_value_size;
+		}
+		if( data_run_value_size == 0 )
+		{
+			data_run_offset = 0;
+		}
+		else
+		{
+			last_data_run_cluster_block_number += data_run_cluster_block_number;
+
+			data_run_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
+		}
+		data_run_size = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: data run: %02d number of cluster blocks\t: %" PRIu64 " (size: %" PRIu64 ")\n",
+			 function,
+			 data_run_index,
+			 data_run_number_of_cluster_blocks,
+			 data_run_size );
+
+			libcnotify_printf(
+			 "%s: data run: %02d cluster block number\t\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
+			 function,
+			 data_run_index,
+			 last_data_run_cluster_block_number,
+			 data_run_cluster_block_number,
+			 data_run_offset );
+
+			if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+			{
+				libcnotify_printf(
+				 "\tIs sparse\n" );
+			}
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+		if( data_offset >= data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: MFT attribute data size value too small.",
+			 function );
+
+			goto on_error;
+		}
+/* TODO this breaks internal_attribute->data_size is not always larger than data_block_offset
+* seen in multi data attribute MFT
+
+		if( internal_attribute->data_size != 0 )
+		{
+			if( ( data_block_offset + data_run_size ) >= internal_attribute->data_size )
+			{
+				data_run_size = internal_attribute->data_size - data_block_offset;
+			}
+		}
+*/
+		data_block_offset += data_run_size;
+
+		if( libfsntfs_data_run_initialize(
+		     &data_run,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create data run.",
+			 function );
+
+			goto on_error;
+		}
+		data_run->start_offset = data_run_offset;
+		data_run->size         = data_run_size;
+		data_run->range_flags  = range_flags;
+
+		if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
+		{
+			if( libcdata_array_append_entry(
+			     internal_attribute->data_runs_array,
+			     &entry_index,
+			     (intptr_t *) data_run,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append data run to array.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		data_run = NULL;
+
+		data_run_index++;
+	}
+	return( (ssize_t) data_offset );
+
+on_error:
+	if( data_run != NULL )
+	{
+		libfsntfs_data_run_free(
+		 &data_run,
+		 NULL );
+	}
+	libcdata_array_empty(
+	 internal_attribute->data_runs_array,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
+	 NULL );
+
+	return( -1 );
+}
+
 /* Reads the attribute from the MFT attributes data in a MFT entry
  * Returns the number of bytes read if successful or -1 on error
  */
@@ -803,25 +1274,11 @@ ssize_t libfsntfs_attribute_read_from_mft(
          uint8_t flags,
          libcerror_error_t **error )
 {
-	libfsntfs_data_run_t *data_run                     = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	uint8_t *mft_attribute_data_run_data               = NULL;
 	static char *function                              = "libfsntfs_attribute_read_from_mft";
-	size64_t data_run_size                             = 0;
 	size_t header_data_size                            = 0;
 	size_t unknown_data_size                           = 0;
 	ssize_t read_count                                 = 0;
-	off64_t data_block_offset                          = 0;
-	off64_t data_run_offset                            = 0;
-	uint64_t data_run_number_of_cluster_blocks         = 0;
-	uint64_t last_data_run_cluster_block_number        = 0;
-	int64_t data_run_cluster_block_number              = 0;
-	uint32_t range_flags                               = 0;
-	uint8_t data_run_value_index                       = 0;
-	uint8_t data_run_value_size                        = 0;
-	uint8_t data_run_value_size_tuple                  = 0;
-	int data_run_index                                 = 0;
-	int entry_index                                    = 0;
 
 	if( attribute == NULL )
 	{
@@ -1074,84 +1531,24 @@ ssize_t libfsntfs_attribute_read_from_mft(
 #endif
 				mft_attribute_data_offset += unknown_data_size;
 			}
-			internal_attribute->name_size *= 2;
+			read_count = libfsntfs_attribute_read_mft_attribute_name_data(
+			              internal_attribute,
+			              &( mft_entry_data[ mft_attribute_data_offset ] ),
+			              mft_entry_data_size - mft_attribute_data_offset,
+			              error );
 
-			if( ( mft_attribute_data_offset + internal_attribute->name_size ) > mft_entry_data_size )
+			if( read_count <= -1 )
 			{
 				libcerror_error_set(
 				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-				 "%s: MFT attribute data size value too small.",
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read MFT attribute name data.",
 				 function );
 
 				goto on_error;
 			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: name data:\n",
-				 function );
-				libcnotify_print_data(
-				 &( mft_entry_data[ mft_attribute_data_offset ] ),
-				 (size_t) internal_attribute->name_size,
-				 0 );
-			}
-#endif
-			internal_attribute->name = (uint8_t *) memory_allocate(
-			                                        sizeof( uint8_t ) * (size_t) internal_attribute->name_size );
-
-			if( internal_attribute->name == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create attribute name.",
-				 function );
-
-				goto on_error;
-			}
-			if( memory_copy(
-			     internal_attribute->name,
-			     &( mft_entry_data[ mft_attribute_data_offset ] ),
-			     (size_t) internal_attribute->name_size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy attribute name.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( libfsntfs_debug_print_utf16_string_value(
-				     function,
-				     "name\t\t\t\t\t",
-				     internal_attribute->name,
-				     (size_t) internal_attribute->name_size,
-				     LIBUNA_ENDIAN_LITTLE,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-					 "%s: unable to print UTF-16 string value.",
-					 function );
-
-					goto on_error;
-				}
-				libcnotify_printf(
-				 "\n" );
-			}
-#endif
-			mft_attribute_data_offset += (size_t) internal_attribute->name_size;
+			mft_attribute_data_offset += read_count;
 		}
 		if( internal_attribute->data_runs_offset > 0 )
 		{
@@ -1173,239 +1570,26 @@ ssize_t libfsntfs_attribute_read_from_mft(
 #endif
 				mft_attribute_data_offset += unknown_data_size;
 			}
-			mft_attribute_data_run_data = &( mft_entry_data[ mft_attribute_data_offset ] );
+			read_count = libfsntfs_attribute_read_mft_attribute_data_runs_data(
+			              internal_attribute,
+			              io_handle,
+			              &( mft_entry_data[ mft_attribute_data_offset ] ),
+			              mft_entry_data_size - mft_attribute_data_offset,
+			              flags,
+			              error );
 
-			while( *mft_attribute_data_run_data != 0 )
+			if( read_count <= -1 )
 			{
-				if( ( mft_attribute_data_offset + 1 ) > mft_entry_data_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-					 "%s: MFT attribute data size value too small.",
-					 function );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read MFT attribute data runs data.",
+				 function );
 
-					goto on_error;
-				}
-				data_run_value_size_tuple = *mft_attribute_data_run_data;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: data run: %02d data:\n",
-					 function,
-					 data_run_index );
-					libcnotify_print_data(
-					 mft_attribute_data_run_data,
-					 (size_t) ( 1 + ( data_run_value_size_tuple & 0x0f ) + ( ( data_run_value_size_tuple >> 4 ) & 0x0f ) ),
-					 0 );
-				}
-#endif
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: data run: %02d value sizes\t\t\t: %" PRIu8 ", %" PRIu8 "\n",
-					 function,
-					 data_run_index,
-					 data_run_value_size_tuple & 0x0f,
-					 ( data_run_value_size_tuple >> 4 ) & 0x0f );
-				}
-#endif
-				mft_attribute_data_run_data += 1;
-				mft_attribute_data_offset   += 1;
-
-				data_run_number_of_cluster_blocks = 0;
-				range_flags                       = 0;
-
-				data_run_value_size = data_run_value_size_tuple & 0x0f;
-
-/* TODO determine if is this a corrupt data run */
-				/* Determine the number of cluster blocks value */
-				if( data_run_value_size == 0 )
-				{
-					/* A empty number of cluster blocks value size seems to also
-					 * depict the end of the data runs. The data runs after do not
-					 * seem to make sense.
-					 */
-#if defined( HAVE_DEBUG_OUTPUT )
-					if( libcnotify_verbose != 0 )
-					{
-						libcnotify_printf(
-						 "%s: detected empty number of cluster blocks value size.\n",
-						 function );
-					}
-#endif
-					break;
-                                }
-				if( ( mft_attribute_data_offset >= mft_entry_data_size )
-				 || ( data_run_value_size > ( mft_entry_data_size - mft_attribute_data_offset ) ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-					 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-					 "%s: MFT attribute data size value too small.",
-					 function );
-
-					goto on_error;
-				}
-				for( data_run_value_index = data_run_value_size;
-				     data_run_value_index > 0;
-				     data_run_value_index-- )
-				{
-					data_run_number_of_cluster_blocks <<= 8;
-					data_run_number_of_cluster_blocks  |= mft_attribute_data_run_data[ data_run_value_index - 1 ];
-				}
-				mft_attribute_data_run_data += data_run_value_size;
-				mft_attribute_data_offset   += data_run_value_size;
-
-				/* Determine the cluster block number value */
-				data_run_value_size = ( data_run_value_size_tuple >> 4 ) & 0x0f;
-
-				if( data_run_value_size == 0 )
-				{
-#if defined( HAVE_DEBUG_OUTPUT )
-					if( libcnotify_verbose != 0 )
-					{
-						if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
-						 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
-						{
-							libcnotify_printf(
-							 "%s: data run is sparse but no flags set.\n",
-							 function );
-						}
-					}
-#endif
-/* TODO: assuming a data run is sparse even if LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE or LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK is not set ? */
-					range_flags |= LIBFDATA_RANGE_FLAG_IS_SPARSE;
-				}
-				else
-				{
-					if( ( mft_attribute_data_offset >= mft_entry_data_size )
-					 || ( data_run_value_size > ( mft_entry_data_size - mft_attribute_data_offset ) ) )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-						 "%s: MFT data run value size value out of bounds.",
-						 function );
-
-						goto on_error;
-					}
-					if( ( last_data_run_cluster_block_number != 0 )
-					 && ( ( mft_attribute_data_run_data[ data_run_value_size - 1 ] & 0x80 ) != 0 ) )
-					{
-						data_run_cluster_block_number = -1;
-					}
-					else
-					{
-						data_run_cluster_block_number = 0;
-					}
-					for( data_run_value_index = data_run_value_size;
-					     data_run_value_index > 0;
-					     data_run_value_index-- )
-					{
-						data_run_cluster_block_number <<= 8;
-						data_run_cluster_block_number  |= mft_attribute_data_run_data[ data_run_value_index - 1 ];
-					}
-					mft_attribute_data_run_data += data_run_value_size;
-					mft_attribute_data_offset   += data_run_value_size;
-				}
-				if( data_run_value_size == 0 )
-				{
-					data_run_offset = 0;
-				}
-				else
-				{
-					last_data_run_cluster_block_number += data_run_cluster_block_number;
-
-					data_run_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
-				}
-				data_run_size = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: data run: %02d number of cluster blocks\t: %" PRIu64 " (size: %" PRIu64 ")\n",
-					 function,
-					 data_run_index,
-					 data_run_number_of_cluster_blocks,
-					 data_run_size );
-
-					libcnotify_printf(
-					 "%s: data run: %02d cluster block number\t\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
-					 function,
-					 data_run_index,
-					 last_data_run_cluster_block_number,
-					 data_run_cluster_block_number,
-					 data_run_offset );
-
-					if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-					{
-						libcnotify_printf(
-						 "\tIs sparse\n" );
-					}
-					libcnotify_printf(
-					 "\n" );
-				}
-#endif
-/* TODO this breaks internal_attribute->data_size is not always larger than data_block_offset
- * seen in multi data attribute MFT
-
-				if( internal_attribute->data_size != 0 )
-				{
-					if( ( data_block_offset + data_run_size ) >= internal_attribute->data_size )
-					{
-						data_run_size = internal_attribute->data_size - data_block_offset;
-					}
-				}
-*/
-				data_block_offset += data_run_size;
-
-				if( libfsntfs_data_run_initialize(
-				     &data_run,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create data run.",
-					 function );
-
-					goto on_error;
-				}
-				data_run->start_offset = data_run_offset;
-				data_run->size         = data_run_size;
-				data_run->range_flags  = range_flags;
-
-				if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
-				{
-					if( libcdata_array_append_entry(
-					     internal_attribute->data_runs_array,
-					     &entry_index,
-					     (intptr_t *) data_run,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-						 "%s: unable to append data run to array.",
-						 function );
-
-						goto on_error;
-					}
-				}
-				data_run = NULL;
-
-				data_run_index++;
+				goto on_error;
 			}
+			mft_attribute_data_offset += read_count;
 		}
 		else
 		{
@@ -1499,12 +1683,6 @@ ssize_t libfsntfs_attribute_read_from_mft(
 	return( (ssize_t) internal_attribute->size );
 
 on_error:
-	if( data_run != NULL )
-	{
-		libfsntfs_data_run_free(
-		 &data_run,
-		 NULL );
-	}
 	if( internal_attribute->name != NULL )
 	{
 		memory_free(

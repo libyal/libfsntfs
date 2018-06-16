@@ -799,8 +799,11 @@ int main(
 #endif
 {
 	libcerror_error_t *error                           = NULL;
-	libfsntfs_volume_name_values_t *volume_name_values = NULL;
 	int result                                         = 0;
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	libfsntfs_volume_name_values_t *volume_name_values = NULL;
+#endif
 
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
@@ -820,8 +823,6 @@ int main(
 	 fsntfs_test_volume_name_values_read_data );
 
 	/* TODO: add tests for libfsntfs_volume_name_values_read_from_attribute */
-
-#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
@@ -859,8 +860,6 @@ int main(
 	 "error",
 	 error );
 
-#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
-
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_volume_name_values_get_utf8_name_size",
 	 fsntfs_test_volume_name_values_get_utf8_name_size,
@@ -880,8 +879,6 @@ int main(
 	 "libfsntfs_volume_name_values_get_utf16_name",
 	 fsntfs_test_volume_name_values_get_utf16_name,
 	 volume_name_values );
-
-#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	/* Clean up
 	 */
@@ -904,6 +901,8 @@ int main(
 
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	return( EXIT_SUCCESS );
 
 on_error:
@@ -912,12 +911,14 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 	if( volume_name_values != NULL )
 	{
 		libfsntfs_volume_name_values_free(
 		 &volume_name_values,
 		 NULL );
 	}
+#endif
 	return( EXIT_FAILURE );
 }
 

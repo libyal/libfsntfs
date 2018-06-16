@@ -175,6 +175,20 @@ ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
          size_t data_size,
          libcerror_error_t **error );
 
+ssize_t libfsntfs_attribute_read_mft_attribute_name_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         const uint8_t *data,
+         size_t data_size,
+         libcerror_error_t **error );
+
+ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
+         libfsntfs_internal_attribute_t *internal_attribute,
+         libfsntfs_io_handle_t *io_handle,
+         const uint8_t *data,
+         size_t data_size,
+         uint8_t flags,
+         libcerror_error_t **error );
+
 ssize_t libfsntfs_attribute_read_from_mft(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
