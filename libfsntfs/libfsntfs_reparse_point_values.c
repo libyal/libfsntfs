@@ -227,7 +227,7 @@ int libfsntfs_reparse_point_values_read_data(
 		 "\n" );
 
 		libcnotify_printf(
-		 "%s: reparse data size\t\t\t: %" PRIu16 "\n",
+		 "%s: reparse data size\t\t: %" PRIu16 "\n",
 		 function,
 		 reparse_point_values->reparse_data_size );
 
@@ -300,7 +300,7 @@ int libfsntfs_reparse_point_values_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: substitute name offset\t\t: 0x%04" PRIx16 "\n",
+			 "%s: substitute name offset\t: 0x%04" PRIx16 "\n",
 			 function,
 			 reparse_point_values->substitute_name_offset );
 
@@ -310,12 +310,12 @@ int libfsntfs_reparse_point_values_read_data(
 			 reparse_point_values->substitute_name_size );
 
 			libcnotify_printf(
-			 "%s: print name offset\t\t\t: 0x%04" PRIx16 "\n",
+			 "%s: print name offset\t\t: 0x%04" PRIx16 "\n",
 			 function,
 			 reparse_point_values->print_name_offset );
 
 			libcnotify_printf(
-			 "%s: print name size\t\t\t: %" PRIu16 "\n",
+			 "%s: print name size\t\t: %" PRIu16 "\n",
 			 function,
 			 reparse_point_values->print_name_size );
 		}
@@ -336,7 +336,7 @@ int libfsntfs_reparse_point_values_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: flags\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 flags );
 		}
@@ -458,7 +458,7 @@ int libfsntfs_reparse_point_values_read_data(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: substitute name\t\t\t: %" PRIs_SYSTEM "\n",
+			 "%s: substitute name\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 
@@ -565,7 +565,7 @@ int libfsntfs_reparse_point_values_read_data(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: print name\t\t\t\t: %" PRIs_SYSTEM "\n",
+			 "%s: print name\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

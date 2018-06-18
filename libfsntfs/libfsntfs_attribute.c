@@ -2772,6 +2772,7 @@ int libfsntfs_attribute_read_value(
 			}
 		}
 	}
+/* TODO print trailing data */
 	return( 1 );
 
 on_error:

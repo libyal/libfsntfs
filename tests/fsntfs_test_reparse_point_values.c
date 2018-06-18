@@ -35,6 +35,12 @@
 
 #include "../libfsntfs/libfsntfs_reparse_point_values.h"
 
+uint8_t fsntfs_test_reparse_point_values_data1[ 60 ] = {
+	0x03, 0x00, 0x00, 0xa0, 0x34, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x1a, 0x00, 0x10, 0x00,
+	0x5c, 0x00, 0x3f, 0x00, 0x3f, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x3a, 0x00, 0x5c, 0x00, 0x55, 0x00,
+	0x73, 0x00, 0x65, 0x00, 0x72, 0x00, 0x73, 0x00, 0x00, 0x00, 0x43, 0x00, 0x3a, 0x00, 0x5c, 0x00,
+	0x55, 0x00, 0x73, 0x00, 0x65, 0x00, 0x72, 0x00, 0x73, 0x00, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_reparse_point_values_initialize function
@@ -266,6 +272,144 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_values_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_values_read_data(
+     void )
+{
+	libcerror_error_t *error                               = NULL;
+	libfsntfs_reparse_point_values_t *reparse_point_values = NULL;
+	int result                                             = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_reparse_point_values_initialize(
+	          &reparse_point_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "reparse_point_values",
+	 reparse_point_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_values_read_data(
+	          reparse_point_values,
+	          fsntfs_test_reparse_point_values_data1,
+	          60,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_values_read_data(
+	          NULL,
+	          fsntfs_test_reparse_point_values_data1,
+	          60,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_reparse_point_values_read_data(
+	          reparse_point_values,
+	          NULL,
+	          60,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_reparse_point_values_read_data(
+	          reparse_point_values,
+	          fsntfs_test_reparse_point_values_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_reparse_point_values_free(
+	          &reparse_point_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "reparse_point_values",
+	 reparse_point_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( reparse_point_values != NULL )
+	{
+		libfsntfs_reparse_point_values_free(
+		 &reparse_point_values,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -1564,7 +1708,9 @@ int main(
 	 "libfsntfs_reparse_point_values_free",
 	 fsntfs_test_reparse_point_values_free );
 
-	/* TODO: add tests for libfsntfs_reparse_point_values_read_data */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_reparse_point_values_read_data",
+	 fsntfs_test_reparse_point_values_read_data );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_reparse_point_values_get_tag",

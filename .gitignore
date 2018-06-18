@@ -146,6 +146,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_mft_metadata_file
 /tests/fsntfs_test_notify
 /tests/fsntfs_test_object_identifier_values
+/tests/fsntfs_test_reparse_point_attribute
 /tests/fsntfs_test_reparse_point_values
 /tests/fsntfs_test_security_descriptor_index
 /tests/fsntfs_test_security_descriptor_index_value

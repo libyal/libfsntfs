@@ -21,6 +21,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \
 	fsntfs_test_notify/fsntfs_test_notify.vcproj \
 	fsntfs_test_object_identifier_values/fsntfs_test_object_identifier_values.vcproj \
+	fsntfs_test_reparse_point_attribute/fsntfs_test_reparse_point_attribute.vcproj \
 	fsntfs_test_reparse_point_values/fsntfs_test_reparse_point_values.vcproj \
 	fsntfs_test_security_descriptor_index/fsntfs_test_security_descriptor_index.vcproj \
 	fsntfs_test_security_descriptor_index_value/fsntfs_test_security_descriptor_index_value.vcproj \
