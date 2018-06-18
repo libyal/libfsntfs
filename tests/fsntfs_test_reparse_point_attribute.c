@@ -120,6 +120,790 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf8_substitute_name_size(
+     libfsntfs_attribute_t *attribute )
+{
+	libcerror_error_t *error             = NULL;
+	size_t utf8_substitute_name_size     = 0;
+	int result                           = 0;
+	int utf8_substitute_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+	          attribute,
+	          &utf8_substitute_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_substitute_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+	          NULL,
+	          &utf8_substitute_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_substitute_name_size_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+		          attribute,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf8_substitute_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf8_substitute_name(
+     libfsntfs_attribute_t *attribute )
+{
+	uint8_t utf8_substitute_name[ 512 ];
+
+	libcerror_error_t *error        = NULL;
+	int result                      = 0;
+	int utf8_substitute_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+	          attribute,
+	          utf8_substitute_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_substitute_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+	          NULL,
+	          utf8_substitute_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_substitute_name_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		          attribute,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		          attribute,
+		          utf8_substitute_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		          attribute,
+		          utf8_substitute_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf16_substitute_name_size(
+     libfsntfs_attribute_t *attribute )
+{
+	libcerror_error_t *error              = NULL;
+	size_t utf16_substitute_name_size     = 0;
+	int result                            = 0;
+	int utf16_substitute_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+	          attribute,
+	          &utf16_substitute_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_substitute_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+	          NULL,
+	          &utf16_substitute_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_substitute_name_size_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+		          attribute,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf16_substitute_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf16_substitute_name(
+     libfsntfs_attribute_t *attribute )
+{
+	uint16_t utf16_substitute_name[ 512 ];
+
+	libcerror_error_t *error         = NULL;
+	int result                       = 0;
+	int utf16_substitute_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+	          attribute,
+	          utf16_substitute_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_substitute_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+	          NULL,
+	          utf16_substitute_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_substitute_name_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		          attribute,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		          attribute,
+		          utf16_substitute_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		          attribute,
+		          utf16_substitute_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf8_print_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf8_print_name_size(
+     libfsntfs_attribute_t *attribute )
+{
+	libcerror_error_t *error        = NULL;
+	size_t utf8_print_name_size     = 0;
+	int result                      = 0;
+	int utf8_print_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+	          attribute,
+	          &utf8_print_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_print_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+	          NULL,
+	          &utf8_print_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_print_name_size_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+		          attribute,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf8_print_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf8_print_name(
+     libfsntfs_attribute_t *attribute )
+{
+	uint8_t utf8_print_name[ 512 ];
+
+	libcerror_error_t *error   = NULL;
+	int result                 = 0;
+	int utf8_print_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+	          attribute,
+	          utf8_print_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf8_print_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+	          NULL,
+	          utf8_print_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf8_print_name_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+		          attribute,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+		          attribute,
+		          utf8_print_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+		          attribute,
+		          utf8_print_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf16_print_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf16_print_name_size(
+     libfsntfs_attribute_t *attribute )
+{
+	libcerror_error_t *error         = NULL;
+	size_t utf16_print_name_size     = 0;
+	int result                       = 0;
+	int utf16_print_name_size_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+	          attribute,
+	          &utf16_print_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_print_name_size_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+	          NULL,
+	          &utf16_print_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_print_name_size_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+		          attribute,
+		          NULL,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_reparse_point_attribute_get_utf16_print_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_reparse_point_attribute_get_utf16_print_name(
+     libfsntfs_attribute_t *attribute )
+{
+	uint16_t utf16_print_name[ 512 ];
+
+	libcerror_error_t *error    = NULL;
+	int result                  = 0;
+	int utf16_print_name_is_set = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+	          attribute,
+	          utf16_print_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	utf16_print_name_is_set = result;
+
+	/* Test error cases
+	 */
+	result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+	          NULL,
+	          utf16_print_name,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	if( utf16_print_name_is_set != 0 )
+	{
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+		          attribute,
+		          NULL,
+		          512,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+		          attribute,
+		          utf16_print_name,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+		          attribute,
+		          utf16_print_name,
+		          (size_t) SSIZE_MAX + 1,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -222,6 +1006,46 @@ int main(
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_reparse_point_attribute_get_tag",
 	 fsntfs_test_reparse_point_attribute_get_tag,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size",
+	 fsntfs_test_reparse_point_attribute_get_utf8_substitute_name_size,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf8_substitute_name",
+	 fsntfs_test_reparse_point_attribute_get_utf8_substitute_name,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size",
+	 fsntfs_test_reparse_point_attribute_get_utf16_substitute_name_size,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf16_substitute_name",
+	 fsntfs_test_reparse_point_attribute_get_utf16_substitute_name,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf8_print_name_size",
+	 fsntfs_test_reparse_point_attribute_get_utf8_print_name_size,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf8_print_name",
+	 fsntfs_test_reparse_point_attribute_get_utf8_print_name,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf16_print_name_size",
+	 fsntfs_test_reparse_point_attribute_get_utf16_print_name_size,
+	 attribute );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_reparse_point_attribute_get_utf16_print_name",
+	 fsntfs_test_reparse_point_attribute_get_utf16_print_name,
 	 attribute );
 
 	/* Clean up

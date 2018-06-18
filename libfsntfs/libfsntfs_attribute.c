@@ -1166,7 +1166,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 			 data_run_size );
 
 			libcnotify_printf(
-			 "%s: data run: %02d cluster block number\t\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
+			 "%s: data run: %02d cluster block number\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
 			 function,
 			 data_run_index,
 			 last_data_run_cluster_block_number,
@@ -1795,40 +1795,40 @@ int libfsntfs_attribute_read_attribute_list_entry_header(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
+		 "%s: type\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
 		 internal_attribute->type,
 		 libfsntfs_debug_print_attribute_type(
 		  internal_attribute->type ) );
 
 		libcnotify_printf(
-		 "%s: size\t\t\t\t: %" PRIu32 "\n",
+		 "%s: size\t\t\t: %" PRIu32 "\n",
 		 function,
 		 internal_attribute->size );
 
 		libcnotify_printf(
-		 "%s: name size\t\t\t\t: %" PRIu16 "\n",
+		 "%s: name size\t\t\t: %" PRIu16 "\n",
 		 function,
 		 internal_attribute->name_size );
 
 		libcnotify_printf(
-		 "%s: name offset\t\t\t\t: %" PRIu8 "\n",
+		 "%s: name offset\t\t: %" PRIu8 "\n",
 		 function,
 		 internal_attribute->name_offset );
 
 		libcnotify_printf(
-		 "%s: data first VCN\t\t\t: %" PRIu64 "\n",
+		 "%s: data first VCN\t\t: %" PRIu64 "\n",
 		 function,
 		 internal_attribute->data_first_vcn );
 
 		libcnotify_printf(
-		 "%s: file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
 		 internal_attribute->file_reference & 0xffffffffffffUL,
 		 internal_attribute->file_reference >> 48 );
 
 		libcnotify_printf(
-		 "%s: identifier\t\t\t\t: %" PRIu16 "\n",
+		 "%s: identifier\t\t: %" PRIu16 "\n",
 		 function,
 		 internal_attribute->identifier );
 

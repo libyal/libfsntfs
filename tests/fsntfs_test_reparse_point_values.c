@@ -424,7 +424,6 @@ int fsntfs_test_reparse_point_values_get_tag(
 	libfsntfs_reparse_point_values_t *reparse_point_values = NULL;
 	uint32_t tag                                           = 0;
 	int result                                             = 0;
-	int tag_is_set                                         = 0;
 
 	/* Initialize test
 	 */
@@ -461,8 +460,6 @@ int fsntfs_test_reparse_point_values_get_tag(
 	 "error",
 	 error );
 
-	tag_is_set = result;
-
 	/* Test error cases
 	 */
 	result = libfsntfs_reparse_point_values_get_tag(
@@ -482,25 +479,23 @@ int fsntfs_test_reparse_point_values_get_tag(
 	libcerror_error_free(
 	 &error );
 
-	if( tag_is_set != 0 )
-	{
-		result = libfsntfs_reparse_point_values_get_tag(
-		          reparse_point_values,
-		          NULL,
-		          &error );
+	result = libfsntfs_reparse_point_values_get_tag(
+	          reparse_point_values,
+	          NULL,
+	          &error );
 
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libfsntfs_reparse_point_values_free(
