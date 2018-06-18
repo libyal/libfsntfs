@@ -56,12 +56,12 @@ int libfsntfs_index_node_free(
      libfsntfs_index_node_t **index_node,
      libcerror_error_t **error );
 
-size_t libfsntfs_index_node_read(
-        libfsntfs_index_node_t *index_node,
-        uint8_t *index_node_data,
-        size_t index_node_data_size,
-        size_t index_node_data_offset,
-        libcerror_error_t **error );
+ssize_t libfsntfs_index_node_read_header_data(
+         libfsntfs_index_node_t *index_node,
+         uint8_t *index_node_data,
+         size_t index_node_data_size,
+         size_t index_node_data_offset,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

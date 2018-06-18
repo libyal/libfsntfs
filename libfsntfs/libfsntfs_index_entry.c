@@ -397,20 +397,20 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	read_count = libfsntfs_index_node_read(
+	read_count = libfsntfs_index_node_read_header_data(
 		      index_node,
 		      index_entry->data,
 		      index_entry->data_size,
 		      index_entry_data_offset,
 		      error );
 
-	if( read_count == -1 )
+	if( read_count <= -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read index node.",
+		 "%s: unable to read index node header.",
 		 function );
 
 		goto on_error;

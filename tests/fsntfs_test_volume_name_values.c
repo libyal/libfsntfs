@@ -340,6 +340,28 @@ int fsntfs_test_volume_name_values_read_data(
 	libcerror_error_free(
 	 &error );
 
+	volume_name_values->name = (uint8_t *) 0x12345678UL;
+
+	result = libfsntfs_volume_name_values_read_data(
+	          volume_name_values,
+	          fsntfs_test_volume_name_values_data1,
+	          18,
+	          &error );
+
+	volume_name_values->name = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
 	          NULL,
@@ -375,6 +397,40 @@ int fsntfs_test_volume_name_values_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	/* Test libfsntfs_volume_name_values_read_data with malloc failing
+	 */
+	fsntfs_test_malloc_attempts_before_fail = 0;
+
+	result = libfsntfs_volume_name_values_read_data(
+	          volume_name_values,
+	          fsntfs_test_volume_name_values_data1,
+	          18,
+	          &error );
+
+	if( fsntfs_test_malloc_attempts_before_fail != -1 )
+	{
+		fsntfs_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
+/* TODO test memcpy failure */
 
 	/* Clean up
 	 */
@@ -898,6 +954,8 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+/* TODO test with emtpy name */
 
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 

@@ -35,7 +35,10 @@
 
 #include "../libfsntfs/libfsntfs_attribute.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 #include "../libfsntfs/libfsntfs_reparse_point_attribute.h"
+#endif
 
 uint8_t fsntfs_test_reparse_point_attribute_data1[ 88 ] = {
 	0xc0, 0x00, 0x00, 0x00, 0x58, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00,

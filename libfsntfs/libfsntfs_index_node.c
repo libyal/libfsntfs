@@ -140,18 +140,18 @@ int libfsntfs_index_node_free(
 	return( 1 );
 }
 
-/* Reads the index node
+/* Reads the index node header
  * Returns the number of bytes read if successful or -1 on error
  */
-size_t libfsntfs_index_node_read(
-        libfsntfs_index_node_t *index_node,
-        uint8_t *index_node_data,
-        size_t index_node_data_size,
-        size_t index_node_data_offset,
-        libcerror_error_t **error )
+ssize_t libfsntfs_index_node_read_header_data(
+         libfsntfs_index_node_t *index_node,
+         uint8_t *data,
+         size_t data_size,
+         size_t data_offset,
+         libcerror_error_t **error )
 {
 	uint8_t *index_node_header_data = NULL;
-	static char *function           = "libfsntfs_index_node_read";
+	static char *function           = "libfsntfs_index_node_read_header_data";
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t value_32bit            = 0;
@@ -168,63 +168,63 @@ size_t libfsntfs_index_node_read(
 
 		return( -1 );
 	}
-	if( index_node_data == NULL )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index node data.",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_node_data_size > (size_t) SSIZE_MAX )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: index node data size value exceeds maximum.",
+		 "%s: data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_node_data_offset > (size_t) SSIZE_MAX )
+	if( data_offset > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: index node data offset value exceeds maximum.",
+		 "%s: data offset value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_node_data_offset >= index_node_data_size )
+	if( data_offset >= data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: index node data offset value out of bounds.",
+		 "%s: data offset value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( index_node_data_size < sizeof( fsntfs_index_node_header_t ) )
-	 || ( index_node_data_offset > ( index_node_data_size - sizeof( fsntfs_index_node_header_t ) ) ) )
+	if( ( data_size < sizeof( fsntfs_index_node_header_t ) )
+	 || ( data_offset > ( data_size - sizeof( fsntfs_index_node_header_t ) ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: index node data size value too small.",
+		 "%s: data size value too small.",
 		 function );
 
 		return( -1 );
 	}
-	index_node_header_data = &( index_node_data[ index_node_data_offset ] );
+	index_node_header_data = &( data[ data_offset ] );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -284,7 +284,7 @@ size_t libfsntfs_index_node_read(
 	if( index_node->size > 0 )
 	{
 		if( ( (size_t) index_node->size < sizeof( fsntfs_index_node_header_t ) )
-		 || ( ( index_node_data_offset + index_node->size ) > index_node_data_size ) )
+		 || ( ( data_offset + index_node->size ) > data_size ) )
 		{
 			libcerror_error_set(
 			 error,
