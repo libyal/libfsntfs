@@ -378,6 +378,24 @@ int fsntfs_test_txf_data_values_read_data(
 	libcerror_error_free(
 	 &error );
 
+	result = libfsntfs_txf_data_values_read_data(
+	          txf_data_values,
+	          fsntfs_test_txf_data_values_data1,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libfsntfs_txf_data_values_free(

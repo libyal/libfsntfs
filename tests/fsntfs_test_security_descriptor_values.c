@@ -35,6 +35,15 @@
 
 #include "../libfsntfs/libfsntfs_security_descriptor_values.h"
 
+uint8_t fsntfs_test_security_descriptor_values_data1[ 100 ] = {
+	0x01, 0x00, 0x04, 0x80, 0x48, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x14, 0x00, 0x00, 0x00, 0x02, 0x00, 0x34, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00,
+	0x89, 0x00, 0x12, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x12, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x18, 0x00, 0x89, 0x00, 0x12, 0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
+	0x20, 0x00, 0x00, 0x00, 0x20, 0x02, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
+	0x12, 0x00, 0x00, 0x00, 0x01, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x20, 0x00, 0x00, 0x00,
+	0x20, 0x02, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_security_descriptor_values_initialize function
@@ -270,17 +279,15 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_security_descriptor_values_get_data_size function
+/* Tests the libfsntfs_security_descriptor_values_read_data function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_security_descriptor_values_get_data_size(
+int fsntfs_test_security_descriptor_values_read_data(
      void )
 {
-	libcerror_error_t *error                                           = NULL;
+	libcerror_error_t *error                                         = NULL;
 	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
-	size_t data_size                                                   = 0;
-	int data_size_is_set                                               = 0;
-	int result                                                         = 0;
+	int result                                                       = 0;
 
 	/* Initialize test
 	 */
@@ -303,27 +310,27 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_security_descriptor_values_get_data_size(
+	result = libfsntfs_security_descriptor_values_read_data(
 	          security_descriptor_values,
-	          &data_size,
+	          fsntfs_test_security_descriptor_values_data1,
+	          100,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	data_size_is_set = result;
-
 	/* Test error cases
 	 */
-	result = libfsntfs_security_descriptor_values_get_data_size(
+	result = libfsntfs_security_descriptor_values_read_data(
 	          NULL,
-	          &data_size,
+	          fsntfs_test_security_descriptor_values_data1,
+	          100,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -338,25 +345,42 @@ int fsntfs_test_security_descriptor_values_get_data_size(
 	libcerror_error_free(
 	 &error );
 
-	if( data_size_is_set != 0 )
-	{
-		result = libfsntfs_security_descriptor_values_get_data_size(
-		          security_descriptor_values,
-		          NULL,
-		          &error );
+	result = libfsntfs_security_descriptor_values_read_data(
+	          security_descriptor_values,
+	          NULL,
+	          100,
+	          &error );
 
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_security_descriptor_values_read_data(
+	          security_descriptor_values,
+	          fsntfs_test_security_descriptor_values_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libfsntfs_security_descriptor_values_free(
@@ -393,6 +417,84 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_security_descriptor_values_get_data_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_security_descriptor_values_get_data_size(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values )
+{
+	libcerror_error_t *error = NULL;
+	size_t data_size         = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_security_descriptor_values_get_data_size(
+	          security_descriptor_values,
+	          &data_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "data_size",
+	 data_size,
+	 (size_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_security_descriptor_values_get_data_size(
+	          NULL,
+	          &data_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_security_descriptor_values_get_data_size(
+	          security_descriptor_values,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -407,6 +509,12 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	libcerror_error_t *error                                           = NULL;
+	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
+	int result                                                         = 0;
+#endif
+
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -420,23 +528,97 @@ int main(
 	 "libfsntfs_security_descriptor_values_free",
 	 fsntfs_test_security_descriptor_values_free );
 
-	/* TODO: add tests for libfsntfs_security_descriptor_values_read_data */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_security_descriptor_values_read_data",
+	 fsntfs_test_security_descriptor_values_read_data );
 
-	/* TODO: add tests for fsntfs_test_security_descriptor_values_read_buffer */
+	/* TODO: add tests for libfsntfs_security_descriptor_values_read_buffer */
 
 	/* TODO: add tests for libfsntfs_security_descriptor_values_read_stream */
 
-	FSNTFS_TEST_RUN(
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	/* Initialize security_descriptor_values for tests
+	 */
+	result = libfsntfs_security_descriptor_values_initialize(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO use libfsntfs_security_descriptor_values_read_buffer instead */
+	result = libfsntfs_security_descriptor_values_read_data(
+	          security_descriptor_values,
+	          fsntfs_test_security_descriptor_values_data1,
+	          100,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_security_descriptor_values_get_data_size",
-	 fsntfs_test_security_descriptor_values_get_data_size );
+	 fsntfs_test_security_descriptor_values_get_data_size,
+	 security_descriptor_values );
 
 	/* TODO: add tests for libfsntfs_security_descriptor_values_get_data */
+
+	/* Clean up
+	 */
+	result = libfsntfs_security_descriptor_values_free(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 on_error:
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( security_descriptor_values != NULL )
+	{
+		libfsntfs_security_descriptor_values_free(
+		 &security_descriptor_values,
+		 NULL );
+	}
+#endif
 	return( EXIT_FAILURE );
 }
 

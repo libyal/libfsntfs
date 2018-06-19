@@ -266,7 +266,7 @@ int libfsntfs_security_descriptor_index_value_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: hash\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: hash\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 security_descriptor_index_value->hash );
 
@@ -276,7 +276,7 @@ int libfsntfs_security_descriptor_index_value_read_data(
 		 security_descriptor_index_value->identifier );
 
 		libcnotify_printf(
-		 "%s: data offset\t\t: 0x%08" PRIx64 "\n",
+		 "%s: data offset\t: 0x%08" PRIx64 "\n",
 		 function,
 		 security_descriptor_index_value->data_offset );
 

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_functions.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
@@ -304,6 +305,241 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_volume_header_read_file_io_handle function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_read_file_io_handle(
+     void )
+{
+	libbfio_handle_t *file_io_handle         = NULL;
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_volume_header_t *volume_header = NULL;
+	int result                               = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_volume_header_initialize(
+	          &volume_header,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "volume_header",
+	 volume_header );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO handle
+	 */
+	result = fsntfs_test_open_file_io_handle(
+	          &file_io_handle,
+	          fsntfs_test_volume_header_data1,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_read_file_io_handle(
+	          volume_header,
+	          file_io_handle,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_read_file_io_handle(
+	          NULL,
+	          file_io_handle,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_read_file_io_handle(
+	          volume_header,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_read_file_io_handle(
+	          volume_header,
+	          file_io_handle,
+	          -1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up file IO handle
+	 */
+	result = fsntfs_test_close_file_io_handle(
+	          &file_io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test data too small
+	 */
+	result = fsntfs_test_open_file_io_handle(
+	          &file_io_handle,
+	          fsntfs_test_volume_header_data1,
+	          8,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_volume_header_read_file_io_handle(
+	          volume_header,
+	          file_io_handle,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = fsntfs_test_close_file_io_handle(
+	          &file_io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO: test data invalid */
+
+	/* Clean up
+	 */
+	result = libfsntfs_volume_header_free(
+	          &volume_header,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "volume_header",
+	 volume_header );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	if( volume_header != NULL )
+	{
+		libfsntfs_volume_header_free(
+		 &volume_header,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_volume_header_read_data function
  * Returns 1 if successful or 0 if not
  */
@@ -487,7 +723,9 @@ int main(
 	 "libfsntfs_volume_header_free",
 	 fsntfs_test_volume_header_free );
 
-	/* TODO: add tests for libfsntfs_volume_header_read_file_io_handle */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_volume_header_read_file_io_handle",
+	 fsntfs_test_volume_header_read_file_io_handle );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_volume_header_read_data",

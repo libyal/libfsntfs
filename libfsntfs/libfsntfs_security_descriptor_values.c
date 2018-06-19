@@ -246,7 +246,7 @@ int libfsntfs_security_descriptor_values_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	return( 1 );
 
 on_error:

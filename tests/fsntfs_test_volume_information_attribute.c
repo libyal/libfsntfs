@@ -51,6 +51,7 @@ int fsntfs_test_volume_information_attribute_get_version(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
+	uint32_t type            = 0;
 	uint8_t major_version    = 0;
 	uint8_t minor_version    = 0;
 	int result               = 0;
@@ -63,10 +64,10 @@ int fsntfs_test_volume_information_attribute_get_version(
 	          &minor_version,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -115,6 +116,30 @@ int fsntfs_test_volume_information_attribute_get_version(
 	          &major_version,
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_information_attribute_get_version(
+	          attribute,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -146,6 +171,7 @@ int fsntfs_test_volume_information_attribute_get_flags(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
+	uint32_t type            = 0;
 	uint16_t flags           = 0;
 	int result               = 0;
 
@@ -156,10 +182,10 @@ int fsntfs_test_volume_information_attribute_get_flags(
 	          &flags,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -188,6 +214,29 @@ int fsntfs_test_volume_information_attribute_get_flags(
 	          attribute,
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_information_attribute_get_flags(
+	          attribute,
+	          &flags,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",

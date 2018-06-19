@@ -52,6 +52,7 @@ int fsntfs_test_volume_name_attribute_get_utf8_name_size(
 {
 	libcerror_error_t *error = NULL;
 	size_t utf8_name_size    = 0;
+	uint32_t type            = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -61,10 +62,15 @@ int fsntfs_test_volume_name_attribute_get_utf8_name_size(
 	          &utf8_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_name_size",
+	 utf8_name_size,
+	 (size_t) 10 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -93,6 +99,29 @@ int fsntfs_test_volume_name_attribute_get_utf8_name_size(
 	          attribute,
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_name_attribute_get_utf8_name_size(
+	          attribute,
+	          &utf8_name_size,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -123,9 +152,10 @@ on_error:
 int fsntfs_test_volume_name_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute )
 {
-	uint8_t utf8_name[ 512 ];
+	uint8_t utf8_name[ 16 ];
 
 	libcerror_error_t *error = NULL;
+	uint32_t type            = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -133,13 +163,13 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	result = libfsntfs_volume_name_attribute_get_utf8_name(
 	          attribute,
 	          utf8_name,
-	          512,
+	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -150,7 +180,7 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	result = libfsntfs_volume_name_attribute_get_utf8_name(
 	          NULL,
 	          utf8_name,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -168,7 +198,7 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	result = libfsntfs_volume_name_attribute_get_utf8_name(
 	          attribute,
 	          NULL,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -206,6 +236,30 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	          utf8_name,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_name_attribute_get_utf8_name(
+	          attribute,
+	          utf8_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -238,6 +292,7 @@ int fsntfs_test_volume_name_attribute_get_utf16_name_size(
 {
 	libcerror_error_t *error = NULL;
 	size_t utf16_name_size   = 0;
+	uint32_t type            = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -247,10 +302,15 @@ int fsntfs_test_volume_name_attribute_get_utf16_name_size(
 	          &utf16_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_name_size",
+	 utf16_name_size,
+	 (size_t) 10 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -279,6 +339,29 @@ int fsntfs_test_volume_name_attribute_get_utf16_name_size(
 	          attribute,
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_name_attribute_get_utf16_name_size(
+	          attribute,
+	          &utf16_name_size,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -309,9 +392,10 @@ on_error:
 int fsntfs_test_volume_name_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute )
 {
-	uint16_t utf16_name[ 512 ];
+	uint16_t utf16_name[ 16 ];
 
 	libcerror_error_t *error = NULL;
+	uint32_t type            = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -319,13 +403,13 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	result = libfsntfs_volume_name_attribute_get_utf16_name(
 	          attribute,
 	          utf16_name,
-	          512,
+	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -336,7 +420,7 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	result = libfsntfs_volume_name_attribute_get_utf16_name(
 	          NULL,
 	          utf16_name,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -354,7 +438,7 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	result = libfsntfs_volume_name_attribute_get_utf16_name(
 	          attribute,
 	          NULL,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -392,6 +476,30 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	          utf16_name,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+
+	result = libfsntfs_volume_name_attribute_get_utf16_name(
+	          attribute,
+	          utf16_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",

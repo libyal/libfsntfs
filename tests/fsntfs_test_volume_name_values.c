@@ -428,9 +428,35 @@ int fsntfs_test_volume_name_values_read_data(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+	/* Test libfsntfs_volume_name_values_read_data with memcpy failing
+	 */
+	fsntfs_test_memcpy_attempts_before_fail = 0;
 
-/* TODO test memcpy failure */
+	result = libfsntfs_volume_name_values_read_data(
+	          volume_name_values,
+	          fsntfs_test_volume_name_values_data1,
+	          18,
+	          &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up
 	 */
@@ -475,6 +501,8 @@ int fsntfs_test_volume_name_values_get_utf8_name_size(
      libfsntfs_volume_name_values_t *volume_name_values )
 {
 	libcerror_error_t *error = NULL;
+	uint8_t *name            = NULL;
+	size_t name_size         = 0;
 	size_t utf8_name_size    = 0;
 	int result               = 0;
 
@@ -485,10 +513,45 @@ int fsntfs_test_volume_name_values_get_utf8_name_size(
 	          &utf8_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_name_size",
+	 utf8_name_size,
+	 (size_t) 10 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with empty name
+	 */
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf8_name_size(
+	          volume_name_values,
+	          &utf8_name_size,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_name_size",
+	 utf8_name_size,
+	 (size_t) 0 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -547,9 +610,11 @@ on_error:
 int fsntfs_test_volume_name_values_get_utf8_name(
      libfsntfs_volume_name_values_t *volume_name_values )
 {
-	uint8_t utf8_name[ 512 ];
+	uint8_t utf8_name[ 16 ];
 
 	libcerror_error_t *error = NULL;
+	uint8_t *name            = NULL;
+	size_t name_size         = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -557,13 +622,39 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          volume_name_values,
 	          utf8_name,
-	          512,
+	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with empty name
+	 */
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf8_name(
+	          volume_name_values,
+	          utf8_name,
+	          16,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -574,7 +665,7 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          NULL,
 	          utf8_name,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -592,7 +683,7 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          volume_name_values,
 	          NULL,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -661,6 +752,8 @@ int fsntfs_test_volume_name_values_get_utf16_name_size(
      libfsntfs_volume_name_values_t *volume_name_values )
 {
 	libcerror_error_t *error = NULL;
+	uint8_t *name            = NULL;
+	size_t name_size         = 0;
 	size_t utf16_name_size   = 0;
 	int result               = 0;
 
@@ -671,10 +764,45 @@ int fsntfs_test_volume_name_values_get_utf16_name_size(
 	          &utf16_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_name_size",
+	 utf16_name_size,
+	 (size_t) 10 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with empty name
+	 */
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf16_name_size(
+	          volume_name_values,
+	          &utf16_name_size,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_name_size",
+	 utf16_name_size,
+	 (size_t) 0 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -733,9 +861,11 @@ on_error:
 int fsntfs_test_volume_name_values_get_utf16_name(
      libfsntfs_volume_name_values_t *volume_name_values )
 {
-	uint16_t utf16_name[ 512 ];
+	uint16_t utf16_name[ 16 ];
 
 	libcerror_error_t *error = NULL;
+	size_t name_size         = 0;
+	uint8_t *name            = NULL;
 	int result               = 0;
 
 	/* Test regular cases
@@ -743,13 +873,39 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          volume_name_values,
 	          utf16_name,
-	          512,
+	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test with empty name
+	 */
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf16_name(
+	          volume_name_values,
+	          utf16_name,
+	          16,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -760,7 +916,7 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          NULL,
 	          utf16_name,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -778,7 +934,7 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          volume_name_values,
 	          NULL,
-	          512,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -854,11 +1010,10 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
-	libcerror_error_t *error                           = NULL;
-	int result                                         = 0;
-
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	libcerror_error_t *error                           = NULL;
 	libfsntfs_volume_name_values_t *volume_name_values = NULL;
+	int result                                         = 0;
 #endif
 
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
@@ -955,8 +1110,6 @@ int main(
 	 "error",
 	 error );
 
-/* TODO test with emtpy name */
-
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
@@ -964,12 +1117,12 @@ int main(
 	return( EXIT_SUCCESS );
 
 on_error:
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 	if( error != NULL )
 	{
 		libcerror_error_free(
 		 &error );
 	}
-#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 	if( volume_name_values != NULL )
 	{
 		libfsntfs_volume_name_values_free(

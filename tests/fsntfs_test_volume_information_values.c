@@ -375,6 +375,24 @@ int fsntfs_test_volume_information_values_read_data(
 	libcerror_error_free(
 	 &error );
 
+	result = libfsntfs_volume_information_values_read_data(
+	          volume_information_values,
+	          fsntfs_test_volume_information_values_data1,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libfsntfs_volume_information_values_free(
