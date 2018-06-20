@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_security_descriptor_index"
-	ProjectGUID="{AF956C6B-4E27-487E-B795-7F8503A4B5AB}"
-	RootNamespace="fsntfs_test_security_descriptor_index"
+	Name="fsntfs_test_file_name_attribute"
+	ProjectGUID="{2BB976E5-C6A6-4EFA-9112-C11FB1088136}"
+	RootNamespace="fsntfs_test_file_name_attribute"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
+				RelativePath="..\..\tests\fsntfs_test_file_name_attribute.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_security_descriptor_index.c"
+				RelativePath="..\..\tests\fsntfs_test_memory.c"
 				>
 			</File>
 		</Filter>
@@ -189,10 +189,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>

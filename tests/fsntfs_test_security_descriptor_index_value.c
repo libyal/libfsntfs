@@ -36,6 +36,10 @@
 
 #include "../libfsntfs/libfsntfs_security_descriptor_index_value.h"
 
+uint8_t fsntfs_test_security_descriptor_index_value_data1[ 20 ] = {
+	0xcb, 0xc6, 0xfe, 0x32, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x78, 0x00, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_security_descriptor_index_value_initialize function
@@ -320,6 +324,9 @@ int fsntfs_test_security_descriptor_index_value_compare(
 
 	/* Test regular cases
 	 */
+	first_security_descriptor_index_value->identifier  = 1;
+	second_security_descriptor_index_value->identifier = 1;
+
 	result = libfsntfs_security_descriptor_index_value_compare(
 	          first_security_descriptor_index_value,
 	          second_security_descriptor_index_value,
@@ -329,6 +336,40 @@ int fsntfs_test_security_descriptor_index_value_compare(
 	 "result",
 	 result,
 	 LIBCDATA_COMPARE_EQUAL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	first_security_descriptor_index_value->identifier  = 1;
+	second_security_descriptor_index_value->identifier = 2;
+
+	result = libfsntfs_security_descriptor_index_value_compare(
+	          first_security_descriptor_index_value,
+	          second_security_descriptor_index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBCDATA_COMPARE_LESS );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	first_security_descriptor_index_value->identifier  = 2;
+	second_security_descriptor_index_value->identifier = 1;
+
+	result = libfsntfs_security_descriptor_index_value_compare(
+	          first_security_descriptor_index_value,
+	          second_security_descriptor_index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBCDATA_COMPARE_GREATER );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -429,6 +470,162 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_security_descriptor_index_value_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_security_descriptor_index_value_read_data(
+     void )
+{
+	libcerror_error_t *error                                         = NULL;
+	libfsntfs_security_descriptor_index_value_t *security_descriptor_index_value = NULL;
+	int result                                                       = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_security_descriptor_index_value_initialize(
+	          &security_descriptor_index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "security_descriptor_index_value",
+	 security_descriptor_index_value );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_security_descriptor_index_value_read_data(
+	          security_descriptor_index_value,
+	          fsntfs_test_security_descriptor_index_value_data1,
+	          20,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_security_descriptor_index_value_read_data(
+	          NULL,
+	          fsntfs_test_security_descriptor_index_value_data1,
+	          20,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_security_descriptor_index_value_read_data(
+	          security_descriptor_index_value,
+	          NULL,
+	          20,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_security_descriptor_index_value_read_data(
+	          security_descriptor_index_value,
+	          fsntfs_test_security_descriptor_index_value_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_security_descriptor_index_value_read_data(
+	          security_descriptor_index_value,
+	          fsntfs_test_security_descriptor_index_value_data1,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_security_descriptor_index_value_free(
+	          &security_descriptor_index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "security_descriptor_index_value",
+	 security_descriptor_index_value );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( security_descriptor_index_value != NULL )
+	{
+		libfsntfs_security_descriptor_index_value_free(
+		 &security_descriptor_index_value,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -460,7 +657,9 @@ int main(
 	 "libfsntfs_security_descriptor_index_value_compare",
 	 fsntfs_test_security_descriptor_index_value_compare );
 
-	/* TODO: add tests for libfsntfs_security_descriptor_index_value_read */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_security_descriptor_index_value_read_data",
+	 fsntfs_test_security_descriptor_index_value_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

@@ -29,6 +29,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_values.h"
 
 #if defined( __cplusplus )

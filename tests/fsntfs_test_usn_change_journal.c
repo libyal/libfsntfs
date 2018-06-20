@@ -267,6 +267,23 @@ int fsntfs_test_usn_change_journal_initialize(
 
 	/* Clean up
 	 */
+	result = libfsntfs_internal_attribute_free(
+	          (libfsntfs_internal_attribute_t **) &data_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "data_attribute",
+	 data_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libfsntfs_io_handle_free(
 	          &io_handle,
 	          &error );

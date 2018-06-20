@@ -108,7 +108,9 @@ int libfsntfs_security_descriptor_index_initialize(
 		 function );
 
 		memory_free(
-		 security_descriptor_index );
+		 *security_descriptor_index );
+
+		*security_descriptor_index = NULL;
 
 		return( -1 );
 	}

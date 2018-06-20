@@ -993,6 +993,19 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		else
 		{
+			if( io_handle->cluster_block_size == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid IO handle - cluster block size value out of bounds.",
+				 function );
+
+				data_handle = NULL;
+
+				goto on_error;
+			}
 			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
 			{
 				libcerror_error_set(

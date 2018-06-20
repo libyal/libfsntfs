@@ -248,16 +248,14 @@ int libfsntfs_file_name_values_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function            = "libfsntfs_file_name_values_read_data";
-	size_t data_offset               = 0;
-	uint16_t name_size               = 0;
+	static char *function = "libfsntfs_file_name_values_read_data";
+	size_t data_offset    = 0;
+	uint16_t name_size    = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t *value_string = NULL;
-	size_t value_string_size         = 0;
-	uint64_t value_64bit             = 0;
-	uint32_t value_32bit             = 0;
-	int result                       = 0;
+	uint64_t value_64bit  = 0;
+	uint32_t value_32bit  = 0;
+	int result            = 0;
 #endif
 
 	if( file_name_values == NULL )
@@ -459,7 +457,8 @@ int libfsntfs_file_name_values_read_data(
 		 libfsntfs_debug_print_file_name_attribute_namespace(
 		  file_name_values->name_namespace ) );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	data_offset = sizeof( fsntfs_file_name_t );
 
 	if( name_size > 0 )
@@ -484,87 +483,29 @@ int libfsntfs_file_name_values_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_size_from_utf16_stream(
-				  file_name_values->name,
-				  file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
-#else
-			result = libuna_utf8_string_size_from_utf16_stream(
-				  file_name_values->name,
-				  file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
-#endif
-			if( result != 1 )
+			if( libfsntfs_debug_print_utf16_string_value(
+			     function,
+			     "name\t\t\t\t",
+			     file_name_values->name,
+			     file_name_values->name_size,
+			     LIBUNA_ENDIAN_LITTLE,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine size of name string.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print UTF-16 string value.",
 				 function );
 
 				goto on_error;
 			}
-			value_string = system_string_allocate(
-			                value_string_size );
-
-			if( value_string == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create name string.",
-				 function );
-
-				goto on_error;
-			}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_copy_from_utf16_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  file_name_values->name,
-				  file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#else
-			result = libuna_utf8_string_copy_from_utf16_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  file_name_values->name,
-				  file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set name string.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: name\t\t\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 value_string );
-
-			memory_free(
-			 value_string );
-
 			libcnotify_printf(
 			 "\n" );
 		}
 		data_offset += file_name_values->name_size;
-#endif
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 /* TODO debug print alignment padding */
 	}
@@ -586,13 +527,6 @@ int libfsntfs_file_name_values_read_data(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( value_string != NULL )
-	{
-		memory_free(
-		 value_string );
-	}
-#endif
 	if( file_name_values->name != NULL )
 	{
 		memory_free(

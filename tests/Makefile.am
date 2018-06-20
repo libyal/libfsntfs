@@ -52,6 +52,7 @@ check_PROGRAMS = \
 	fsntfs_test_directory_entry \
 	fsntfs_test_error \
 	fsntfs_test_file_entry \
+	fsntfs_test_file_name_attribute \
 	fsntfs_test_file_name_values \
 	fsntfs_test_index \
 	fsntfs_test_index_entry \
@@ -206,6 +207,18 @@ fsntfs_test_file_entry_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_file_entry_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_file_name_attribute_SOURCES = \
+	fsntfs_test_file_name_attribute.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_file_name_attribute_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -386,6 +399,7 @@ fsntfs_test_reparse_point_values_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_security_descriptor_index_SOURCES = \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \

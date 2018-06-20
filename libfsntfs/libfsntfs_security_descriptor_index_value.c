@@ -271,7 +271,7 @@ int libfsntfs_security_descriptor_index_value_read_data(
 		 security_descriptor_index_value->hash );
 
 		libcnotify_printf(
-		 "%s: identifier\t\t: %" PRIu32 "\n",
+		 "%s: identifier\t\t\t: %" PRIu32 "\n",
 		 function,
 		 security_descriptor_index_value->identifier );
 
@@ -281,7 +281,7 @@ int libfsntfs_security_descriptor_index_value_read_data(
 		 security_descriptor_index_value->data_offset );
 
 		libcnotify_printf(
-		 "%s: data size\t\t: %" PRIu32 "\n",
+		 "%s: data size\t\t\t: %" PRIu32 "\n",
 		 function,
 		 security_descriptor_index_value->data_size );
 

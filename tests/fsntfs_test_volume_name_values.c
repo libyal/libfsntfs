@@ -323,6 +323,64 @@ int fsntfs_test_volume_name_values_read_data(
 	/* Test error cases
 	 */
 	result = libfsntfs_volume_name_values_read_data(
+	          volume_name_values,
+	          fsntfs_test_volume_name_values_data1,
+	          18,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_volume_name_values_free(
+	          &volume_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "volume_name_values",
+	 volume_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_volume_name_values_initialize(
+	          &volume_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "volume_name_values",
+	 volume_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_name_values_read_data(
 	          NULL,
 	          fsntfs_test_volume_name_values_data1,
 	          18,
@@ -428,6 +486,7 @@ int fsntfs_test_volume_name_values_read_data(
 		libcerror_error_free(
 		 &error );
 	}
+#ifdef TODO
 	/* Test libfsntfs_volume_name_values_read_data with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
@@ -456,6 +515,7 @@ int fsntfs_test_volume_name_values_read_data(
 		libcerror_error_free(
 		 &error );
 	}
+#endif /* TODO */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up
