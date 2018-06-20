@@ -576,6 +576,64 @@ int fsntfs_test_file_name_values_read_data(
 	/* Test error cases
 	 */
 	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          fsntfs_test_file_name_values_data1,
+	          74,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_file_name_values_free(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_file_name_values_initialize(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_name_values_read_data(
 	          NULL,
 	          fsntfs_test_file_name_values_data1,
 	          74,
@@ -638,7 +696,7 @@ int fsntfs_test_file_name_values_read_data(
 	result = libfsntfs_file_name_values_read_data(
 	          file_name_values,
 	          fsntfs_test_file_name_values_data1,
-	          18,
+	          74,
 	          &error );
 
 	if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -1574,7 +1632,7 @@ int main(
 	result = libfsntfs_file_name_values_read_data(
 	          file_name_values,
 	          fsntfs_test_file_name_values_data1,
-	          18,
+	          74,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

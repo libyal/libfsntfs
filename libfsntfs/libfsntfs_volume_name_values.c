@@ -211,7 +211,6 @@ int libfsntfs_volume_name_values_read_data(
 	 */
 	if( data_size > 0 )
 	{
-/* TODO implement libfsntfs_volume_name_values_set_name */
 		volume_name_values->name = (uint8_t *) memory_allocate(
 		                                        sizeof( uint8_t ) * data_size );
 

@@ -486,7 +486,7 @@ int fsntfs_test_volume_name_values_read_data(
 		libcerror_error_free(
 		 &error );
 	}
-#ifdef TODO
+#if defined( OPTIMIZATION_DISABLED )
 	/* Test libfsntfs_volume_name_values_read_data with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
@@ -515,7 +515,7 @@ int fsntfs_test_volume_name_values_read_data(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* TODO */
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up

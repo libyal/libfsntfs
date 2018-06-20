@@ -51,6 +51,7 @@ int fsntfs_test_volume_information_attribute_get_version(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
+	intptr_t *value          = NULL;
 	uint32_t type            = 0;
 	uint8_t major_version    = 0;
 	uint8_t minor_version    = 0;
@@ -153,6 +154,30 @@ int fsntfs_test_volume_information_attribute_get_version(
 	libcerror_error_free(
 	 &error );
 
+	value = ( (libfsntfs_internal_attribute_t *) attribute )->value;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->value = NULL;
+
+	result = libfsntfs_volume_information_attribute_get_version(
+	          attribute,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->value = value;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -171,6 +196,7 @@ int fsntfs_test_volume_information_attribute_get_flags(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
+	intptr_t *value          = NULL;
 	uint32_t type            = 0;
 	uint16_t flags           = 0;
 	int result               = 0;
@@ -237,6 +263,29 @@ int fsntfs_test_volume_information_attribute_get_flags(
 	          &error );
 
 	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	value = ( (libfsntfs_internal_attribute_t *) attribute )->value;
+
+	( (libfsntfs_internal_attribute_t *) attribute )->value = NULL;
+
+	result = libfsntfs_volume_information_attribute_get_flags(
+	          attribute,
+	          &flags,
+	          &error );
+
+	( (libfsntfs_internal_attribute_t *) attribute )->value = value;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
