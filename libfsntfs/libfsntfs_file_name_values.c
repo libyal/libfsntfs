@@ -255,7 +255,6 @@ int libfsntfs_file_name_values_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint64_t value_64bit  = 0;
 	uint32_t value_32bit  = 0;
-	int result            = 0;
 #endif
 
 	if( file_name_values == NULL )

@@ -636,6 +636,34 @@ int fsntfs_test_volume_name_values_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf8_name_size(
+	          volume_name_values,
+	          NULL,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libfsntfs_volume_name_values_get_utf8_name_size with failing libuna_utf8_string_size_from_utf16_stream */
+
 	result = libfsntfs_volume_name_values_get_utf8_name_size(
 	          volume_name_values,
 	          NULL,
@@ -740,11 +768,20 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          volume_name_values,
 	          NULL,
 	          16,
 	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -757,6 +794,12 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 
 	libcerror_error_free(
 	 &error );
+
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
 
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          volume_name_values,
@@ -764,6 +807,9 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	          0,
 	          &error );
 
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -776,10 +822,39 @@ int fsntfs_test_volume_name_values_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
 	result = libfsntfs_volume_name_values_get_utf8_name(
 	          volume_name_values,
 	          utf8_name,
 	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test fsntfs_test_volume_name_values_get_utf8_name with failing libuna_utf8_string_copy_from_utf16_stream */
+
+	result = libfsntfs_volume_name_values_get_utf8_name(
+	          volume_name_values,
+	          NULL,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -887,6 +962,34 @@ int fsntfs_test_volume_name_values_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
+	result = libfsntfs_volume_name_values_get_utf16_name_size(
+	          volume_name_values,
+	          NULL,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test libfsntfs_volume_name_values_get_utf16_name_size with failing libuna_utf16_string_size_from_utf16_stream */
+
 	result = libfsntfs_volume_name_values_get_utf16_name_size(
 	          volume_name_values,
 	          NULL,
@@ -924,8 +1027,8 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	uint16_t utf16_name[ 16 ];
 
 	libcerror_error_t *error = NULL;
-	size_t name_size         = 0;
 	uint8_t *name            = NULL;
+	size_t name_size         = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -991,11 +1094,20 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          volume_name_values,
 	          NULL,
 	          16,
 	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1008,6 +1120,12 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 
 	libcerror_error_free(
 	 &error );
+
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
 
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          volume_name_values,
@@ -1015,6 +1133,9 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	          0,
 	          &error );
 
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -1027,10 +1148,39 @@ int fsntfs_test_volume_name_values_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
+	name      = volume_name_values->name;
+	name_size = volume_name_values->name_size;
+
+	volume_name_values->name      = NULL;
+	volume_name_values->name_size = 0;
+
 	result = libfsntfs_volume_name_values_get_utf16_name(
 	          volume_name_values,
 	          utf16_name,
 	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	volume_name_values->name      = name;
+	volume_name_values->name_size = name_size;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test fsntfs_test_volume_name_values_get_utf16_name with failing libuna_utf16_string_copy_from_utf16_stream */
+
+	result = libfsntfs_volume_name_values_get_utf16_name(
+	          volume_name_values,
+	          NULL,
+	          16,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
