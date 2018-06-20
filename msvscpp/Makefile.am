@@ -2,6 +2,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_attribute/fsntfs_test_attribute.vcproj \
 	fsntfs_test_bitmap_values/fsntfs_test_bitmap_values.vcproj \
 	fsntfs_test_cluster_block/fsntfs_test_cluster_block.vcproj \
+	fsntfs_test_compressed_block/fsntfs_test_compressed_block.vcproj \
 	fsntfs_test_compressed_block_descriptor/fsntfs_test_compressed_block_descriptor.vcproj \
 	fsntfs_test_data_run/fsntfs_test_data_run.vcproj \
 	fsntfs_test_data_stream/fsntfs_test_data_stream.vcproj \
