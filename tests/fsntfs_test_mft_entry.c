@@ -21,6 +21,7 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <memory.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
@@ -37,6 +38,92 @@
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
+/* Tests the libfsntfs_mft_entry_check_for_empty_block function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_check_for_empty_block(
+     void )
+{
+	uint8_t empty_block[ 1024 ];
+
+	libcerror_error_t *error = NULL;
+	void *memset_result      = NULL;
+	int result               = 0;
+
+	/* Initialize test
+	 */
+	memset_result = memory_set(
+	                 empty_block,
+	                 0,
+	                 sizeof( uint8_t ) * 1024 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "memset_result",
+	 memset_result );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_entry_check_for_empty_block(
+	          empty_block,
+	          1024,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_check_for_empty_block(
+	          NULL,
+	          1024,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_check_for_empty_block(
+	          empty_block,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_mft_entry_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -48,7 +135,7 @@ int fsntfs_test_mft_entry_initialize(
 	int result                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests  = 1;
+	int number_of_malloc_fail_tests  = 4;
 	int number_of_memset_fail_tests  = 1;
 	int test_number                  = 0;
 #endif
@@ -266,6 +353,152 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_entry_clone function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_clone(
+     void )
+{
+	libcerror_error_t *error                     = NULL;
+	libfsntfs_mft_entry_t *destination_mft_entry = NULL;
+	libfsntfs_mft_entry_t *source_mft_entry      = NULL;
+	int result                                   = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_mft_entry_initialize(
+	          &source_mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "source_mft_entry",
+	 source_mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_entry_clone(
+	          &destination_mft_entry,
+	          source_mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_mft_entry",
+	 destination_mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_entry_free(
+	          &destination_mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_mft_entry",
+	 destination_mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_entry_clone(
+	          &destination_mft_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "destination_mft_entry",
+	 destination_mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_clone(
+	          NULL,
+	          source_mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_mft_entry_free(
+	          &source_mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "source_mft_entry",
+	 source_mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( destination_mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 &destination_mft_entry,
+		 NULL );
+	}
+	if( source_mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 &source_mft_entry,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -905,6 +1138,10 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
+	 "libfsntfs_mft_entry_check_for_empty_block",
+	 fsntfs_test_mft_entry_check_for_empty_block );
+
+	FSNTFS_TEST_RUN(
 	 "libfsntfs_mft_entry_initialize",
 	 fsntfs_test_mft_entry_initialize );
 
@@ -912,7 +1149,9 @@ int main(
 	 "libfsntfs_mft_entry_free",
 	 fsntfs_test_mft_entry_free );
 
-	/* TODO: add tests for libfsntfs_mft_entry_check_for_empty_block */
+	FSNTFS_TEST_RUN(
+	 "fsntfs_test_mft_entry_clone",
+	 fsntfs_test_mft_entry_clone );
 
 	/* TODO: add tests for libfsntfs_mft_entry_read */
 
