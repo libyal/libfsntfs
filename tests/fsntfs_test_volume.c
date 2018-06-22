@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_functions.h"
 #include "fsntfs_test_getopt.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libclocale.h"
@@ -38,6 +39,24 @@
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 
+#include "../libfsntfs/libfsntfs_volume.h"
+
+#if !defined( LIBFSNTFS_HAVE_BFIO )
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_volume_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_open_file_io_handle(
+     libfsntfs_volume_t *volume,
+     libbfio_handle_t *file_io_handle,
+     int access_flags,
+     libfsntfs_error_t **error );
+
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
 #error Unsupported size of wchar_t
 #endif
@@ -45,406 +64,6 @@
 /* Define to make fsntfs_test_volume generate verbose output
 #define FSNTFS_TEST_VOLUME_VERBOSE
  */
-
-/* Retrieves source as a narrow string
- * Returns 1 if successful or -1 on error
- */
-int fsntfs_test_volume_get_narrow_source(
-     const system_character_t *source,
-     char *narrow_string,
-     size_t narrow_string_size,
-     libcerror_error_t **error )
-{
-	static char *function     = "fsntfs_test_volume_get_narrow_source";
-	size_t narrow_source_size = 0;
-	size_t source_length      = 0;
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result                = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid narrow string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine narrow string size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	narrow_source_size = source_length + 1;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( narrow_string_size < narrow_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: narrow string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_copy_from_utf32(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_copy_from_utf16(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_copy_from_utf32(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_copy_from_utf16(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	if( system_string_copy(
-	     narrow_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	narrow_string[ source_length ] = 0;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves source as a wide string
- * Returns 1 if successful or -1 on error
- */
-int fsntfs_test_volume_get_wide_source(
-     const system_character_t *source,
-     wchar_t *wide_string,
-     size_t wide_string_size,
-     libcerror_error_t **error )
-{
-	static char *function   = "fsntfs_test_volume_get_wide_source";
-	size_t source_length    = 0;
-	size_t wide_source_size = 0;
-
-#if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result              = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid wide string.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid wide string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wide_source_size = source_length + 1;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine wide string size.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( wide_string_size < wide_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: wide string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( system_string_copy(
-	     wide_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-	wide_string[ source_length ] = 0;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_utf8(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_utf8(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_byte_stream(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_byte_stream(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Creates and opens a source volume
  * Returns 1 if successful or -1 on error
@@ -578,8 +197,6 @@ int fsntfs_test_volume_close_source(
 	return( result );
 }
 
-#include "../libfsntfs/libfsntfs_volume.h"
-
 /* Tests the libfsntfs_volume_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -591,7 +208,7 @@ int fsntfs_test_volume_initialize(
 	int result                      = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 1;
+	int number_of_malloc_fail_tests = 3;
 	int number_of_memset_fail_tests = 1;
 	int test_number                 = 0;
 #endif
@@ -827,7 +444,7 @@ int fsntfs_test_volume_open(
 
 	/* Initialize test
 	 */
-	result = fsntfs_test_volume_get_narrow_source(
+	result = fsntfs_test_get_narrow_source(
 	          source,
 	          narrow_source,
 	          256,
@@ -948,7 +565,7 @@ int fsntfs_test_volume_open_wide(
 
 	/* Initialize test
 	 */
-	result = fsntfs_test_volume_get_wide_source(
+	result = fsntfs_test_get_wide_source(
 	          source,
 	          wide_source,
 	          256,
@@ -1054,6 +671,231 @@ on_error:
 }
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
+
+/* Tests the libfsntfs_volume_open_file_io_handle function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_open_file_io_handle(
+     const system_character_t *source )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_volume_t *volume        = NULL;
+	size_t string_length             = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libbfio_file_initialize(
+	          &file_io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+         "file_io_handle",
+         file_io_handle );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	string_length = system_string_length(
+	                 source );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libbfio_file_set_name_wide(
+	          file_io_handle,
+	          source,
+	          string_length,
+	          &error );
+#else
+	result = libbfio_file_set_name(
+	          file_io_handle,
+	          source,
+	          string_length,
+	          &error );
+#endif
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	result = libfsntfs_volume_initialize(
+	          &volume,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "volume",
+	 volume );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test open
+	 */
+	result = libfsntfs_volume_open_file_io_handle(
+	          volume,
+	          file_io_handle,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_open_file_io_handle(
+	          NULL,
+	          file_io_handle,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open_file_io_handle(
+	          volume,
+	          NULL,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open_file_io_handle(
+	          volume,
+	          file_io_handle,
+	          -1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test open when already opened
+	 */
+	result = libfsntfs_volume_open_file_io_handle(
+	          volume,
+	          file_io_handle,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_volume_free(
+	          &volume,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "volume",
+	 volume );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libbfio_handle_free(
+	          &file_io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+         "file_io_handle",
+         file_io_handle );
+
+        FSNTFS_TEST_ASSERT_IS_NULL(
+         "error",
+         error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( volume != NULL )
+	{
+		libfsntfs_volume_free(
+		 &volume,
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
 
 /* Tests the libfsntfs_volume_close function
  * Returns 1 if successful or 0 if not
@@ -2303,16 +2145,20 @@ int main(
      char * const argv[] )
 #endif
 {
-	libcerror_error_t *error   = NULL;
-	libfsntfs_volume_t *volume = NULL;
-	system_character_t *source = NULL;
-	system_integer_t option    = 0;
-	int result                 = 0;
+	libbfio_handle_t *file_io_handle  = NULL;
+	libcerror_error_t *error          = NULL;
+	libfsntfs_volume_t *volume        = NULL;
+	system_character_t *option_offset = NULL;
+	system_character_t *source        = NULL;
+	system_integer_t option           = 0;
+	size_t string_length              = 0;
+	off64_t volume_offset             = 0;
+	int result                        = 0;
 
 	while( ( option = fsntfs_test_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "o:" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -2324,11 +2170,36 @@ int main(
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'o':
+				option_offset = optarg;
+
+				break;
 		}
 	}
 	if( optind < argc )
 	{
 		source = argv[ optind ];
+	}
+	if( option_offset != NULL )
+	{
+		string_length = system_string_length(
+		                 option_offset );
+
+		result = fsntfs_test_system_string_copy_from_64_bit_in_decimal(
+		          option_offset,
+		          string_length + 1,
+		          (uint64_t *) &volume_offset,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
 	}
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( FSNTFS_TEST_VOLUME_VERBOSE )
 	libfsntfs_notify_set_verbose(
@@ -2349,15 +2220,66 @@ int main(
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
 	{
+		result = libbfio_file_range_initialize(
+		          &file_io_handle,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	         "file_io_handle",
+	         file_io_handle );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		string_length = system_string_length(
+		                 source );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfsntfs_check_volume_signature_wide(
+		result = libbfio_file_range_set_name_wide(
+		          file_io_handle,
 		          source,
+		          string_length,
 		          &error );
 #else
-		result = libfsntfs_check_volume_signature(
+		result = libbfio_file_range_set_name(
+		          file_io_handle,
 		          source,
+		          string_length,
 		          &error );
 #endif
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		result = libbfio_file_range_set(
+		          file_io_handle,
+		          volume_offset,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		result = libfsntfs_check_volume_signature_file_io_handle(
+		          file_io_handle,
+		          &error );
 
 		FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 		 "result",
@@ -2368,7 +2290,8 @@ int main(
 		 "error",
 		 error );
 	}
-	if( result != 0 )
+	if( ( result != 0 )
+	 && ( volume_offset == 0 ) )
 	{
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_open",
@@ -2384,11 +2307,10 @@ int main(
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
-#if defined( LIBFSNTFS_HAVE_BFIO )
-
-		/* TODO add test for libfsntfs_volume_open_file_io_handle */
-
-#endif /* defined( LIBFSNTFS_HAVE_BFIO ) */
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_volume_open_file_io_handle",
+		 fsntfs_test_volume_open_file_io_handle,
+		 source );
 
 		FSNTFS_TEST_RUN(
 		 "libfsntfs_volume_close",
@@ -2398,7 +2320,9 @@ int main(
 		 "libfsntfs_volume_open_close",
 		 fsntfs_test_volume_open_close,
 		 source );
-
+	}
+	if( result != 0 )
+	{
 		/* Initialize test
 		 */
 		result = fsntfs_test_volume_open_source(
@@ -2510,6 +2434,25 @@ int main(
 		 "error",
 		 error );
 	}
+	if( file_io_handle != NULL )
+	{
+		result = libbfio_handle_free(
+		          &file_io_handle,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+	         "file_io_handle",
+	         file_io_handle );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+	}
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 	return( EXIT_SUCCESS );
@@ -2522,8 +2465,14 @@ on_error:
 	}
 	if( volume != NULL )
 	{
-		fsntfs_test_volume_close_source(
+		libfsntfs_volume_free(
 		 &volume,
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

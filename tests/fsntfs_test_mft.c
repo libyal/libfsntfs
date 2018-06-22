@@ -33,9 +33,298 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft.h"
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+/* Tests the libfsntfs_mft_initialize function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_initialize(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_io_handle_t *io_handle = NULL;
+	libfsntfs_mft_t *mft             = NULL;
+	int result                       = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests  = 3;
+	int number_of_memset_fail_tests  = 1;
+	int test_number                  = 0;
+#endif
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->cluster_block_size = 4096;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_initialize(
+	          &mft,
+	          io_handle,
+	          0,
+	          4096,
+	          1024,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft",
+	 mft );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_free(
+	          &mft,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft",
+	 mft );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_initialize(
+	          NULL,
+	          io_handle,
+	          0,
+	          4096,
+	          1024,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft = (libfsntfs_mft_t *) 0x12345678UL;
+
+	result = libfsntfs_mft_initialize(
+	          &mft,
+	          io_handle,
+	          0,
+	          4096,
+	          1024,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft = NULL;
+
+	result = libfsntfs_mft_initialize(
+	          &mft,
+	          NULL,
+	          0,
+	          4096,
+	          1024,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_mft_initialize with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_mft_initialize(
+		          &mft,
+		          io_handle,
+		          0,
+		          4096,
+		          1024,
+		          0,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( mft != NULL )
+			{
+				libfsntfs_mft_free(
+				 &mft,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "mft",
+			 mft );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_mft_initialize with memset failing
+		 */
+		fsntfs_test_memset_attempts_before_fail = test_number;
+
+		result = libfsntfs_mft_initialize(
+		          &mft,
+		          io_handle,
+		          0,
+		          4096,
+		          1024,
+		          0,
+		          &error );
+
+		if( fsntfs_test_memset_attempts_before_fail != -1 )
+		{
+			fsntfs_test_memset_attempts_before_fail = -1;
+
+			if( mft != NULL )
+			{
+				libfsntfs_mft_free(
+				 &mft,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "mft",
+			 mft );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( mft != NULL )
+	{
+		libfsntfs_mft_free(
+		 &mft,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
 
 /* Tests the libfsntfs_mft_free function
  * Returns 1 if successful or 0 if not
@@ -94,7 +383,9 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-	/* TODO: add tests for libfsntfs_mft_initialize */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_mft_initialize",
+	 fsntfs_test_mft_initialize );
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_mft_free",

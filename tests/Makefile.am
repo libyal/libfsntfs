@@ -523,6 +523,7 @@ fsntfs_test_usn_change_journal_LDADD = \
 fsntfs_test_volume_SOURCES = \
 	fsntfs_test_getopt.c fsntfs_test_getopt.h \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libclocale.h \
 	fsntfs_test_libcnotify.h \

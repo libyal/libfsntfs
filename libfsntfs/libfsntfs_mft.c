@@ -114,7 +114,12 @@ int libfsntfs_mft_initialize(
 		 "%s: unable to clear MFT.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *mft );
+
+		*mft = NULL;
+
+		return( -1 );
 	}
 	if( libfdata_vector_initialize(
 	     &( ( *mft )->mft_entry_vector ),

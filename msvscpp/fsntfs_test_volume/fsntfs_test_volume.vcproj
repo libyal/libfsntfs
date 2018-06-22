@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
 			</File>
