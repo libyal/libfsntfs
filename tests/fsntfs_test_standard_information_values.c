@@ -437,32 +437,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_creation_time(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint64_t creation_time                                               = 0;
-	int creation_time_is_set                                             = 0;
-	int result                                                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error = NULL;
+	uint64_t creation_time   = 0;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -479,8 +458,6 @@ int fsntfs_test_standard_information_values_get_creation_time(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	creation_time_is_set = result;
 
 	/* Test error cases
 	 */
@@ -501,43 +478,22 @@ int fsntfs_test_standard_information_values_get_creation_time(
 	libcerror_error_free(
 	 &error );
 
-	if( creation_time_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_creation_time(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_creation_time(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -546,12 +502,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -560,32 +510,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_modification_time(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint64_t modification_time                                           = 0;
-	int modification_time_is_set                                         = 0;
-	int result                                                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error   = NULL;
+	uint64_t modification_time = 0;
+	int result                 = 0;
 
 	/* Test regular cases
 	 */
@@ -602,8 +531,6 @@ int fsntfs_test_standard_information_values_get_modification_time(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	modification_time_is_set = result;
 
 	/* Test error cases
 	 */
@@ -624,43 +551,22 @@ int fsntfs_test_standard_information_values_get_modification_time(
 	libcerror_error_free(
 	 &error );
 
-	if( modification_time_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_modification_time(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_modification_time(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -669,12 +575,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -683,32 +583,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_access_time(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint64_t access_time                                                 = 0;
-	int access_time_is_set                                               = 0;
-	int result                                                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error = NULL;
+	uint64_t access_time     = 0;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -725,8 +604,6 @@ int fsntfs_test_standard_information_values_get_access_time(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	access_time_is_set = result;
 
 	/* Test error cases
 	 */
@@ -747,43 +624,22 @@ int fsntfs_test_standard_information_values_get_access_time(
 	libcerror_error_free(
 	 &error );
 
-	if( access_time_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_access_time(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_access_time(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -792,12 +648,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -806,32 +656,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_entry_modification_time(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint64_t entry_modification_time                                     = 0;
-	int entry_modification_time_is_set                                   = 0;
-	int result                                                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error         = NULL;
+	uint64_t entry_modification_time = 0;
+	int result                       = 0;
 
 	/* Test regular cases
 	 */
@@ -848,8 +677,6 @@ int fsntfs_test_standard_information_values_get_entry_modification_time(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	entry_modification_time_is_set = result;
 
 	/* Test error cases
 	 */
@@ -870,43 +697,22 @@ int fsntfs_test_standard_information_values_get_entry_modification_time(
 	libcerror_error_free(
 	 &error );
 
-	if( entry_modification_time_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_entry_modification_time(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_entry_modification_time(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -915,12 +721,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -929,32 +729,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_file_attribute_flags(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint32_t file_attribute_flags                                        = 0;
-	int file_attribute_flags_is_set                                      = 0;
-	int result                                                           = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error      = NULL;
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
 
 	/* Test regular cases
 	 */
@@ -971,8 +750,6 @@ int fsntfs_test_standard_information_values_get_file_attribute_flags(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	file_attribute_flags_is_set = result;
 
 	/* Test error cases
 	 */
@@ -993,43 +770,22 @@ int fsntfs_test_standard_information_values_get_file_attribute_flags(
 	libcerror_error_free(
 	 &error );
 
-	if( file_attribute_flags_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_file_attribute_flags(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_file_attribute_flags(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -1038,12 +794,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1052,32 +802,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_security_descriptor_identifier(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint32_t security_descriptor_identifier                              = 0;
-	int result                                                           = 0;
-	int security_descriptor_identifier_is_set                            = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error                = NULL;
+	uint32_t security_descriptor_identifier = 0;
+	int result                              = 0;
 
 	/* Test regular cases
 	 */
@@ -1094,8 +823,6 @@ int fsntfs_test_standard_information_values_get_security_descriptor_identifier(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	security_descriptor_identifier_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1116,43 +843,22 @@ int fsntfs_test_standard_information_values_get_security_descriptor_identifier(
 	libcerror_error_free(
 	 &error );
 
-	if( security_descriptor_identifier_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_security_descriptor_identifier(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_security_descriptor_identifier(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -1161,12 +867,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1175,32 +875,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_standard_information_values_get_update_sequence_number(
-     void )
+     libfsntfs_standard_information_values_t *standard_information_values )
 {
-	libcerror_error_t *error                                             = NULL;
-	libfsntfs_standard_information_values_t *standard_information_values = NULL;
-	uint64_t update_sequence_number                                      = 0;
-	int result                                                           = 0;
-	int update_sequence_number_is_set                                    = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_standard_information_values_initialize(
-	          &standard_information_values,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error        = NULL;
+	uint64_t update_sequence_number = 0;
+	int result                      = 0;
 
 	/* Test regular cases
 	 */
@@ -1217,8 +896,6 @@ int fsntfs_test_standard_information_values_get_update_sequence_number(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	update_sequence_number_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1239,43 +916,22 @@ int fsntfs_test_standard_information_values_get_update_sequence_number(
 	libcerror_error_free(
 	 &error );
 
-	if( update_sequence_number_is_set != 0 )
-	{
-		result = libfsntfs_standard_information_values_get_update_sequence_number(
-		          standard_information_values,
-		          NULL,
-		          &error );
-
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Clean up
-	 */
-	result = libfsntfs_standard_information_values_free(
-	          &standard_information_values,
+	result = libfsntfs_standard_information_values_get_update_sequence_number(
+	          standard_information_values,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "standard_information_values",
-	 standard_information_values );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
 	 error );
+
+	libcerror_error_free(
+	 &error );
 
 	return( 1 );
 
@@ -1284,12 +940,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( standard_information_values != NULL )
-	{
-		libfsntfs_standard_information_values_free(
-		 &standard_information_values,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1308,6 +958,12 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	libcerror_error_t *error                                             = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	int result                                                           = 0;
+#endif
+
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -1325,39 +981,116 @@ int main(
 	 "libfsntfs_standard_information_values_read_data",
 	 fsntfs_test_standard_information_values_read_data );
 
-	FSNTFS_TEST_RUN(
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	/* Initialize standard_information_values for tests
+	 */
+	result = libfsntfs_standard_information_values_initialize(
+	          &standard_information_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "standard_information_values",
+	 standard_information_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_standard_information_values_read_data(
+	          standard_information_values,
+	          fsntfs_test_standard_information_values_data1,
+	          72,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_creation_time",
-	 fsntfs_test_standard_information_values_get_creation_time );
+	 fsntfs_test_standard_information_values_get_creation_time,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_modification_time",
-	 fsntfs_test_standard_information_values_get_modification_time );
+	 fsntfs_test_standard_information_values_get_modification_time,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_access_time",
-	 fsntfs_test_standard_information_values_get_access_time );
+	 fsntfs_test_standard_information_values_get_access_time,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_entry_modification_time",
-	 fsntfs_test_standard_information_values_get_entry_modification_time );
+	 fsntfs_test_standard_information_values_get_entry_modification_time,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_file_attribute_flags",
-	 fsntfs_test_standard_information_values_get_file_attribute_flags );
+	 fsntfs_test_standard_information_values_get_file_attribute_flags,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_security_descriptor_identifier",
-	 fsntfs_test_standard_information_values_get_security_descriptor_identifier );
+	 fsntfs_test_standard_information_values_get_security_descriptor_identifier,
+	 standard_information_values );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_standard_information_values_get_update_sequence_number",
-	 fsntfs_test_standard_information_values_get_update_sequence_number );
+	 fsntfs_test_standard_information_values_get_update_sequence_number,
+	 standard_information_values );
+
+	/* Clean up
+	 */
+	result = libfsntfs_standard_information_values_free(
+	          &standard_information_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "standard_information_values",
+	 standard_information_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 on_error:
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( standard_information_values != NULL )
+	{
+		libfsntfs_standard_information_values_free(
+		 &standard_information_values,
+		 NULL );
+	}
+#endif
 	return( EXIT_FAILURE );
 }
 

@@ -281,7 +281,7 @@ typedef int system_integer_t;
 #define UINT8_MAX (0xff)
 #endif
 
-/* The maximum signed 16-bit integer is 32767 (0xr7ffff)
+/* The maximum signed 16-bit integer is 32767 (0x7ffff)
  */
 #if !defined( INT16_MAX )
 #define INT16_MAX (0x7fff)

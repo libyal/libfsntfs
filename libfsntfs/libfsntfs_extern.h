@@ -37,8 +37,11 @@
 
 #include <libfsntfs/extern.h>
 
+#define LIBFSNTFS_EXTERN_VARIABLE	LIBFSNTFS_EXTERN
+
 #else
-#define LIBFSNTFS_EXTERN	/* extern */
+#define LIBFSNTFS_EXTERN		/* extern */
+#define LIBFSNTFS_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBFSNTFS ) */
 
