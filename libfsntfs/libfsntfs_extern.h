@@ -28,13 +28,6 @@
  */
 #if !defined( HAVE_LOCAL_LIBFSNTFS )
 
-/* If libtool DLL support is enabled set LIBFSNTFS_DLL_EXPORT
- * before including libfsntfs/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBFSNTFS_DLL_EXPORT
-#endif
-
 #include <libfsntfs/extern.h>
 
 #define LIBFSNTFS_EXTERN_VARIABLE	LIBFSNTFS_EXTERN

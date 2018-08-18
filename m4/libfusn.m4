@@ -1,6 +1,6 @@
-dnl Functions for libfusn
+dnl Checks for libfusn required headers and functions
 dnl
-dnl Version: 20170907
+dnl Version: 20180725
 
 dnl Function to detect if libfusn is available
 dnl ac_libfusn_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -24,7 +24,7 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
       [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
       [PKG_CHECK_MODULES(
         [libfusn],
-        [libfusn >= 20150902],
+        [libfusn >= 20180611],
         [ac_cv_libfusn=yes],
         [ac_cv_libfusn=no])
       ])
@@ -48,7 +48,29 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
           [ac_cv_libfusn_dummy=yes],
           [ac_cv_libfusn=no])
 
-        dnl TODO add functions
+        dnl Record functions
+        AC_CHECK_LIB(
+          fusn,
+          libfusn_record_initialize,
+          [ac_cv_libfusn_dummy=yes],
+          [ac_cv_libfusn=no])
+        AC_CHECK_LIB(
+          fusn,
+          libfusn_record_free,
+          [ac_cv_libfusn_dummy=yes],
+          [ac_cv_libfusn=no])
+
+        AC_CHECK_LIB(
+          fusn,
+          libfusn_record_copy_from_byte_stream,
+          [ac_cv_libfusn_dummy=yes],
+          [ac_cv_libfusn=no])
+
+        AC_CHECK_LIB(
+          fusn,
+          libfusn_record_get_size,
+          [ac_cv_libfusn_dummy=yes],
+          [ac_cv_libfusn=no])
 
         ac_cv_libfusn_LIBADD="-lfusn"
         ])
