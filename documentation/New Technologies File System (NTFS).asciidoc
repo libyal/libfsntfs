@@ -1,5 +1,5 @@
 = New Technologies File System (NTFS)
-Analysis the Windows NT File System
+Analysis of NTFS
 
 :toc:
 :toclevels: 4
@@ -8,11 +8,10 @@ Analysis the Windows NT File System
 [abstract]
 == Summary
 NTFS is the primary file system for Microsoft Windows versions that are based
-on Windows NT.
+on Windows NT. This specification is based on publicly availble work on the
+format and was enhanced by analyzing test data.
 
-This document is intended as a working document for the NTFS format. Which
-should allow existing Open Source forensic tooling to be able to process this
-type of file system.
+This document is intended as a working document for the NTFS format.
 
 [preface]
 == Document information
@@ -21,7 +20,7 @@ type of file system.
 | Author(s): | Joachim Metz <joachim.metz@gmail.com>
 | Abstract: | This document contains information about the New Technologies File System (NTFS)
 | Classification: | Public
-| Keywords: | NTFS, New Technologies File System
+| Keywords: | New Technologies File System, NTFS
 |===
 
 [preface]
