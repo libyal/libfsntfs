@@ -278,7 +278,7 @@ int libfsntfs_volume_header_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: volume header:\n",
+		 "%s: volume header data:\n",
 		 function );
 		libcnotify_print_data(
 		 data,
