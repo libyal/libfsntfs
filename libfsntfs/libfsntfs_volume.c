@@ -1838,7 +1838,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 {
 	libcdata_btree_t *directory_entries_tree          = NULL;
 	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
-	uint8_t *utf8_string_segment                      = NULL;
+	const uint8_t *utf8_string_segment                = NULL;
 	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path";
 	libuna_unicode_character_t unicode_character      = 0;
 	size_t utf8_string_index                          = 0;
@@ -1853,6 +1853,28 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_length > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-8 string length value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1959,7 +1981,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 
 			goto on_error;
 		}
-		utf8_string_segment        = (uint8_t *) &( utf8_string[ utf8_string_index ] );
+		utf8_string_segment        = &( utf8_string[ utf8_string_index ] );
 		utf8_string_segment_length = utf8_string_index;
 
 		while( utf8_string_index < utf8_string_length )
@@ -2225,7 +2247,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 {
 	libcdata_btree_t *directory_entries_tree          = NULL;
 	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
-	uint16_t *utf16_string_segment                    = NULL;
+	const uint16_t *utf16_string_segment              = NULL;
 	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path";
 	libuna_unicode_character_t unicode_character      = 0;
 	size_t utf16_string_index                         = 0;
@@ -2240,6 +2262,28 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_length > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-16 string length value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -2346,7 +2390,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 
 			goto on_error;
 		}
-		utf16_string_segment        = (uint16_t *) &( utf16_string[ utf16_string_index ] );
+		utf16_string_segment        = &( utf16_string[ utf16_string_index ] );
 		utf16_string_segment_length = utf16_string_index;
 
 		while( utf16_string_index < utf16_string_length )

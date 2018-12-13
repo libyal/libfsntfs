@@ -1,42 +1,46 @@
 dnl Checks for libfusn required headers and functions
 dnl
-dnl Version: 20180725
+dnl Version: 20181117
 
 dnl Function to detect if libfusn is available
 dnl ac_libfusn_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
 AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
-  [dnl Check if parameters were provided
-  AS_IF(
-    [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xno && test "x$ac_cv_with_libfusn" != xauto-detect],
-    [AS_IF(
-      [test -d "$ac_cv_with_libfusn"],
-      [CFLAGS="$CFLAGS -I${ac_cv_with_libfusn}/include"
-      LDFLAGS="$LDFLAGS -L${ac_cv_with_libfusn}/lib"],
-      [AC_MSG_WARN([no such directory: $ac_cv_with_libfusn])
-      ])
-    ])
-
-  AS_IF(
-    [test "x$ac_cv_with_libfusn" = xno],
+  [AS_IF(
+    [test "x$ac_cv_enable_shared_libs" = xno || test "x$ac_cv_with_libfusn" = xno],
     [ac_cv_libfusn=no],
-    [dnl Check for a pkg-config file
+    [dnl Check if the directory provided as parameter exists
     AS_IF(
-      [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
-      [PKG_CHECK_MODULES(
-        [libfusn],
-        [libfusn >= 20180611],
-        [ac_cv_libfusn=yes],
-        [ac_cv_libfusn=no])
+      [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect],
+      [AS_IF(
+        [test -d "$ac_cv_with_libfusn"],
+        [CFLAGS="$CFLAGS -I${ac_cv_with_libfusn}/include"
+        LDFLAGS="$LDFLAGS -L${ac_cv_with_libfusn}/lib"],
+        [AC_MSG_FAILURE(
+          [no such directory: $ac_cv_with_libfusn],
+          [1])
+        ])
+        ac_cv_libfusn=check],
+      [dnl Check for a pkg-config file
+      AS_IF(
+        [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
+        [PKG_CHECK_MODULES(
+          [libfusn],
+          [libfusn >= 20180611],
+          [ac_cv_libfusn=yes],
+          [ac_cv_libfusn=check])
+        ])
+      AS_IF(
+        [test "x$ac_cv_libfusn" = xyes],
+        [ac_cv_libfusn_CPPFLAGS="$pkg_cv_libfusn_CFLAGS"
+        ac_cv_libfusn_LIBADD="$pkg_cv_libfusn_LIBS"])
       ])
 
     AS_IF(
-      [test "x$ac_cv_libfusn" = xyes],
-      [ac_cv_libfusn_CPPFLAGS="$pkg_cv_libfusn_CFLAGS"
-      ac_cv_libfusn_LIBADD="$pkg_cv_libfusn_LIBS"],
+      [test "x$ac_cv_libfusn" = xcheck],
       [dnl Check for headers
       AC_CHECK_HEADERS([libfusn.h])
 
-    AS_IF(
+      AS_IF(
         [test "x$ac_cv_header_libfusn_h" = xno],
         [ac_cv_libfusn=no],
         [dnl Check for the individual functions
@@ -72,8 +76,13 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
           [ac_cv_libfusn_dummy=yes],
           [ac_cv_libfusn=no])
 
-        ac_cv_libfusn_LIBADD="-lfusn"
-        ])
+        ac_cv_libfusn_LIBADD="-lfusn"])
+      ])
+    AS_IF(
+      [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_libfusn" != xyes],
+      [AC_MSG_FAILURE(
+        [unable to find supported libfusn in directory: $ac_cv_with_libfusn],
+        [1])
       ])
     ])
 

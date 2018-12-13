@@ -10,42 +10,44 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 @libfsntfs_spec_requires@ @ax_libbfio_spec_requires@ @ax_libcdata_spec_requires@ @ax_libcerror_spec_requires@ @ax_libcfile_spec_requires@ @ax_libclocale_spec_requires@ @ax_libcnotify_spec_requires@ @ax_libcpath_spec_requires@ @ax_libcsplit_spec_requires@ @ax_libcthreads_spec_requires@ @ax_libfcache_spec_requires@ @ax_libfdata_spec_requires@ @ax_libfdatetime_spec_requires@ @ax_libfguid_spec_requires@ @ax_libfwnt_spec_requires@ @ax_libuna_spec_requires@
 BuildRequires: gcc @ax_libbfio_spec_build_requires@ @ax_libcdata_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcfile_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcpath_spec_build_requires@ @ax_libcsplit_spec_build_requires@ @ax_libcthreads_spec_build_requires@ @ax_libfcache_spec_build_requires@ @ax_libfdata_spec_build_requires@ @ax_libfdatetime_spec_build_requires@ @ax_libfguid_spec_build_requires@ @ax_libfwnt_spec_build_requires@ @ax_libuna_spec_build_requires@
 
-%description
+%description -n libfsntfs
 Library to access the Windows New Technology File System (NTFS) format
 
-%package devel
+%package -n libfsntfs-devel
 Summary: Header files and libraries for developing applications for libfsntfs
 Group: Development/Libraries
 Requires: libfsntfs = %{version}-%{release}
 
-%description devel
+%description -n libfsntfs-devel
 Header files and libraries for developing applications for libfsntfs.
 
-%package python
+%package -n libfsntfs-python2
+Obsoletes: libfsntfs-python < %{version}
+Provides: libfsntfs-python = %{version}
 Summary: Python 2 bindings for libfsntfs
 Group: System Environment/Libraries
-Requires: libfsntfs = %{version}-%{release} python
-BuildRequires: python-devel
+Requires: libfsntfs = %{version}-%{release} python2
+BuildRequires: python2-devel
 
-%description python
+%description -n libfsntfs-python2
 Python 2 bindings for libfsntfs
 
-%package python3
+%package -n libfsntfs-python3
 Summary: Python 3 bindings for libfsntfs
 Group: System Environment/Libraries
 Requires: libfsntfs = %{version}-%{release} python3
 BuildRequires: python3-devel
 
-%description python3
+%description -n libfsntfs-python3
 Python 3 bindings for libfsntfs
 
-%package tools
+%package -n libfsntfs-tools
 Summary: Several tools for reading Windows New Technology File System (NTFS) volumes
 Group: Applications/System
 Requires: libfsntfs = %{version}-%{release} @ax_libfusn_spec_requires@
 @libfsntfs_spec_tools_build_requires@ @ax_libfusn_spec_build_requires@
 
-%description tools
+%description -n libfsntfs-tools
 Several tools for reading Windows New Technology File System (NTFS) volumes
 
 %prep
@@ -66,13 +68,13 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-%files
+%files -n libfsntfs
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
-%files devel
+%files -n libfsntfs-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README ChangeLog
@@ -83,7 +85,7 @@ rm -rf %{buildroot}
 %{_includedir}/*
 %{_mandir}/man3/*
 
-%files python
+%files -n libfsntfs-python2
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
@@ -91,7 +93,7 @@ rm -rf %{buildroot}
 %{_libdir}/python2*/site-packages/*.la
 %{_libdir}/python2*/site-packages/*.so
 
-%files python3
+%files -n libfsntfs-python3
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
@@ -99,7 +101,7 @@ rm -rf %{buildroot}
 %{_libdir}/python3*/site-packages/*.la
 %{_libdir}/python3*/site-packages/*.so
 
-%files tools
+%files -n libfsntfs-tools
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
