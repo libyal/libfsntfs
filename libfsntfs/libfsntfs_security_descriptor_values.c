@@ -1,7 +1,7 @@
 /*
  * Security descriptor attribute ($SECURITY_DESCRIPTOR) values functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -506,6 +506,8 @@ on_error:
 	{
 		memory_free(
 		 security_descriptor_values->data );
+
+		security_descriptor_values->data = NULL;
 	}
 	security_descriptor_values->data_size = 0;
 

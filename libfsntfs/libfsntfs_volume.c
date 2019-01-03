@@ -1,7 +1,7 @@
 /*
  * Volume functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -39,6 +39,8 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libfcache.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_index.h"
@@ -2776,7 +2778,7 @@ int libfsntfs_internal_volume_read_bitmap(
 		if( libfdata_vector_get_element_value_by_index(
 		     cluster_block_vector,
 		     (intptr_t *) file_io_handle,
-		     cluster_block_cache,
+		     (libfdata_cache_t *) cluster_block_cache,
 		     cluster_block_index,
 		     (intptr_t **) &cluster_block,
 		     0,

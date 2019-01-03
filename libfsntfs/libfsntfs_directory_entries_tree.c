@@ -1,7 +1,7 @@
 /*
  * Directory entries tree functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -257,7 +257,7 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
 
 				goto on_error;
 			}
-			else if( result == 1 )
+			else if( result == LIBUNA_COMPARE_EQUAL )
 			{
 				return( 1 );
 			}
@@ -302,7 +302,7 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
 
 				goto on_error;
 			}
-			else if( result == 1 )
+			else if( result == LIBUNA_COMPARE_EQUAL )
 			{
 				return( 1 );
 			}
@@ -544,7 +544,7 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
 
 				goto on_error;
 			}
-			else if( result == 1 )
+			else if( result == LIBUNA_COMPARE_EQUAL )
 			{
 				return( 1 );
 			}
@@ -589,7 +589,7 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
 
 				goto on_error;
 			}
-			else if( result == 1 )
+			else if( result == LIBUNA_COMPARE_EQUAL )
 			{
 				return( 1 );
 			}

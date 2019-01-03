@@ -1,7 +1,7 @@
 /*
  * Index functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -468,7 +468,7 @@ int libfsntfs_index_read(
 	     (intptr_t *) index,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_index_read_index_value_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_index_read_index_value_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -1180,7 +1180,7 @@ int libfsntfs_index_read_sub_nodes(
 			if( libfdata_vector_get_element_value_at_offset(
 			     index->index_entry_vector,
 			     (intptr_t *) file_io_handle,
-			     index->index_entry_cache,
+			     (libfdata_cache_t *) index->index_entry_cache,
 			     index_entry_offset,
 			     &element_data_offset,
 			     (intptr_t **) &index_entry,
@@ -1308,7 +1308,7 @@ int libfsntfs_index_read_index_value_element_data(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int element_file_index,
      off64_t index_value_offset,
      size64_t element_size LIBFSNTFS_ATTRIBUTE_UNUSED,
@@ -1392,7 +1392,7 @@ int libfsntfs_index_read_index_value_element_data(
 		if( libfdata_vector_get_element_value_at_offset(
 		     index->index_entry_vector,
 		     (intptr_t *) file_io_handle,
-		     index->index_entry_cache,
+		     (libfdata_cache_t *) index->index_entry_cache,
 		     index_value_offset,
 		     &index_entry_data_offset,
 		     (intptr_t **) &index_entry,
@@ -1580,7 +1580,7 @@ int libfsntfs_index_get_index_value_by_index(
 	if( libfdata_list_get_element_value_by_index(
 	     index->index_value_list,
 	     (intptr_t *) file_io_handle,
-	     index->index_value_cache,
+	     (libfdata_cache_t *) index->index_value_cache,
 	     index_value_entry,
 	     (intptr_t **) index_value,
 	     0,

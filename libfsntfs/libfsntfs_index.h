@@ -1,7 +1,7 @@
 /*
  * Index functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -154,7 +154,7 @@ int libfsntfs_index_read_index_value_element_data(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int element_file_index,
      off64_t index_value_offset,
      size64_t element_size,

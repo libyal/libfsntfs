@@ -1,7 +1,7 @@
 /*
  * Attribute functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -2222,7 +2222,7 @@ int libfsntfs_attribute_read_value(
 
 					goto on_error;
 				}
-				else if( result == 1 )
+				else if( result == LIBUNA_COMPARE_EQUAL )
 				{
 					internal_attribute->free_value = (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_txf_data_values_free;
 
@@ -2682,7 +2682,7 @@ int libfsntfs_attribute_read_value(
 					if( libfdata_vector_get_element_value_by_index(
 					     cluster_block_vector,
 					     (intptr_t *) file_io_handle,
-					     cluster_block_cache,
+					     (libfdata_cache_t *) cluster_block_cache,
 					     cluster_block_index,
 					     (intptr_t **) &cluster_block,
 					     0,
@@ -3468,8 +3468,13 @@ int libfsntfs_attribute_compare_name_with_utf8_string(
 
 		return( -1 );
 	}
-	return( result );
-#endif
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
+
+#endif /* TODO_CASE_INSENSITIVE */
 }
 
 /* Compares the name with an UTF-16 encoded string
@@ -3603,8 +3608,13 @@ int libfsntfs_attribute_compare_name_with_utf16_string(
 
 		return( -1 );
 	}
-	return( result );
-#endif
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
+
+#endif /* TODO_CASE_INSENSITIVE */
 }
 
 /* Retrieves the data size

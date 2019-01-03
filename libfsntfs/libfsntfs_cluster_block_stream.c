@@ -1,7 +1,7 @@
 /*
  * Cluster block stream functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -141,7 +141,7 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
 		     (intptr_t *) ( *data_handle )->compressed_block_descriptors_array,
 		     NULL,
 		     NULL,
-		     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compressed_block_read_element_data,
+		     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compressed_block_read_element_data,
 		     NULL,
 		     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 		     error ) != 1 )
@@ -520,7 +520,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 		if( libfdata_vector_get_element_value_by_index(
 		     data_handle->compressed_block_vector,
 		     (intptr_t *) file_io_handle,
-		     data_handle->cache,
+		     (libfdata_cache_t *) data_handle->cache,
 		     segment_index,
 		     (intptr_t **) &compressed_block,
 		     read_flags,

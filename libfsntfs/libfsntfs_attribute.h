@@ -1,7 +1,7 @@
 /*
  * Attribute functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -31,8 +31,6 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
-#include "libfsntfs_libfdata.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )

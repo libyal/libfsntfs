@@ -2,7 +2,7 @@
  * The Transactional NTFS (TxF) data ($TXF_DATA) logged utility stream
  * attribute ($LOGGED_UTILITY_STREAM) values functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

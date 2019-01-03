@@ -9,6 +9,8 @@ Homepage: https://github.com/libyal/libfsntfs
 Package: libfsntfs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libfsntfs1
+Replaces: libfsntfs1
 Suggests: libfsntfs-dbg
 Description: Library to access the Windows New Technology File System (NTFS) format
  libfsntfs is a library to access the Windows New Technology File System (NTFS) format.
@@ -31,6 +33,8 @@ Package: libfsntfs-tools
 Section: utils
 Architecture: any
 Depends: libfsntfs (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libfsntfs-utils
+Replaces: libfsntfs-utils
 Description: Several tools for reading Windows New Technology File System (NTFS) volumes
  Several tools for reading Windows New Technology File System (NTFS) volumes.
 
@@ -45,6 +49,8 @@ Package: libfsntfs-python
 Section: python
 Architecture: any
 Depends: libfsntfs (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python-libfsntfs
+Replaces: python-libfsntfs
 Suggests: libfsntfs-python-dbg
 Description: Python 2 bindings for libfsntfs
  Python 2 bindings for libfsntfs.
@@ -60,6 +66,8 @@ Package: libfsntfs-python3
 Section: python
 Architecture: any
 Depends: libfsntfs (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python3-libfsntfs
+Replaces: python3-libfsntfs
 Suggests: libfsntfs-python3-dbg
 Description: Python 3 bindings for libfsntfs
  Python 3 bindings for libfsntfs.

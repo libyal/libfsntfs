@@ -1,7 +1,7 @@
 /*
  * Cluster block functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -27,7 +27,6 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
@@ -254,7 +253,7 @@ int libfsntfs_cluster_block_read_element_data(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int element_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t cluster_block_offset,

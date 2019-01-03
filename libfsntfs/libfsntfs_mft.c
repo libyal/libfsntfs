@@ -1,7 +1,7 @@
 /*
  * MFT functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -127,7 +127,7 @@ int libfsntfs_mft_initialize(
 	     (intptr_t *) io_handle,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfcache_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_mft_entry_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_mft_entry_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -559,7 +559,7 @@ int libfsntfs_mft_get_utf8_volume_name_size(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
 	     (intptr_t **) &mft_entry,
 	     0,
@@ -631,7 +631,7 @@ int libfsntfs_mft_get_utf8_volume_name(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
 	     (intptr_t **) &mft_entry,
 	     0,
@@ -703,7 +703,7 @@ int libfsntfs_mft_get_utf16_volume_name_size(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
 	     (intptr_t **) &mft_entry,
 	     0,
@@ -775,7 +775,7 @@ int libfsntfs_mft_get_utf16_volume_name(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
 	     (intptr_t **) &mft_entry,
 	     0,
@@ -846,7 +846,7 @@ int libfsntfs_mft_get_volume_version(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
 	     (intptr_t **) &mft_entry,
 	     0,
@@ -964,7 +964,7 @@ int libfsntfs_mft_get_mft_entry_by_index(
 	if( libfdata_vector_get_element_value_by_index(
 	     mft->mft_entry_vector,
 	     (intptr_t *) file_io_handle,
-	     mft->mft_entry_cache,
+	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     (int) mft_entry_index,
 	     (intptr_t **) mft_entry,
 	     0,

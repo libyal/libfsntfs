@@ -1,7 +1,7 @@
 /*
  * Master File Table (MFT) entry functions
  *
- * Copyright (C) 2010-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1524,7 +1524,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		if( libfdata_vector_get_element_value_by_index(
 		     mft_entry_vector,
 		     (intptr_t *) file_io_handle,
-		     mft_entry_cache,
+		     (libfdata_cache_t *) mft_entry_cache,
 		     (int) list_mft_entry_index,
 		     (intptr_t **) &list_mft_entry,
 		     0,
@@ -2611,7 +2611,7 @@ int libfsntfs_mft_entry_append_index(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			mft_entry->i30_index = *index;
 		}
@@ -2637,7 +2637,7 @@ int libfsntfs_mft_entry_append_index(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			mft_entry->sii_index = *index;
 		}
@@ -2725,7 +2725,7 @@ int libfsntfs_mft_entry_get_index_by_name(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			*index = mft_entry->i30_index;
 
@@ -2753,7 +2753,7 @@ int libfsntfs_mft_entry_get_index_by_name(
 
 			return( -1 );
 		}
-		else if( result != 0 )
+		else if( result == LIBUNA_COMPARE_EQUAL )
 		{
 			*index = mft_entry->sii_index;
 
@@ -3631,7 +3631,7 @@ int libfsntfs_mft_entry_read_element_data(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int element_index,
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t element_data_offset,
