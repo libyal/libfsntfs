@@ -582,6 +582,18 @@ int libfsntfs_mft_entry_read_header(
 
 		goto on_error;
 	}
+	if( ( (size_t) io_handle->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
+	 || ( (size_t) io_handle->mft_entry_size > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT entry - MFT entry size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	mft_entry->data = (uint8_t *) memory_allocate(
 	                               io_handle->mft_entry_size );
 
@@ -1049,9 +1061,10 @@ int libfsntfs_mft_entry_read_attributes(
 	libcdata_array_t *attribute_list = NULL;
 	libfsntfs_attribute_t *attribute = NULL;
 	static char *function            = "libfsntfs_mft_entry_read_attributes";
-	size_t attributes_data_offset    = 0;
+	size_t attribute_data_offset     = 0;
 	ssize_t read_count               = 0;
 	uint32_t attribute_type          = 0;
+	int attribute_index              = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -1086,22 +1099,23 @@ int libfsntfs_mft_entry_read_attributes(
 
 		return( -1 );
 	}
-	if( ( mft_entry->attributes_offset < sizeof( fsntfs_mft_entry_header_t ) )
-	 || ( mft_entry->attributes_offset >= mft_entry->data_size ) )
+	attribute_data_offset = mft_entry->attributes_offset;
+
+	if( ( attribute_data_offset < sizeof( fsntfs_mft_entry_header_t ) )
+	 || ( attribute_data_offset >= mft_entry->data_size ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid MFT entry - attributes offset value out of bounds.",
-		 function );
+		 "%s: invalid MFT entry - attribute offset: %d value out of bounds.",
+		 function,
+		 attribute_index );
 
 		goto on_error;
 	}
-	attributes_data_offset = mft_entry->attributes_offset;
-
 	byte_stream_copy_to_uint32_little_endian(
-	 &( mft_entry->data[ attributes_data_offset ] ),
+	 &( mft_entry->data[ attribute_data_offset ] ),
 	 attribute_type );
 
 	while( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
@@ -1114,8 +1128,9 @@ int libfsntfs_mft_entry_read_attributes(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute.",
-			 function );
+			 "%s: unable to create attribute: %d.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
@@ -1124,7 +1139,7 @@ int libfsntfs_mft_entry_read_attributes(
 			      io_handle,
 			      mft_entry->data,
 			      mft_entry->data_size,
-			      attributes_data_offset,
+			      attribute_data_offset,
 			      flags,
 			      error );
 
@@ -1134,12 +1149,13 @@ int libfsntfs_mft_entry_read_attributes(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attribute.",
-			 function );
+			 "%s: unable to read attribute: %d.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
-		attributes_data_offset += read_count;
+		attribute_data_offset += read_count;
 
 		if( libfsntfs_attribute_get_type(
 		     attribute,
@@ -1150,8 +1166,9 @@ int libfsntfs_mft_entry_read_attributes(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute type.",
-			 function );
+			 "%s: unable to retrieve attribute: %d type.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
@@ -1204,8 +1221,9 @@ int libfsntfs_mft_entry_read_attributes(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append attribute.",
-			 function );
+			 "%s: unable to append attribute: %d.",
+			 function,
+			 attribute_index );
 
 			/* Prevent a double free of the attribute */
 			attribute = NULL;
@@ -1214,21 +1232,35 @@ int libfsntfs_mft_entry_read_attributes(
 		}
 		attribute = NULL;
 
+		attribute_index++;
+
+		if( attribute_data_offset >= mft_entry->data_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid MFT entry - attribute: %d offset value out of bounds.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
 		byte_stream_copy_to_uint32_little_endian(
-		 &( mft_entry->data[ attributes_data_offset ] ),
+		 &( mft_entry->data[ attribute_data_offset ] ),
 		 attribute_type );
 	}
-	attributes_data_offset += 4;
+	attribute_data_offset += 4;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( attributes_data_offset != (size_t) mft_entry->used_entry_size )
+		if( attribute_data_offset != (size_t) mft_entry->used_entry_size )
 		{
 			libcnotify_printf(
 			 "%s: mismatch in used MFT entry size (calculated: %" PRIzd ", stored: %" PRIu16 ").\n",
 			 function,
-			 attributes_data_offset,
+			 attribute_data_offset,
 			 mft_entry->used_entry_size );
 		}
 	}

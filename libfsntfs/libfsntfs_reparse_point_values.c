@@ -235,19 +235,20 @@ int libfsntfs_reparse_point_values_read_data(
 		 "\n" );
 	}
 #endif
-	if( (size_t) reparse_point_values->reparse_data_size > data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid reparse data size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
 	if( reparse_point_values->reparse_data_size > 0 )
 	{
+		if( ( sizeof( fsntfs_reparse_point_t ) > data_size )
+		 || ( (size_t) reparse_point_values->reparse_data_size > ( data_size - sizeof( fsntfs_reparse_point_t ) ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid reparse data size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		reparse_point_values->reparse_data = (uint8_t *) memory_allocate(
 		                                                  sizeof( uint8_t ) * reparse_point_values->reparse_data_size );
 

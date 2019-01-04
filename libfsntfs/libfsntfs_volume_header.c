@@ -30,6 +30,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_volume_header.h"
 
+#include "fsntfs_mft_entry.h"
 #include "fsntfs_volume_header.h"
 
 /* Creates volume header
@@ -555,6 +556,18 @@ int libfsntfs_volume_header_read_data(
 			return( -1 );
 		}
 		volume_header->mft_entry_size = 1 << volume_header->mft_entry_size;
+	}
+	if( (size_t) volume_header->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT entry size: %" PRIu32 " value out of bounds.",
+		 function,
+		 volume_header->mft_entry_size );
+
+		return( -1 );
 	}
 	if( ( volume_header->index_entry_size == 0 )
 	 || ( volume_header->index_entry_size > 255 ) )
