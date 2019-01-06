@@ -120,6 +120,8 @@ int fsntfs_test_file_name_values_initialize(
 	          &file_name_values,
 	          &error );
 
+	file_name_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -131,8 +133,6 @@ int fsntfs_test_file_name_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	file_name_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

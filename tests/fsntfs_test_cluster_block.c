@@ -184,6 +184,8 @@ int fsntfs_test_cluster_block_initialize(
 	          1024,
 	          &error );
 
+	cluster_block = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -195,8 +197,6 @@ int fsntfs_test_cluster_block_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	cluster_block = NULL;
 
 	result = libfsntfs_cluster_block_initialize(
 	          &cluster_block,

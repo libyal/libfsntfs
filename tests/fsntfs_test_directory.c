@@ -113,6 +113,8 @@ int fsntfs_test_directory_initialize(
 	          &directory,
 	          &error );
 
+	directory = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int fsntfs_test_directory_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	directory = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

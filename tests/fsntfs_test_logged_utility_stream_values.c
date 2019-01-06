@@ -113,6 +113,8 @@ int fsntfs_test_logged_utility_stream_values_initialize(
 	          &logged_utility_stream_values,
 	          &error );
 
+	logged_utility_stream_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int fsntfs_test_logged_utility_stream_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	logged_utility_stream_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

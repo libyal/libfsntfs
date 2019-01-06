@@ -151,6 +151,8 @@ int fsntfs_test_mft_initialize(
 	          0,
 	          &error );
 
+	mft = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -162,8 +164,6 @@ int fsntfs_test_mft_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	mft = NULL;
 
 	result = libfsntfs_mft_initialize(
 	          &mft,

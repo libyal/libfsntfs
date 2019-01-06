@@ -131,7 +131,7 @@ int libfsntfs_volume_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to intialize read/write lock.",
+		 "%s: unable to initialize read/write lock.",
 		 function );
 
 		goto on_error;
@@ -1044,7 +1044,7 @@ int libfsntfs_internal_volume_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: 6.",
+		 "%s: unable to read bitmap (MFT entry: 6).",
 		 function );
 
 		goto on_error;
@@ -1065,7 +1065,7 @@ int libfsntfs_internal_volume_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: 9.",
+		 "%s: unable to read security descriptors (MFT entry: 9).",
 		 function );
 
 		goto on_error;
@@ -3001,6 +3001,7 @@ int libfsntfs_internal_volume_read_security_descriptors(
 	libfsntfs_attribute_t *data_attribute = NULL;
 	libfsntfs_mft_entry_t *mft_entry      = NULL;
 	static char *function                 = "libfsntfs_internal_volume_read_security_descriptors";
+	int result                            = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -3041,53 +3042,85 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
-	     mft_entry,
-	     (uint8_t *) "$SDS",
-	     4,
-	     &data_attribute,
-	     error ) != 1 )
+	if( mft_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve $SDS data attribute.",
-		 function );
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_index_initialize(
-	     &( internal_volume->security_descriptor_index ),
-	     internal_volume->io_handle,
-	     file_io_handle,
-	     data_attribute,
-	     error ) != 1 )
+	result = libfsntfs_attribute_compare_name_with_utf8_string(
+	          mft_entry->file_name_attribute,
+	          (uint8_t *) "$Secure",
+	          7,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create security descriptor index.",
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-8 string with data attribute name.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfsntfs_security_descriptor_index_read_sii_index(
-	     internal_volume->security_descriptor_index,
-	     internal_volume->io_handle,
-	     file_io_handle,
-	     mft_entry,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read security descriptor identifier ($SII) index.",
-		 function );
+		if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
+		     mft_entry,
+		     (uint8_t *) "$SDS",
+		     4,
+		     &data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve $SDS data attribute.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_index_initialize(
+		     &( internal_volume->security_descriptor_index ),
+		     internal_volume->io_handle,
+		     file_io_handle,
+		     data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create security descriptor index.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_index_read_sii_index(
+		     internal_volume->security_descriptor_index,
+		     internal_volume->io_handle,
+		     file_io_handle,
+		     mft_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read security descriptor identifier ($SII) index.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 

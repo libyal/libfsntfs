@@ -116,6 +116,8 @@ int fsntfs_test_bitmap_values_initialize(
 	          &bitmap_values,
 	          &error );
 
+	bitmap_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -127,8 +129,6 @@ int fsntfs_test_bitmap_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	bitmap_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

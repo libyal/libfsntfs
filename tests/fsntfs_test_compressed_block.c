@@ -118,6 +118,8 @@ int fsntfs_test_compressed_block_initialize(
 	          1024,
 	          &error );
 
+	compressed_block = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -129,8 +131,6 @@ int fsntfs_test_compressed_block_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	compressed_block = NULL;
 
 	result = libfsntfs_compressed_block_initialize(
 	          &compressed_block,

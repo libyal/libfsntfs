@@ -120,6 +120,8 @@ int fsntfs_test_standard_information_values_initialize(
 	          &standard_information_values,
 	          &error );
 
+	standard_information_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -131,8 +133,6 @@ int fsntfs_test_standard_information_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	standard_information_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

@@ -166,6 +166,8 @@ int fsntfs_test_security_descriptor_index_initialize(
 	          data_attribute,
 	          &error );
 
+	security_descriptor_index = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -177,8 +179,6 @@ int fsntfs_test_security_descriptor_index_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	security_descriptor_index = NULL;
 
 	result = libfsntfs_security_descriptor_index_initialize(
 	          &security_descriptor_index,

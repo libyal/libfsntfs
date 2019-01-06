@@ -32,14 +32,21 @@
 
 #include "fsntfs_test_functions.h"
 #include "fsntfs_test_getopt.h"
+#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
-#include "fsntfs_test_libclocale.h"
 #include "fsntfs_test_libfsntfs.h"
-#include "fsntfs_test_libuna.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 
 #include "../libfsntfs/libfsntfs_volume.h"
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
+#error Unsupported size of wchar_t
+#endif
+
+/* Define to make fsntfs_test_volume generate verbose output
+#define FSNTFS_TEST_VOLUME_VERBOSE
+ */
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
 
@@ -57,20 +64,12 @@ int libfsntfs_volume_open_file_io_handle(
 
 #endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
-#error Unsupported size of wchar_t
-#endif
-
-/* Define to make fsntfs_test_volume generate verbose output
-#define FSNTFS_TEST_VOLUME_VERBOSE
- */
-
 /* Creates and opens a source volume
  * Returns 1 if successful or -1 on error
  */
 int fsntfs_test_volume_open_source(
      libfsntfs_volume_t **volume,
-     const system_character_t *source,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	static char *function = "fsntfs_test_volume_open_source";
@@ -87,13 +86,13 @@ int fsntfs_test_volume_open_source(
 
 		return( -1 );
 	}
-	if( source == NULL )
+	if( file_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
+		 "%s: invalid file IO handle.",
 		 function );
 
 		return( -1 );
@@ -111,19 +110,12 @@ int fsntfs_test_volume_open_source(
 
 		goto on_error;
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_volume_open_wide(
+	result = libfsntfs_volume_open_file_io_handle(
 	          *volume,
-	          source,
+	          file_io_handle,
 	          LIBFSNTFS_OPEN_READ,
 	          error );
-#else
-	result = libfsntfs_volume_open(
-	          *volume,
-	          source,
-	          LIBFSNTFS_OPEN_READ,
-	          error );
-#endif
+
 	if( result != 1 )
 	{
 		libcerror_error_set(
@@ -273,6 +265,8 @@ int fsntfs_test_volume_initialize(
 	          &volume,
 	          &error );
 
+	volume = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -284,8 +278,6 @@ int fsntfs_test_volume_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	volume = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
@@ -496,6 +488,62 @@ int fsntfs_test_volume_open(
 	/* Test error cases
 	 */
 	result = libfsntfs_volume_open(
+	          NULL,
+	          narrow_source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open(
+	          volume,
+	          NULL,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open(
+	          volume,
+	          narrow_source,
+	          -1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test open when already opened
+	 */
+	result = libfsntfs_volume_open(
 	          volume,
 	          narrow_source,
 	          LIBFSNTFS_OPEN_READ,
@@ -617,6 +665,62 @@ int fsntfs_test_volume_open_wide(
 	/* Test error cases
 	 */
 	result = libfsntfs_volume_open_wide(
+	          NULL,
+	          wide_source,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open_wide(
+	          volume,
+	          NULL,
+	          LIBFSNTFS_OPEN_READ,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_open_wide(
+	          volume,
+	          wide_source,
+	          -1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test open when already opened
+	 */
+	result = libfsntfs_volume_open_wide(
 	          volume,
 	          wide_source,
 	          LIBFSNTFS_OPEN_READ,
@@ -680,7 +784,7 @@ int fsntfs_test_volume_open_file_io_handle(
 {
 	libbfio_handle_t *file_io_handle = NULL;
 	libcerror_error_t *error         = NULL;
-	libfsntfs_volume_t *volume        = NULL;
+	libfsntfs_volume_t *volume       = NULL;
 	size_t string_length             = 0;
 	int result                       = 0;
 
@@ -2320,14 +2424,15 @@ int main(
 		 "libfsntfs_volume_open_close",
 		 fsntfs_test_volume_open_close,
 		 source );
+
 	}
 	if( result != 0 )
 	{
-		/* Initialize test
+		/* Initialize volume for tests
 		 */
 		result = fsntfs_test_volume_open_source(
 		          &volume,
-		          source,
+		          file_io_handle,
 		          &error );
 
 		FSNTFS_TEST_ASSERT_EQUAL_INT(

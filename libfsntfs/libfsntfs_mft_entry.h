@@ -94,6 +94,10 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
 
+	/* The (first) file name attribute
+	 */
+	libfsntfs_attribute_t *file_name_attribute;
+
 	/* The object identifier attribute
 	 */
 	libfsntfs_attribute_t *object_identifier_attribute;

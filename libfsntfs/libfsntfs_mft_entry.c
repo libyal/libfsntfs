@@ -582,8 +582,12 @@ int libfsntfs_mft_entry_read_header(
 
 		goto on_error;
 	}
+#if ( SIZEOF_SIZE_T <= 4 )
 	if( ( (size_t) io_handle->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
 	 || ( (size_t) io_handle->mft_entry_size > (size_t) SSIZE_MAX ) )
+#else
+	if( (size_t) io_handle->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
+#endif
 	{
 		libcerror_error_set(
 		 error,
@@ -3098,6 +3102,13 @@ int libfsntfs_mft_entry_append_attribute(
 	}
 	switch( attribute_type )
 	{
+		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
+			if( mft_entry->file_name_attribute == NULL )
+			{
+				mft_entry->file_name_attribute = attribute;
+			}
+			break;
+
 		case LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER:
 			if( ( mft_entry->object_identifier_attribute == NULL )
 			 && ( attribute_has_name == 0 ) )

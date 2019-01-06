@@ -30,13 +30,17 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_functions.h"
 #include "fsntfs_test_getopt.h"
+#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libclocale.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_libuna.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
+
+#include "../libfsntfs/libfsntfs_mft_metadata_file.h"
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
 #error Unsupported size of wchar_t
@@ -46,412 +50,21 @@
 #define FSNTFS_TEST_MFT_METADATA_FILE_VERBOSE
  */
 
-/* Retrieves source as a narrow string
- * Returns 1 if successful or -1 on error
- */
-int fsntfs_test_mft_metadata_file_get_narrow_source(
-     const system_character_t *source,
-     char *narrow_string,
-     size_t narrow_string_size,
-     libcerror_error_t **error )
-{
-	static char *function     = "fsntfs_test_mft_metadata_file_get_narrow_source";
-	size_t narrow_source_size = 0;
-	size_t source_length      = 0;
+#if !defined( LIBFSNTFS_HAVE_BFIO )
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result                = 0;
-#endif
+LIBFSNTFS_EXTERN \
+int libfsntfs_check_mft_metadata_file_signature_file_io_handle(
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_error_t **error );
 
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
-		return( -1 );
-	}
-	if( narrow_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	if( narrow_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid narrow string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_size_from_utf32(
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_size_from_utf16(
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &narrow_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine narrow string size.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	narrow_source_size = source_length + 1;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( narrow_string_size < narrow_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: narrow string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf8_string_copy_from_utf32(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf8_string_copy_from_utf16(
-		          (libuna_utf8_character_t *) narrow_string,
-		          narrow_string_size,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_byte_stream_copy_from_utf32(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf32_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_byte_stream_copy_from_utf16(
-		          (uint8_t *) narrow_string,
-		          narrow_string_size,
-		          libclocale_codepage,
-		          (libuna_utf16_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-#else
-	if( system_string_copy(
-	     narrow_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set narrow string.",
-		 function );
-
-		return( -1 );
-	}
-	narrow_string[ source_length ] = 0;
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves source as a wide string
- * Returns 1 if successful or -1 on error
- */
-int fsntfs_test_mft_metadata_file_get_wide_source(
-     const system_character_t *source,
-     wchar_t *wide_string,
-     size_t wide_string_size,
-     libcerror_error_t **error )
-{
-	static char *function   = "fsntfs_test_mft_metadata_file_get_wide_source";
-	size_t source_length    = 0;
-	size_t wide_source_size = 0;
-
-#if !defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	int result              = 0;
-#endif
-
-	if( source == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid wide string.",
-		 function );
-
-		return( -1 );
-	}
-	if( wide_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid wide string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	source_length = system_string_length(
-	                 source );
-
-	if( source_length > (size_t) ( SSIZE_MAX - 1 ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid source length value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	wide_source_size = source_length + 1;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_utf8(
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_size_from_byte_stream(
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          &wide_source_size,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine wide string size.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	if( wide_string_size < wide_source_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: wide string too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	if( system_string_copy(
-	     wide_string,
-	     source,
-	     source_length ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-	wide_string[ source_length ] = 0;
-#else
-	if( libclocale_codepage == 0 )
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_utf8(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_utf8(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (libuna_utf8_character_t *) source,
-		          source_length + 1,
-		          error );
-#endif
-	}
-	else
-	{
-#if SIZEOF_WCHAR_T == 4
-		result = libuna_utf32_string_copy_from_byte_stream(
-		          (libuna_utf32_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#elif SIZEOF_WCHAR_T == 2
-		result = libuna_utf16_string_copy_from_byte_stream(
-		          (libuna_utf16_character_t *) wide_string,
-		          wide_string_size,
-		          (uint8_t *) source,
-		          source_length + 1,
-		          libclocale_codepage,
-		          error );
-#endif
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set wide string.",
-		 function );
-
-		return( -1 );
-	}
-
-#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
-
-	return( 1 );
-}
-
-#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
-
-/* Creates and opens a source mft_metadata_file
+/* Creates and opens a source MFT metadata file
  * Returns 1 if successful or -1 on error
  */
 int fsntfs_test_mft_metadata_file_open_source(
      libfsntfs_mft_metadata_file_t **mft_metadata_file,
-     const system_character_t *source,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	static char *function = "fsntfs_test_mft_metadata_file_open_source";
@@ -463,18 +76,18 @@ int fsntfs_test_mft_metadata_file_open_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mft_metadata_file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
 	}
-	if( source == NULL )
+	if( file_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid source.",
+		 "%s: invalid file IO handle.",
 		 function );
 
 		return( -1 );
@@ -487,31 +100,24 @@ int fsntfs_test_mft_metadata_file_open_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize mft_metadata_file.",
+		 "%s: unable to initialize MFT metadata file.",
 		 function );
 
 		goto on_error;
 	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_mft_metadata_file_open_wide(
+	result = libfsntfs_mft_metadata_file_open_file_io_handle(
 	          *mft_metadata_file,
-	          source,
+	          file_io_handle,
 	          LIBFSNTFS_OPEN_READ,
 	          error );
-#else
-	result = libfsntfs_mft_metadata_file_open(
-	          *mft_metadata_file,
-	          source,
-	          LIBFSNTFS_OPEN_READ,
-	          error );
-#endif
+
 	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open mft_metadata_file.",
+		 "%s: unable to open MFT metadata file.",
 		 function );
 
 		goto on_error;
@@ -528,7 +134,7 @@ on_error:
 	return( -1 );
 }
 
-/* Closes and frees a source mft_metadata_file
+/* Closes and frees a source MFT metadata file
  * Returns 1 if successful or -1 on error
  */
 int fsntfs_test_mft_metadata_file_close_source(
@@ -544,7 +150,7 @@ int fsntfs_test_mft_metadata_file_close_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid mft_metadata_file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
@@ -557,7 +163,7 @@ int fsntfs_test_mft_metadata_file_close_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close mft_metadata_file.",
+		 "%s: unable to close MFT metadata file.",
 		 function );
 
 		result = -1;
@@ -570,15 +176,13 @@ int fsntfs_test_mft_metadata_file_close_source(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free mft_metadata_file.",
+		 "%s: unable to free MFT metadata file.",
 		 function );
 
 		result = -1;
 	}
 	return( result );
 }
-
-#include "../libfsntfs/libfsntfs_mft_metadata_file.h"
 
 /* Tests the libfsntfs_mft_metadata_file_initialize function
  * Returns 1 if successful or 0 if not
@@ -656,6 +260,8 @@ int fsntfs_test_mft_metadata_file_initialize(
 	          &mft_metadata_file,
 	          &error );
 
+	mft_metadata_file = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -667,8 +273,6 @@ int fsntfs_test_mft_metadata_file_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	mft_metadata_file = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
@@ -827,7 +431,7 @@ int fsntfs_test_mft_metadata_file_open(
 
 	/* Initialize test
 	 */
-	result = fsntfs_test_mft_metadata_file_get_narrow_source(
+	result = fsntfs_test_get_narrow_source(
 	          source,
 	          narrow_source,
 	          256,
@@ -948,7 +552,7 @@ int fsntfs_test_mft_metadata_file_open_wide(
 
 	/* Initialize test
 	 */
-	result = fsntfs_test_mft_metadata_file_get_wide_source(
+	result = fsntfs_test_get_wide_source(
 	          source,
 	          wide_source,
 	          256,
@@ -1769,16 +1373,20 @@ int main(
      char * const argv[] )
 #endif
 {
+	libbfio_handle_t *file_io_handle                 = NULL;
 	libcerror_error_t *error                         = NULL;
 	libfsntfs_mft_metadata_file_t *mft_metadata_file = NULL;
+	system_character_t *option_offset                = NULL;
 	system_character_t *source                       = NULL;
 	system_integer_t option                          = 0;
+	size_t string_length                             = 0;
+	off64_t mft_metadata_file_offset                 = 0;
 	int result                                       = 0;
 
 	while( ( option = fsntfs_test_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "o:" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1790,11 +1398,36 @@ int main(
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'o':
+				option_offset = optarg;
+
+				break;
 		}
 	}
 	if( optind < argc )
 	{
 		source = argv[ optind ];
+	}
+	if( option_offset != NULL )
+	{
+		string_length = system_string_length(
+		                 option_offset );
+
+		result = fsntfs_test_system_string_copy_from_64_bit_in_decimal(
+		          option_offset,
+		          string_length + 1,
+		          (uint64_t *) &mft_metadata_file_offset,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
 	}
 #if defined( HAVE_DEBUG_OUTPUT ) && defined( FSNTFS_TEST_MFT_METADATA_FILE_VERBOSE )
 	libfsntfs_notify_set_verbose(
@@ -1815,15 +1448,66 @@ int main(
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 	if( source != NULL )
 	{
+		result = libbfio_file_range_initialize(
+		          &file_io_handle,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	         "file_io_handle",
+	         file_io_handle );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		string_length = system_string_length(
+		                 source );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfsntfs_check_mft_metadata_file_signature_wide(
+		result = libbfio_file_range_set_name_wide(
+		          file_io_handle,
 		          source,
+		          string_length,
 		          &error );
 #else
-		result = libfsntfs_check_mft_metadata_file_signature(
+		result = libbfio_file_range_set_name(
+		          file_io_handle,
 		          source,
+		          string_length,
 		          &error );
 #endif
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		result = libbfio_file_range_set(
+		          file_io_handle,
+		          mft_metadata_file_offset,
+		          0,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+
+		result = libfsntfs_check_mft_metadata_file_signature_file_io_handle(
+		          file_io_handle,
+		          &error );
 
 		FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 		 "result",
@@ -1834,7 +1518,8 @@ int main(
 		 "error",
 		 error );
 	}
-	if( result != 0 )
+	if( ( result != 0 )
+	 && ( mft_metadata_file_offset == 0 ) )
 	{
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_mft_metadata_file_open",
@@ -1864,12 +1549,14 @@ int main(
 		 "libfsntfs_mft_metadata_file_open_close",
 		 fsntfs_test_mft_metadata_file_open_close,
 		 source );
-
+	}
+	if( result != 0 )
+	{
 		/* Initialize test
 		 */
 		result = fsntfs_test_mft_metadata_file_open_source(
 		          &mft_metadata_file,
-		          source,
+		          file_io_handle,
 		          &error );
 
 		FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1944,6 +1631,25 @@ int main(
 		 "error",
 		 error );
 	}
+	if( file_io_handle != NULL )
+	{
+		result = libbfio_handle_free(
+		          &file_io_handle,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+	         "file_io_handle",
+	         file_io_handle );
+
+	        FSNTFS_TEST_ASSERT_IS_NULL(
+	         "error",
+	         error );
+	}
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 	return( EXIT_SUCCESS );
@@ -1958,6 +1664,12 @@ on_error:
 	{
 		fsntfs_test_mft_metadata_file_close_source(
 		 &mft_metadata_file,
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
 		 NULL );
 	}
 	return( EXIT_FAILURE );

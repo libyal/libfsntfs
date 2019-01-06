@@ -118,6 +118,8 @@ int fsntfs_test_index_node_initialize(
 	          &index_node,
 	          &error );
 
+	index_node = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -129,8 +131,6 @@ int fsntfs_test_index_node_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	index_node = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

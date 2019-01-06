@@ -155,6 +155,8 @@ int fsntfs_test_usn_change_journal_initialize(
 	          data_attribute,
 	          &error );
 
+	usn_change_journal = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -166,8 +168,6 @@ int fsntfs_test_usn_change_journal_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	usn_change_journal = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

@@ -119,6 +119,8 @@ int fsntfs_test_reparse_point_values_initialize(
 	          &reparse_point_values,
 	          &error );
 
+	reparse_point_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -130,8 +132,6 @@ int fsntfs_test_reparse_point_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	reparse_point_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

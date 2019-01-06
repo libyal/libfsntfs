@@ -117,6 +117,8 @@ int fsntfs_test_volume_name_values_initialize(
 	          &volume_name_values,
 	          &error );
 
+	volume_name_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -128,8 +130,6 @@ int fsntfs_test_volume_name_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	volume_name_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

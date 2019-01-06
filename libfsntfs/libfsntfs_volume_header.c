@@ -494,22 +494,42 @@ int libfsntfs_volume_header_read_data(
 
 		return( -1 );
 	}
-	if( ( ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block < 1 )
-	 || ( ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block > 8 ) )
+	volume_header->cluster_block_size = ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block;
+
+	if( ( volume_header->cluster_block_size < 1 )
+	 || ( volume_header->cluster_block_size > 128 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: sectors per cluster block: %" PRIu8 " value out of bounds.",
+		 function,
+		 volume_header->cluster_block_size );
+
+		return( -1 );
+	}
+	volume_header->cluster_block_size *= volume_header->bytes_per_sector;
+
+	if( ( volume_header->cluster_block_size != 512 )
+	 && ( volume_header->cluster_block_size != 1024 )
+	 && ( volume_header->cluster_block_size != 2048 )
+	 && ( volume_header->cluster_block_size != 4096 )
+	 && ( volume_header->cluster_block_size != 8192 )
+	 && ( volume_header->cluster_block_size != 16384 )
+	 && ( volume_header->cluster_block_size != 32768 )
+	 && ( volume_header->cluster_block_size != 65536 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported sectors per cluster block: %" PRIu8 ".",
+		 "%s: unsupported cluster block size: %" PRIu32 ".",
 		 function,
-		 ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block );
+		 volume_header->cluster_block_size );
 
 		return( -1 );
 	}
-	volume_header->cluster_block_size = ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block
-	                                  * volume_header->bytes_per_sector;
-
 	if( ( volume_header->mft_entry_size == 0 )
 	 || ( volume_header->mft_entry_size > 255 ) )
 	{

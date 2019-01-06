@@ -122,6 +122,8 @@ int fsntfs_test_security_descriptor_values_initialize(
 	          &security_descriptor_values,
 	          &error );
 
+	security_descriptor_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -133,8 +135,6 @@ int fsntfs_test_security_descriptor_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	security_descriptor_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

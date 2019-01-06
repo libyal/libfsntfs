@@ -113,6 +113,8 @@ int fsntfs_test_data_run_initialize(
 	          &data_run,
 	          &error );
 
+	data_run = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int fsntfs_test_data_run_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	data_run = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

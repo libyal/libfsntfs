@@ -200,6 +200,8 @@ int fsntfs_test_mft_entry_initialize(
 	          &mft_entry,
 	          &error );
 
+	mft_entry = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -211,8 +213,6 @@ int fsntfs_test_mft_entry_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	mft_entry = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

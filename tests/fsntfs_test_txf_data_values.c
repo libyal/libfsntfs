@@ -119,6 +119,8 @@ int fsntfs_test_txf_data_values_initialize(
 	          &txf_data_values,
 	          &error );
 
+	txf_data_values = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -130,8 +132,6 @@ int fsntfs_test_txf_data_values_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	txf_data_values = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

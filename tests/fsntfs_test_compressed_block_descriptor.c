@@ -113,6 +113,8 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	          &compressed_block_descriptor,
 	          &error );
 
+	compressed_block_descriptor = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	compressed_block_descriptor = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

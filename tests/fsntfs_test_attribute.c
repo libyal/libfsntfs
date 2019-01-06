@@ -141,6 +141,8 @@ int fsntfs_test_attribute_initialize(
 	          &attribute,
 	          &error );
 
+	attribute = NULL;
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -152,8 +154,6 @@ int fsntfs_test_attribute_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	attribute = NULL;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 

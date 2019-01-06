@@ -354,7 +354,9 @@ fsntfs_test_mft_entry_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_mft_metadata_file_SOURCES = \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_getopt.c fsntfs_test_getopt.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libclocale.h \
 	fsntfs_test_libcnotify.h \
@@ -365,7 +367,11 @@ fsntfs_test_mft_metadata_file_SOURCES = \
 	fsntfs_test_mft_metadata_file.c
 
 fsntfs_test_mft_metadata_file_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
