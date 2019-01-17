@@ -36,14 +36,14 @@ int fsntfstools_output_initialize(
      int stdio_mode,
      libcerror_error_t **error );
 
-void fsntfsoutput_copyright_fprint(
+void fsntfstools_output_copyright_fprint(
       FILE *stream );
 
-void fsntfsoutput_version_fprint(
+void fsntfstools_output_version_fprint(
       FILE *stream,
       const char *program );
 
-void fsntfsoutput_version_detailed_fprint(
+void fsntfstools_output_version_detailed_fprint(
       FILE *stream,
       const char *program );
 
