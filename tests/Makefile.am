@@ -26,6 +26,7 @@ endif
 
 TESTS = \
 	test_library.sh \
+	test_manpage.sh \
 	test_fsntfsinfo.sh \
 	$(TESTS_PYFSNTFS)
 
@@ -35,6 +36,7 @@ check_SCRIPTS = \
 	pyfsntfs_test_volume.py \
 	test_fsntfsinfo.sh \
 	test_library.sh \
+	test_manpage.sh \
 	test_python_module.sh \
 	test_runner.sh
 
