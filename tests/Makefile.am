@@ -26,7 +26,6 @@ endif
 
 TESTS = \
 	test_library.sh \
-	test_manpage.sh \
 	test_fsntfsinfo.sh \
 	$(TESTS_PYFSNTFS)
 
