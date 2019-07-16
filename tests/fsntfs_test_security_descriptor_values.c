@@ -27,7 +27,10 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_functions.h"
+#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
+#include "fsntfs_test_libfdata.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
@@ -45,6 +48,88 @@ uint8_t fsntfs_test_security_descriptor_values_data1[ 100 ] = {
 	0x20, 0x02, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+/* Reads data from the current offset into a buffer
+ * Callback for the compressed block descriptor data stream
+ * Returns the number of bytes read or -1 on error
+ */
+ssize_t fsntfs_test_security_descriptor_values_read_segment_data(
+         intptr_t *data_handle FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         libbfio_handle_t *file_io_handle,
+         int segment_index FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         int segment_file_index FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         uint8_t *segment_data,
+         size_t segment_data_size,
+         uint32_t segment_flags FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         uint8_t read_flags FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         libcerror_error_t **error )
+{
+	static char *function = "fsntfs_test_security_descriptor_values_read_segment_data";
+	ssize_t read_count    = 0;
+
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( data_handle )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( segment_index )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( segment_file_index )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( segment_flags )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( read_flags )
+
+	read_count = libbfio_handle_read_buffer(
+	              file_io_handle,
+	              segment_data,
+	              segment_data_size,
+	              error );
+
+	if( read_count != (ssize_t) segment_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read segment data.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+/* Seeks a certain offset of the data
+ * Callback for the cluster block stream
+ * Returns the offset if seek is successful or -1 on error
+ */
+off64_t fsntfs_test_security_descriptor_values_seek_segment_offset(
+         intptr_t *data_handle FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         libbfio_handle_t *file_io_handle,
+         int segment_index FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         int segment_file_index FSNTFS_TEST_ATTRIBUTE_UNUSED,
+         off64_t segment_offset,
+         libcerror_error_t **error )
+{
+	static char *function = "fsntfs_test_security_descriptor_values_seek_segment_offset";
+
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( data_handle )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( segment_index )
+	FSNTFS_TEST_UNREFERENCED_PARAMETER( segment_file_index )
+
+	if( libbfio_handle_seek_offset(
+	     file_io_handle,
+	     segment_offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek segment offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 segment_offset,
+		 segment_offset );
+
+		return( -1 );
+	}
+	return( segment_offset );
+}
 
 /* Tests the libfsntfs_security_descriptor_values_initialize function
  * Returns 1 if successful or 0 if not
@@ -697,6 +782,279 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_security_descriptor_values_read_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_security_descriptor_values_read_stream(
+     void )
+{
+	libbfio_handle_t *file_io_handle                                   = NULL;
+	libcerror_error_t *error                                           = NULL;
+	libfdata_stream_t *data_stream                                     = NULL;
+	libfsntfs_security_descriptor_values_t *security_descriptor_values = NULL;
+	int element_index                                                  = 0;
+	int result                                                         = 0;
+
+	/* Initialize test
+	 */
+	result = fsntfs_test_open_file_io_handle(
+	          &file_io_handle,
+	          fsntfs_test_security_descriptor_values_data1,
+	          100,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_initialize(
+	          &data_stream,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &fsntfs_test_security_descriptor_values_read_segment_data,
+	          NULL,
+	          (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &fsntfs_test_security_descriptor_values_seek_segment_offset,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "data_stream",
+	 data_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_append_segment(
+	          data_stream,
+	          &element_index,
+	          0,
+	          0,
+	          100,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_security_descriptor_values_initialize(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_security_descriptor_values_read_stream(
+	          security_descriptor_values,
+	          file_io_handle,
+	          data_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_security_descriptor_values_read_stream(
+	          security_descriptor_values,
+	          file_io_handle,
+	          data_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_security_descriptor_values_free(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_security_descriptor_values_initialize(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_security_descriptor_values_read_stream(
+	          NULL,
+	          file_io_handle,
+	          data_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO implement */
+
+	/* Clean up
+	 */
+	result = libfsntfs_security_descriptor_values_free(
+	          &security_descriptor_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "security_descriptor_values",
+	 security_descriptor_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfdata_stream_free(
+	          &data_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "data_stream",
+	 data_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libbfio_handle_free(
+	          &file_io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( security_descriptor_values != NULL )
+	{
+		libfsntfs_security_descriptor_values_free(
+		 &security_descriptor_values,
+		 NULL );
+	}
+	if( data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &data_stream,
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_security_descriptor_values_get_data_size function
  * Returns 1 if successful or 0 if not
  */
@@ -961,7 +1319,9 @@ int main(
 	 "libfsntfs_security_descriptor_values_read_buffer",
 	 fsntfs_test_security_descriptor_values_read_buffer );
 
-	/* TODO: add tests for libfsntfs_security_descriptor_values_read_stream */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_security_descriptor_values_read_stream",
+	 fsntfs_test_security_descriptor_values_read_stream );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 

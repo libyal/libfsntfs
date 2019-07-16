@@ -412,6 +412,17 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		return( -1 );
 	}
+	if( security_descriptor_values->data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid security descriptor values - data already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfdata_stream_get_size(
 	     data_stream,
 	     &data_size,
