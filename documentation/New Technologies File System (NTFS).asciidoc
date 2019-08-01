@@ -232,7 +232,7 @@ Often contains: +
 eb52   jmp 0x52 +
 90       nop +
 This is a jump instruction to the bootcode at offset 84 followed by a no-operation.
-| 3 | 4 | "NTFS\x20\x20\x20\x20" | File system signature +
+| 3 | 8 | "NTFS\x20\x20\x20\x20" | File system signature +
 (Also known as OEM and/or dummy identifier) +
 4+| _DOS version 2.0 BIOS parameter block (BPB)_
 | 11 | 2 | | Bytes per sector

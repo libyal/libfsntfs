@@ -30,6 +30,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_volume_header.h"
 
+#include "fsntfs_index.h"
 #include "fsntfs_mft_entry.h"
 #include "fsntfs_volume_header.h"
 
@@ -132,93 +133,6 @@ int libfsntfs_volume_header_free(
 		 *volume_header );
 
 		*volume_header = NULL;
-	}
-	return( 1 );
-}
-
-/* Reads the volume header
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_volume_header_read_file_io_handle(
-     libfsntfs_volume_header_t *volume_header,
-     libbfio_handle_t *file_io_handle,
-     off64_t file_offset,
-     libcerror_error_t **error )
-{
-	fsntfs_volume_header_t volume_header_data;
-
-	static char *function = "libfsntfs_volume_header_read_file_io_handle";
-	ssize_t read_count    = 0;
-
-	if( volume_header == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume header.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading volume header at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 file_offset,
-		 file_offset );
-	}
-#endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek volume header offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 file_offset,
-		 file_offset );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
-	              file_io_handle,
-	              (uint8_t *) &volume_header_data,
-	              sizeof( fsntfs_volume_header_t ),
-	              error );
-
-	if( read_count != (ssize_t) sizeof( fsntfs_volume_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read volume header data.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_volume_header_read_data(
-	     volume_header,
-	     (uint8_t *) &volume_header_data,
-	     sizeof( fsntfs_volume_header_t ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read volume header data.",
-		 function );
-
-		return( -1 );
 	}
 	return( 1 );
 }
@@ -636,6 +550,18 @@ int libfsntfs_volume_header_read_data(
 		}
 		volume_header->index_entry_size = 1 << volume_header->index_entry_size;
 	}
+	if( (size_t) volume_header->index_entry_size < sizeof( fsntfs_index_entry_header_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT entry size: %" PRIu32 " value out of bounds.",
+		 function,
+		 volume_header->index_entry_size );
+
+		return( -1 );
+	}
 	if( volume_header->volume_size > (size64_t) ( ( UINT64_MAX / volume_header->bytes_per_sector ) + 1 ) )
 	{
 		libcerror_error_set(
@@ -683,6 +609,93 @@ int libfsntfs_volume_header_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+	return( 1 );
+}
+
+/* Reads the volume header
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_read_file_io_handle(
+     libfsntfs_volume_header_t *volume_header,
+     libbfio_handle_t *file_io_handle,
+     off64_t file_offset,
+     libcerror_error_t **error )
+{
+	fsntfs_volume_header_t volume_header_data;
+
+	static char *function = "libfsntfs_volume_header_read_file_io_handle";
+	ssize_t read_count    = 0;
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading volume header at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
+		 file_offset,
+		 file_offset );
+	}
+#endif
+	if( libbfio_handle_seek_offset(
+	     file_io_handle,
+	     file_offset,
+	     SEEK_SET,
+	     error ) == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek volume header offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 file_offset,
+		 file_offset );
+
+		return( -1 );
+	}
+	read_count = libbfio_handle_read_buffer(
+	              file_io_handle,
+	              (uint8_t *) &volume_header_data,
+	              sizeof( fsntfs_volume_header_t ),
+	              error );
+
+	if( read_count != (ssize_t) sizeof( fsntfs_volume_header_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read volume header data.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_volume_header_read_data(
+	     volume_header,
+	     (uint8_t *) &volume_header_data,
+	     sizeof( fsntfs_volume_header_t ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read volume header data.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
