@@ -308,13 +308,22 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
      libfsntfs_volume_t *volume,
      libfsntfs_error_t **error );
 
+/* Retrieves the bytes per sector
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_bytes_per_sector(
+     libfsntfs_volume_t *volume,
+     uint16_t *bytes_per_sector,
+     libfsntfs_error_t **error );
+
 /* Retrieves the cluster block size
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_cluster_block_size(
      libfsntfs_volume_t *volume,
-     size_t *cluster_block_size,
+     size32_t *cluster_block_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the MFT entry size

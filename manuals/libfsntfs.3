@@ -1,4 +1,4 @@
-.Dd March  3, 2019
+.Dd August 21, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -71,7 +71,9 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_has_volume_shadow_snapshots "libfsntfs_volume_t *volume" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_cluster_block_size "libfsntfs_volume_t *volume" "size_t *cluster_block_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_bytes_per_sector "libfsntfs_volume_t *volume" "uint16_t *bytes_per_sector" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_cluster_block_size "libfsntfs_volume_t *volume" "size32_t *cluster_block_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_mft_entry_size "libfsntfs_volume_t *volume" "size32_t *mft_entry_size" "libfsntfs_error_t **error"
 .Ft int

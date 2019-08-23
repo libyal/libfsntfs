@@ -1170,12 +1170,63 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
 	return( 0 );
 }
 
+/* Retrieves the bytes per sector
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_bytes_per_sector(
+     libfsntfs_volume_t *volume,
+     uint16_t *bytes_per_sector,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_bytes_per_sector";
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( bytes_per_sector == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+	*bytes_per_sector = internal_volume->io_handle->bytes_per_sector;
+
+	return( 1 );
+}
+
 /* Retrieves the cluster block size
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_volume_get_cluster_block_size(
      libfsntfs_volume_t *volume,
-     size_t *cluster_block_size,
+     size32_t *cluster_block_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;

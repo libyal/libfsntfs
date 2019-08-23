@@ -953,7 +953,7 @@ int libfsntfs_mft_entry_read_header(
 
 		mft_entry_data_offset += 2;
 
-		mft_entry_fixup_offset = io_handle->bytes_per_sector - 2;
+		mft_entry_fixup_offset = 510;
 
 		for( fixup_value_index = 0;
 		     fixup_value_index < number_of_fixup_values;
@@ -1011,7 +1011,7 @@ int libfsntfs_mft_entry_read_header(
 				mft_entry->data[ mft_entry_fixup_offset + 1 ] = mft_entry->data[ mft_entry_data_offset + 1 ];
 			}
 			mft_entry_data_offset  += 2;
-			mft_entry_fixup_offset += io_handle->bytes_per_sector;
+			mft_entry_fixup_offset += 512;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )

@@ -140,9 +140,15 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_bytes_per_sector(
+     libfsntfs_volume_t *volume,
+     uint16_t *bytes_per_sector,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_cluster_block_size(
      libfsntfs_volume_t *volume,
-     size_t *cluster_block_size,
+     size32_t *cluster_block_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

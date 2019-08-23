@@ -254,12 +254,12 @@ ssize_t libfsntfs_index_node_read_header_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: index values offset\t\t\t\t: %" PRIu32 "\n",
+		 "%s: index values offset\t\t: %" PRIu32 "\n",
 		 function,
 		 index_node->index_values_offset );
 
 		libcnotify_printf(
-		 "%s: size\t\t\t\t\t\t: %" PRIu32 "\n",
+		 "%s: size\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 index_node->size );
 
@@ -267,12 +267,12 @@ ssize_t libfsntfs_index_node_read_header_data(
 		 ( (fsntfs_index_node_header_t *) index_node_header_data )->allocated_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: allocated size\t\t\t\t: %" PRIu32 "\n",
+		 "%s: allocated size\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: flags\t\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 index_node->flags );
 		libfsntfs_debug_print_index_node_flags(

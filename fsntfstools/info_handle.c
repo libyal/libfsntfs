@@ -5180,11 +5180,12 @@ int info_handle_volume_fprint(
 {
 	system_character_t *volume_name = NULL;
 	static char *function           = "info_handle_volume_fprint";
+	size32_t cluster_block_size     = 0;
 	size32_t index_entry_size       = 0;
 	size32_t mft_entry_size         = 0;
-	size_t cluster_block_size       = 0;
 	size_t volume_name_size         = 0;
 	uint64_t serial_number          = 0;
+	uint16_t bytes_per_sector       = 0;
 	uint8_t major_version           = 0;
 	uint8_t minor_version           = 0;
 	int result                      = 0;
@@ -5390,6 +5391,35 @@ int info_handle_volume_fprint(
 	}
 	else if( info_handle->input_volume != NULL )
 	{
+		result = libfsntfs_volume_get_bytes_per_sector(
+		          info_handle->input_volume,
+		          &bytes_per_sector,
+		          error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tBytes per sector\t\t: %" PRIu16 "\n",
+	 bytes_per_sector );
+*/
+
+	if( info_handle->input_mft_metadata_file != NULL )
+	{
+/* TODO */
+	}
+	else if( info_handle->input_volume != NULL )
+	{
 		result = libfsntfs_volume_get_cluster_block_size(
 		          info_handle->input_volume,
 		          &cluster_block_size,
@@ -5408,7 +5438,7 @@ int info_handle_volume_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tCluster block size\t\t: %" PRIzd "\n",
+	 "\tCluster block size\t\t: %" PRIu32 "\n",
 	 cluster_block_size );
 
 	if( info_handle->input_mft_metadata_file != NULL )

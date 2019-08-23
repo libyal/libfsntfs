@@ -38,7 +38,7 @@ struct libfsntfs_volume_header
 {
 	/* The cluster block size
 	 */
-	size_t cluster_block_size;
+	size32_t cluster_block_size;
 
 	/* The number of bytes per sector
 	 */
@@ -87,6 +87,36 @@ int libfsntfs_volume_header_read_file_io_handle(
      libfsntfs_volume_header_t *volume_header,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_bytes_per_sector(
+     libfsntfs_volume_header_t *volume_header,
+     uint16_t *bytes_per_sector,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_cluster_block_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *cluster_block_size,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_mft_entry_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *mft_entry_size,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_index_entry_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *index_entry_size,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_volume_size(
+     libfsntfs_volume_header_t *volume_header,
+     size64_t *volume_size,
+     libcerror_error_t **error );
+
+int libfsntfs_volume_header_get_volume_serial_number(
+     libfsntfs_volume_header_t *volume_header,
+     uint64_t *volume_serial_number,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -65,6 +65,7 @@ Switched to asccidoc format.
 | 0.0.14 | J.B. Metz | April 2016 | Small changes.
 | 0.0.15 | J.B. Metz | June 2018 | Corrected typos.
 | 0.0.16 | J.B. Metz | January 2019 | Changes to format.
+| 0.0.17 | J.B. Metz | August 2019 | Additional information regarding volumes created by mkntfs.
 |===
 
 :numbered:
@@ -235,9 +236,10 @@ This is a jump instruction to the bootcode at offset 84 followed by a no-operati
 | 3 | 8 | "NTFS\x20\x20\x20\x20" | File system signature +
 (Also known as OEM and/or dummy identifier) +
 4+| _DOS version 2.0 BIOS parameter block (BPB)_
-| 11 | 2 | | Bytes per sector
+| 11 | 2 | | Bytes per sector +
+Values supported by mkntfs: 256, 512, 1024, 2048 and 4096
 | 13 | 1 | | Sectors per cluster block +
-[yellow-background]*Values seen 1, 2, 8*
+See below.
 | 14 | 2 | 0x00 | Reserved Sectors +
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
 | 16 | 1 | 0x00 | Number of File Allocation Tables (FATs) +
@@ -291,7 +293,13 @@ not used by NTFS `[POLLARD06]`, `[MSDN]`
 | 510 | 2 | 0x55 0xaa | Sector signature
 |===
 
-Both the MFT and index entry sizes are defined as following:
+The sectors per cluster block value as used by mkntfs is defined as following:
+
+* Values 0 to 128 represent sizes of 0 to 128 sectors.
+* Values 244 to 255 represent sizes of `2^(256-n)` sectors.
+* Other values are unknown.
+
+The MFT entry size and index entry size are defined as following:
 
 * Values 0 to 127 represent sizes of 0 to 127 cluster blocks.
 * Values 128 to 255 represent sizes of `2^(256-n)` bytes; or `2^(-n)` if considered as a signed byte.
@@ -302,7 +310,7 @@ The cluster block size can be determined as following:
 cluster block size = bytes per sector x sectors per cluster block
 ....
 
-Values available in Windows are:
+Values supported by Windows and diskpart are:
 
 * 512
 * 1024
@@ -312,6 +320,8 @@ Values available in Windows are:
 * 16K (16384)
 * 32K (32768)
 * 64K (65536)
+
+Values supported by mkntfs: 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576 and 2097152.
 
 The MFT offset can be determined as following:
 ....
@@ -524,9 +534,9 @@ The fix-up values are variable of size and consists of:
 | 2 | 2 x number of fix-up values | | Fix-up (original) value array
 |===
 
-On disk the last 2 bytes in each sector is replaced by the fix-up placeholder
-value. The original value is stored in the corresponding fix-up (original)
-value array entry.
+On disk the last 2 bytes for each 512 bytes block is replaced by the fix-up
+placeholder value. The original value is stored in the corresponding fix-up
+(original) value array entry.
 
 [NOTE]
 There can be more fix-up values than the amount of sectors in the data.

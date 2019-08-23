@@ -484,7 +484,7 @@ int fsntfs_test_volume_header_read_data(
 
 	/* Test error case where sectors per cluster block is invalid
 	 */
-	fsntfs_test_volume_header_data1[ 13 ] = 0xff;
+	fsntfs_test_volume_header_data1[ 13 ] = 0xc0;
 
 	result = libfsntfs_volume_header_read_data(
 	          volume_header,
@@ -517,6 +517,34 @@ int fsntfs_test_volume_header_read_data(
 	          &error );
 
 	fsntfs_test_volume_header_data1[ 13 ] = 0x01;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where total number of sectors is invalid
+	 */
+	byte_stream_copy_from_uint64_little_endian(
+	 &( fsntfs_test_volume_header_data1[ 40 ] ),
+	 0x0080000000000001UL );
+
+	result = libfsntfs_volume_header_read_data(
+	          volume_header,
+	          fsntfs_test_volume_header_data1,
+	          512,
+	          &error );
+
+	byte_stream_copy_from_uint64_little_endian(
+	 &( fsntfs_test_volume_header_data1[ 40 ] ),
+	 0x0000000000003ec0UL );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",

@@ -1,0 +1,90 @@
+/*
+ * Master File Table (MFT) entry header functions
+ *
+ * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined( _LIBFSNTFS_MFT_ENTRY_HEADER_H )
+#define _LIBFSNTFS_MFT_ENTRY_HEADER_H
+
+#include <common.h>
+#include <types.h>
+
+#include "libfsntfs_libcerror.h"
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+typedef struct libfsntfs_mft_entry_header libfsntfs_mft_entry_header_t;
+
+struct libfsntfs_mft_entry_header
+{
+	/* The journal sequence number
+	 */
+	uint64_t journal_sequence_number;
+
+	/* The sequence
+	 */
+	uint16_t sequence;
+
+	/* The reference count
+	 */
+	uint16_t reference_count;
+
+	/* The attributes offset
+	 */
+	uint16_t attributes_offset;
+
+	/* The flags
+	 */
+	uint16_t flags;
+
+	/* The used entry size 
+	 */
+	uint16_t used_entry_size;
+
+	/* The base record file reference
+	 */
+	uint64_t base_record_file_reference;
+
+	/* The index
+	 */
+	uint32_t index;
+};
+
+int libfsntfs_mft_entry_header_initialize(
+     libfsntfs_mft_entry_header_t **mft_entry_header,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_header_free(
+     libfsntfs_mft_entry_header_t **mft_entry_header,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_header_read_data(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif /* !defined( _LIBFSNTFS_MFT_ENTRY_HEADER_H ) */
+

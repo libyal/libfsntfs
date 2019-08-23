@@ -396,7 +396,11 @@ int libfsntfs_volume_header_read_data(
 		 "\n" );
 	}
 #endif
-	if( volume_header->bytes_per_sector != 512 )
+	if( ( volume_header->bytes_per_sector != 256 )
+	 && ( volume_header->bytes_per_sector != 512 )
+	 && ( volume_header->bytes_per_sector != 1024 )
+	 && ( volume_header->bytes_per_sector != 2048 )
+	 && ( volume_header->bytes_per_sector != 4096 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -410,29 +414,41 @@ int libfsntfs_volume_header_read_data(
 	}
 	volume_header->cluster_block_size = ( (fsntfs_volume_header_t *) data )->sectors_per_cluster_block;
 
-	if( ( volume_header->cluster_block_size < 1 )
-	 || ( volume_header->cluster_block_size > 128 ) )
+	if( volume_header->cluster_block_size > 128 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: sectors per cluster block: %" PRIu8 " value out of bounds.",
-		 function,
-		 volume_header->cluster_block_size );
+		/* The size is calculated as: 2 ^ ( 256 - value )
+		 */
+		volume_header->cluster_block_size = 256 - volume_header->cluster_block_size;
 
-		return( -1 );
+		if( volume_header->cluster_block_size > 12 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid cluster block size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		volume_header->cluster_block_size = 1 << volume_header->cluster_block_size;
 	}
 	volume_header->cluster_block_size *= volume_header->bytes_per_sector;
 
-	if( ( volume_header->cluster_block_size != 512 )
+	if( ( volume_header->cluster_block_size != 256 )
+	 && ( volume_header->cluster_block_size != 512 )
 	 && ( volume_header->cluster_block_size != 1024 )
 	 && ( volume_header->cluster_block_size != 2048 )
 	 && ( volume_header->cluster_block_size != 4096 )
 	 && ( volume_header->cluster_block_size != 8192 )
 	 && ( volume_header->cluster_block_size != 16384 )
 	 && ( volume_header->cluster_block_size != 32768 )
-	 && ( volume_header->cluster_block_size != 65536 ) )
+	 && ( volume_header->cluster_block_size != 65536 )
+	 && ( volume_header->cluster_block_size != 131072 )
+	 && ( volume_header->cluster_block_size != 262144 )
+	 && ( volume_header->cluster_block_size != 524288 )
+	 && ( volume_header->cluster_block_size != 1048576 )
+	 && ( volume_header->cluster_block_size != 2097152 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -585,6 +601,11 @@ int libfsntfs_volume_header_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
+		 "%s: calculated cluster block size\t: %" PRIu32 "\n",
+		 function,
+		 volume_header->cluster_block_size );
+
+		libcnotify_printf(
 		 "%s: calculated MFT entry size\t\t: %" PRIu32 "\n",
 		 function,
 		 volume_header->mft_entry_size );
@@ -696,6 +717,43 @@ int libfsntfs_volume_header_read_file_io_handle(
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Retrieves the bytes per sector
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_bytes_per_sector(
+     libfsntfs_volume_header_t *volume_header,
+     uint16_t *bytes_per_sector,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_bytes_per_sector";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( bytes_per_sector == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid bytes per sector.",
+		 function );
+
+		return( -1 );
+	}
+	*bytes_per_sector = volume_header->bytes_per_sector;
+
 	return( 1 );
 }
 

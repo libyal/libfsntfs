@@ -77,6 +77,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_logged_utility_stream_values.c libfsntfs_logged_utility_stream_values.h \
 	libfsntfs_mft.c libfsntfs_mft.h \
 	libfsntfs_mft_entry.c libfsntfs_mft_entry.h \
+	libfsntfs_mft_entry_header.c libfsntfs_mft_entry_header.h \
 	libfsntfs_mft_metadata_file.c libfsntfs_mft_metadata_file.h \
 	libfsntfs_notify.c libfsntfs_notify.h \
 	libfsntfs_object_identifier_attribute.c libfsntfs_object_identifier_attribute.h \
