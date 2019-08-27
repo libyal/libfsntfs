@@ -310,18 +310,32 @@ The cluster block size can be determined as following:
 cluster block size = bytes per sector x sectors per cluster block
 ....
 
-Values supported by Windows and diskpart are:
+[NOTE]
+Different NTFS implementations support different cluster block sizes.
 
-* 512
-* 1024
-* 2048
-* 4096
-* 8192
-* 16K (16384)
-* 32K (32768)
-* 64K (65536)
+Known supported cluster block size:
 
-Values supported by mkntfs: 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576 and 2097152.
+[cols="1,1,5",options="header"]
+|===
+| Cluster block size | Bytes per sector | Supported by
+| 256 | 256 | mkntfs
+| 512 | 256 - 512 | diskpart, mkntfs, ntfs3g, Windows
+| 1024 | 256 - 1024 | diskpart, mkntfs, ntfs3g, Windows
+| 2048 | 256 - 2048 | diskpart, mkntfs, ntfs3g, Windows
+| 4096 | 256 - 4096 | diskpart, mkntfs, ntfs3g, Windows
+| 8192 | 256 - 4096 | diskpart, mkntfs, ntfs3g, Windows
+| 16K (16384) | 256 - 4096 | diskpart, mkntfs, ntfs3g, Windows
+| 32K (32768) | 256 - 4096 | diskpart, mkntfs, ntfs3g, Windows
+| 64K (65536) | 256 - 4096 | diskpart, mkntfs, ntfs3g, Windows
+| 131072 | 256 - 4096 | mkntfs, ntfs3g
+| 262144 | 256 - 4096 | mkntfs, ntfs3g
+| 524288 | 256 - 4096 | mkntfs, ntfs3g
+| 1048576 | 256 - 4096 | mkntfs, ntfs3g
+| 2097152 | 512 - 4096 | mkntfs, ntfs3g
+|===
+
+[NOTE]
+mkntfs restricts the cluster size to: bytes per sector >= cluster size > 4096 * bytes per sector 
 
 The MFT offset can be determined as following:
 ....

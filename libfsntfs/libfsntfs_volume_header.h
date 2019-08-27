@@ -119,6 +119,11 @@ int libfsntfs_volume_header_get_volume_serial_number(
      uint64_t *volume_serial_number,
      libcerror_error_t **error );
 
+int libfsntfs_volume_header_get_mft_offset(
+     libfsntfs_volume_header_t *volume_header,
+     off64_t *mft_offset,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

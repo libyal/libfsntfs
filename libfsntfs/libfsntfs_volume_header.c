@@ -757,3 +757,225 @@ int libfsntfs_volume_header_get_bytes_per_sector(
 	return( 1 );
 }
 
+/* Retrieves the cluster block size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_cluster_block_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *cluster_block_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_cluster_block_size";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( cluster_block_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cluster block size.",
+		 function );
+
+		return( -1 );
+	}
+	*cluster_block_size = volume_header->cluster_block_size;
+
+	return( 1 );
+}
+
+/* Retrieves the MFT entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_mft_entry_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *mft_entry_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_mft_entry_size";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*mft_entry_size = volume_header->mft_entry_size;
+
+	return( 1 );
+}
+
+/* Retrieves the index entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_index_entry_size(
+     libfsntfs_volume_header_t *volume_header,
+     size32_t *index_entry_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_index_entry_size";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( index_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*index_entry_size = volume_header->index_entry_size;
+
+	return( 1 );
+}
+
+/* Retrieves the volume size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_volume_size(
+     libfsntfs_volume_header_t *volume_header,
+     size64_t *volume_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_volume_size";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( volume_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume size.",
+		 function );
+
+		return( -1 );
+	}
+	*volume_size = volume_header->volume_size;
+
+	return( 1 );
+}
+
+/* Retrieves the volume serial number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_volume_serial_number(
+     libfsntfs_volume_header_t *volume_header,
+     uint64_t *volume_serial_number,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_volume_serial_number";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( volume_serial_number == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume serial number.",
+		 function );
+
+		return( -1 );
+	}
+	*volume_serial_number = volume_header->volume_serial_number;
+
+	return( 1 );
+}
+
+/* Retrieves the MFT offset
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_header_get_mft_offset(
+     libfsntfs_volume_header_t *volume_header,
+     off64_t *mft_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_volume_header_get_mft_offset";
+
+	if( volume_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume header.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT offset.",
+		 function );
+
+		return( -1 );
+	}
+	*mft_offset = volume_header->mft_offset;
+
+	return( 1 );
+}
+

@@ -388,8 +388,40 @@ int libfsntfs_volume_open(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_volume->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_volume->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -525,8 +557,40 @@ int libfsntfs_volume_open_wide(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_volume->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_volume->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -665,9 +729,42 @@ int libfsntfs_volume_open_file_io_handle(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_volume->file_io_handle                   = file_io_handle;
 	internal_volume->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_volume->file_io_handle                   = NULL;
+		internal_volume->file_io_handle_opened_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -715,6 +812,21 @@ int libfsntfs_volume_close(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -785,18 +897,37 @@ int libfsntfs_volume_close(
 
 		result = -1;
 	}
-	if( libfsntfs_mft_free(
-	     &( internal_volume->mft ),
-	     error ) != 1 )
+	if( internal_volume->volume_header != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free MFT.",
-		 function );
+		if( libfsntfs_volume_header_free(
+		     &( internal_volume->volume_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free volume header.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
+	}
+	if( internal_volume->mft != NULL )
+	{
+		if( libfsntfs_mft_free(
+		     &( internal_volume->mft ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free MFT.",
+			 function );
+
+			result = -1;
+		}
 	}
 	if( internal_volume->security_descriptor_index != NULL )
 	{
@@ -814,6 +945,21 @@ int libfsntfs_volume_close(
 			result = -1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -825,10 +971,11 @@ int libfsntfs_internal_volume_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_entry_t *mft_entry         = NULL;
-	libfsntfs_volume_header_t *volume_header = NULL;
-	static char *function                    = "libfsntfs_internal_volume_open_read";
-	size64_t mft_size                        = 0;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	static char *function            = "libfsntfs_internal_volume_open_read";
+	size64_t mft_size                = 0;
+	size64_t volume_size             = 0;
+	off64_t mft_offset               = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -852,6 +999,17 @@ int libfsntfs_internal_volume_open_read(
 
 		return( -1 );
 	}
+	if( internal_volume->volume_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid internal volume - volume header value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_volume->mft != NULL )
 	{
 		libcerror_error_set(
@@ -871,7 +1029,7 @@ int libfsntfs_internal_volume_open_read(
 	}
 #endif
 	if( libfsntfs_volume_header_initialize(
-	     &volume_header,
+	     &( internal_volume->volume_header ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -884,7 +1042,7 @@ int libfsntfs_internal_volume_open_read(
 		goto on_error;
 	}
 	if( libfsntfs_volume_header_read_file_io_handle(
-	     volume_header,
+	     internal_volume->volume_header,
 	     file_io_handle,
 	     0,
 	     error ) != 1 )
@@ -898,13 +1056,90 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-	internal_volume->io_handle->cluster_block_size = volume_header->cluster_block_size;
-	internal_volume->io_handle->index_entry_size   = volume_header->index_entry_size;
-	internal_volume->io_handle->mft_entry_size     = volume_header->mft_entry_size;
-	internal_volume->io_handle->bytes_per_sector   = volume_header->bytes_per_sector;
+	if( libfsntfs_volume_header_get_bytes_per_sector(
+	     internal_volume->volume_header,
+	     &( internal_volume->io_handle->bytes_per_sector ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
 
-	internal_volume->volume_serial_number          = volume_header->volume_serial_number;
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_get_cluster_block_size(
+	     internal_volume->volume_header,
+	     &( internal_volume->io_handle->cluster_block_size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve cluster block size.",
+		 function );
 
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_get_mft_entry_size(
+	     internal_volume->volume_header,
+	     &( internal_volume->io_handle->mft_entry_size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry size.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_get_index_entry_size(
+	     internal_volume->volume_header,
+	     &( internal_volume->io_handle->index_entry_size ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_get_volume_size(
+	     internal_volume->volume_header,
+	     &volume_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume size.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_volume_header_get_mft_offset(
+	     internal_volume->volume_header,
+	     &mft_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT offset.",
+		 function );
+
+		goto on_error;
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -912,8 +1147,8 @@ int libfsntfs_internal_volume_open_read(
 		 "Reading MFT entry: 0:\n" );
 	}
 #endif
-	if( ( volume_header->mft_offset < 0 )
-	 || ( (size64_t) volume_header->mft_offset >= volume_header->volume_size ) )
+	if( ( mft_offset < 0 )
+	 || ( (size64_t) mft_offset >= volume_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -924,7 +1159,7 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-	mft_size = volume_header->volume_size - volume_header->mft_offset;
+	mft_size = volume_size - mft_offset;
 
 	/* Since MFT entry 0 can contain an attribute list
 	 * we define MFT entry vector before knowning all the data runs
@@ -932,7 +1167,7 @@ int libfsntfs_internal_volume_open_read(
 	if( libfsntfs_mft_initialize(
 	     &( internal_volume->mft ),
 	     internal_volume->io_handle,
-	     volume_header->mft_offset,
+	     mft_offset,
 	     mft_size,
 	     (size64_t) internal_volume->io_handle->mft_entry_size,
 	     0,
@@ -964,7 +1199,7 @@ int libfsntfs_internal_volume_open_read(
 	     internal_volume->mft,
 	     internal_volume->io_handle,
 	     file_io_handle,
-	     volume_header->mft_offset,
+	     mft_offset,
 	     0,
 	     mft_entry,
 	     0,
@@ -975,19 +1210,6 @@ int libfsntfs_internal_volume_open_read(
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read MFT entry: 0.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_volume_header_free(
-	     &volume_header,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free volume header.",
 		 function );
 
 		goto on_error;
@@ -1085,10 +1307,10 @@ on_error:
 		 &mft_entry,
 		 NULL );
 	}
-	if( volume_header != NULL )
+	if( internal_volume->volume_header != NULL )
 	{
 		libfsntfs_volume_header_free(
-		 &volume_header,
+		 &( internal_volume->volume_header ),
 		 NULL );
 	}
 	return( -1 );
@@ -1103,6 +1325,7 @@ int libfsntfs_volume_has_bitlocker_drive_encryption(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_has_bitlocker_drive_encryption";
+	int result                                   = 0;
 
 	if( volume == NULL )
 	{
@@ -1117,19 +1340,39 @@ int libfsntfs_volume_has_bitlocker_drive_encryption(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-/* TODO */
-	return( 0 );
+#endif
+/* TODO implement */
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Determines if the volume has Volume Shadow Snapshots (VSS)
@@ -1141,6 +1384,7 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_has_volume_shadow_snapshots";
+	int result                                   = 0;
 
 	if( volume == NULL )
 	{
@@ -1155,19 +1399,39 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-/* TODO */
-	return( 0 );
+#endif
+/* TODO implement */
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the bytes per sector
@@ -1180,6 +1444,7 @@ int libfsntfs_volume_get_bytes_per_sector(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_bytes_per_sector";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1194,31 +1459,51 @@ int libfsntfs_volume_get_bytes_per_sector(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( bytes_per_sector == NULL )
+#endif
+	if( libfsntfs_volume_header_get_bytes_per_sector(
+	     internal_volume->volume_header,
+	     bytes_per_sector,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid bytes per sector.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	*bytes_per_sector = internal_volume->io_handle->bytes_per_sector;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the cluster block size
@@ -1231,6 +1516,7 @@ int libfsntfs_volume_get_cluster_block_size(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_cluster_block_size";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1245,31 +1531,51 @@ int libfsntfs_volume_get_cluster_block_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( cluster_block_size == NULL )
+#endif
+	if( libfsntfs_volume_header_get_cluster_block_size(
+	     internal_volume->volume_header,
+	     cluster_block_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid cluster block size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve cluster block size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	*cluster_block_size = internal_volume->io_handle->cluster_block_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the MFT entry size
@@ -1282,6 +1588,7 @@ int libfsntfs_volume_get_mft_entry_size(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_mft_entry_size";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1296,31 +1603,51 @@ int libfsntfs_volume_get_mft_entry_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( mft_entry_size == NULL )
+#endif
+	if( libfsntfs_volume_header_get_mft_entry_size(
+	     internal_volume->volume_header,
+	     mft_entry_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	*mft_entry_size = (size32_t) internal_volume->io_handle->mft_entry_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the index entry size
@@ -1333,6 +1660,7 @@ int libfsntfs_volume_get_index_entry_size(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_index_entry_size";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1347,31 +1675,51 @@ int libfsntfs_volume_get_index_entry_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_entry_size == NULL )
+#endif
+	if( libfsntfs_volume_header_get_index_entry_size(
+	     internal_volume->volume_header,
+	     index_entry_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index entry size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	*index_entry_size = (size32_t) internal_volume->io_handle->index_entry_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-8 encoded name
@@ -1386,6 +1734,7 @@ int libfsntfs_volume_get_utf8_name_size(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf8_name_size";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1400,6 +1749,21 @@ int libfsntfs_volume_get_utf8_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_utf8_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1413,9 +1777,24 @@ int libfsntfs_volume_get_utf8_name_size(
 		 "%s: unable to retrieve size of UTF-8 volume name.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded name
@@ -1431,6 +1810,7 @@ int libfsntfs_volume_get_utf8_name(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf8_name";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1445,6 +1825,21 @@ int libfsntfs_volume_get_utf8_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_utf8_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1459,9 +1854,24 @@ int libfsntfs_volume_get_utf8_name(
 		 "%s: unable to retrieve UTF-8 volume name.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1476,6 +1886,7 @@ int libfsntfs_volume_get_utf16_name_size(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf16_name_size";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1490,6 +1901,21 @@ int libfsntfs_volume_get_utf16_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_utf16_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1503,9 +1929,24 @@ int libfsntfs_volume_get_utf16_name_size(
 		 "%s: unable to retrieve size of UTF-16 volune name.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded name
@@ -1521,6 +1962,7 @@ int libfsntfs_volume_get_utf16_name(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_utf16_name";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1535,6 +1977,21 @@ int libfsntfs_volume_get_utf16_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_utf16_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1549,9 +2006,24 @@ int libfsntfs_volume_get_utf16_name(
 		 "%s: unable to retrieve UTF-16 volume name.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the version
@@ -1565,6 +2037,7 @@ int libfsntfs_volume_get_version(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_version";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1579,6 +2052,21 @@ int libfsntfs_volume_get_version(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_volume_version(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1593,9 +2081,24 @@ int libfsntfs_volume_get_version(
 		 "%s: unable to retrieve volume version.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the serial number
@@ -1608,6 +2111,7 @@ int libfsntfs_volume_get_serial_number(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_serial_number";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -1622,31 +2126,51 @@ int libfsntfs_volume_get_serial_number(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( serial_number == NULL )
+#endif
+	if( libfsntfs_volume_header_get_volume_serial_number(
+	     internal_volume->volume_header,
+	     serial_number,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid serial number.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume serial number.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	*serial_number = internal_volume->volume_serial_number;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the number of file entries (MFT entries)
@@ -1673,6 +2197,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+/* TODO implement read/write lock support */
 	if( libfsntfs_mft_get_number_of_entries(
 	     internal_volume->mft,
 	     number_of_file_entries,
@@ -1738,6 +2263,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		return( -1 );
 	}
+/* TODO implement read/write lock support */
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -1826,6 +2352,7 @@ int libfsntfs_volume_get_root_directory(
 
 		return( -1 );
 	}
+/* TODO implement read/write lock support */
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -2229,6 +2756,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
+/* TODO implement read/write lock support */
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          utf8_string,
@@ -2638,6 +3166,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
+/* TODO implement read/write lock support */
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	          internal_volume,
 	          utf16_string,
@@ -3065,17 +3594,6 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		return( -1 );
 	}
-	if( internal_volume->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_volume->mft,
 	     file_io_handle,
@@ -3213,6 +3731,7 @@ int libfsntfs_volume_get_usn_change_journal(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
+/* TODO implement read/write lock support */
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          (uint8_t *) "\\$Extend\\$UsnJrnl",

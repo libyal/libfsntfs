@@ -1,4 +1,6 @@
 TODO
+* implement read/write lock support
+
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 
 * create directory type and wrap directory_entries_tree

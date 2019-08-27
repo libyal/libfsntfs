@@ -1031,6 +1031,552 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_volume_header_get_bytes_per_sector function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_bytes_per_sector(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error  = NULL;
+	uint16_t bytes_per_sector = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_bytes_per_sector(
+	          volume_header,
+	          &bytes_per_sector,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT16(
+	 "bytes_per_sector",
+	 bytes_per_sector,
+	 512 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_bytes_per_sector(
+	          NULL,
+	          &bytes_per_sector,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_bytes_per_sector(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_cluster_block_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_cluster_block_size(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error    = NULL;
+	size32_t cluster_block_size = 0;
+	int result                  = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_cluster_block_size(
+	          volume_header,
+	          &cluster_block_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "cluster_block_size",
+	 (uint32_t) cluster_block_size,
+	 512 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_cluster_block_size(
+	          NULL,
+	          &cluster_block_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_cluster_block_size(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_mft_entry_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_mft_entry_size(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error = NULL;
+	size32_t mft_entry_size  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_mft_entry_size(
+	          volume_header,
+	          &mft_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "mft_entry_size",
+	 (uint32_t) mft_entry_size,
+	 1024 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_mft_entry_size(
+	          NULL,
+	          &mft_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_mft_entry_size(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_index_entry_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_index_entry_size(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error  = NULL;
+	size32_t index_entry_size = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_index_entry_size(
+	          volume_header,
+	          &index_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "index_entry_size",
+	 (uint32_t) index_entry_size,
+	 1024 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_index_entry_size(
+	          NULL,
+	          &index_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_index_entry_size(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_volume_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_volume_size(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error = NULL;
+	size64_t volume_size     = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_volume_size(
+	          volume_header,
+	          &volume_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "volume_size",
+	 (uint64_t) volume_size,
+	 (uint64_t) 8224768 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_volume_size(
+	          NULL,
+	          &volume_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_volume_size(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_volume_serial_number function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_volume_serial_number(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error      = NULL;
+	uint64_t volume_serial_number = 0;
+	int result                    = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_volume_serial_number(
+	          volume_header,
+	          &volume_serial_number,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "volume_serial_number",
+	 volume_serial_number,
+	 (uint64_t) 0xba50ed9250ed5623UL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_volume_serial_number(
+	          NULL,
+	          &volume_serial_number,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_volume_serial_number(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_volume_header_get_mft_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_header_get_mft_offset(
+     libfsntfs_volume_header_t *volume_header )
+{
+	libcerror_error_t *error = NULL;
+	off64_t mft_offset       = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_header_get_mft_offset(
+	          volume_header,
+	          &mft_offset,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "mft_offset",
+	 mft_offset,
+	 (int64_t) 0x0029d600UL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_header_get_mft_offset(
+	          NULL,
+	          &mft_offset,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_header_get_mft_offset(
+	          volume_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -1045,6 +1591,14 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_volume_header_t *volume_header = NULL;
+	int result                               = 0;
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -1066,11 +1620,120 @@ int main(
 	 "libfsntfs_volume_header_read_file_io_handle",
 	 fsntfs_test_volume_header_read_file_io_handle );
 
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	/* Initialize test
+	 */
+	result = libfsntfs_volume_header_initialize(
+	          &volume_header,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "volume_header",
+	 volume_header );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_volume_header_read_data(
+	          volume_header,
+	          fsntfs_test_volume_header_data1,
+	          512,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_bytes_per_sector",
+	 fsntfs_test_volume_header_get_bytes_per_sector,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_cluster_block_size",
+	 fsntfs_test_volume_header_get_cluster_block_size,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_mft_entry_size",
+	 fsntfs_test_volume_header_get_mft_entry_size,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_index_entry_size",
+	 fsntfs_test_volume_header_get_index_entry_size,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_volume_size",
+	 fsntfs_test_volume_header_get_volume_size,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_volume_serial_number",
+	 fsntfs_test_volume_header_get_volume_serial_number,
+	 volume_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_volume_header_get_mft_offset",
+	 fsntfs_test_volume_header_get_mft_offset,
+	 volume_header );
+
+	/* Clean up
+	 */
+	result = libfsntfs_volume_header_free(
+	          &volume_header,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "volume_header",
+	 volume_header );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 on_error:
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( volume_header != NULL )
+	{
+		libfsntfs_volume_header_free(
+		 &volume_header,
+		 NULL );
+	}
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	return( EXIT_FAILURE );
 }
 

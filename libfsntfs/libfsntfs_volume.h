@@ -35,6 +35,7 @@
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_types.h"
+#include "libfsntfs_volume_header.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -63,6 +64,10 @@ struct libfsntfs_internal_volume
 	/* The volume serial number
 	 */
 	uint64_t volume_serial_number;
+
+	/* The volume header
+	 */
+	libfsntfs_volume_header_t *volume_header;
 
 	/* The MFT
 	 */

@@ -30,7 +30,6 @@ TESTS = \
 	$(TESTS_PYFSNTFS)
 
 check_SCRIPTS = \
-	pyfsntfs_test_read.py \
 	pyfsntfs_test_support.py \
 	pyfsntfs_test_volume.py \
 	test_fsntfsinfo.sh \
@@ -464,6 +463,7 @@ fsntfs_test_security_descriptor_values_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_security_descriptor_values_LDADD = \
+	@LIBFDATA_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

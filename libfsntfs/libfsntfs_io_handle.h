@@ -40,7 +40,7 @@ struct libfsntfs_io_handle
 {
 	/* The cluster block size
 	 */
-	size_t cluster_block_size;
+	size32_t cluster_block_size;
 
 	/* The index entry size
 	 */
