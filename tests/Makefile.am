@@ -63,6 +63,7 @@ check_PROGRAMS = \
 	fsntfs_test_logged_utility_stream_values \
 	fsntfs_test_mft \
 	fsntfs_test_mft_entry \
+	fsntfs_test_mft_entry_header \
 	fsntfs_test_mft_metadata_file \
 	fsntfs_test_notify \
 	fsntfs_test_object_identifier_values \
@@ -350,6 +351,18 @@ fsntfs_test_mft_entry_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_mft_entry_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_mft_entry_header_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_mft_entry_header.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_mft_entry_header_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

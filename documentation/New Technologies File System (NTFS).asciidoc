@@ -181,7 +181,7 @@ Last used in NTFS version 1.2
 Introduced in NTFS version 3.0
 | 10 | $UpCase | Table of uppercase characters used for ensuring case insensitivity in Windows and DOS namespaces.
 | 11 | $Extend | A directory containing extended metadata files
-| 12-15 | | Reserved +
+| 12-15 | | [yellow-background]*Unknown (Reserved)* +
 Marked as in use but empty
 | 16-23 | | Unused +
 Marked as unused
@@ -240,7 +240,7 @@ This is a jump instruction to the bootcode at offset 84 followed by a no-operati
 Values supported by mkntfs: 256, 512, 1024, 2048 and 4096
 | 13 | 1 | | Sectors per cluster block +
 See below.
-| 14 | 2 | 0x00 | Reserved Sectors +
+| 14 | 2 | 0x00 | [yellow-background]*Unknown (Reserved Sectors)* +
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
 | 16 | 1 | 0x00 | Number of File Allocation Tables (FATs) +
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
@@ -517,11 +517,16 @@ Live MFT header:
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x0001 | FILE_RECORD_SEGMENT_IN_USE | In use
-| 0x0002 | FILE_NAME_INDEX_PRESENT | Has file name (or $I30) index +
-When this flag is present the file entry is a directory (or contains sub file entries)
-| 0x0004 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse, $UsnJrnl)*
-| 0x0008 | | [yellow-background]*Unknown (set for $ObjId, $Quota, $Reparse. $Secure)*
+| 0x0001 | FILE_RECORD_SEGMENT_IN_USE +
+MFT_RECORD_IN_USE | In use
+| 0x0002 | FILE_NAME_INDEX_PRESENT +
+MFT_RECORD_IS_DIRECTORY | Has file name (or $I30) index +
+When this flag is set the file entry represents a directory (that contains sub file entries)
+| 0x0004 | MFT_RECORD_IN_EXTEND | [yellow-background]*Unknown* +
+According to `[APPLE06]` this is set for all system files present in the $Extend directory
+| 0x0008 | MFT_RECORD_IS_VIEW_INDEX | Is index +
+When this flag is set the file entry represents an index +
+According to `[APPLE06]` this is set for all indices other than $I30
 |===
 
 === [[file_reference]]The file reference
@@ -1805,7 +1810,7 @@ The reparse point data (REPARSE_DATA_BUFFER) is variable of size and consists of
 | Offset | Size | Value | Description
 | 0 | 4 | | Reparse point tag
 | 4 | 2 | | Reparse data size
-| 6 | 2 | 0 | Reserved
+| 6 | 2 | 0 | [yellow-background]*Unknown (Reserved)*
 | 8 | ... | | Reparse data
 |===
 
@@ -1825,7 +1830,7 @@ for that tag.*
 |===
 | Offset | Size | Value | Description
 | 0.0  | 16 bits | | Type
-| 2.0  | 12 bits | | Reserved
+| 2.0  | 12 bits | | [yellow-background]*Unknown (Reserved)*
 | 3.4 | 4 bits | | Flags
 |===
 
@@ -1836,8 +1841,8 @@ Predefined reparse point tag values according to `[MSDN]`:
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x00000000 | IO_REPARSE_TAG_RESERVED_ZERO | Reserved
-| 0x00000001 | IO_REPARSE_TAG_RESERVED_ONE | Reserved
+| 0x00000000 | IO_REPARSE_TAG_RESERVED_ZERO | [yellow-background]*Unknown (Reserved)*
+| 0x00000001 | IO_REPARSE_TAG_RESERVED_ONE | [yellow-background]*Unknown (Reserved)*
 | | |
 | 0x80000005 | IO_REPARSE_TAG_DRIVER_EXTENDER | Used by Home server drive extender
 | 0x80000006 | IO_REPARSE_TAG_HSM2 | Used by Hierarchical Storage Manager Product
@@ -1880,7 +1885,8 @@ Flag	Description
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x1 | | Reserved according to `[MSDN]`
+| 0x1 | | [yellow-background]*Unknown (Reserved)* +
+Reserved according to `[MSDN]`
 | 0x2 | | Is alias (Name surrogate bit) +
 If this bit is set, the file or directory represents another named entity in the system.
 | 0x4 | | Is high-latency media +
@@ -2803,6 +2809,14 @@ What file system metadata is missing:
 | Author(s) | Richard Russon, Yuval Fiedel
 | Date | 2005
 | URL | http://linux-ntfs.org/
+|===
+
+`[APPLE06]`
+
+[cols="1,5",options="header"]
+|===
+| Title | ntfs_layout.h - NTFS associated on-disk structures
+| URL | https://opensource.apple.com/source/ntfs/ntfs-65.2/kext/ntfs_layout.h.auto.html
 |===
 
 `[POLLARD06]`

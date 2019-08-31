@@ -20,6 +20,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_logged_utility_stream_values/fsntfs_test_logged_utility_stream_values.vcproj \
 	fsntfs_test_mft/fsntfs_test_mft.vcproj \
 	fsntfs_test_mft_entry/fsntfs_test_mft_entry.vcproj \
+	fsntfs_test_mft_entry_header/fsntfs_test_mft_entry_header.vcproj \
 	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \
 	fsntfs_test_notify/fsntfs_test_notify.vcproj \
 	fsntfs_test_object_identifier_values/fsntfs_test_object_identifier_values.vcproj \

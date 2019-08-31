@@ -143,13 +143,11 @@ int libfsntfs_mft_entry_header_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function           = "libfsntfs_mft_entry_header_read_data";
-	uint16_t fixup_values_offset    = 0;
-	uint16_t number_of_fixup_values = 0;
-	uint16_t total_entry_size       = 0;
+	static char *function   = "libfsntfs_mft_entry_header_read_data";
+	size_t header_data_size = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint16_t value_16bit            = 0;
+	uint16_t value_16bit    = 0;
 #endif
 
 	if( mft_entry_header == NULL )
@@ -174,7 +172,8 @@ int libfsntfs_mft_entry_header_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
+	if( ( data_size < 2 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -185,6 +184,18 @@ int libfsntfs_mft_entry_header_read_data(
 
 		return( -1 );
 	}
+	byte_stream_copy_to_uint16_little_endian(
+	 ( (fsntfs_mft_entry_header_t *) data )->fixup_values_offset,
+	 mft_entry_header->fixup_values_offset );
+
+	if( mft_entry_header->fixup_values_offset > 42 )
+	{
+		header_data_size = sizeof( fsntfs_mft_entry_header_t );
+	}
+	else
+	{
+		header_data_size = 42;
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -193,23 +204,32 @@ int libfsntfs_mft_entry_header_read_data(
 		 function );
 		libcnotify_print_data(
 		 data,
-		 data_size,
+		 header_data_size,
 		 0 );
 	}
 #endif
-	if( ( data_size != 42 )
-	 && ( data_size != 48 ) )
+	if( data_size < header_data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported MFT entry header data size: %" PRIzd "\n",
-		 function,
-		 data_size );
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
+		 function );
 
 		return( -1 );
 	}
+	if( memory_compare(
+	     ( (fsntfs_mft_entry_header_t *) data )->signature,
+	     "BAAD",
+	     4 ) == 0 )
+	{
+		mft_entry_header->is_bad = 1;
+
+		return( 1 );
+	}
+	mft_entry_header->is_bad = 0;
+
 	if( memory_compare(
 	     ( (fsntfs_mft_entry_header_t *) data )->signature,
 	     "FILE",
@@ -225,12 +245,8 @@ int libfsntfs_mft_entry_header_read_data(
 		return( -1 );
 	}
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_entry_header_t *) data )->fixup_values_offset,
-	 fixup_values_offset );
-
-	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->number_of_fixup_values,
-	 number_of_fixup_values );
+	 mft_entry_header->number_of_fixup_values );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->journal_sequence_number,
@@ -258,13 +274,13 @@ int libfsntfs_mft_entry_header_read_data(
 
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->total_entry_size,
-	 total_entry_size );
+	 mft_entry_header->total_entry_size );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->base_record_file_reference,
 	 mft_entry_header->base_record_file_reference );
 
-	if( fixup_values_offset > 42 )
+	if( header_data_size > 42 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (fsntfs_mft_entry_header_t *) data )->index,
@@ -282,14 +298,14 @@ int libfsntfs_mft_entry_header_read_data(
 		 ( (fsntfs_mft_entry_header_t *) data )->signature[ 3 ] );
 
 		libcnotify_printf(
-		 "%s: fixup values offset\t\t\t\t: %" PRIu16 "\n",
+		 "%s: fix-up values offset\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 fixup_values_offset );
+		 mft_entry_header->fixup_values_offset );
 
 		libcnotify_printf(
-		 "%s: number of fixup values\t\t\t\t: %" PRIu16 "\n",
+		 "%s: number of fix-up values\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 number_of_fixup_values );
+		 mft_entry_header->number_of_fixup_values );
 
 		libcnotify_printf(
 		 "%s: journal sequence number\t\t\t: %" PRIu64 "\n",
@@ -328,7 +344,7 @@ int libfsntfs_mft_entry_header_read_data(
 		libcnotify_printf(
 		 "%s: total entry size\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 total_entry_size );
+		 mft_entry_header->total_entry_size );
 
 		libcnotify_printf(
 		 "%s: base record file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
@@ -344,7 +360,7 @@ int libfsntfs_mft_entry_header_read_data(
 		 function,
 		 value_16bit );
 
-		if( fixup_values_offset > 42 )
+		if( header_data_size > 42 )
 		{
 			byte_stream_copy_to_uint16_little_endian(
 			 ( (fsntfs_mft_entry_header_t *) data )->unknown1,
@@ -363,6 +379,176 @@ int libfsntfs_mft_entry_header_read_data(
 		 "\n" );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	if( mft_entry_header->fixup_values_offset < header_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid fix-up values offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry_header->attributes_offset < header_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid attributes offset value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the fix-up values offset
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_fixup_values_offset(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *fixup_values_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_fixup_values_offset";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( fixup_values_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid fix-up values offset.",
+		 function );
+
+		return( -1 );
+	}
+	*fixup_values_offset = mft_entry_header->fixup_values_offset;
+
+	return( 1 );
+}
+
+/* Retrieves the number of fix-up values
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_number_of_fixup_values(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *number_of_fixup_values,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_number_of_fixup_values";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_fixup_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of fix-up values.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_fixup_values = mft_entry_header->number_of_fixup_values;
+
+	return( 1 );
+}
+
+/* Retrieves the attributes offset
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_attributes_offset(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *attributes_offset,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_attributes_offset";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( attributes_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attributes offset.",
+		 function );
+
+		return( -1 );
+	}
+	*attributes_offset = mft_entry_header->attributes_offset;
+
+	return( 1 );
+}
+
+/* Retrieves the total entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_total_entry_size(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *total_entry_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_total_entry_size";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( total_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid total entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*total_entry_size = mft_entry_header->total_entry_size;
 
 	return( 1 );
 }

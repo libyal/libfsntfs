@@ -33,6 +33,7 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_entry_header.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -42,6 +43,10 @@ typedef struct libfsntfs_mft_entry libfsntfs_mft_entry_t;
 
 struct libfsntfs_mft_entry
 {
+	/* The MFT entry header
+	 */
+	libfsntfs_mft_entry_header_t *header;
+
 	/* The data
 	 */
 	uint8_t *data;
@@ -77,10 +82,6 @@ struct libfsntfs_mft_entry
 	/* The used entry size 
 	 */
 	uint16_t used_entry_size;
-
-	/* The attributes offset
-	 */
-	uint16_t attributes_offset;
 
 	/* The attributes array
 	 */
@@ -156,9 +157,10 @@ int libfsntfs_mft_entry_free(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_clone(
-     libfsntfs_mft_entry_t **destination_mft_entry,
-     libfsntfs_mft_entry_t *source_mft_entry,
+int libfsntfs_mft_entry_apply_fixup_values(
+     libfsntfs_mft_entry_t *mft_entry,
+     uint16_t fixup_values_offset,
+     uint16_t number_of_fixup_values,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read(
