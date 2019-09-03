@@ -508,14 +508,34 @@ int libfsntfs_mft_read_mft_entry(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read(
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_entry_read_file_io_handle(
 	     mft_entry,
-	     io_handle,
 	     file_io_handle,
-	     mft->mft_entry_vector,
 	     file_offset,
+	     io_handle->mft_entry_size,
 	     mft_entry_index,
-	     flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -528,6 +548,27 @@ int libfsntfs_mft_read_mft_entry(
 
 		return( -1 );
 	}
+	if( mft_entry->is_empty == 0 )
+	{
+		if( libfsntfs_mft_entry_read_attributes(
+		     mft_entry,
+		     io_handle,
+		     file_io_handle,
+		     mft->mft_entry_vector,
+		     flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read MFT entry: %" PRIu32 " attributes.",
+			 function,
+			 mft_entry_index );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
 }
 
@@ -539,7 +580,7 @@ int libfsntfs_mft_read_mft_entry(
 int libfsntfs_mft_get_utf8_volume_name_size(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     size_t *utf8_volume_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -587,7 +628,7 @@ int libfsntfs_mft_get_utf8_volume_name_size(
 	}
 	if( libfsntfs_volume_name_attribute_get_utf8_name_size(
 	     mft_entry->volume_name_attibute,
-	     utf8_volume_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -610,8 +651,8 @@ int libfsntfs_mft_get_utf8_volume_name_size(
 int libfsntfs_mft_get_utf8_volume_name(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     uint8_t *utf8_volume_name,
-     size_t utf8_volume_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -659,8 +700,8 @@ int libfsntfs_mft_get_utf8_volume_name(
 	}
 	if( libfsntfs_volume_name_attribute_get_utf8_name(
 	     mft_entry->volume_name_attibute,
-	     utf8_volume_name,
-	     utf8_volume_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -683,7 +724,7 @@ int libfsntfs_mft_get_utf8_volume_name(
 int libfsntfs_mft_get_utf16_volume_name_size(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     size_t *utf16_volume_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -731,7 +772,7 @@ int libfsntfs_mft_get_utf16_volume_name_size(
 	}
 	if( libfsntfs_volume_name_attribute_get_utf16_name_size(
 	     mft_entry->volume_name_attibute,
-	     utf16_volume_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -754,8 +795,8 @@ int libfsntfs_mft_get_utf16_volume_name_size(
 int libfsntfs_mft_get_utf16_volume_name(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     uint16_t *utf16_volume_name,
-     size_t utf16_volume_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -803,8 +844,8 @@ int libfsntfs_mft_get_utf16_volume_name(
 	}
 	if( libfsntfs_volume_name_attribute_get_utf16_name(
 	     mft_entry->volume_name_attibute,
-	     utf16_volume_name,
-	     utf16_volume_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

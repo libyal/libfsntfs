@@ -85,46 +85,46 @@ int libfsntfs_reparse_point_values_get_tag(
 
 int libfsntfs_reparse_point_values_get_utf8_substitute_name_size(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf8_substitute_name(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf16_substitute_name_size(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf16_substitute_name(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf8_print_name_size(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf8_print_name(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf16_print_name_size(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf16_print_name(
      libfsntfs_reparse_point_values_t *reparse_point_values,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

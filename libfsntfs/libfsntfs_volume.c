@@ -801,13 +801,13 @@ int libfsntfs_volume_close(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-	if( internal_volume->io_handle == NULL )
+	if( internal_volume->file_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 "%s: invalid volume - missing file IO handle.",
 		 function );
 
 		return( -1 );
@@ -1729,7 +1729,7 @@ int libfsntfs_volume_get_index_entry_size(
  */
 int libfsntfs_volume_get_utf8_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
@@ -1767,7 +1767,7 @@ int libfsntfs_volume_get_utf8_name_size(
 	if( libfsntfs_mft_get_utf8_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1804,8 +1804,8 @@ int libfsntfs_volume_get_utf8_name_size(
  */
 int libfsntfs_volume_get_utf8_name(
      libfsntfs_volume_t *volume,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
@@ -1843,8 +1843,8 @@ int libfsntfs_volume_get_utf8_name(
 	if( libfsntfs_mft_get_utf8_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1881,7 +1881,7 @@ int libfsntfs_volume_get_utf8_name(
  */
 int libfsntfs_volume_get_utf16_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
@@ -1919,7 +1919,7 @@ int libfsntfs_volume_get_utf16_name_size(
 	if( libfsntfs_mft_get_utf16_volume_name_size(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1956,8 +1956,8 @@ int libfsntfs_volume_get_utf16_name_size(
  */
 int libfsntfs_volume_get_utf16_name(
      libfsntfs_volume_t *volume,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
@@ -1995,8 +1995,8 @@ int libfsntfs_volume_get_utf16_name(
 	if( libfsntfs_mft_get_utf16_volume_name(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2183,6 +2183,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
 	static char *function                        = "libfsntfs_volume_get_number_of_file_entries";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -2197,7 +2198,21 @@ int libfsntfs_volume_get_number_of_file_entries(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_number_of_entries(
 	     internal_volume->mft,
 	     number_of_file_entries,
@@ -2210,9 +2225,24 @@ int libfsntfs_volume_get_number_of_file_entries(
 		 "%s: unable to retrieve number of MFT entries.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the file entry of a specific MFT entry index

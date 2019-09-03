@@ -1,5 +1,8 @@
 TODO
+* fix python module tests
+
 * implement read/write lock support
+* add support for WofCompressedData NTFS alternate data streams
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 

@@ -611,7 +611,7 @@ PyObject *pyfsntfs_file_entry_new(
 	if( file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -668,7 +668,7 @@ int pyfsntfs_file_entry_init(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -694,17 +694,8 @@ void pyfsntfs_file_entry_free(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_file_entry->file_entry == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid file entry - missing libfsntfs file entry.",
 		 function );
 
 		return;
@@ -730,24 +721,27 @@ void pyfsntfs_file_entry_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_free(
-	          &( pyfsntfs_file_entry->file_entry ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyfsntfs_file_entry->file_entry != NULL )
 	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free file entry.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libfsntfs_file_entry_free(
+		          &( pyfsntfs_file_entry->file_entry ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free file entry.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	if( pyfsntfs_file_entry->parent_object != NULL )
 	{
@@ -779,7 +773,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
@@ -788,7 +782,7 @@ PyObject *pyfsntfs_file_entry_read_buffer(
 	if( pyfsntfs_file_entry->file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
@@ -1037,7 +1031,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
@@ -1046,7 +1040,7 @@ PyObject *pyfsntfs_file_entry_read_buffer_at_offset(
 	if( pyfsntfs_file_entry->file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
@@ -1283,7 +1277,7 @@ PyObject *pyfsntfs_file_entry_seek_offset(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry.",
 		 function );
 
@@ -1292,7 +1286,7 @@ PyObject *pyfsntfs_file_entry_seek_offset(
 	if( pyfsntfs_file_entry->file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs file entry - missing libfsntfs file entry.",
 		 function );
 
@@ -1385,7 +1379,7 @@ PyObject *pyfsntfs_file_entry_get_offset(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1467,7 +1461,7 @@ PyObject *pyfsntfs_file_entry_get_size(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1549,7 +1543,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_extents(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1606,7 +1600,7 @@ PyObject *pyfsntfs_file_entry_get_extent_by_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1737,7 +1731,7 @@ PyObject *pyfsntfs_file_entry_is_empty(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1793,7 +1787,7 @@ PyObject *pyfsntfs_file_entry_is_allocated(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1849,7 +1843,7 @@ PyObject *pyfsntfs_file_entry_has_directory_entries_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1905,7 +1899,7 @@ PyObject *pyfsntfs_file_entry_has_default_data_stream(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -1963,7 +1957,7 @@ PyObject *pyfsntfs_file_entry_get_file_reference(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2015,7 +2009,7 @@ PyObject *pyfsntfs_file_entry_get_base_record_file_reference(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2067,7 +2061,7 @@ PyObject *pyfsntfs_file_entry_get_parent_file_reference(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2129,7 +2123,7 @@ PyObject *pyfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2192,7 +2186,7 @@ PyObject *pyfsntfs_file_entry_get_journal_sequence_number(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2718,7 +2712,7 @@ PyObject *pyfsntfs_file_entry_get_name(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2830,7 +2824,7 @@ PyObject *pyfsntfs_file_entry_get_name_attribute_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -2891,7 +2885,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3013,7 +3007,7 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3067,7 +3061,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3181,7 +3175,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_print_name(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3391,7 +3385,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_attributes(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3433,7 +3427,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_attributes(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_get_attribute_by_index(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *pyfsntfs_file_entry,
            int attribute_index )
 {
 	libcerror_error_t *error         = NULL;
@@ -3447,7 +3441,7 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3456,7 +3450,7 @@ PyObject *pyfsntfs_file_entry_get_attribute_by_index(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_file_entry_get_attribute_by_index(
-	          pyfsntfs_file_entry->file_entry,
+	          ( (pyfsntfs_file_entry_t *) pyfsntfs_file_entry )->file_entry,
 	          attribute_index,
 	          &attribute,
 	          &error );
@@ -3581,7 +3575,7 @@ PyObject *pyfsntfs_file_entry_get_attribute(
 		return( NULL );
 	}
 	attribute_object = pyfsntfs_file_entry_get_attribute_by_index(
-	                    pyfsntfs_file_entry,
+	                    (PyObject *) pyfsntfs_file_entry,
 	                    attribute_index );
 
 	return( attribute_object );
@@ -3605,7 +3599,7 @@ PyObject *pyfsntfs_file_entry_get_attributes(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3634,7 +3628,7 @@ PyObject *pyfsntfs_file_entry_get_attributes(
 		return( NULL );
 	}
 	attributes_object = pyfsntfs_attributes_new(
-	                     pyfsntfs_file_entry,
+	                     (PyObject *) pyfsntfs_file_entry,
 	                     &pyfsntfs_file_entry_get_attribute_by_index,
 	                     number_of_attributes );
 
@@ -3668,7 +3662,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_alternate_data_streams(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3710,7 +3704,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_alternate_data_streams(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_index(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *pyfsntfs_file_entry,
            int alternate_data_stream_index )
 {
 	libcerror_error_t *error             = NULL;
@@ -3722,7 +3716,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3731,7 +3725,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_index(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_file_entry_get_alternate_data_stream_by_index(
-	          pyfsntfs_file_entry->file_entry,
+	          ( (pyfsntfs_file_entry_t *) pyfsntfs_file_entry )->file_entry,
 	          alternate_data_stream_index,
 	          &data_stream,
 	          &error );
@@ -3799,7 +3793,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream(
 		return( NULL );
 	}
 	data_stream_object = pyfsntfs_file_entry_get_alternate_data_stream_by_index(
-	                      pyfsntfs_file_entry,
+	                      (PyObject *) pyfsntfs_file_entry,
 	                      alternate_data_stream_index );
 
 	return( data_stream_object );
@@ -3823,7 +3817,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_streams(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3852,7 +3846,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_streams(
 		return( NULL );
 	}
 	data_streams_object = pyfsntfs_data_streams_new(
-	                       pyfsntfs_file_entry,
+	                       (PyObject *) pyfsntfs_file_entry,
 	                       &pyfsntfs_file_entry_get_alternate_data_stream_by_index,
 	                       number_of_alternate_data_streams );
 
@@ -3886,7 +3880,7 @@ PyObject *pyfsntfs_file_entry_has_alternate_data_stream_by_name(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -3962,7 +3956,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_name(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -4015,7 +4009,7 @@ PyObject *pyfsntfs_file_entry_get_alternate_data_stream_by_name(
 	}
 	data_stream_object = pyfsntfs_data_stream_new(
 	                      data_stream,
-	                      pyfsntfs_file_entry );
+	                      (PyObject *) pyfsntfs_file_entry );
 
 	if( data_stream_object == NULL )
 	{
@@ -4056,7 +4050,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -4098,7 +4092,7 @@ PyObject *pyfsntfs_file_entry_get_number_of_sub_file_entries(
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *pyfsntfs_file_entry,
            int sub_file_entry_index )
 {
 	libcerror_error_t *error               = NULL;
@@ -4110,7 +4104,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -4119,7 +4113,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_file_entry_get_sub_file_entry_by_index(
-	          pyfsntfs_file_entry->file_entry,
+	          ( (pyfsntfs_file_entry_t *) pyfsntfs_file_entry )->file_entry,
 	          sub_file_entry_index,
 	          &sub_file_entry,
 	          &error );
@@ -4142,7 +4136,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry_by_index(
 	}
 	file_entry_object = pyfsntfs_file_entry_new(
 	                     sub_file_entry,
-	                     pyfsntfs_file_entry->parent_object );
+	                     ( (pyfsntfs_file_entry_t *) pyfsntfs_file_entry )->parent_object );
 
 	if( file_entry_object == NULL )
 	{
@@ -4187,7 +4181,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entry(
 		return( NULL );
 	}
 	file_entry_object = pyfsntfs_file_entry_get_sub_file_entry_by_index(
-	                     pyfsntfs_file_entry,
+	                     (PyObject *) pyfsntfs_file_entry,
 	                     sub_file_entry_index );
 
 	return( file_entry_object );
@@ -4211,7 +4205,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entries(
 	if( pyfsntfs_file_entry == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file entry.",
 		 function );
 
@@ -4240,7 +4234,7 @@ PyObject *pyfsntfs_file_entry_get_sub_file_entries(
 		return( NULL );
 	}
 	file_entries_object = pyfsntfs_file_entries_new(
-	                       pyfsntfs_file_entry,
+	                       (PyObject *) pyfsntfs_file_entry,
 	                       &pyfsntfs_file_entry_get_sub_file_entry_by_index,
 	                       number_of_sub_file_entries );
 

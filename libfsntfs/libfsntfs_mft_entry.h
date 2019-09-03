@@ -87,6 +87,10 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_array_t *attributes_array;
 
+	/* The (attribute) list attribute
+	 */
+	libfsntfs_attribute_t *list_attribute;
+
 	/* The default (nameless) $DATA attribute
 	 */
 	libfsntfs_attribute_t *data_attribute;
@@ -149,6 +153,13 @@ int libfsntfs_mft_entry_check_for_empty_block(
      size_t data_size,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_apply_fixup_values(
+     uint8_t *data,
+     size_t data_size,
+     uint16_t fixup_values_offset,
+     uint16_t number_of_fixup_values,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_initialize(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
@@ -157,28 +168,28 @@ int libfsntfs_mft_entry_free(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_apply_fixup_values(
+int libfsntfs_mft_entry_read_data(
      libfsntfs_mft_entry_t *mft_entry,
-     uint16_t fixup_values_offset,
-     uint16_t number_of_fixup_values,
+     uint8_t *data,
+     size_t data_size,
+     uint32_t mft_entry_index,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_read(
+int libfsntfs_mft_entry_read_file_io_handle(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *mft_entry_vector,
      off64_t file_offset,
+     uint32_t mft_entry_size,
      uint32_t mft_entry_index,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_read_attributes_data(
+     libfsntfs_mft_entry_t *mft_entry,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_io_handle_t *io_handle,
+     const uint8_t *data,
+     size_t data_size,
      uint8_t flags,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_read_header(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     off64_t file_offset,
-     uint32_t mft_entry_index,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_attributes(

@@ -44,5 +44,5 @@ PyObject *pyfsntfs_volume_name_attribute_get_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_VOLUME_NAME_ATTRIBUTE_H ) */
 

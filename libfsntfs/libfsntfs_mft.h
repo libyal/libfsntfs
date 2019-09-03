@@ -85,27 +85,27 @@ int libfsntfs_mft_read_mft_entry(
 int libfsntfs_mft_get_utf8_volume_name_size(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     size_t *utf8_volume_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_utf8_volume_name(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     uint8_t *utf8_volume_name,
-     size_t utf8_volume_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_utf16_volume_name_size(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     size_t *utf16_volume_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_utf16_volume_name(
      libfsntfs_mft_t *mft,
      libbfio_handle_t *file_io_handle,
-     uint16_t *utf16_volume_name,
-     size_t utf16_volume_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_volume_version(

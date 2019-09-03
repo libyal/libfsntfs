@@ -1,5 +1,5 @@
 /*
- * Python bindings for libfsntfs (pyfsntfs)
+ * Python bindings module for libfsntfs (pyfsntfs)
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -45,6 +45,16 @@ PyObject *pyfsntfs_check_volume_signature_file_object(
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyfsntfs_open_new_volume(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyfsntfs_open_new_volume_with_file_object(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
 #if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit_pyfsntfs(
                 void );
@@ -57,5 +67,5 @@ PyMODINIT_FUNC initpyfsntfs(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_H ) */
 

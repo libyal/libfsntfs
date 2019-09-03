@@ -53,19 +53,6 @@ struct pyfsntfs_volume
 extern PyMethodDef pyfsntfs_volume_object_methods[];
 extern PyTypeObject pyfsntfs_volume_type_object;
 
-PyObject *pyfsntfs_volume_new(
-           void );
-
-PyObject *pyfsntfs_volume_new_open(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyfsntfs_volume_new_open_file_object(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
 int pyfsntfs_volume_init(
      pyfsntfs_volume_t *pyfsntfs_volume );
 
@@ -90,11 +77,27 @@ PyObject *pyfsntfs_volume_close(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 
+PyObject *pyfsntfs_volume_get_bytes_per_sector(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_cluster_block_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_mft_entry_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_volume_get_index_entry_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_volume_get_name(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 
-PyObject *pyfsntfs_volume_get_usn_change_journal(
+PyObject *pyfsntfs_volume_get_serial_number(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments );
 
@@ -124,9 +127,13 @@ PyObject *pyfsntfs_volume_get_file_entry_by_path(
            PyObject *arguments,
            PyObject *keywords );
 
+PyObject *pyfsntfs_volume_get_usn_change_journal(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_VOLUME_H ) */
 

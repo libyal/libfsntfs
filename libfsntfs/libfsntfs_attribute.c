@@ -1268,7 +1268,7 @@ on_error:
 ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
-         uint8_t *data,
+         const uint8_t *data,
          size_t data_size,
          size_t mft_attribute_data_offset,
          uint8_t flags,
@@ -2960,7 +2960,7 @@ int libfsntfs_attribute_has_name(
  */
 int libfsntfs_attribute_get_utf8_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -2982,18 +2982,18 @@ int libfsntfs_attribute_get_utf8_name_size(
 	if( ( internal_attribute->name == NULL )
 	 || ( internal_attribute->name_size == 0 ) )
 	{
-		if( utf8_name_size == NULL )
+		if( utf8_string_size == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-8 name size.",
+			 "%s: invalid UTF-8 string size.",
 			 function );
 
 			return( -1 );
 		}
-		*utf8_name_size = 0;
+		*utf8_string_size = 0;
 	}
 	else
 	{
@@ -3001,7 +3001,7 @@ int libfsntfs_attribute_get_utf8_name_size(
 		     internal_attribute->name,
 		     (size_t) internal_attribute->name_size,
 		     LIBUNA_ENDIAN_LITTLE,
-		     utf8_name_size,
+		     utf8_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3023,8 +3023,8 @@ int libfsntfs_attribute_get_utf8_name_size(
  */
 int libfsntfs_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -3055,8 +3055,8 @@ int libfsntfs_attribute_get_utf8_name(
 		return( -1 );
 	}
 	if( libuna_utf8_string_copy_from_utf16_stream(
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     internal_attribute->name,
 	     (size_t) internal_attribute->name_size,
 	     LIBUNA_ENDIAN_LITTLE,
@@ -3080,7 +3080,7 @@ int libfsntfs_attribute_get_utf8_name(
  */
 int libfsntfs_attribute_get_utf16_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -3102,18 +3102,18 @@ int libfsntfs_attribute_get_utf16_name_size(
 	if( ( internal_attribute->name == NULL )
 	 || ( internal_attribute->name_size == 0 ) )
 	{
-		if( utf16_name_size == NULL )
+		if( utf16_string_size == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-16 name size.",
+			 "%s: invalid UTF-16 string size.",
 			 function );
 
 			return( -1 );
 		}
-		*utf16_name_size = 0;
+		*utf16_string_size = 0;
 	}
 	else
 	{
@@ -3121,7 +3121,7 @@ int libfsntfs_attribute_get_utf16_name_size(
 		     internal_attribute->name,
 		     (size_t) internal_attribute->name_size,
 		     LIBUNA_ENDIAN_LITTLE,
-		     utf16_name_size,
+		     utf16_string_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3143,8 +3143,8 @@ int libfsntfs_attribute_get_utf16_name_size(
  */
 int libfsntfs_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -3175,8 +3175,8 @@ int libfsntfs_attribute_get_utf16_name(
 		return( -1 );
 	}
 	if( libuna_utf16_string_copy_from_utf16_stream(
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     internal_attribute->name,
 	     (size_t) internal_attribute->name_size,
 	     LIBUNA_ENDIAN_LITTLE,

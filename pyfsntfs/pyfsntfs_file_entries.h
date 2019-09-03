@@ -1,5 +1,5 @@
 /*
- * Python object definition of the file entries sequence and iterator
+ * Python object definition of the sequence and iterator object of file entries
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 
@@ -41,56 +40,56 @@ struct pyfsntfs_file_entries
 	 */
 	PyObject_HEAD
 
-	/* The file entry object
+	/* The parent object
 	 */
-	pyfsntfs_file_entry_t *file_entry_object;
+	PyObject *parent_object;
 
-	/* The get sub file entry by index callback function
+	/* The get item by index callback function
 	 */
-	PyObject* (*get_sub_file_entry_by_index)(
-	             pyfsntfs_file_entry_t *file_entry_object,
-	             int sub_file_entry_index );
+	PyObject* (*get_item_by_index)(
+	             PyObject *parent_object,
+	             int index );
 
-	/* The (current) sub file entry index
+	/* The current index
 	 */
-	int sub_file_entry_index;
+	int current_index;
 
-	/* The number of sub file entries
+	/* The number of items
 	 */
-	int number_of_sub_file_entries;
+	int number_of_items;
 };
 
 extern PyTypeObject pyfsntfs_file_entries_type_object;
 
 PyObject *pyfsntfs_file_entries_new(
-           pyfsntfs_file_entry_t *file_entry_object,
-           PyObject* (*get_sub_file_entry_by_index)(
-                        pyfsntfs_file_entry_t *file_entry_object,
-                        int sub_file_entry_index ),
-           int number_of_sub_file_entries );
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items );
 
 int pyfsntfs_file_entries_init(
-     pyfsntfs_file_entries_t *pyfsntfs_file_entries );
+     pyfsntfs_file_entries_t *sequence_object );
 
 void pyfsntfs_file_entries_free(
-      pyfsntfs_file_entries_t *pyfsntfs_file_entries );
+      pyfsntfs_file_entries_t *sequence_object );
 
 Py_ssize_t pyfsntfs_file_entries_len(
-            pyfsntfs_file_entries_t *pyfsntfs_file_entries );
+            pyfsntfs_file_entries_t *sequence_object );
 
 PyObject *pyfsntfs_file_entries_getitem(
-           pyfsntfs_file_entries_t *pyfsntfs_file_entries,
+           pyfsntfs_file_entries_t *sequence_object,
            Py_ssize_t item_index );
 
 PyObject *pyfsntfs_file_entries_iter(
-           pyfsntfs_file_entries_t *pyfsntfs_file_entries );
+           pyfsntfs_file_entries_t *sequence_object );
 
 PyObject *pyfsntfs_file_entries_iternext(
-           pyfsntfs_file_entries_t *pyfsntfs_file_entries );
+           pyfsntfs_file_entries_t *sequence_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_FILE_ENTRIES_H ) */
 

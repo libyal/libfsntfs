@@ -50,14 +50,14 @@ PyObject *pyfsntfs_file_attribute_flags_new(
            void );
 
 int pyfsntfs_file_attribute_flags_init(
-     pyfsntfs_file_attribute_flags_t *pyfsntfs_file_attribute_flags );
+     pyfsntfs_file_attribute_flags_t *definitions_object );
 
 void pyfsntfs_file_attribute_flags_free(
-      pyfsntfs_file_attribute_flags_t *pyfsntfs_file_attribute_flags );
+      pyfsntfs_file_attribute_flags_t *definitions_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_FILE_ATTRIBUTE_FLAGS_H ) */
 

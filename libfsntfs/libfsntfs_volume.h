@@ -171,27 +171,27 @@ int libfsntfs_volume_get_index_entry_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name(
      libfsntfs_volume_t *volume,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name(
      libfsntfs_volume_t *volume,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

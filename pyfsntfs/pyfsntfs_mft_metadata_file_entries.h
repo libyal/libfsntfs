@@ -93,5 +93,5 @@ PyObject *pyfsntfs_mft_metadata_file_entries_iternext(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_MFT_METADATA_FILE_ENTRIES_H ) */
 

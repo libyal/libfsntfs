@@ -114,6 +114,11 @@ int libfsntfs_mft_entry_header_get_attributes_offset(
      uint16_t *attributes_offset,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_header_get_used_entry_size(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *used_entry_size,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_header_get_total_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
      uint16_t *total_entry_size,

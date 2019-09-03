@@ -1,4 +1,4 @@
-.Dd August 21, 2019
+.Dd September  2, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -79,13 +79,13 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_get_index_entry_size "libfsntfs_volume_t *volume" "size32_t *index_entry_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_utf8_name_size "libfsntfs_volume_t *volume" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_utf8_name_size "libfsntfs_volume_t *volume" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_utf8_name "libfsntfs_volume_t *volume" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_utf8_name "libfsntfs_volume_t *volume" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_utf16_name_size "libfsntfs_volume_t *volume" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_utf16_name_size "libfsntfs_volume_t *volume" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_utf16_name "libfsntfs_volume_t *volume" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_get_utf16_name "libfsntfs_volume_t *volume" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_version "libfsntfs_volume_t *volume" "uint8_t *major_version" "uint8_t *minor_version" "libfsntfs_error_t **error"
 .Ft int
@@ -137,39 +137,39 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_file_attribute_flags "libfsntfs_file_entry_t *file_entry" "uint32_t *file_attribute_flags" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_name_attribute_index "libfsntfs_file_entry_t *file_entry" "int *attribute_index" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_name_size_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_name_size_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_name_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_name_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_name_size_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_name_size_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_name_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_name_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_security_descriptor_size "libfsntfs_file_entry_t *file_entry" "size_t *data_size" "libfsntfs_error_t **error"
 .Ft int
@@ -225,13 +225,13 @@ Attribute functions
 .Ft int
 .Fn libfsntfs_attribute_get_data_flags "libfsntfs_attribute_t *attribute" "uint16_t *data_flags" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_attribute_get_data_vcn_range "libfsntfs_attribute_t *attribute" "uint64_t *data_first_vcn" "uint64_t *data_last_vcn" "libfsntfs_error_t **error"
 .Ft int
@@ -253,13 +253,13 @@ $FILE_NAME attribute functions
 .Ft int
 .Fn libfsntfs_file_name_attribute_get_file_attribute_flags "libfsntfs_attribute_t *attribute" "uint32_t *file_attribute_flags" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Pp
 $REPARSE_POINT attribute functions
 .Ft int
@@ -297,13 +297,13 @@ $VOLUME_INFORMATION attribute functions
 .Pp
 $VOLUME_NAME attribute functions
 .Ft int
-.Fn libfsntfs_volume_name_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_name_attribute_get_utf8_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_name_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_name_attribute_get_utf8_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_volume_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_usn_change_journal "libfsntfs_volume_t *volume" "libfsntfs_usn_change_journal_t **usn_change_journal" "libfsntfs_error_t **error"
 .Pp
@@ -311,13 +311,13 @@ Data stream functions
 .Ft int
 .Fn libfsntfs_data_stream_free "libfsntfs_data_stream_t **data_stream" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_data_stream_get_utf8_name_size "libfsntfs_data_stream_t *data_stream" "size_t *utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_data_stream_get_utf8_name_size "libfsntfs_data_stream_t *data_stream" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_data_stream_get_utf8_name "libfsntfs_data_stream_t *data_stream" "uint8_t *utf8_name" "size_t utf8_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_data_stream_get_utf8_name "libfsntfs_data_stream_t *data_stream" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_data_stream_get_utf16_name_size "libfsntfs_data_stream_t *data_stream" "size_t *utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_data_stream_get_utf16_name_size "libfsntfs_data_stream_t *data_stream" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_data_stream_get_utf16_name "libfsntfs_data_stream_t *data_stream" "uint16_t *utf16_name" "size_t utf16_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_data_stream_get_utf16_name "libfsntfs_data_stream_t *data_stream" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft ssize_t
 .Fn libfsntfs_data_stream_read_buffer "libfsntfs_data_stream_t *data_stream" "void *buffer" "size_t buffer_size" "libfsntfs_error_t **error"
 .Ft ssize_t
@@ -343,13 +343,13 @@ MFT metadata file functions
 .Ft int
 .Fn libfsntfs_mft_metadata_file_close "libfsntfs_mft_metadata_file_t *mft_metadata_file" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file" "size_t *utf8_volume_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint8_t *utf8_volume_name" "size_t utf8_volume_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_mft_metadata_file_get_utf8_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file" "size_t *utf16_volume_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name_size "libfsntfs_mft_metadata_file_t *mft_metadata_file" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint16_t *utf16_volume_name" "size_t utf16_volume_name_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_mft_metadata_file_get_utf16_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_mft_metadata_file_get_volume_version "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint8_t *major_version" "uint8_t *minor_version" "libfsntfs_error_t **error"
 .Ft int

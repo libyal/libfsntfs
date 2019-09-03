@@ -5407,12 +5407,10 @@ int info_handle_volume_fprint(
 
 		return( -1 );
 	}
-/* TODO
 	fprintf(
 	 info_handle->notify_stream,
 	 "\tBytes per sector\t\t: %" PRIu16 "\n",
 	 bytes_per_sector );
-*/
 
 	if( info_handle->input_mft_metadata_file != NULL )
 	{

@@ -950,7 +950,7 @@ on_error:
  */
 int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf8_volume_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
@@ -972,7 +972,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 	if( libfsntfs_mft_get_utf8_volume_name_size(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->file_io_handle,
-	     utf8_volume_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -994,8 +994,8 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
  */
 int libfsntfs_mft_metadata_file_get_utf8_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint8_t *utf8_volume_name,
-     size_t utf8_volume_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
@@ -1017,8 +1017,8 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 	if( libfsntfs_mft_get_utf8_volume_name(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->file_io_handle,
-	     utf8_volume_name,
-	     utf8_volume_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1040,7 +1040,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
  */
 int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf16_volume_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
@@ -1062,7 +1062,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 	if( libfsntfs_mft_get_utf16_volume_name_size(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->file_io_handle,
-	     utf16_volume_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1084,8 +1084,8 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
  */
 int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint16_t *utf16_volume_name,
-     size_t utf16_volume_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
@@ -1107,8 +1107,8 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
 	if( libfsntfs_mft_get_utf16_volume_name(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->file_io_handle,
-	     utf16_volume_name,
-	     utf16_volume_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

@@ -1,5 +1,5 @@
 /*
- * Python object definition of the data streams sequence and iterator
+ * Python object definition of the sequence and iterator object of data streams
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,7 +27,6 @@
 #endif
 
 #include "pyfsntfs_data_streams.h"
-#include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
@@ -97,7 +96,7 @@ PyTypeObject pyfsntfs_data_streams_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"internal pyfsntfs data streams sequence and iterator object",
+	"pyfsntfs sequence and iterator object of data streams",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -150,126 +149,122 @@ PyTypeObject pyfsntfs_data_streams_type_object = {
 	0
 };
 
-/* Creates a new data streams object
+/* Creates a new data streams sequence and iterator object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_data_streams_new(
-           pyfsntfs_file_entry_t *file_entry_object,
-           PyObject* (*get_data_stream_by_index)(
-                        pyfsntfs_file_entry_t *file_entry_object,
-                        int data_stream_index ),
-           int number_of_data_streams )
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items )
 {
-	pyfsntfs_data_streams_t *pyfsntfs_data_streams = NULL;
-	static char *function                          = "pyfsntfs_data_streams_new";
+	pyfsntfs_data_streams_t *sequence_object = NULL;
+	static char *function                    = "pyfsntfs_data_streams_new";
 
-	if( file_entry_object == NULL )
+	if( parent_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entry object.",
+		 "%s: invalid parent object.",
 		 function );
 
 		return( NULL );
 	}
-	if( get_data_stream_by_index == NULL )
+	if( get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid get data stream by index function.",
+		 "%s: invalid get item by index function.",
 		 function );
 
 		return( NULL );
 	}
 	/* Make sure the data streams values are initialized
 	 */
-	pyfsntfs_data_streams = PyObject_New(
-	                         struct pyfsntfs_data_streams,
-	                         &pyfsntfs_data_streams_type_object );
+	sequence_object = PyObject_New(
+	                   struct pyfsntfs_data_streams,
+	                   &pyfsntfs_data_streams_type_object );
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize data streams.",
+		 "%s: unable to create sequence object.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyfsntfs_data_streams_init(
-	     pyfsntfs_data_streams ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize data streams.",
-		 function );
-
-		goto on_error;
-	}
-	pyfsntfs_data_streams->file_entry_object        = file_entry_object;
-	pyfsntfs_data_streams->get_data_stream_by_index = get_data_stream_by_index;
-	pyfsntfs_data_streams->number_of_data_streams   = number_of_data_streams;
+	sequence_object->parent_object     = parent_object;
+	sequence_object->get_item_by_index = get_item_by_index;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_data_streams->file_entry_object );
+	 (PyObject *) sequence_object->parent_object );
 
-	return( (PyObject *) pyfsntfs_data_streams );
+	return( (PyObject *) sequence_object );
 
 on_error:
-	if( pyfsntfs_data_streams != NULL )
+	if( sequence_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_data_streams );
+		 (PyObject *) sequence_object );
 	}
 	return( NULL );
 }
 
-/* Intializes a data streams object
+/* Intializes a data streams sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_data_streams_init(
-     pyfsntfs_data_streams_t *pyfsntfs_data_streams )
+     pyfsntfs_data_streams_t *sequence_object )
 {
 	static char *function = "pyfsntfs_data_streams_init";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data_streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the data streams values are initialized
 	 */
-	pyfsntfs_data_streams->file_entry_object        = NULL;
-	pyfsntfs_data_streams->get_data_stream_by_index = NULL;
-	pyfsntfs_data_streams->data_stream_index        = 0;
-	pyfsntfs_data_streams->number_of_data_streams   = 0;
+	sequence_object->parent_object     = NULL;
+	sequence_object->get_item_by_index = NULL;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = 0;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of data streams not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees a data streams object
+/* Frees a data streams sequence object
  */
 void pyfsntfs_data_streams_free(
-      pyfsntfs_data_streams_t *pyfsntfs_data_streams )
+      pyfsntfs_data_streams_t *sequence_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyfsntfs_data_streams_free";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyfsntfs_data_streams );
+	           sequence_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +284,72 @@ void pyfsntfs_data_streams_free(
 
 		return;
 	}
-	if( pyfsntfs_data_streams->file_entry_object != NULL )
+	if( sequence_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_data_streams->file_entry_object );
+		 (PyObject *) sequence_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyfsntfs_data_streams );
+	 (PyObject*) sequence_object );
 }
 
 /* The data streams len() function
  */
 Py_ssize_t pyfsntfs_data_streams_len(
-            pyfsntfs_data_streams_t *pyfsntfs_data_streams )
+            pyfsntfs_data_streams_t *sequence_object )
 {
 	static char *function = "pyfsntfs_data_streams_len";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) pyfsntfs_data_streams->number_of_data_streams );
+	return( (Py_ssize_t) sequence_object->number_of_items );
 }
 
 /* The data streams getitem() function
  */
 PyObject *pyfsntfs_data_streams_getitem(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams,
+           pyfsntfs_data_streams_t *sequence_object,
            Py_ssize_t item_index )
 {
 	PyObject *data_stream_object = NULL;
 	static char *function        = "pyfsntfs_data_streams_getitem";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->get_data_stream_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams - missing get data stream by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->number_of_data_streams < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams - invalid number of data streams.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) pyfsntfs_data_streams->number_of_data_streams ) )
+	 || ( item_index >= (Py_ssize_t) sequence_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +358,8 @@ PyObject *pyfsntfs_data_streams_getitem(
 
 		return( NULL );
 	}
-	data_stream_object = pyfsntfs_data_streams->get_data_stream_by_index(
-	                      pyfsntfs_data_streams->file_entry_object,
+	data_stream_object = sequence_object->get_item_by_index(
+	                      sequence_object->parent_object,
 	                      (int) item_index );
 
 	return( data_stream_object );
@@ -373,83 +368,83 @@ PyObject *pyfsntfs_data_streams_getitem(
 /* The data streams iter() function
  */
 PyObject *pyfsntfs_data_streams_iter(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams )
+           pyfsntfs_data_streams_t *sequence_object )
 {
 	static char *function = "pyfsntfs_data_streams_iter";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_data_streams );
+	 (PyObject *) sequence_object );
 
-	return( (PyObject *) pyfsntfs_data_streams );
+	return( (PyObject *) sequence_object );
 }
 
 /* The data streams iternext() function
  */
 PyObject *pyfsntfs_data_streams_iternext(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams )
+           pyfsntfs_data_streams_t *sequence_object )
 {
 	PyObject *data_stream_object = NULL;
 	static char *function        = "pyfsntfs_data_streams_iternext";
 
-	if( pyfsntfs_data_streams == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->get_data_stream_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams - missing get data stream by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->data_stream_index < 0 )
+	if( sequence_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams - invalid data stream index.",
+		 "%s: invalid sequence object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->number_of_data_streams < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid data streams - invalid number of data streams.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_data_streams->data_stream_index >= pyfsntfs_data_streams->number_of_data_streams )
+	if( sequence_object->current_index >= sequence_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	data_stream_object = pyfsntfs_data_streams->get_data_stream_by_index(
-	                      pyfsntfs_data_streams->file_entry_object,
-	                      pyfsntfs_data_streams->data_stream_index );
+	data_stream_object = sequence_object->get_item_by_index(
+	                      sequence_object->parent_object,
+	                      sequence_object->current_index );
 
 	if( data_stream_object != NULL )
 	{
-		pyfsntfs_data_streams->data_stream_index++;
+		sequence_object->current_index++;
 	}
 	return( data_stream_object );
 }

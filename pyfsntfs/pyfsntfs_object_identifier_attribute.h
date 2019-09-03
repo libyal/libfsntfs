@@ -56,5 +56,5 @@ PyObject *pyfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_OBJECT_IDENTIFIER_ATTRIBUTE_H ) */
 

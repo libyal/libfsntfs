@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
@@ -46,9 +45,9 @@ struct pyfsntfs_data_stream
 	 */
 	libfsntfs_data_stream_t *data_stream;
 
-	/* The file entry object
+	/* The parent object
 	 */
-	pyfsntfs_file_entry_t *file_entry_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyfsntfs_data_stream_object_methods[];
@@ -56,7 +55,7 @@ extern PyTypeObject pyfsntfs_data_stream_type_object;
 
 PyObject *pyfsntfs_data_stream_new(
            libfsntfs_data_stream_t *data_stream,
-           pyfsntfs_file_entry_t *file_entry_object );
+           PyObject *parent_object );
 
 int pyfsntfs_data_stream_init(
      pyfsntfs_data_stream_t *pyfsntfs_data_stream );

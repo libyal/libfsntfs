@@ -250,7 +250,7 @@ PyTypeObject pyfsntfs_data_stream_type_object = {
  */
 PyObject *pyfsntfs_data_stream_new(
            libfsntfs_data_stream_t *data_stream,
-           pyfsntfs_file_entry_t *file_entry_object )
+           PyObject *parent_object )
 {
 	pyfsntfs_data_stream_t *pyfsntfs_data_stream = NULL;
 	static char *function                        = "pyfsntfs_data_stream_new";
@@ -258,7 +258,7 @@ PyObject *pyfsntfs_data_stream_new(
 	if( data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -287,11 +287,11 @@ PyObject *pyfsntfs_data_stream_new(
 
 		goto on_error;
 	}
-	pyfsntfs_data_stream->data_stream       = data_stream;
-	pyfsntfs_data_stream->file_entry_object = file_entry_object;
+	pyfsntfs_data_stream->data_stream   = data_stream;
+	pyfsntfs_data_stream->parent_object = parent_object;
 
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_data_stream->file_entry_object );
+	 pyfsntfs_data_stream->parent_object );
 
 	return( (PyObject *) pyfsntfs_data_stream );
 
@@ -315,7 +315,7 @@ int pyfsntfs_data_stream_init(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -341,17 +341,8 @@ void pyfsntfs_data_stream_free(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_data_stream->data_stream == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid data stream - missing libfsntfs data stream.",
 		 function );
 
 		return;
@@ -377,29 +368,32 @@ void pyfsntfs_data_stream_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_data_stream_free(
-	          &( pyfsntfs_data_stream->data_stream ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyfsntfs_data_stream->data_stream != NULL )
 	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free data stream.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libfsntfs_data_stream_free(
+		          &( pyfsntfs_data_stream->data_stream ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free data stream.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
-	if( pyfsntfs_data_stream->file_entry_object != NULL )
+	if( pyfsntfs_data_stream->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_data_stream->file_entry_object );
+		 pyfsntfs_data_stream->parent_object );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_data_stream );
@@ -426,7 +420,7 @@ PyObject *pyfsntfs_data_stream_read_buffer(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream.",
 		 function );
 
@@ -435,7 +429,7 @@ PyObject *pyfsntfs_data_stream_read_buffer(
 	if( pyfsntfs_data_stream->data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream - missing libfsntfs data stream.",
 		 function );
 
@@ -536,7 +530,7 @@ PyObject *pyfsntfs_data_stream_read_buffer(
 	else
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: unsupported integer object type.",
 		 function );
 
@@ -650,7 +644,7 @@ PyObject *pyfsntfs_data_stream_read_buffer_at_offset(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream.",
 		 function );
 
@@ -659,7 +653,7 @@ PyObject *pyfsntfs_data_stream_read_buffer_at_offset(
 	if( pyfsntfs_data_stream->data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream - missing libfsntfs data stream.",
 		 function );
 
@@ -865,7 +859,7 @@ PyObject *pyfsntfs_data_stream_seek_offset(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream.",
 		 function );
 
@@ -874,7 +868,7 @@ PyObject *pyfsntfs_data_stream_seek_offset(
 	if( pyfsntfs_data_stream->data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid pyfsntfs data stream - missing libfsntfs data stream.",
 		 function );
 
@@ -937,7 +931,7 @@ PyObject *pyfsntfs_data_stream_get_offset(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -989,7 +983,7 @@ PyObject *pyfsntfs_data_stream_get_size(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -1043,7 +1037,7 @@ PyObject *pyfsntfs_data_stream_get_name(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -1155,7 +1149,7 @@ PyObject *pyfsntfs_data_stream_get_number_of_extents(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 
@@ -1212,7 +1206,7 @@ PyObject *pyfsntfs_data_stream_get_extent_by_index(
 	if( pyfsntfs_data_stream == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid data stream.",
 		 function );
 

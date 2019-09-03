@@ -298,12 +298,12 @@ int libfsntfs_mft_entry_header_read_data(
 		 ( (fsntfs_mft_entry_header_t *) data )->signature[ 3 ] );
 
 		libcnotify_printf(
-		 "%s: fix-up values offset\t\t\t\t: %" PRIu16 "\n",
+		 "%s: fix-up values offset\t\t\t: %" PRIu16 "\n",
 		 function,
 		 mft_entry_header->fixup_values_offset );
 
 		libcnotify_printf(
-		 "%s: number of fix-up values\t\t\t\t: %" PRIu16 "\n",
+		 "%s: number of fix-up values\t\t\t: %" PRIu16 "\n",
 		 function,
 		 mft_entry_header->number_of_fixup_values );
 
@@ -328,7 +328,7 @@ int libfsntfs_mft_entry_header_read_data(
 		 mft_entry_header->attributes_offset );
 
 		libcnotify_printf(
-		 "%s: flags\t\t\t\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: flags\t\t\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
 		 mft_entry_header->flags );
 		libfsntfs_debug_print_mft_entry_flags(
@@ -347,7 +347,7 @@ int libfsntfs_mft_entry_header_read_data(
 		 mft_entry_header->total_entry_size );
 
 		libcnotify_printf(
-		 "%s: base record file reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: base record file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
 		 mft_entry_header->base_record_file_reference & 0xffffffffffffUL,
 		 mft_entry_header->base_record_file_reference >> 48 );
@@ -356,7 +356,7 @@ int libfsntfs_mft_entry_header_read_data(
 		 ( (fsntfs_mft_entry_header_t *) data )->first_available_attribute_identifier,
 		 value_16bit );
 		libcnotify_printf(
-		 "%s: first available attribute identifier\t\t: %" PRIu16 "\n",
+		 "%s: first available attribute identifier\t: %" PRIu16 "\n",
 		 function,
 		 value_16bit );
 
@@ -371,7 +371,7 @@ int libfsntfs_mft_entry_header_read_data(
 			 value_16bit );
 
 			libcnotify_printf(
-			 "%s: index\t\t\t\t\t\t: %" PRIu32 "\n",
+			 "%s: index\t\t\t\t\t: %" PRIu32 "\n",
 			 function,
 			 mft_entry_header->index );
 		}
@@ -512,6 +512,43 @@ int libfsntfs_mft_entry_header_get_attributes_offset(
 		return( -1 );
 	}
 	*attributes_offset = mft_entry_header->attributes_offset;
+
+	return( 1 );
+}
+
+/* Retrieves the used entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_used_entry_size(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *used_entry_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_used_entry_size";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( used_entry_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid used entry size.",
+		 function );
+
+		return( -1 );
+	}
+	*used_entry_size = mft_entry_header->used_entry_size;
 
 	return( 1 );
 }

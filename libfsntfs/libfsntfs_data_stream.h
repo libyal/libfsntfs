@@ -73,27 +73,27 @@ int libfsntfs_data_stream_free(
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf8_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf8_name(
      libfsntfs_data_stream_t *data_stream,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf16_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf16_name(
      libfsntfs_data_stream_t *data_stream,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

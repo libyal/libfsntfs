@@ -1,5 +1,5 @@
 /*
- * Python object definition of the attributes sequence and iterator
+ * Python object definition of the sequence and iterator object of attributes
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_attribute.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 
@@ -41,56 +40,56 @@ struct pyfsntfs_attributes
 	 */
 	PyObject_HEAD
 
-	/* The file entry object
+	/* The parent object
 	 */
-	pyfsntfs_file_entry_t *file_entry_object;
+	PyObject *parent_object;
 
-	/* The get attribute by index callback function
+	/* The get item by index callback function
 	 */
-	PyObject* (*get_attribute_by_index)(
-	             pyfsntfs_file_entry_t *file_entry_object,
-	             int attribute_index );
+	PyObject* (*get_item_by_index)(
+	             PyObject *parent_object,
+	             int index );
 
-	/* The (current) attribute index
+	/* The current index
 	 */
-	int attribute_index;
+	int current_index;
 
-	/* The number of attributes
+	/* The number of items
 	 */
-	int number_of_attributes;
+	int number_of_items;
 };
 
 extern PyTypeObject pyfsntfs_attributes_type_object;
 
 PyObject *pyfsntfs_attributes_new(
-           pyfsntfs_file_entry_t *file_entry_object,
-           PyObject* (*get_attribute_by_index)(
-                        pyfsntfs_file_entry_t *file_entry_object,
-                        int attribute_index ),
-           int number_of_attributes );
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items );
 
 int pyfsntfs_attributes_init(
-     pyfsntfs_attributes_t *pyfsntfs_attributes );
+     pyfsntfs_attributes_t *sequence_object );
 
 void pyfsntfs_attributes_free(
-      pyfsntfs_attributes_t *pyfsntfs_attributes );
+      pyfsntfs_attributes_t *sequence_object );
 
 Py_ssize_t pyfsntfs_attributes_len(
-            pyfsntfs_attributes_t *pyfsntfs_attributes );
+            pyfsntfs_attributes_t *sequence_object );
 
 PyObject *pyfsntfs_attributes_getitem(
-           pyfsntfs_attributes_t *pyfsntfs_attributes,
+           pyfsntfs_attributes_t *sequence_object,
            Py_ssize_t item_index );
 
 PyObject *pyfsntfs_attributes_iter(
-           pyfsntfs_attributes_t *pyfsntfs_attributes );
+           pyfsntfs_attributes_t *sequence_object );
 
 PyObject *pyfsntfs_attributes_iternext(
-           pyfsntfs_attributes_t *pyfsntfs_attributes );
+           pyfsntfs_attributes_t *sequence_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_ATTRIBUTES_H ) */
 

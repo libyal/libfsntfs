@@ -190,7 +190,7 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
-         uint8_t *data,
+         const uint8_t *data,
          size_t data_size,
          size_t mft_attribute_data_offset,
          uint8_t flags,
@@ -241,27 +241,27 @@ int libfsntfs_attribute_has_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf8_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf16_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 int libfsntfs_attribute_compare_name_with_utf8_string(

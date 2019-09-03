@@ -88,5 +88,5 @@ PyObject *pyfsntfs_standard_information_attribute_get_update_sequence_number(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_STANDARD_INFORMATION_ATTRIBUTE_H ) */
 

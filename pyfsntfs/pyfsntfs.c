@@ -56,11 +56,13 @@
 #include "pyfsntfs_volume_name_attribute.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_check_volume_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
 /* The pyfsntfs module methods
  */
@@ -77,34 +79,31 @@ PyMethodDef pyfsntfs_module_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "check_volume_signature(filename) -> Boolean\n"
 	  "\n"
-	  "Checks if a volume has a NTFS volume signature." },
+	  "Checks if a volume has a Windows New Technology File System (NTFS) signature." },
 
 	{ "check_volume_signature_file_object",
 	  (PyCFunction) pyfsntfs_check_volume_signature_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "check_volume_signature(file_object) -> Boolean\n"
+	  "check_volume_signature_file_object(file_object) -> Boolean\n"
 	  "\n"
-	  "Checks if a volume has a NTFS volume signature using a file-like object." },
+	  "Checks if a volume has a Windows New Technology File System (NTFS) signature using a file-like object." },
 
 	{ "open",
-	  (PyCFunction) pyfsntfs_volume_new_open,
+	  (PyCFunction) pyfsntfs_open_new_volume,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open(filename, mode='r') -> Object\n"
 	  "\n"
 	  "Opens a volume." },
 
 	{ "open_file_object",
-	  (PyCFunction) pyfsntfs_volume_new_open_file_object,
+	  (PyCFunction) pyfsntfs_open_new_volume_with_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open_file_object(file_object, mode='r') -> Object\n"
 	  "\n"
 	  "Opens a volume using a file-like object." },
 
 	/* Sentinel */
-	{ NULL,
-	  NULL,
-	  0,
-	  NULL}
+	{ NULL, NULL, 0, NULL }
 };
 
 /* Retrieves the pyfsntfs/libfsntfs version
@@ -140,7 +139,7 @@ PyObject *pyfsntfs_get_version(
 	         errors ) );
 }
 
-/* Checks if the volume has a NTFS volume signature
+/* Checks if a volume has a Windows New Technology File System (NTFS) signature
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_check_volume_signature(
@@ -171,7 +170,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &string_object ) == 0 )
 	{
@@ -187,7 +186,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	{
 		pyfsntfs_error_fetch_and_raise(
 	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -212,9 +211,9 @@ PyObject *pyfsntfs_check_volume_signature(
 
 		if( utf8_string_object == NULL )
 		{
-			PyErr_Format(
+			pyfsntfs_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
@@ -236,7 +235,9 @@ PyObject *pyfsntfs_check_volume_signature(
 
 		Py_DecRef(
 		 utf8_string_object );
-#endif
+
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 		if( result == -1 )
 		{
 			pyfsntfs_error_raise(
@@ -334,7 +335,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	return( NULL );
 }
 
-/* Checks if the volume has a NTFS volume signature using a file-like object
+/* Checks if a volume has a Windows New Technology File System (NTFS) signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_check_volume_signature_file_object(
@@ -434,6 +435,52 @@ on_error:
 	return( NULL );
 }
 
+/* Creates a new volume object and opens it
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_open_new_volume(
+           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *pyfsntfs_volume = NULL;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( self )
+
+	pyfsntfs_volume_init(
+	 (pyfsntfs_volume_t *) pyfsntfs_volume );
+
+	pyfsntfs_volume_open(
+	 (pyfsntfs_volume_t *) pyfsntfs_volume,
+	 arguments,
+	 keywords );
+
+	return( pyfsntfs_volume );
+}
+
+/* Creates a new volume object and opens it using a file-like object
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_open_new_volume_with_file_object(
+           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *pyfsntfs_volume = NULL;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( self )
+
+	pyfsntfs_volume_init(
+	 (pyfsntfs_volume_t *) pyfsntfs_volume );
+
+	pyfsntfs_volume_open_file_object(
+	 (pyfsntfs_volume_t *) pyfsntfs_volume,
+	 arguments,
+	 keywords );
+
+	return( pyfsntfs_volume );
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 /* The pyfsntfs module definition
@@ -471,28 +518,8 @@ PyMODINIT_FUNC initpyfsntfs(
                 void )
 #endif
 {
-	PyObject *module                                         = NULL;
-	PyTypeObject *attribute_type_object                      = NULL;
-	PyTypeObject *attribute_types_type_object                = NULL;
-	PyTypeObject *attributes_type_object                     = NULL;
-	PyTypeObject *data_stream_type_object                    = NULL;
-	PyTypeObject *data_streams_type_object                   = NULL;
-	PyTypeObject *file_attribute_flags_type_object           = NULL;
-	PyTypeObject *file_entries_type_object                   = NULL;
-	PyTypeObject *file_entry_type_object                     = NULL;
-	PyTypeObject *file_name_attribute_type_object            = NULL;
-	PyTypeObject *mft_metadata_file_type_object              = NULL;
-	PyTypeObject *mft_metadata_file_entries_type_object      = NULL;
-	PyTypeObject *object_identifier_attribute_type_object    = NULL;
-	PyTypeObject *reparse_point_attribute_type_object        = NULL;
-	PyTypeObject *security_descriptor_attribute_type_object  = NULL;
-	PyTypeObject *standard_information_attribute_type_object = NULL;
-	PyTypeObject *usn_change_journal_type_object             = NULL;
-	PyTypeObject *volume_type_object                         = NULL;
-	PyTypeObject *volume_file_entries_type_object            = NULL;
-	PyTypeObject *volume_information_attribute_type_object   = NULL;
-	PyTypeObject *volume_name_attribute_type_object          = NULL;
-	PyGILState_STATE gil_state                               = 0;
+	PyObject *module           = NULL;
+	PyGILState_STATE gil_state = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libfsntfs_notify_set_stream(
@@ -527,82 +554,6 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	gil_state = PyGILState_Ensure();
 
-	/* Setup the volume type object
-	 */
-	pyfsntfs_volume_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_volume_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_volume_type_object );
-
-	volume_type_object = &pyfsntfs_volume_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "volume",
-	 (PyObject *) volume_type_object );
-
-	/* Setup the MFT metadata file type object
-	 */
-	pyfsntfs_mft_metadata_file_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_mft_metadata_file_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_mft_metadata_file_type_object );
-
-	mft_metadata_file_type_object = &pyfsntfs_mft_metadata_file_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "mft_metadata_file",
-	 (PyObject *) mft_metadata_file_type_object );
-
-	/* Setup the file entry type object
-	 */
-	pyfsntfs_file_entry_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_file_entry_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_file_entry_type_object );
-
-	file_entry_type_object = &pyfsntfs_file_entry_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "file_entry",
-	 (PyObject *) file_entry_type_object );
-
-	/* Setup the data stream type object
-	 */
-	pyfsntfs_data_stream_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_data_stream_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_data_stream_type_object );
-
-	data_stream_type_object = &pyfsntfs_data_stream_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "data_stream",
-	 (PyObject *) data_stream_type_object );
-
 	/* Setup the attribute type object
 	 */
 	pyfsntfs_attribute_type_object.tp_new = PyType_GenericNew;
@@ -615,259 +566,10 @@ PyMODINIT_FUNC initpyfsntfs(
 	Py_IncRef(
 	 (PyObject *) &pyfsntfs_attribute_type_object );
 
-	attribute_type_object = &pyfsntfs_attribute_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "attribute",
-	 (PyObject *) attribute_type_object );
-
-	/* Setup the $FILE_NAME attribute type object
-	 */
-	pyfsntfs_file_name_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_file_name_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_file_name_attribute_type_object );
-
-	file_name_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "file_name_attribute",
-	 (PyObject *) file_name_attribute_type_object );
-
-	/* Setup the $OBJECT_IDENTIFIER attribute type object
-	 */
-	pyfsntfs_object_identifier_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_object_identifier_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_object_identifier_attribute_type_object );
-
-	object_identifier_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "object_identifier_attribute",
-	 (PyObject *) object_identifier_attribute_type_object );
-
-	/* Setup the $REPARSE_POINT attribute type object
-	 */
-	pyfsntfs_reparse_point_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_reparse_point_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_reparse_point_attribute_type_object );
-
-	reparse_point_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "reparse_point_attribute",
-	 (PyObject *) reparse_point_attribute_type_object );
-
-	/* Setup the $SECURITY_DESCRIPTOR attribute type object
-	 */
-	pyfsntfs_security_descriptor_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_security_descriptor_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_security_descriptor_attribute_type_object );
-
-	security_descriptor_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "security_descriptor_attribute",
-	 (PyObject *) security_descriptor_attribute_type_object );
-
-	/* Setup the $STANDARD_INFORMATION attribute type object
-	 */
-	pyfsntfs_standard_information_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_standard_information_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_standard_information_attribute_type_object );
-
-	standard_information_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "standard_information_attribute",
-	 (PyObject *) standard_information_attribute_type_object );
-
-	/* Setup the $VOLUME_INFORMATION attribute type object
-	 */
-	pyfsntfs_volume_information_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_volume_information_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_volume_information_attribute_type_object );
-
-	volume_information_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "volume_information_attribute",
-	 (PyObject *) volume_information_attribute_type_object );
-
-	/* Setup the $VOLUME_NAME attribute type object
-	 */
-	pyfsntfs_volume_name_attribute_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_volume_name_attribute_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_volume_name_attribute_type_object );
-
-	volume_name_attribute_type_object = &pyfsntfs_attribute_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "volume_name_attribute",
-	 (PyObject *) volume_name_attribute_type_object );
-
-	/* Setup the USN change journal type object
-	 */
-	pyfsntfs_usn_change_journal_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_usn_change_journal_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_usn_change_journal_type_object );
-
-	usn_change_journal_type_object = &pyfsntfs_usn_change_journal_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "usn_change_journal",
-	 (PyObject *) usn_change_journal_type_object );
-
-	/* Setup the attributes type object
-	 */
-	pyfsntfs_attributes_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_attributes_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_attributes_type_object );
-
-	attributes_type_object = &pyfsntfs_attributes_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_attributes",
-	 (PyObject *) attributes_type_object );
-
-	/* Setup the data streams type object
-	 */
-	pyfsntfs_data_streams_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_data_streams_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_data_streams_type_object );
-
-	data_streams_type_object = &pyfsntfs_data_streams_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_data_streams",
-	 (PyObject *) data_streams_type_object );
-
-	/* Setup the file entries type object
-	 */
-	pyfsntfs_file_entries_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_file_entries_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_file_entries_type_object );
-
-	file_entries_type_object = &pyfsntfs_file_entries_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_file_entries",
-	 (PyObject *) file_entries_type_object );
-
-	/* Setup the MFT metadata file entries type object
-	 */
-	pyfsntfs_mft_metadata_file_entries_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_mft_metadata_file_entries_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_mft_metadata_file_entries_type_object );
-
-	mft_metadata_file_entries_type_object = &pyfsntfs_mft_metadata_file_entries_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_mft_metadata_file_entries",
-	 (PyObject *) mft_metadata_file_entries_type_object );
-
-	/* Setup the volume file entries type object
-	 */
-	pyfsntfs_volume_file_entries_type_object.tp_new = PyType_GenericNew;
-
-	if( PyType_Ready(
-	     &pyfsntfs_volume_file_entries_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyfsntfs_volume_file_entries_type_object );
-
-	volume_file_entries_type_object = &pyfsntfs_volume_file_entries_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "_volume_file_entries",
-	 (PyObject *) volume_file_entries_type_object );
+	 (PyObject *) &pyfsntfs_attribute_type_object );
 
 	/* Setup the attribute types type object
 	 */
@@ -886,12 +588,61 @@ PyMODINIT_FUNC initpyfsntfs(
 	Py_IncRef(
 	 (PyObject *) &pyfsntfs_attribute_types_type_object );
 
-	attribute_types_type_object = &pyfsntfs_attribute_types_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "attribute_types",
-	 (PyObject *) attribute_types_type_object );
+	 (PyObject *) &pyfsntfs_attribute_types_type_object );
+
+	/* Setup the attributes type object
+	 */
+	pyfsntfs_attributes_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_attributes_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_attributes_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "_attributes",
+	 (PyObject *) &pyfsntfs_attributes_type_object );
+
+	/* Setup the data stream type object
+	 */
+	pyfsntfs_data_stream_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_data_stream_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_data_stream_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "data_stream",
+	 (PyObject *) &pyfsntfs_data_stream_type_object );
+
+	/* Setup the data streams type object
+	 */
+	pyfsntfs_data_streams_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_data_streams_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_data_streams_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "_data_streams",
+	 (PyObject *) &pyfsntfs_data_streams_type_object );
 
 	/* Setup the file attribute flags type object
 	 */
@@ -910,12 +661,248 @@ PyMODINIT_FUNC initpyfsntfs(
 	Py_IncRef(
 	 (PyObject *) &pyfsntfs_file_attribute_flags_type_object );
 
-	file_attribute_flags_type_object = &pyfsntfs_file_attribute_flags_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "file_attribute_flags",
-	 (PyObject *) file_attribute_flags_type_object );
+	 (PyObject *) &pyfsntfs_file_attribute_flags_type_object );
+
+	/* Setup the file entry type object
+	 */
+	pyfsntfs_file_entry_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_file_entry_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_file_entry_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "file_entry",
+	 (PyObject *) &pyfsntfs_file_entry_type_object );
+
+	/* Setup the file entries type object
+	 */
+	pyfsntfs_file_entries_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_file_entries_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_file_entries_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "_file_entries",
+	 (PyObject *) &pyfsntfs_file_entries_type_object );
+
+	/* Setup the $FILE_NAME attribute type object
+	 */
+	pyfsntfs_file_name_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_file_name_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_file_name_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "file_name_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the MFT metadata file type object
+	 */
+	pyfsntfs_mft_metadata_file_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_mft_metadata_file_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_mft_metadata_file_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "mft_metadata_file",
+	 (PyObject *) &pyfsntfs_mft_metadata_file_type_object );
+
+	/* Setup the MFT metadata file entries type object
+	 */
+	pyfsntfs_mft_metadata_file_entries_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_mft_metadata_file_entries_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_mft_metadata_file_entries_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "_mft_metadata_file_entries",
+	 (PyObject *) &pyfsntfs_mft_metadata_file_entries_type_object );
+
+	/* Setup the $OBJECT_IDENTIFIER attribute type object
+	 */
+	pyfsntfs_object_identifier_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_object_identifier_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_object_identifier_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "object_identifier_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the $REPARSE_POINT attribute type object
+	 */
+	pyfsntfs_reparse_point_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_reparse_point_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_reparse_point_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "reparse_point_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the $SECURITY_DESCRIPTOR attribute type object
+	 */
+	pyfsntfs_security_descriptor_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_security_descriptor_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_security_descriptor_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "security_descriptor_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the $STANDARD_INFORMATION attribute type object
+	 */
+	pyfsntfs_standard_information_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_standard_information_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_standard_information_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "standard_information_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the USN change journal type object
+	 */
+	pyfsntfs_usn_change_journal_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_usn_change_journal_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_usn_change_journal_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "usn_change_journal",
+	 (PyObject *) &pyfsntfs_usn_change_journal_type_object );
+
+	/* Setup the volume type object
+	 */
+	pyfsntfs_volume_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "volume",
+	 (PyObject *) &pyfsntfs_volume_type_object );
+
+	/* Setup the volume file entries type object
+	 */
+	pyfsntfs_volume_file_entries_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_file_entries_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_file_entries_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "_volume_file_entries",
+	 (PyObject *) &pyfsntfs_volume_file_entries_type_object );
+
+	/* Setup the $VOLUME_INFORMATION attribute type object
+	 */
+	pyfsntfs_volume_information_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_information_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_information_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "volume_information_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
+
+	/* Setup the $VOLUME_NAME attribute type object
+	 */
+	pyfsntfs_volume_name_attribute_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyfsntfs_volume_name_attribute_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyfsntfs_volume_name_attribute_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "volume_name_attribute",
+	 (PyObject *) &pyfsntfs_attribute_type_object );
 
 	PyGILState_Release(
 	 gil_state );

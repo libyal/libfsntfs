@@ -1,5 +1,5 @@
 /*
- * Python object definition of the attributes sequence and iterator
+ * Python object definition of the sequence and iterator object of attributes
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,7 +27,6 @@
 #endif
 
 #include "pyfsntfs_attributes.h"
-#include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
@@ -97,7 +96,7 @@ PyTypeObject pyfsntfs_attributes_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"internal pyfsntfs attributes sequence and iterator object",
+	"pyfsntfs sequence and iterator object of attributes",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -150,126 +149,122 @@ PyTypeObject pyfsntfs_attributes_type_object = {
 	0
 };
 
-/* Creates a new attributes object
+/* Creates a new attributes sequence and iterator object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_attributes_new(
-           pyfsntfs_file_entry_t *file_entry_object,
-           PyObject* (*get_attribute_by_index)(
-                        pyfsntfs_file_entry_t *file_entry_object,
-                        int attribute_index ),
-           int number_of_attributes )
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items )
 {
-	pyfsntfs_attributes_t *pyfsntfs_attributes = NULL;
-	static char *function                      = "pyfsntfs_attributes_new";
+	pyfsntfs_attributes_t *sequence_object = NULL;
+	static char *function                  = "pyfsntfs_attributes_new";
 
-	if( file_entry_object == NULL )
+	if( parent_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid file entry object.",
+		 "%s: invalid parent object.",
 		 function );
 
 		return( NULL );
 	}
-	if( get_attribute_by_index == NULL )
+	if( get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid get attribute by index function.",
+		 "%s: invalid get item by index function.",
 		 function );
 
 		return( NULL );
 	}
 	/* Make sure the attributes values are initialized
 	 */
-	pyfsntfs_attributes = PyObject_New(
-	                       struct pyfsntfs_attributes,
-	                       &pyfsntfs_attributes_type_object );
+	sequence_object = PyObject_New(
+	                   struct pyfsntfs_attributes,
+	                   &pyfsntfs_attributes_type_object );
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize attributes.",
+		 "%s: unable to create sequence object.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyfsntfs_attributes_init(
-	     pyfsntfs_attributes ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize attributes.",
-		 function );
-
-		goto on_error;
-	}
-	pyfsntfs_attributes->file_entry_object      = file_entry_object;
-	pyfsntfs_attributes->get_attribute_by_index = get_attribute_by_index;
-	pyfsntfs_attributes->number_of_attributes   = number_of_attributes;
+	sequence_object->parent_object     = parent_object;
+	sequence_object->get_item_by_index = get_item_by_index;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_attributes->file_entry_object );
+	 (PyObject *) sequence_object->parent_object );
 
-	return( (PyObject *) pyfsntfs_attributes );
+	return( (PyObject *) sequence_object );
 
 on_error:
-	if( pyfsntfs_attributes != NULL )
+	if( sequence_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_attributes );
+		 (PyObject *) sequence_object );
 	}
 	return( NULL );
 }
 
-/* Intializes an attributes object
+/* Intializes an attributes sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_attributes_init(
-     pyfsntfs_attributes_t *pyfsntfs_attributes )
+     pyfsntfs_attributes_t *sequence_object )
 {
 	static char *function = "pyfsntfs_attributes_init";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the attributes values are initialized
 	 */
-	pyfsntfs_attributes->file_entry_object      = NULL;
-	pyfsntfs_attributes->get_attribute_by_index = NULL;
-	pyfsntfs_attributes->attribute_index        = 0;
-	pyfsntfs_attributes->number_of_attributes   = 0;
+	sequence_object->parent_object     = NULL;
+	sequence_object->get_item_by_index = NULL;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = 0;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of attributes not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees an attributes object
+/* Frees an attributes sequence object
  */
 void pyfsntfs_attributes_free(
-      pyfsntfs_attributes_t *pyfsntfs_attributes )
+      pyfsntfs_attributes_t *sequence_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyfsntfs_attributes_free";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyfsntfs_attributes );
+	           sequence_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +284,72 @@ void pyfsntfs_attributes_free(
 
 		return;
 	}
-	if( pyfsntfs_attributes->file_entry_object != NULL )
+	if( sequence_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_attributes->file_entry_object );
+		 (PyObject *) sequence_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyfsntfs_attributes );
+	 (PyObject*) sequence_object );
 }
 
 /* The attributes len() function
  */
 Py_ssize_t pyfsntfs_attributes_len(
-            pyfsntfs_attributes_t *pyfsntfs_attributes )
+            pyfsntfs_attributes_t *sequence_object )
 {
 	static char *function = "pyfsntfs_attributes_len";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) pyfsntfs_attributes->number_of_attributes );
+	return( (Py_ssize_t) sequence_object->number_of_items );
 }
 
 /* The attributes getitem() function
  */
 PyObject *pyfsntfs_attributes_getitem(
-           pyfsntfs_attributes_t *pyfsntfs_attributes,
+           pyfsntfs_attributes_t *sequence_object,
            Py_ssize_t item_index )
 {
 	PyObject *attribute_object = NULL;
 	static char *function      = "pyfsntfs_attributes_getitem";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->get_attribute_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes - missing get attribute by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->number_of_attributes < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes - invalid number of attributes.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) pyfsntfs_attributes->number_of_attributes ) )
+	 || ( item_index >= (Py_ssize_t) sequence_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +358,8 @@ PyObject *pyfsntfs_attributes_getitem(
 
 		return( NULL );
 	}
-	attribute_object = pyfsntfs_attributes->get_attribute_by_index(
-	                    pyfsntfs_attributes->file_entry_object,
+	attribute_object = sequence_object->get_item_by_index(
+	                    sequence_object->parent_object,
 	                    (int) item_index );
 
 	return( attribute_object );
@@ -373,83 +368,83 @@ PyObject *pyfsntfs_attributes_getitem(
 /* The attributes iter() function
  */
 PyObject *pyfsntfs_attributes_iter(
-           pyfsntfs_attributes_t *pyfsntfs_attributes )
+           pyfsntfs_attributes_t *sequence_object )
 {
 	static char *function = "pyfsntfs_attributes_iter";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_attributes );
+	 (PyObject *) sequence_object );
 
-	return( (PyObject *) pyfsntfs_attributes );
+	return( (PyObject *) sequence_object );
 }
 
 /* The attributes iternext() function
  */
 PyObject *pyfsntfs_attributes_iternext(
-           pyfsntfs_attributes_t *pyfsntfs_attributes )
+           pyfsntfs_attributes_t *sequence_object )
 {
 	PyObject *attribute_object = NULL;
 	static char *function      = "pyfsntfs_attributes_iternext";
 
-	if( pyfsntfs_attributes == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->get_attribute_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes - missing get attribute by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->attribute_index < 0 )
+	if( sequence_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes - invalid attribute index.",
+		 "%s: invalid sequence object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->number_of_attributes < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid attributes - invalid number of attributes.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( pyfsntfs_attributes->attribute_index >= pyfsntfs_attributes->number_of_attributes )
+	if( sequence_object->current_index >= sequence_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	attribute_object = pyfsntfs_attributes->get_attribute_by_index(
-	                    pyfsntfs_attributes->file_entry_object,
-	                    pyfsntfs_attributes->attribute_index );
+	attribute_object = sequence_object->get_item_by_index(
+	                    sequence_object->parent_object,
+	                    sequence_object->current_index );
 
 	if( attribute_object != NULL )
 	{
-		pyfsntfs_attributes->attribute_index++;
+		sequence_object->current_index++;
 	}
 	return( attribute_object );
 }

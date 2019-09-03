@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_file_entry.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
@@ -46,9 +45,9 @@ struct pyfsntfs_attribute
 	 */
 	libfsntfs_attribute_t *attribute;
 
-	/* The file entry object
+	/* The parent object
 	 */
-	pyfsntfs_file_entry_t *file_entry_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyfsntfs_attribute_object_methods[];
@@ -57,7 +56,7 @@ extern PyTypeObject pyfsntfs_attribute_type_object;
 PyObject *pyfsntfs_attribute_new(
            PyTypeObject *type_object,
            libfsntfs_attribute_t *attribute,
-           pyfsntfs_file_entry_t *file_entry_object );
+           PyObject *parent_object );
 
 int pyfsntfs_attribute_init(
      pyfsntfs_attribute_t *pyfsntfs_attribute );
@@ -77,5 +76,5 @@ PyObject *pyfsntfs_attribute_get_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_ATTRIBUTE_H ) */
 

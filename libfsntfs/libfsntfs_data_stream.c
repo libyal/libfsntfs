@@ -228,7 +228,7 @@ int libfsntfs_data_stream_free(
  */
 int libfsntfs_data_stream_get_utf8_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
@@ -249,7 +249,7 @@ int libfsntfs_data_stream_get_utf8_name_size(
 
 	if( libfsntfs_attribute_get_utf8_name_size(
 	     internal_data_stream->data_attribute,
-	     utf8_name_size,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -270,8 +270,8 @@ int libfsntfs_data_stream_get_utf8_name_size(
  */
 int libfsntfs_data_stream_get_utf8_name(
      libfsntfs_data_stream_t *data_stream,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
@@ -292,8 +292,8 @@ int libfsntfs_data_stream_get_utf8_name(
 
 	if( libfsntfs_attribute_get_utf8_name(
 	     internal_data_stream->data_attribute,
-	     utf8_name,
-	     utf8_name_size,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -314,7 +314,7 @@ int libfsntfs_data_stream_get_utf8_name(
  */
 int libfsntfs_data_stream_get_utf16_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
@@ -335,7 +335,7 @@ int libfsntfs_data_stream_get_utf16_name_size(
 
 	if( libfsntfs_attribute_get_utf16_name_size(
 	     internal_data_stream->data_attribute,
-	     utf16_name_size,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -356,8 +356,8 @@ int libfsntfs_data_stream_get_utf16_name_size(
  */
 int libfsntfs_data_stream_get_utf16_name(
      libfsntfs_data_stream_t *data_stream,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
@@ -378,8 +378,8 @@ int libfsntfs_data_stream_get_utf16_name(
 
 	if( libfsntfs_attribute_get_utf16_name(
 	     internal_data_stream->data_attribute,
-	     utf16_name,
-	     utf16_name_size,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

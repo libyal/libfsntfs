@@ -1,5 +1,5 @@
 /*
- * Python object definition of the data streams sequence and iterator
+ * Python object definition of the sequence and iterator object of data streams
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_data_stream.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 
@@ -41,56 +40,56 @@ struct pyfsntfs_data_streams
 	 */
 	PyObject_HEAD
 
-	/* The file entry object
+	/* The parent object
 	 */
-	pyfsntfs_file_entry_t *file_entry_object;
+	PyObject *parent_object;
 
-	/* The get data stream by index callback function
+	/* The get item by index callback function
 	 */
-	PyObject* (*get_data_stream_by_index)(
-	             pyfsntfs_file_entry_t *file_entry_object,
-	             int data_stream_index );
+	PyObject* (*get_item_by_index)(
+	             PyObject *parent_object,
+	             int index );
 
-	/* The (current) data stream index
+	/* The current index
 	 */
-	int data_stream_index;
+	int current_index;
 
-	/* The number of data streams
+	/* The number of items
 	 */
-	int number_of_data_streams;
+	int number_of_items;
 };
 
 extern PyTypeObject pyfsntfs_data_streams_type_object;
 
 PyObject *pyfsntfs_data_streams_new(
-           pyfsntfs_file_entry_t *file_entry_object,
-           PyObject* (*get_data_stream_by_index)(
-                        pyfsntfs_file_entry_t *file_entry_object,
-                        int data_stream_index ),
-           int number_of_data_streams );
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items );
 
 int pyfsntfs_data_streams_init(
-     pyfsntfs_data_streams_t *pyfsntfs_data_streams );
+     pyfsntfs_data_streams_t *sequence_object );
 
 void pyfsntfs_data_streams_free(
-      pyfsntfs_data_streams_t *pyfsntfs_data_streams );
+      pyfsntfs_data_streams_t *sequence_object );
 
 Py_ssize_t pyfsntfs_data_streams_len(
-            pyfsntfs_data_streams_t *pyfsntfs_data_streams );
+            pyfsntfs_data_streams_t *sequence_object );
 
 PyObject *pyfsntfs_data_streams_getitem(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams,
+           pyfsntfs_data_streams_t *sequence_object,
            Py_ssize_t item_index );
 
 PyObject *pyfsntfs_data_streams_iter(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams );
+           pyfsntfs_data_streams_t *sequence_object );
 
 PyObject *pyfsntfs_data_streams_iternext(
-           pyfsntfs_data_streams_t *pyfsntfs_data_streams );
+           pyfsntfs_data_streams_t *sequence_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_DATA_STREAMS_H ) */
 

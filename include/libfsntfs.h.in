@@ -352,7 +352,7 @@ int libfsntfs_volume_get_index_entry_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -363,8 +363,8 @@ int libfsntfs_volume_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name(
      libfsntfs_volume_t *volume,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -375,7 +375,7 @@ int libfsntfs_volume_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name_size(
      libfsntfs_volume_t *volume,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -386,8 +386,8 @@ int libfsntfs_volume_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name(
      libfsntfs_volume_t *volume,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the version
@@ -592,7 +592,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -603,8 +603,8 @@ int libfsntfs_file_entry_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -615,7 +615,7 @@ int libfsntfs_file_entry_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -626,8 +626,8 @@ int libfsntfs_file_entry_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the name attribute index
@@ -647,7 +647,7 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name for a specific $FILE_NAME attribute
@@ -658,8 +658,8 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name for a specific $FILE_NAME attribute
@@ -670,7 +670,7 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name for a specific $FILE_NAME attribute
@@ -681,8 +681,8 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded reparse point substitute name
@@ -693,7 +693,7 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded reparse point substitute name
@@ -704,8 +704,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded reparse point substitute name
@@ -716,7 +716,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded reparse point substitute name
@@ -727,8 +727,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded reparse point print name
@@ -739,7 +739,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded reparse point print name
@@ -750,8 +750,8 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded reparse point print name
@@ -762,7 +762,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
      libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded reparse point print name
@@ -773,8 +773,8 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
      libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the security descriptor (data) size
@@ -1040,7 +1040,7 @@ int libfsntfs_attribute_get_data_flags(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf8_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -1050,8 +1050,8 @@ int libfsntfs_attribute_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1061,7 +1061,7 @@ int libfsntfs_attribute_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf16_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -1071,8 +1071,8 @@ int libfsntfs_attribute_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the data VCN range
@@ -1170,7 +1170,7 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_utf8_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -1180,8 +1180,8 @@ int libfsntfs_file_name_attribute_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1191,7 +1191,7 @@ int libfsntfs_file_name_attribute_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_utf16_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -1201,8 +1201,8 @@ int libfsntfs_file_name_attribute_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_name_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1265,7 +1265,7 @@ int libfsntfs_reparse_point_attribute_get_tag(
  */
 int libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded substitute name
@@ -1274,8 +1274,8 @@ int libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
  */
 int libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded substitute name
@@ -1284,7 +1284,7 @@ int libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
  */
 int libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded substitute name
@@ -1293,8 +1293,8 @@ int libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
  */
 int libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded print name
@@ -1303,7 +1303,7 @@ int libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
  */
 int libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded print name
@@ -1312,8 +1312,8 @@ int libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
  */
 int libfsntfs_reparse_point_attribute_get_utf8_print_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded print name
@@ -1322,7 +1322,7 @@ int libfsntfs_reparse_point_attribute_get_utf8_print_name(
  */
 int libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded print name
@@ -1331,8 +1331,8 @@ int libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
  */
 int libfsntfs_reparse_point_attribute_get_utf16_print_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1468,7 +1468,7 @@ int libfsntfs_volume_information_attribute_get_flags(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_name_attribute_get_utf8_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -1478,8 +1478,8 @@ int libfsntfs_volume_name_attribute_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_name_attribute_get_utf8_name(
      libfsntfs_attribute_t *attribute,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1489,7 +1489,7 @@ int libfsntfs_volume_name_attribute_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_name_attribute_get_utf16_name_size(
      libfsntfs_attribute_t *attribute,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -1499,8 +1499,8 @@ int libfsntfs_volume_name_attribute_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_name_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the usn change journal
@@ -1531,7 +1531,7 @@ int libfsntfs_data_stream_free(
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf8_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
@@ -1541,8 +1541,8 @@ int libfsntfs_data_stream_get_utf8_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf8_name(
      libfsntfs_data_stream_t *data_stream,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1552,7 +1552,7 @@ int libfsntfs_data_stream_get_utf8_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf16_name_size(
      libfsntfs_data_stream_t *data_stream,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
@@ -1562,8 +1562,8 @@ int libfsntfs_data_stream_get_utf16_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_data_stream_get_utf16_name(
      libfsntfs_data_stream_t *data_stream,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Reads data at the current offset

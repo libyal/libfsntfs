@@ -52,5 +52,5 @@ PyObject *pyfsntfs_reparse_point_attribute_get_print_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_REPARSE_POINT_ATTRIBUTE_H ) */
 

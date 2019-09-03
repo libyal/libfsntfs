@@ -175,7 +175,7 @@ PyTypeObject pyfsntfs_attribute_type_object = {
 PyObject *pyfsntfs_attribute_new(
            PyTypeObject *type_object,
            libfsntfs_attribute_t *attribute,
-           pyfsntfs_file_entry_t *file_entry_object )
+           PyObject *parent_object )
 {
 	pyfsntfs_attribute_t *pyfsntfs_attribute = NULL;
 	static char *function                    = "pyfsntfs_attribute_new";
@@ -183,12 +183,14 @@ PyObject *pyfsntfs_attribute_new(
 	if( attribute == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid attribute.",
 		 function );
 
 		return( NULL );
 	}
+	/* PyObject_New does not invoke tp_init
+	 */
 	pyfsntfs_attribute = PyObject_New(
 	                      struct pyfsntfs_attribute,
 	                      type_object );
@@ -202,21 +204,11 @@ PyObject *pyfsntfs_attribute_new(
 
 		goto on_error;
 	}
-	if( pyfsntfs_attribute_init(
-	     pyfsntfs_attribute ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize attribute.",
-		 function );
-
-		goto on_error;
-	}
-	pyfsntfs_attribute->attribute         = attribute;
-	pyfsntfs_attribute->file_entry_object = file_entry_object;
+	pyfsntfs_attribute->attribute     = attribute;
+	pyfsntfs_attribute->parent_object = parent_object;
 
 	Py_IncRef(
-	 (PyObject *) pyfsntfs_attribute->file_entry_object );
+	 pyfsntfs_attribute->parent_object );
 
 	return( (PyObject *) pyfsntfs_attribute );
 
@@ -240,7 +232,7 @@ int pyfsntfs_attribute_init(
 	if( pyfsntfs_attribute == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid attribute.",
 		 function );
 
@@ -250,7 +242,12 @@ int pyfsntfs_attribute_init(
 	 */
 	pyfsntfs_attribute->attribute = NULL;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of attribute not supported.",
+	 function );
+
+	return( -1 );
 }
 
 /* Frees an attribute object
@@ -258,25 +255,16 @@ int pyfsntfs_attribute_init(
 void pyfsntfs_attribute_free(
       pyfsntfs_attribute_t *pyfsntfs_attribute )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyfsntfs_attribute_free";
 	int result                  = 0;
 
 	if( pyfsntfs_attribute == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid attribute.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_attribute->attribute == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid attribute - missing libfsntfs attribute.",
 		 function );
 
 		return;
@@ -302,29 +290,32 @@ void pyfsntfs_attribute_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_attribute_free(
-	          &( pyfsntfs_attribute->attribute ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyfsntfs_attribute->attribute != NULL )
 	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free attribute.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libfsntfs_attribute_free(
+		          &( pyfsntfs_attribute->attribute ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free attribute.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
-	if( pyfsntfs_attribute->file_entry_object != NULL )
+	if( pyfsntfs_attribute->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_attribute->file_entry_object );
+		 pyfsntfs_attribute->parent_object );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_attribute );
@@ -340,7 +331,7 @@ PyObject *pyfsntfs_attribute_get_type(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyfsntfs_attribute_get_type";
-	uint32_t type            = 0;
+	uint32_t value_32bit     = 0;
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
@@ -348,7 +339,7 @@ PyObject *pyfsntfs_attribute_get_type(
 	if( pyfsntfs_attribute == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid attribute.",
 		 function );
 
@@ -358,7 +349,7 @@ PyObject *pyfsntfs_attribute_get_type(
 
 	result = libfsntfs_attribute_get_type(
 	          pyfsntfs_attribute->attribute,
-	          &type,
+	          &value_32bit,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -376,8 +367,8 @@ PyObject *pyfsntfs_attribute_get_type(
 
 		return( NULL );
 	}
-	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) type );
+	integer_object = PyLong_FromUnsignedLong(
+	                  (unsigned long) value_32bit );
 
 	return( integer_object );
 }
@@ -402,7 +393,7 @@ PyObject *pyfsntfs_attribute_get_name(
 	if( pyfsntfs_attribute == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid attribute.",
 		 function );
 

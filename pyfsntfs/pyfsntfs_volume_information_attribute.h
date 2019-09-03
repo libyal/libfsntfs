@@ -48,5 +48,5 @@ PyObject *pyfsntfs_volume_information_attribute_get_flags(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_VOLUME_INFORMATION_ATTRIBUTE_H ) */
 

@@ -50,14 +50,14 @@ PyObject *pyfsntfs_attribute_types_new(
            void );
 
 int pyfsntfs_attribute_types_init(
-     pyfsntfs_attribute_types_t *pyfsntfs_attribute_types );
+     pyfsntfs_attribute_types_t *definitions_object );
 
 void pyfsntfs_attribute_types_free(
-      pyfsntfs_attribute_types_t *pyfsntfs_attribute_types );
+      pyfsntfs_attribute_types_t *definitions_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_ATTRIBUTE_TYPES_H ) */
 

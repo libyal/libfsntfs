@@ -93,5 +93,5 @@ PyObject *pyfsntfs_volume_file_entries_iternext(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_VOLUME_FILE_ENTRIES_H ) */
 

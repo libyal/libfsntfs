@@ -114,27 +114,27 @@ int libfsntfs_mft_metadata_file_open_read(
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf8_volume_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint8_t *utf8_volume_name,
-     size_t utf8_volume_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf16_volume_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint16_t *utf16_volume_name,
-     size_t utf16_volume_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

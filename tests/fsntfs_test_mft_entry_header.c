@@ -694,6 +694,84 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_mft_entry_header_get_used_entry_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_header_get_used_entry_size(
+     libfsntfs_mft_entry_header_t *mft_entry_header )
+{
+	libcerror_error_t *error = NULL;
+	uint16_t used_entry_size = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_entry_header_get_used_entry_size(
+	          mft_entry_header,
+	          &used_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT16(
+	 "used_entry_size",
+	 used_entry_size,
+	 408 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_header_get_used_entry_size(
+	          NULL,
+	          &used_entry_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_header_get_used_entry_size(
+	          mft_entry_header,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_mft_entry_header_get_total_entry_size function
  * Returns 1 if successful or 0 if not
  */
@@ -862,6 +940,11 @@ int main(
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_header_get_attributes_offset",
 	 fsntfs_test_mft_entry_header_get_attributes_offset,
+	 mft_entry_header );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_entry_header_get_used_entry_size",
+	 fsntfs_test_mft_entry_header_get_used_entry_size,
 	 mft_entry_header );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

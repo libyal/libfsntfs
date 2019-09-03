@@ -70,7 +70,7 @@ PyTypeObject pyfsntfs_attribute_types_type_object = {
 	0,
 	/* tp_as_buffer */
 	0,
-	/* tp_types */
+	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
 	"pyfsntfs attribute types object (wraps LIBFSNTFS_ATTRIBUTE_TYPES)",
@@ -387,39 +387,39 @@ on_error:
 PyObject *pyfsntfs_attribute_types_new(
            void )
 {
-	pyfsntfs_attribute_types_t *pyfsntfs_attribute_types = NULL;
-	static char *function                                = "pyfsntfs_attribute_types_new";
+	pyfsntfs_attribute_types_t *definitions_object = NULL;
+	static char *function                          = "pyfsntfs_attribute_types_new";
 
-	pyfsntfs_attribute_types = PyObject_New(
-	                            struct pyfsntfs_attribute_types,
-	                            &pyfsntfs_attribute_types_type_object );
+	definitions_object = PyObject_New(
+	                      struct pyfsntfs_attribute_types,
+	                      &pyfsntfs_attribute_types_type_object );
 
-	if( pyfsntfs_attribute_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize attribute types.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyfsntfs_attribute_types_init(
-	     pyfsntfs_attribute_types ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize attribute types.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyfsntfs_attribute_types );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyfsntfs_attribute_types != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyfsntfs_attribute_types );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -428,15 +428,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_attribute_types_init(
-     pyfsntfs_attribute_types_t *pyfsntfs_attribute_types )
+     pyfsntfs_attribute_types_t *definitions_object )
 {
 	static char *function = "pyfsntfs_attribute_types_init";
 
-	if( pyfsntfs_attribute_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid attribute types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -447,22 +447,22 @@ int pyfsntfs_attribute_types_init(
 /* Frees an attribute types object
  */
 void pyfsntfs_attribute_types_free(
-      pyfsntfs_attribute_types_t *pyfsntfs_attribute_types )
+      pyfsntfs_attribute_types_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyfsntfs_attribute_types_free";
 
-	if( pyfsntfs_attribute_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid attribute types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyfsntfs_attribute_types );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -483,6 +483,6 @@ void pyfsntfs_attribute_types_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyfsntfs_attribute_types );
+	 (PyObject*) definitions_object );
 }
 

@@ -84,5 +84,5 @@ PyObject *pyfsntfs_file_name_attribute_get_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_FILE_NAME_ATTRIBUTE_H ) */
 

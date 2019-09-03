@@ -41,13 +41,15 @@
 #include "pyfsntfs_volume_file_entries.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_open_file_io_handle(
      libfsntfs_volume_t *volume,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
 PyMethodDef pyfsntfs_volume_object_methods[] = {
 
@@ -83,6 +85,34 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 
 	/* Functions to access the volume values */
 
+	{ "get_bytes_per_sector",
+	  (PyCFunction) pyfsntfs_volume_get_bytes_per_sector,
+	  METH_NOARGS,
+	  "get_bytes_per_sector() -> Integer\n"
+	  "\n"
+	  "Retrieves the bytes per sector." },
+
+	{ "get_cluster_block_size",
+	  (PyCFunction) pyfsntfs_volume_get_cluster_block_size,
+	  METH_NOARGS,
+	  "get_cluster_block_size() -> Integer\n"
+	  "\n"
+	  "Retrieves the cluster block size." },
+
+	{ "get_mft_entry_size",
+	  (PyCFunction) pyfsntfs_volume_get_mft_entry_size,
+	  METH_NOARGS,
+	  "get_mft_entry_size() -> Integer\n"
+	  "\n"
+	  "Retrieves the MFT entry size." },
+
+	{ "get_index_entry_size",
+	  (PyCFunction) pyfsntfs_volume_get_index_entry_size,
+	  METH_NOARGS,
+	  "get_index_entry_size() -> Integer\n"
+	  "\n"
+	  "Retrieves the index entry size." },
+
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_volume_get_name,
 	  METH_NOARGS,
@@ -90,12 +120,12 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 	  "\n"
 	  "Retrieves the name." },
 
-	{ "get_usn_change_journal",
-	  (PyCFunction) pyfsntfs_volume_get_usn_change_journal,
+	{ "get_serial_number",
+	  (PyCFunction) pyfsntfs_volume_get_serial_number,
 	  METH_NOARGS,
-	  "get_usn_change_journal() -> Object or None\n"
+	  "get_serial_number() -> Integer\n"
 	  "\n"
-	  "Retrieves the USN change journal." },
+	  "Retrieves the serial number." },
 
 	/* Functions to access the file entries */
 
@@ -127,16 +157,53 @@ PyMethodDef pyfsntfs_volume_object_methods[] = {
 	  "\n"
 	  "Retrieves a file entry specified by the path." },
 
+	{ "get_usn_change_journal",
+	  (PyCFunction) pyfsntfs_volume_get_usn_change_journal,
+	  METH_NOARGS,
+	  "get_usn_change_journal() -> Object or None\n"
+	  "\n"
+	  "Retrieves the USN change journal." },
+
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
 
 PyGetSetDef pyfsntfs_volume_object_get_set_definitions[] = {
 
+	{ "bytes_per_sector",
+	  (getter) pyfsntfs_volume_get_bytes_per_sector,
+	  (setter) 0,
+	  "The bytes per sector.",
+	  NULL },
+
+	{ "cluster_block_size",
+	  (getter) pyfsntfs_volume_get_cluster_block_size,
+	  (setter) 0,
+	  "The cluster block size.",
+	  NULL },
+
+	{ "mft_entry_size",
+	  (getter) pyfsntfs_volume_get_mft_entry_size,
+	  (setter) 0,
+	  "The MFT entry size.",
+	  NULL },
+
+	{ "index_entry_size",
+	  (getter) pyfsntfs_volume_get_index_entry_size,
+	  (setter) 0,
+	  "The index entry size.",
+	  NULL },
+
 	{ "name",
 	  (getter) pyfsntfs_volume_get_name,
 	  (setter) 0,
 	  "The name.",
+	  NULL },
+
+	{ "serial_number",
+	  (getter) pyfsntfs_volume_get_serial_number,
+	  (setter) 0,
+	  "The serial number.",
 	  NULL },
 
 	{ "number_of_file_entries",
@@ -250,101 +317,14 @@ PyTypeObject pyfsntfs_volume_type_object = {
 	0
 };
 
-/* Creates a new volume object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_new(
-           void )
-{
-	pyfsntfs_volume_t *pyfsntfs_volume = NULL;
-	static char *function              = "pyfsntfs_volume_new";
-
-	pyfsntfs_volume = PyObject_New(
-	                   struct pyfsntfs_volume,
-	                   &pyfsntfs_volume_type_object );
-
-	if( pyfsntfs_volume == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize volume.",
-		 function );
-
-		goto on_error;
-	}
-	if( pyfsntfs_volume_init(
-	     pyfsntfs_volume ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize volume.",
-		 function );
-
-		goto on_error;
-	}
-	return( (PyObject *) pyfsntfs_volume );
-
-on_error:
-	if( pyfsntfs_volume != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) pyfsntfs_volume );
-	}
-	return( NULL );
-}
-
-/* Creates a new volume object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_new_open(
-           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyfsntfs_volume = NULL;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( self )
-
-	pyfsntfs_volume = pyfsntfs_volume_new();
-
-	pyfsntfs_volume_open(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
-
-	return( pyfsntfs_volume );
-}
-
-/* Creates a new volume object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_new_open_file_object(
-           PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyfsntfs_volume = NULL;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( self )
-
-	pyfsntfs_volume = pyfsntfs_volume_new();
-
-	pyfsntfs_volume_open_file_object(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
-
-	return( pyfsntfs_volume );
-}
-
 /* Intializes a volume object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_volume_init(
      pyfsntfs_volume_t *pyfsntfs_volume )
 {
-	static char *function    = "pyfsntfs_volume_init";
 	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_volume_init";
 
 	if( pyfsntfs_volume == NULL )
 	{
@@ -355,6 +335,8 @@ int pyfsntfs_volume_init(
 
 		return( -1 );
 	}
+	/* Make sure libfsntfs volume is set to NULL
+	 */
 	pyfsntfs_volume->volume         = NULL;
 	pyfsntfs_volume->file_io_handle = NULL;
 
@@ -381,8 +363,8 @@ int pyfsntfs_volume_init(
 void pyfsntfs_volume_free(
       pyfsntfs_volume_t *pyfsntfs_volume )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyfsntfs_volume_free";
 	int result                  = 0;
 
@@ -391,15 +373,6 @@ void pyfsntfs_volume_free(
 		PyErr_Format(
 		 PyExc_ValueError,
 		 "%s: invalid volume.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_volume->volume == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid volume - missing libfsntfs volume.",
 		 function );
 
 		return;
@@ -425,24 +398,27 @@ void pyfsntfs_volume_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_volume_free(
-	          &( pyfsntfs_volume->volume ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyfsntfs_volume->volume != NULL )
 	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free libfsntfs volume.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libfsntfs_volume_free(
+		          &( pyfsntfs_volume->volume ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libfsntfs volume.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_volume );
@@ -507,9 +483,9 @@ PyObject *pyfsntfs_volume_open(
 {
 	PyObject *string_object      = NULL;
 	libcerror_error_t *error     = NULL;
+	const char *filename_narrow  = NULL;
 	static char *function        = "pyfsntfs_volume_open";
 	static char *keyword_list[]  = { "filename", "mode", NULL };
-	const char *filename_narrow  = NULL;
 	char *mode                   = NULL;
 	int result                   = 0;
 
@@ -563,8 +539,8 @@ PyObject *pyfsntfs_volume_open(
 	if( result == -1 )
 	{
 		pyfsntfs_error_fetch_and_raise(
-	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -576,11 +552,12 @@ PyObject *pyfsntfs_volume_open(
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
+
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_volume_open_wide(
 		          pyfsntfs_volume->volume,
-	                  filename_wide,
+		          filename_wide,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
 
@@ -593,23 +570,23 @@ PyObject *pyfsntfs_volume_open(
 		{
 			pyfsntfs_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_volume_open(
 		          pyfsntfs_volume->volume,
-	                  filename_narrow,
+		          filename_narrow,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
 
@@ -640,17 +617,17 @@ PyObject *pyfsntfs_volume_open(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
 		pyfsntfs_error_fetch_and_raise(
-	         PyExc_RuntimeError,
+		 PyExc_RuntimeError,
 		 "%s: unable to determine if string object is of type string.",
 		 function );
 
@@ -662,16 +639,16 @@ PyObject *pyfsntfs_volume_open(
 
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   string_object );
+		                   string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   string_object );
+		                   string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_volume_open(
 		          pyfsntfs_volume->volume,
-	                  filename_narrow,
+		          filename_narrow,
 		          LIBFSNTFS_OPEN_READ,
 		          &error );
 
@@ -713,9 +690,9 @@ PyObject *pyfsntfs_volume_open_file_object(
 {
 	PyObject *file_object       = NULL;
 	libcerror_error_t *error    = NULL;
-	char *mode                  = NULL;
-	static char *keyword_list[] = { "file_object", "mode", NULL };
 	static char *function       = "pyfsntfs_volume_open_file_object";
+	static char *keyword_list[] = { "file_object", "mode", NULL };
+	char *mode                  = NULL;
 	int result                  = 0;
 
 	if( pyfsntfs_volume == NULL )
@@ -747,6 +724,16 @@ PyObject *pyfsntfs_volume_open_file_object(
 		 mode );
 
 		return( NULL );
+	}
+	if( pyfsntfs_volume->file_io_handle != NULL )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: invalid volume - file IO handle already set.",
+		 function );
+
+		goto on_error;
 	}
 	if( pyfsntfs_file_object_initialize(
 	     &( pyfsntfs_volume->file_io_handle ),
@@ -859,7 +846,7 @@ PyObject *pyfsntfs_volume_close(
 		{
 			pyfsntfs_error_raise(
 			 error,
-			 PyExc_IOError,
+			 PyExc_MemoryError,
 			 "%s: unable to free libbfio file IO handle.",
 			 function );
 
@@ -873,6 +860,218 @@ PyObject *pyfsntfs_volume_close(
 	 Py_None );
 
 	return( Py_None );
+}
+
+/* Retrieves the bytes per sector
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_bytes_per_sector(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object  = NULL;
+	libcerror_error_t *error  = NULL;
+	static char *function     = "pyfsntfs_volume_get_bytes_per_sector";
+	uint16_t bytes_per_sector = 0;
+	int result                = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_bytes_per_sector(
+	          pyfsntfs_volume->volume,
+	          &bytes_per_sector,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve bytes per sector.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) bytes_per_sector );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) bytes_per_sector );
+#endif
+	return( integer_object );
+}
+
+/* Retrieves the cluster block size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_cluster_block_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object    = NULL;
+	libcerror_error_t *error    = NULL;
+	static char *function       = "pyfsntfs_volume_get_cluster_block_size";
+	size32_t cluster_block_size = 0;
+	int result                  = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_cluster_block_size(
+	          pyfsntfs_volume->volume,
+	          &cluster_block_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve cluster block size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = PyLong_FromUnsignedLong(
+	                  (unsigned long) cluster_block_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the MFT entry size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_mft_entry_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object = NULL;
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_volume_get_mft_entry_size";
+	size32_t mft_entry_size  = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_mft_entry_size(
+	          pyfsntfs_volume->volume,
+	          &mft_entry_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve MFT entry size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = PyLong_FromUnsignedLong(
+	                  (unsigned long) mft_entry_size );
+
+	return( integer_object );
+}
+
+/* Retrieves the index entry size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_index_entry_size(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object  = NULL;
+	libcerror_error_t *error  = NULL;
+	static char *function     = "pyfsntfs_volume_get_index_entry_size";
+	size32_t index_entry_size = 0;
+	int result                = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_index_entry_size(
+	          pyfsntfs_volume->volume,
+	          &index_entry_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: failed to retrieve index entry size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = PyLong_FromUnsignedLong(
+	                  (unsigned long) index_entry_size );
+
+	return( integer_object );
 }
 
 /* Retrieves the name
@@ -895,7 +1094,7 @@ PyObject *pyfsntfs_volume_get_name(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -989,25 +1188,25 @@ on_error:
 	return( NULL );
 }
 
-/* Retrieves the USN change journal
+/* Retrieves the serial number
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_volume_get_usn_change_journal(
+PyObject *pyfsntfs_volume_get_serial_number(
            pyfsntfs_volume_t *pyfsntfs_volume,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error                           = NULL;
-	libfsntfs_usn_change_journal_t *usn_change_journal = NULL;
-	PyObject *usn_change_journal_object                = NULL;
-	static char *function                              = "pyfsntfs_volume_get_usn_change_journal";
-	int result                                         = 0;
+	PyObject *integer_object = NULL;
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_volume_get_serial_number";
+	uint64_t value_64bit     = 0;
+	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
 
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1015,56 +1214,30 @@ PyObject *pyfsntfs_volume_get_usn_change_journal(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_volume_get_usn_change_journal(
+	result = libfsntfs_volume_get_serial_number(
 	          pyfsntfs_volume->volume,
-	          &usn_change_journal,
+	          &value_64bit,
 	          &error );
 
 	Py_END_ALLOW_THREADS
 
-	if( result == -1 )
+	if( result != 1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve USN change journal.",
+		 "%s: unable to retrieve serial number.",
 		 function );
 
 		libcerror_error_free(
 		 &error );
 
-		goto on_error;
+		return( NULL );
 	}
-	else if( result == 0 )
-	{
-		Py_IncRef(
-		 Py_None );
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) value_64bit );
 
-		return( Py_None );
-	}
-	usn_change_journal_object = pyfsntfs_usn_change_journal_new(
-	                             usn_change_journal,
-	                             (PyObject *) pyfsntfs_volume );
-
-	if( usn_change_journal_object == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to create USN change journal object.",
-		 function );
-
-		goto on_error;
-	}
-	return( usn_change_journal_object );
-
-on_error:
-	if( usn_change_journal != NULL )
-	{
-		libfsntfs_usn_change_journal_free(
-		 &usn_change_journal,
-		 NULL );
-	}
-	return( NULL );
+	return( integer_object );
 }
 
 /* Retrieves the number of file entries
@@ -1085,7 +1258,7 @@ PyObject *pyfsntfs_volume_get_number_of_file_entries(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1135,7 +1308,7 @@ PyObject *pyfsntfs_volume_get_file_entry_by_index(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1236,7 +1409,7 @@ PyObject *pyfsntfs_volume_get_root_directory(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1307,7 +1480,7 @@ PyObject *pyfsntfs_volume_get_file_entries(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1372,7 +1545,7 @@ PyObject *pyfsntfs_volume_get_file_entry_by_path(
 	if( pyfsntfs_volume == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid volume.",
 		 function );
 
@@ -1443,6 +1616,84 @@ on_error:
 	{
 		libfsntfs_file_entry_free(
 		 &file_entry,
+		 NULL );
+	}
+	return( NULL );
+}
+
+/* Retrieves the USN change journal
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_usn_change_journal(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error                           = NULL;
+	libfsntfs_usn_change_journal_t *usn_change_journal = NULL;
+	PyObject *usn_change_journal_object                = NULL;
+	static char *function                              = "pyfsntfs_volume_get_usn_change_journal";
+	int result                                         = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_usn_change_journal(
+	          pyfsntfs_volume->volume,
+	          &usn_change_journal,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve USN change journal.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	usn_change_journal_object = pyfsntfs_usn_change_journal_new(
+	                             usn_change_journal,
+	                             (PyObject *) pyfsntfs_volume );
+
+	if( usn_change_journal_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create USN change journal object.",
+		 function );
+
+		goto on_error;
+	}
+	return( usn_change_journal_object );
+
+on_error:
+	if( usn_change_journal != NULL )
+	{
+		libfsntfs_usn_change_journal_free(
+		 &usn_change_journal,
 		 NULL );
 	}
 	return( NULL );
