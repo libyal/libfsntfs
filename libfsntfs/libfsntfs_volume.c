@@ -1316,6 +1316,485 @@ on_error:
 	return( -1 );
 }
 
+/* Reads the bitmap file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_internal_volume_read_bitmap(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libfcache_cache_t *cluster_block_cache   = NULL;
+	libfdata_vector_t *cluster_block_vector  = NULL;
+	libfsntfs_cluster_block_t *cluster_block = NULL;
+	libfsntfs_mft_entry_t *mft_entry         = NULL;
+	static char *function                    = "libfsntfs_internal_volume_read_bitmap";
+	off64_t bitmap_offset                    = 0;
+	off64_t start_offset                     = 0;
+	size_t cluster_block_data_offset         = 0;
+	uint32_t value_32bit                     = 0;
+	uint8_t bit_index                        = 0;
+	int cluster_block_index                  = 0;
+	int number_of_cluster_blocks             = 0;
+
+	if( internal_volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal volume.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_volume->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid volume - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     file_io_handle,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
+
+		goto on_error;
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
+
+		goto on_error;
+	}
+	if( mft_entry->data_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT entry: %d - missing data attribute.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
+
+		goto on_error;
+	}
+	if( libfsntfs_cluster_block_vector_initialize(
+	     &cluster_block_vector,
+	     internal_volume->io_handle,
+	     mft_entry->data_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create cluster block vector.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &cluster_block_cache,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create cluster block cache.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_vector_get_number_of_elements(
+	     cluster_block_vector,
+	     &number_of_cluster_blocks,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of cluster blocks.",
+		 function );
+
+		goto on_error;
+	}
+	for( cluster_block_index = 0;
+	     cluster_block_index < number_of_cluster_blocks;
+	     cluster_block_index++ )
+	{
+		if( libfdata_vector_get_element_value_by_index(
+		     cluster_block_vector,
+		     (intptr_t *) file_io_handle,
+		     (libfdata_cache_t *) cluster_block_cache,
+		     cluster_block_index,
+		     (intptr_t **) &cluster_block,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve cluster block: %d from vector.",
+			 function,
+			 cluster_block_index );
+
+			goto on_error;
+		}
+		if( cluster_block == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing cluster block: %d.",
+			 function,
+			 cluster_block_index );
+
+			goto on_error;
+		}
+		if( cluster_block->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid cluster block: %d - missing data.",
+			 function,
+			 cluster_block_index );
+
+			goto on_error;
+		}
+		if( ( ( cluster_block->data_size % 4 ) != 0 )
+		 || ( cluster_block->data_size > (size_t) SSIZE_MAX ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: cluster block: %d data size value out of bounds.",
+			 function,
+			 cluster_block_index );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: bitmap segment: %d data:\n",
+			 function,
+			 cluster_block_index );
+			libcnotify_print_data(
+			 cluster_block->data,
+			 cluster_block->data_size,
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+		}
+#endif
+		cluster_block_data_offset = 0;
+		start_offset              = -1;
+
+		while( cluster_block_data_offset < cluster_block->data_size )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 &( cluster_block->data[ cluster_block_data_offset ] ),
+			 value_32bit );
+
+			for( bit_index = 0;
+			     bit_index < 32;
+			     bit_index++ )
+			{
+				if( ( value_32bit & 0x00000001UL ) == 0 )
+				{
+					if( start_offset >= 0 )
+					{
+#if defined( HAVE_DEBUG_OUTPUT )
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+							 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
+							 function,
+							 start_offset,
+							 bitmap_offset,
+							 bitmap_offset - start_offset );
+						}
+#endif
+/*
+						if( libfsntfs_offset_list_append_offset(
+						     offset_list,
+						     start_offset,
+						     bitmap_offset - start_offset,
+						     1,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+							 "%s: unable to append offset range to offset list.",
+							 function );
+
+							goto on_error;
+						}
+*/
+						start_offset = -1;
+					}
+				}
+				else
+				{
+					if( start_offset < 0 )
+					{
+						start_offset = bitmap_offset;
+					}
+				}
+				bitmap_offset += internal_volume->io_handle->cluster_block_size;
+
+				value_32bit >>= 1;
+			}
+			cluster_block_data_offset += 4;
+		}
+		if( start_offset >= 0 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
+				 function,
+				 start_offset,
+				 bitmap_offset,
+				 bitmap_offset - start_offset );
+			}
+#endif
+/* TODO
+			if( libfsntfs_offset_list_append_offset(
+			     offset_list,
+			     start_offset,
+			     bitmap_offset - start_offset,
+			     1,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append offset range to offset list.",
+				 function );
+
+				goto on_error;
+			}
+*/
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+	}
+	if( libfdata_vector_free(
+	     &cluster_block_vector,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free cluster block vector.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfcache_cache_free(
+	     &cluster_block_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free cluster block cache.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( cluster_block_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &cluster_block_cache,
+		 NULL );
+	}
+	if( cluster_block_vector != NULL )
+	{
+		libfdata_vector_free(
+		 &cluster_block_vector,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the security descriptors file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_internal_volume_read_security_descriptors(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *data_attribute = NULL;
+	libfsntfs_mft_entry_t *mft_entry      = NULL;
+	static char *function                 = "libfsntfs_internal_volume_read_security_descriptors";
+	int result                            = 0;
+
+	if( internal_volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid internal volume.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_get_mft_entry_by_index(
+	     internal_volume->mft,
+	     file_io_handle,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_SECURE,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+
+		goto on_error;
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+
+		goto on_error;
+	}
+	result = libfsntfs_attribute_compare_name_with_utf8_string(
+	          mft_entry->file_name_attribute,
+	          (uint8_t *) "$Secure",
+	          7,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-8 string with data attribute name.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
+		     mft_entry,
+		     (uint8_t *) "$SDS",
+		     4,
+		     &data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve $SDS data attribute.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_index_initialize(
+		     &( internal_volume->security_descriptor_index ),
+		     internal_volume->io_handle,
+		     file_io_handle,
+		     data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create security descriptor index.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_index_read_sii_index(
+		     internal_volume->security_descriptor_index,
+		     internal_volume->io_handle,
+		     file_io_handle,
+		     mft_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read security descriptor identifier ($SII) index.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( internal_volume->security_descriptor_index != NULL )
+	{
+		libfsntfs_security_descriptor_index_free(
+		 &( internal_volume->security_descriptor_index ),
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Determines if the volume has BitLocker Drive Encryption (BDE)
  * Returns 1 if the volume has BitLocker Drive Encryption, 0 if not or -1 on error
  */
@@ -2335,105 +2814,6 @@ int libfsntfs_volume_get_file_entry_by_index(
 	return( 1 );
 }
 
-/* Retrieves the root directory file entry
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
-     libfsntfs_file_entry_t **file_entry,
-     libcerror_error_t **error )
-{
-	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
-	static char *function                        = "libfsntfs_volume_get_root_directory";
-
-	if( volume == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume.",
-		 function );
-
-		return( -1 );
-	}
-	internal_volume = (libfsntfs_internal_volume_t *) volume;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( *file_entry != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file entry value already set.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO implement read/write lock support */
-	if( libfsntfs_mft_get_mft_entry_by_index(
-	     internal_volume->mft,
-	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 5.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: 5.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO clone MFT entry */
-	if( libfsntfs_file_entry_initialize(
-	     file_entry,
-	     internal_volume->io_handle,
-	     internal_volume->file_io_handle,
-	     internal_volume->mft,
-	     internal_volume->security_descriptor_index,
-	     mft_entry,
-	     NULL,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file entry.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Retrieves the MFT entry for an UTF-8 encoded path
  * A new directory_entry is allocated if a match is found
  * Returns 1 if successful, 0 if no such file entry or -1 on error
@@ -3254,53 +3634,58 @@ on_error:
 	return( -1 );
 }
 
-/* Reads the bitmap file entry
+/* Retrieves the root directory file entry
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_internal_volume_read_bitmap(
-     libfsntfs_internal_volume_t *internal_volume,
-     libbfio_handle_t *file_io_handle,
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libfcache_cache_t *cluster_block_cache   = NULL;
-	libfdata_vector_t *cluster_block_vector  = NULL;
-	libfsntfs_cluster_block_t *cluster_block = NULL;
-	libfsntfs_mft_entry_t *mft_entry         = NULL;
-	static char *function                    = "libfsntfs_internal_volume_read_bitmap";
-	off64_t bitmap_offset                    = 0;
-	off64_t start_offset                     = 0;
-	size_t cluster_block_data_offset         = 0;
-	uint32_t value_32bit                     = 0;
-	uint8_t bit_index                        = 0;
-	int cluster_block_index                  = 0;
-	int number_of_cluster_blocks             = 0;
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	libfsntfs_mft_entry_t *mft_entry             = NULL;
+	static char *function                        = "libfsntfs_volume_get_root_directory";
 
-	if( internal_volume == NULL )
+	if( volume == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal volume.",
+		 "%s: invalid volume.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_volume->io_handle == NULL )
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *file_entry != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid volume - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry value already set.",
 		 function );
 
 		return( -1 );
 	}
+/* TODO implement read/write lock support */
 	if( libfsntfs_mft_get_mft_entry_by_index(
 	     internal_volume->mft,
-	     file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP,
+	     internal_volume->file_io_handle,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
 	     &mft_entry,
 	     error ) != 1 )
 	{
@@ -3308,11 +3693,10 @@ int libfsntfs_internal_volume_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
+		 "%s: unable to retrieve MFT entry: 5.",
+		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( mft_entry == NULL )
 	{
@@ -3320,417 +3704,33 @@ int libfsntfs_internal_volume_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
+		 "%s: missing MFT entry: 5.",
+		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( mft_entry->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid MFT entry: %d - missing data attribute.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_BITMAP );
-
-		goto on_error;
-	}
-	if( libfsntfs_cluster_block_vector_initialize(
-	     &cluster_block_vector,
+/* TODO clone MFT entry */
+	if( libfsntfs_file_entry_initialize(
+	     file_entry,
 	     internal_volume->io_handle,
-	     mft_entry->data_attribute,
+	     internal_volume->file_io_handle,
+	     internal_volume->mft,
+	     internal_volume->security_descriptor_index,
+	     mft_entry,
+	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create cluster block vector.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_initialize(
-	     &cluster_block_cache,
-	     1,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create cluster block cache.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfdata_vector_get_number_of_elements(
-	     cluster_block_vector,
-	     &number_of_cluster_blocks,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of cluster blocks.",
-		 function );
-
-		goto on_error;
-	}
-	for( cluster_block_index = 0;
-	     cluster_block_index < number_of_cluster_blocks;
-	     cluster_block_index++ )
-	{
-		if( libfdata_vector_get_element_value_by_index(
-		     cluster_block_vector,
-		     (intptr_t *) file_io_handle,
-		     (libfdata_cache_t *) cluster_block_cache,
-		     cluster_block_index,
-		     (intptr_t **) &cluster_block,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve cluster block: %d from vector.",
-			 function,
-			 cluster_block_index );
-
-			goto on_error;
-		}
-		if( cluster_block == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing cluster block: %d.",
-			 function,
-			 cluster_block_index );
-
-			goto on_error;
-		}
-		if( cluster_block->data == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid cluster block: %d - missing data.",
-			 function,
-			 cluster_block_index );
-
-			goto on_error;
-		}
-		if( ( ( cluster_block->data_size % 4 ) != 0 )
-		 || ( cluster_block->data_size > (size_t) SSIZE_MAX ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: cluster block: %d data size value out of bounds.",
-			 function,
-			 cluster_block_index );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: bitmap segment: %d data:\n",
-			 function,
-			 cluster_block_index );
-			libcnotify_print_data(
-			 cluster_block->data,
-			 cluster_block->data_size,
-			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
-		}
-#endif
-		cluster_block_data_offset = 0;
-		start_offset              = -1;
-
-		while( cluster_block_data_offset < cluster_block->data_size )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 &( cluster_block->data[ cluster_block_data_offset ] ),
-			 value_32bit );
-
-			for( bit_index = 0;
-			     bit_index < 32;
-			     bit_index++ )
-			{
-				if( ( value_32bit & 0x00000001UL ) == 0 )
-				{
-					if( start_offset >= 0 )
-					{
-#if defined( HAVE_DEBUG_OUTPUT )
-						if( libcnotify_verbose != 0 )
-						{
-							libcnotify_printf(
-							 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
-							 function,
-							 start_offset,
-							 bitmap_offset,
-							 bitmap_offset - start_offset );
-						}
-#endif
-/*
-						if( libfsntfs_offset_list_append_offset(
-						     offset_list,
-						     start_offset,
-						     bitmap_offset - start_offset,
-						     1,
-						     error ) != 1 )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-							 "%s: unable to append offset range to offset list.",
-							 function );
-
-							goto on_error;
-						}
-*/
-						start_offset = -1;
-					}
-				}
-				else
-				{
-					if( start_offset < 0 )
-					{
-						start_offset = bitmap_offset;
-					}
-				}
-				bitmap_offset += internal_volume->io_handle->cluster_block_size;
-
-				value_32bit >>= 1;
-			}
-			cluster_block_data_offset += 4;
-		}
-		if( start_offset >= 0 )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
-				 function,
-				 start_offset,
-				 bitmap_offset,
-				 bitmap_offset - start_offset );
-			}
-#endif
-/* TODO
-			if( libfsntfs_offset_list_append_offset(
-			     offset_list,
-			     start_offset,
-			     bitmap_offset - start_offset,
-			     1,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append offset range to offset list.",
-				 function );
-
-				goto on_error;
-			}
-*/
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-	}
-	if( libfdata_vector_free(
-	     &cluster_block_vector,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free cluster block vector.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfcache_cache_free(
-	     &cluster_block_cache,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free cluster block cache.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( cluster_block_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &cluster_block_cache,
-		 NULL );
-	}
-	if( cluster_block_vector != NULL )
-	{
-		libfdata_vector_free(
-		 &cluster_block_vector,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Reads the security descriptors file entry
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_internal_volume_read_security_descriptors(
-     libfsntfs_internal_volume_t *internal_volume,
-     libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *data_attribute = NULL;
-	libfsntfs_mft_entry_t *mft_entry      = NULL;
-	static char *function                 = "libfsntfs_internal_volume_read_security_descriptors";
-	int result                            = 0;
-
-	if( internal_volume == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal volume.",
+		 "%s: unable to create file entry.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_get_mft_entry_by_index(
-	     internal_volume->mft,
-	     file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_SECURE,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
-
-		goto on_error;
-	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
-
-		goto on_error;
-	}
-	result = libfsntfs_attribute_compare_name_with_utf8_string(
-	          mft_entry->file_name_attribute,
-	          (uint8_t *) "$Secure",
-	          7,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare UTF-8 string with data attribute name.",
-		 function );
-
-		goto on_error;
-	}
-	else if( result != 0 )
-	{
-		if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
-		     mft_entry,
-		     (uint8_t *) "$SDS",
-		     4,
-		     &data_attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve $SDS data attribute.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_security_descriptor_index_initialize(
-		     &( internal_volume->security_descriptor_index ),
-		     internal_volume->io_handle,
-		     file_io_handle,
-		     data_attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create security descriptor index.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_security_descriptor_index_read_sii_index(
-		     internal_volume->security_descriptor_index,
-		     internal_volume->io_handle,
-		     file_io_handle,
-		     mft_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read security descriptor identifier ($SII) index.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	return( 1 );
-
-on_error:
-	if( internal_volume->security_descriptor_index != NULL )
-	{
-		libfsntfs_security_descriptor_index_free(
-		 &( internal_volume->security_descriptor_index ),
-		 NULL );
-	}
-	return( -1 );
 }
 
 /* Retrieves the USN change journal

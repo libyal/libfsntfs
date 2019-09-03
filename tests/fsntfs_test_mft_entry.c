@@ -1326,8 +1326,6 @@ int fsntfs_test_mft_entry_read_attributes_data(
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
-FSNTFS_TEST_FPRINT_ERROR( error );
-
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,

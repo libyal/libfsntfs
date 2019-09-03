@@ -134,6 +134,16 @@ int libfsntfs_internal_volume_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
+int libfsntfs_internal_volume_read_bitmap(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_volume_read_security_descriptors(
+     libfsntfs_internal_volume_t *internal_volume,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_has_bitlocker_drive_encryption(
      libfsntfs_volume_t *volume,
@@ -220,12 +230,6 @@ int libfsntfs_volume_get_file_entry_by_index(
      libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
-LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
-     libfsntfs_file_entry_t **file_entry,
-     libcerror_error_t **error );
-
 int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
      libfsntfs_internal_volume_t *internal_volume,
      const uint8_t *utf8_string,
@@ -239,7 +243,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
      libfsntfs_volume_t *volume,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libfsntfs_file_entry_t **sub_file_entry,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
@@ -255,17 +259,13 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      libfsntfs_volume_t *volume,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_file_entry_t **sub_file_entry,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
-int libfsntfs_internal_volume_read_bitmap(
-     libfsntfs_internal_volume_t *internal_volume,
-     libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_internal_volume_read_security_descriptors(
-     libfsntfs_internal_volume_t *internal_volume,
-     libbfio_handle_t *file_io_handle,
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

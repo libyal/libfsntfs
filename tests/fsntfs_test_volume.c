@@ -38,6 +38,8 @@
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 
+#include "../libfsntfs/libfsntfs_directory_entry.h"
+#include "../libfsntfs/libfsntfs_mft_entry.h"
 #include "../libfsntfs/libfsntfs_volume.h"
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER ) && SIZEOF_WCHAR_T != 2 && SIZEOF_WCHAR_T != 4
@@ -1233,6 +1235,79 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_volume_get_bytes_per_sector function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_get_bytes_per_sector(
+     libfsntfs_volume_t *volume )
+{
+	libcerror_error_t *error  = NULL;
+	uint16_t bytes_per_sector = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_get_bytes_per_sector(
+	          volume,
+	          &bytes_per_sector,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_get_bytes_per_sector(
+	          NULL,
+	          &bytes_per_sector,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_bytes_per_sector(
+	          volume,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_volume_get_cluster_block_size function
  * Returns 1 if successful or 0 if not
  */
@@ -1970,6 +2045,893 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_volume_get_file_entry_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_get_file_entry_by_index(
+     libfsntfs_volume_t *volume )
+{
+	libcerror_error_t *error           = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	int result                         = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_index(
+	          volume,
+	          0,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_file_entry_free(
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_index(
+	          NULL,
+	          0,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_index(
+	          volume,
+	          0xffffffffffffffffUL,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_index(
+	          volume,
+	          0,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	file_entry = (libfsntfs_file_entry_t *) 0x12345678UL;
+
+	result = libfsntfs_volume_get_file_entry_by_index(
+	          volume,
+	          0,
+	          &file_entry,
+	          &error );
+
+	file_entry = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+/* Tests the libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+     libfsntfs_volume_t *volume )
+{
+	uint8_t utf8_path[ 6 ]                       = { '\\', '$', 'M', 'F', 'T', 0 };
+	libcerror_error_t *error                     = NULL;
+	libfsntfs_directory_entry_t *directory_entry = NULL;
+	libfsntfs_mft_entry_t *mft_entry             = NULL;
+	int result                                   = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf8_path,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entry",
+	 directory_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_directory_entry_free(
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entry",
+	 directory_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          NULL,
+	          utf8_path,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          NULL,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf8_path,
+	          (size_t) SSIZE_MAX + 1,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf8_path,
+	          5,
+	          NULL,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf8_path,
+	          5,
+	          &mft_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	directory_entry = (libfsntfs_directory_entry_t *) 0x12345678UL;
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf8_path,
+	          5,
+	          &mft_entry,
+	          NULL,
+	          &error );
+
+	directory_entry = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &directory_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
+/* Tests the libfsntfs_volume_get_file_entry_by_utf8_path function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_get_file_entry_by_utf8_path(
+     libfsntfs_volume_t *volume )
+{
+	uint8_t utf8_path[ 6 ]             = { '\\', '$', 'M', 'F', 'T', 0 };
+	libcerror_error_t *error           = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	int result                         = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          volume,
+	          utf8_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_file_entry_free(
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          NULL,
+	          utf8_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          volume,
+	          NULL,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          volume,
+	          utf8_path,
+	          5,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	file_entry = (libfsntfs_file_entry_t *) 0x12345678UL;
+
+	result = libfsntfs_volume_get_file_entry_by_utf8_path(
+	          volume,
+	          utf8_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	file_entry = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+/* Tests the libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+     libfsntfs_volume_t *volume )
+{
+	uint16_t utf16_path[ 6 ]                     = { '\\', '$', 'M', 'F', 'T', 0 };
+	libcerror_error_t *error                     = NULL;
+	libfsntfs_directory_entry_t *directory_entry = NULL;
+	libfsntfs_mft_entry_t *mft_entry             = NULL;
+	int result                                   = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf16_path,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entry",
+	 directory_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_directory_entry_free(
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entry",
+	 directory_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          NULL,
+	          utf16_path,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          NULL,
+	          5,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf16_path,
+	          (size_t) SSIZE_MAX + 1,
+	          &mft_entry,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf16_path,
+	          5,
+	          NULL,
+	          &directory_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf16_path,
+	          5,
+	          &mft_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	directory_entry = (libfsntfs_directory_entry_t *) 0x12345678UL;
+
+	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
+	          (libfsntfs_internal_volume_t *) volume,
+	          utf16_path,
+	          5,
+	          &mft_entry,
+	          NULL,
+	          &error );
+
+	directory_entry = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &directory_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
+/* Tests the libfsntfs_volume_get_file_entry_by_utf16_path function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_volume_get_file_entry_by_utf16_path(
+     libfsntfs_volume_t *volume )
+{
+	uint16_t utf16_path[ 6 ]           = { '\\', '$', 'M', 'F', 'T', 0 };
+	libcerror_error_t *error           = NULL;
+	libfsntfs_file_entry_t *file_entry = NULL;
+	int result                         = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          volume,
+	          utf16_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_file_entry_free(
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          NULL,
+	          utf16_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          volume,
+	          NULL,
+	          5,
+	          &file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          volume,
+	          utf16_path,
+	          5,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_entry",
+	 file_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	file_entry = (libfsntfs_file_entry_t *) 0x12345678UL;
+
+	result = libfsntfs_volume_get_file_entry_by_utf16_path(
+	          volume,
+	          utf16_path,
+	          5,
+	          &file_entry,
+	          &error );
+
+	file_entry = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_entry != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &file_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_volume_get_root_directory function
  * Returns 1 if successful or 0 if not
  */
@@ -1992,13 +2954,13 @@ int fsntfs_test_volume_get_root_directory(
 	 result,
 	 1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "root_directory",
 	 root_directory );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libfsntfs_file_entry_free(
 	          &root_directory,
@@ -2008,6 +2970,10 @@ int fsntfs_test_volume_get_root_directory(
 	 "result",
 	 result,
 	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "root_directory",
+	 root_directory );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2373,6 +3339,11 @@ int main(
 		 fsntfs_test_volume_open_close,
 		 source );
 
+		/* TODO: add tests for libfsntfs_internal_volume_open_read */
+
+		/* TODO: add tests for libfsntfs_internal_volume_read_bitmap */
+
+		/* TODO: add tests for libfsntfs_internal_volume_read_security_descriptors */
 	}
 	if( result != 0 )
 	{
@@ -2405,7 +3376,10 @@ int main(
 
 		/* TODO: add tests for libfsntfs_volume_has_volume_shadow_snapshots */
 
-		/* TODO: add tests for libfsntfs_volume_get_bytes_per_sector */
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_volume_get_bytes_per_sector",
+		 fsntfs_test_volume_get_bytes_per_sector,
+		 volume );
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_get_cluster_block_size",
@@ -2454,16 +3428,43 @@ int main(
 		 fsntfs_test_volume_get_number_of_file_entries,
 		 volume );
 
-		/* TODO: add tests for libfsntfs_volume_get_file_entry_by_index */
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_volume_get_file_entry_by_index",
+		 fsntfs_test_volume_get_file_entry_by_index,
+		 volume );
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path",
+		 fsntfs_test_internal_volume_get_mft_and_directory_entry_by_utf8_path,
+		 volume );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_volume_get_file_entry_by_utf8_path",
+		 fsntfs_test_volume_get_file_entry_by_utf8_path,
+		 volume );
+
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path",
+		 fsntfs_test_internal_volume_get_mft_and_directory_entry_by_utf16_path,
+		 volume );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
+		FSNTFS_TEST_RUN_WITH_ARGS(
+		 "libfsntfs_volume_get_file_entry_by_utf16_path",
+		 fsntfs_test_volume_get_file_entry_by_utf16_path,
+		 volume );
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_get_root_directory",
 		 fsntfs_test_volume_get_root_directory,
 		 volume );
-
-		/* TODO: add tests for libfsntfs_volume_get_file_entry_by_utf8_path */
-
-		/* TODO: add tests for libfsntfs_volume_get_file_entry_by_utf16_path */
 
 		FSNTFS_TEST_RUN_WITH_ARGS(
 		 "libfsntfs_volume_get_usn_change_journal",
