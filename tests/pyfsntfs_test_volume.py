@@ -245,6 +245,196 @@ class VolumeTypeTests(unittest.TestCase):
     del file_object
     fsntfs_volume.close()
 
+  def test_get_bytes_per_sector(self):
+    """Tests the get_bytes_per_sector function and bytes_per_sector property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      bytes_per_sector = fsntfs_volume.get_bytes_per_sector()
+      self.assertIsNotNone(bytes_per_sector)
+
+      self.assertIsNotNone(fsntfs_volume.bytes_per_sector)
+
+      fsntfs_volume.close()
+
+  def test_get_cluster_block_size(self):
+    """Tests the get_cluster_block_size function and cluster_block_size property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      cluster_block_size = fsntfs_volume.get_cluster_block_size()
+      self.assertIsNotNone(cluster_block_size)
+
+      self.assertIsNotNone(fsntfs_volume.cluster_block_size)
+
+      fsntfs_volume.close()
+
+  def test_get_mft_entry_size(self):
+    """Tests the get_mft_entry_size function and mft_entry_size property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      mft_entry_size = fsntfs_volume.get_mft_entry_size()
+      self.assertIsNotNone(mft_entry_size)
+
+      self.assertIsNotNone(fsntfs_volume.mft_entry_size)
+
+      fsntfs_volume.close()
+
+  def test_get_index_entry_size(self):
+    """Tests the get_index_entry_size function and index_entry_size property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      index_entry_size = fsntfs_volume.get_index_entry_size()
+      self.assertIsNotNone(index_entry_size)
+
+      self.assertIsNotNone(fsntfs_volume.index_entry_size)
+
+      fsntfs_volume.close()
+
+  def test_get_name(self):
+    """Tests the get_name function and name property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      name = fsntfs_volume.get_name()
+      self.assertIsNotNone(name)
+
+      self.assertIsNotNone(fsntfs_volume.name)
+
+      fsntfs_volume.close()
+
+  def test_get_serial_number(self):
+    """Tests the get_serial_number function and serial_number property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      serial_number = fsntfs_volume.get_serial_number()
+      self.assertIsNotNone(serial_number)
+
+      self.assertIsNotNone(fsntfs_volume.serial_number)
+
+      fsntfs_volume.close()
+
+  def test_get_number_of_file_entries(self):
+    """Tests the get_number_of_file_entries function and number_of_file_entries property."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      number_of_file_entries = fsntfs_volume.get_number_of_file_entries()
+      self.assertIsNotNone(number_of_file_entries)
+
+      self.assertIsNotNone(fsntfs_volume.number_of_file_entries)
+
+      fsntfs_volume.close()
+
+  def test_get_file_entry(self):
+    """Tests the get_file_entry function."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      file_entry = fsntfs_volume.get_file_entry(0)
+      self.assertIsNotNone(file_entry)
+
+      fsntfs_volume.close()
+
+  def test_get_file_entry_by_path(self):
+    """Tests the get_file_entry_by_path function."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      file_entry = fsntfs_volume.get_file_entry_by_path('\\$MFT')
+      self.assertIsNotNone(file_entry)
+
+      fsntfs_volume.close()
+
+  def test_get_root_directory(self):
+    """Tests the get_root_directory function."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      root_directory = fsntfs_volume.get_root_directory()
+      self.assertIsNotNone(root_directory)
+
+      fsntfs_volume.close()
+
+  def test_get_usn_change_journal(self):
+    """Tests the get_usn_change_journal function."""
+    if not unittest.source:
+      raise unittest.SkipTest('missing source')
+
+    with DataRangeFileObject(
+        unittest.source, unittest.offset or 0, None) as file_object:
+
+      fsntfs_volume = pyfsntfs.volume()
+      fsntfs_volume.open_file_object(file_object)
+
+      # Test invocation only.
+      fsntfs_volume.get_usn_change_journal()
+
+      fsntfs_volume.close()
+
 
 if __name__ == "__main__":
   argument_parser = argparse.ArgumentParser()

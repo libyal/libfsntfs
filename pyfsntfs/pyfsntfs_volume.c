@@ -1391,77 +1391,6 @@ PyObject *pyfsntfs_volume_get_file_entry(
 	return( file_entry_object );
 }
 
-/* Retrieves the root directory
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_volume_get_root_directory(
-           pyfsntfs_volume_t *pyfsntfs_volume,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error               = NULL;
-	libfsntfs_file_entry_t *root_directory = NULL;
-	PyObject *file_entry_object            = NULL;
-	static char *function                  = "pyfsntfs_volume_get_root_directory";
-	int result                             = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_volume == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid volume.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_volume_get_root_directory(
-	          pyfsntfs_volume->volume,
-	          &root_directory,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve root directory.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		goto on_error;
-	}
-	file_entry_object = pyfsntfs_file_entry_new(
-	                     root_directory,
-	                     (PyObject *) pyfsntfs_volume );
-
-	if( file_entry_object == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to create file entry object.",
-		 function );
-
-		goto on_error;
-	}
-	return( file_entry_object );
-
-on_error:
-	if( root_directory != NULL )
-	{
-		libfsntfs_file_entry_free(
-		 &root_directory,
-		 NULL );
-	}
-	return( NULL );
-}
-
 /* Retrieves a file entries sequence and iterator object for the volume file entries
  * Returns a Python object if successful or NULL on error
  */
@@ -1616,6 +1545,77 @@ on_error:
 	{
 		libfsntfs_file_entry_free(
 		 &file_entry,
+		 NULL );
+	}
+	return( NULL );
+}
+
+/* Retrieves the root directory
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_volume_get_root_directory(
+           pyfsntfs_volume_t *pyfsntfs_volume,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error               = NULL;
+	libfsntfs_file_entry_t *root_directory = NULL;
+	PyObject *file_entry_object            = NULL;
+	static char *function                  = "pyfsntfs_volume_get_root_directory";
+	int result                             = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid volume.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_volume_get_root_directory(
+	          pyfsntfs_volume->volume,
+	          &root_directory,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve root directory.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	file_entry_object = pyfsntfs_file_entry_new(
+	                     root_directory,
+	                     (PyObject *) pyfsntfs_volume );
+
+	if( file_entry_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file entry object.",
+		 function );
+
+		goto on_error;
+	}
+	return( file_entry_object );
+
+on_error:
+	if( root_directory != NULL )
+	{
+		libfsntfs_file_entry_free(
+		 &root_directory,
 		 NULL );
 	}
 	return( NULL );

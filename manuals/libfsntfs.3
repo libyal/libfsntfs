@@ -1,4 +1,4 @@
-.Dd September  2, 2019
+.Dd September  5, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -95,11 +95,13 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_get_file_entry_by_index "libfsntfs_volume_t *volume" "uint64_t mft_entry_index" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_volume_get_root_directory "libfsntfs_volume_t *volume" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
-.Ft int
 .Fn libfsntfs_volume_get_file_entry_by_utf8_path "libfsntfs_volume_t *volume" "const uint8_t *utf8_string" "size_t utf8_string_length" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_file_entry_by_utf16_path "libfsntfs_volume_t *volume" "const uint16_t *utf16_string" "size_t utf16_string_length" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_root_directory "libfsntfs_volume_t *volume" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_usn_change_journal "libfsntfs_volume_t *volume" "libfsntfs_usn_change_journal_t **usn_change_journal" "libfsntfs_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
@@ -304,8 +306,6 @@ $VOLUME_NAME attribute functions
 .Fn libfsntfs_volume_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_volume_get_usn_change_journal "libfsntfs_volume_t *volume" "libfsntfs_usn_change_journal_t **usn_change_journal" "libfsntfs_error_t **error"
 .Pp
 Data stream functions
 .Ft int

@@ -428,15 +428,6 @@ int libfsntfs_volume_get_file_entry_by_index(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_error_t **error );
 
-/* Retrieves the root directory file entry
- * Returns 1 if successful or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
-     libfsntfs_file_entry_t **file_entry,
-     libfsntfs_error_t **error );
-
 /* Retrieves the file entry for an UTF-8 encoded path
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
@@ -457,6 +448,24 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the root directory file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the usn change journal
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_usn_change_journal(
+     libfsntfs_volume_t *volume,
+     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1501,15 +1510,6 @@ int libfsntfs_volume_name_attribute_get_utf16_name(
      libfsntfs_attribute_t *attribute,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     libfsntfs_error_t **error );
-
-/* Retrieves the usn change journal
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_usn_change_journal(
-     libfsntfs_volume_t *volume,
-     libfsntfs_usn_change_journal_t **usn_change_journal,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
