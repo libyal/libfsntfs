@@ -38,6 +38,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs.c \
 	libfsntfs_attribute.c libfsntfs_attribute.h \
 	libfsntfs_attribute_list.c libfsntfs_attribute_list.h \
+	libfsntfs_attribute_list_entry.c libfsntfs_attribute_list_entry.h \
 	libfsntfs_bitmap_values.c libfsntfs_bitmap_values.h \
 	libfsntfs_cluster_block.c libfsntfs_cluster_block.h \
 	libfsntfs_cluster_block_stream.c libfsntfs_cluster_block_stream.h \
@@ -76,6 +77,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_libuna.h \
 	libfsntfs_logged_utility_stream_values.c libfsntfs_logged_utility_stream_values.h \
 	libfsntfs_mft.c libfsntfs_mft.h \
+	libfsntfs_mft_attribute_header.c libfsntfs_mft_attribute_header.h \
 	libfsntfs_mft_entry.c libfsntfs_mft_entry.h \
 	libfsntfs_mft_entry_header.c libfsntfs_mft_entry_header.h \
 	libfsntfs_mft_metadata_file.c libfsntfs_mft_metadata_file.h \

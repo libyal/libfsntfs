@@ -656,10 +656,12 @@ Contains an offset relative from the start of the MFT attribute
 Contains an empty byte
 |===
 
+===== Notes
+
 [yellow-background]*What meaning has ATTRIBUTE_FLAG_COMPRESSION_MASK in
 $INDEX_ROOT attribute? The attribute data is uncompressed.*
 
-Seen on Windows 10 (version 3.1)
+Seen on Windows 10 (NTFS version 3.1)
 ....
 type                                 : 0x00000090 ($INDEX_ROOT)
 size                                 : 88
@@ -869,7 +871,8 @@ See section: <<file_attribute_flags,File attribute flags>>
 | 36 | 4 | | Maximum number of versions +
 [yellow-background]*What does it contain and what is it used for?*
 | 40 | 4 | | Version number +
-[yellow-background]*What does it contain and what is it used for?*
+[yellow-background]*What does it contain and what is it used for?* +
+[yellow-background]*On Windows 10 does a value of 1 indicate case-senstive folder?*
 | 44 | 4 | | Class identifier +
 [yellow-background]*What does it contain and what is it used for?*
 4+| _Introduced in NTFS version 3.0_
@@ -879,7 +882,8 @@ See section: <<file_attribute_flags,File attribute flags>>
 Contains the entry number in the security ID index ($Secure:$SII) +
 See section: <<access_control,Access Control>>
 | 56 | 8 | | Quota charged +
-[yellow-background]*What does it contain and what is it used for?*
+[yellow-background]*What does it contain and what is it used for?* +
+[yellow-background]*Does this value correspond to StorageReservedID in fsutil layout output?*
 | 64 | 8 | | Update Sequence Number (USN) +
 [yellow-background]*What does it contain and what is it used for?*
 |===

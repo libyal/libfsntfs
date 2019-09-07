@@ -45,10 +45,12 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_logged_utility_stream_values.h"
+#include "libfsntfs_mft_attribute_header.h"
 #include "libfsntfs_object_identifier_values.h"
 #include "libfsntfs_reparse_point_values.h"
 #include "libfsntfs_security_descriptor_values.h"
@@ -139,6 +141,21 @@ int libfsntfs_attribute_initialize(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_attribute->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	*attribute = (libfsntfs_attribute_t *) internal_attribute;
 
 	return( 1 );
@@ -202,6 +219,37 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( ( *internal_attribute )->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
+		if( ( *internal_attribute )->header != NULL )
+		{
+			if( libfsntfs_mft_attribute_header_free(
+			     &( ( *internal_attribute )->header ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free MFT attribute header.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *internal_attribute )->name != NULL )
 		{
 			memory_free(
@@ -299,168 +347,6 @@ int libfsntfs_attribute_compare_by_file_reference(
 		return( LIBCDATA_COMPARE_GREATER );
 	}
 	return( LIBCDATA_COMPARE_EQUAL );
-}
-
-/* Reads the MFT attribute header
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_attribute_read_mft_attribute_header(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_attribute_read_mft_attribute_header";
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < sizeof( fsntfs_mft_attribute_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: MFT attribute header data:\n",
-		 function );
-		libcnotify_print_data(
-		 data,
-		 sizeof( fsntfs_mft_attribute_header_t ),
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_mft_attribute_header_t *) data )->type,
-	 internal_attribute->type );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: type\t\t\t: 0x%08" PRIx32 " (%s)\n",
-		 function,
-		 internal_attribute->type,
-		 libfsntfs_debug_print_attribute_type(
-		  internal_attribute->type ) );
-	}
-#endif
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
-	{
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_mft_attribute_header_t *) data )->size,
-		 internal_attribute->size );
-
-		internal_attribute->non_resident_flag = ( (fsntfs_mft_attribute_header_t *) data )->non_resident_flag;
-
-		internal_attribute->name_size = (uint16_t) ( (fsntfs_mft_attribute_header_t *) data )->name_size;
-
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_attribute_header_t *) data )->name_offset,
-		 internal_attribute->name_offset );
-
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_attribute_header_t *) data )->data_flags,
-		 internal_attribute->data_flags );
-
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (fsntfs_mft_attribute_header_t *) data )->identifier,
-		 internal_attribute->identifier );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: size\t\t\t: %" PRIu32 "\n",
-			 function,
-			 internal_attribute->size );
-
-			libcnotify_printf(
-			 "%s: non resident flag\t: 0x%02" PRIx8 "\n",
-			 function,
-			 internal_attribute->non_resident_flag );
-
-			libcnotify_printf(
-			 "%s: name size\t\t: %" PRIu16 "\n",
-			 function,
-			 internal_attribute->name_size );
-
-			libcnotify_printf(
-			 "%s: name offset\t\t: %" PRIu16 "\n",
-			 function,
-			 internal_attribute->name_offset );
-
-			libcnotify_printf(
-			 "%s: data flags\t\t: 0x%04" PRIx16 "\n",
-			 function,
-			 internal_attribute->data_flags );
-			libfsntfs_debug_print_mft_attribute_data_flags(
-			 internal_attribute->data_flags );
-			libcnotify_printf(
-			 "\n" );
-
-			libcnotify_printf(
-			 "%s: identifier\t\t: %" PRIu16 "\n",
-			 function,
-			 internal_attribute->identifier );
-
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-	}
-	if( internal_attribute->name_size > (uint16_t) INT16_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: attribute name size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	internal_attribute->name_size *= 2;
-
-	return( 1 );
 }
 
 /* Reads the MFT attribute resident data
@@ -1293,6 +1179,17 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
+	if( internal_attribute->header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid attribute - header value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -1348,8 +1245,21 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_read_mft_attribute_header(
-	     internal_attribute,
+	if( libfsntfs_mft_attribute_header_initialize(
+	     &( internal_attribute->header ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT attribute header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_attribute_header_read_data(
+	     internal_attribute->header,
 	     &( data[ mft_attribute_data_offset ] ),
 	     data_size - mft_attribute_data_offset,
 	     error ) != 1 )
@@ -1363,6 +1273,15 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 
 		goto on_error;
 	}
+/* TODO refactor */
+	internal_attribute->size              = internal_attribute->header->size;
+	internal_attribute->type              = internal_attribute->header->type;
+	internal_attribute->non_resident_flag = internal_attribute->header->non_resident_flag;
+	internal_attribute->name_size         = internal_attribute->header->name_size;
+	internal_attribute->name_offset       = internal_attribute->header->name_offset;
+	internal_attribute->data_flags        = internal_attribute->header->data_flags;
+	internal_attribute->identifier        = internal_attribute->header->identifier;
+
 /* TODO check size of LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES */
 	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
 	{
@@ -1692,392 +1611,16 @@ on_error:
 	}
 	internal_attribute->name_size = 0;
 
+	if( internal_attribute->header != NULL )
+	{
+		libfsntfs_mft_attribute_header_free(
+		 &( internal_attribute->header ),
+		 NULL );
+	}
 	libcdata_array_empty(
 	 internal_attribute->data_runs_array,
 	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
 	 NULL );
-
-	return( -1 );
-}
-
-/* Reads the attribute list entry header
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_attribute_read_attribute_list_entry_header(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_attribute_read_attribute_list_entry_header";
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < sizeof( fsntfs_attribute_list_entry_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: attribute list entry header data:\n",
-		 function );
-		libcnotify_print_data(
-		 data,
-		 sizeof( fsntfs_attribute_list_entry_header_t ),
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_attribute_list_entry_header_t *) data )->type,
-	 internal_attribute->type );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_attribute_list_entry_header_t *) data )->size,
-	 internal_attribute->size );
-
-	internal_attribute->name_size = (uint16_t) ( (fsntfs_attribute_list_entry_header_t *) data )->name_size;
-
-	internal_attribute->name_offset = ( (fsntfs_attribute_list_entry_header_t *) data )->name_offset;
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_attribute_list_entry_header_t *) data )->data_first_vcn,
-	 internal_attribute->data_first_vcn );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_attribute_list_entry_header_t *) data )->file_reference,
-	 internal_attribute->file_reference );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_attribute_list_entry_header_t *) data )->identifier,
-	 internal_attribute->identifier );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: type\t\t\t: 0x%08" PRIx32 " (%s)\n",
-		 function,
-		 internal_attribute->type,
-		 libfsntfs_debug_print_attribute_type(
-		  internal_attribute->type ) );
-
-		libcnotify_printf(
-		 "%s: size\t\t\t: %" PRIu32 "\n",
-		 function,
-		 internal_attribute->size );
-
-		libcnotify_printf(
-		 "%s: name size\t\t\t: %" PRIu16 "\n",
-		 function,
-		 internal_attribute->name_size );
-
-		libcnotify_printf(
-		 "%s: name offset\t\t: %" PRIu8 "\n",
-		 function,
-		 internal_attribute->name_offset );
-
-		libcnotify_printf(
-		 "%s: data first VCN\t\t: %" PRIu64 "\n",
-		 function,
-		 internal_attribute->data_first_vcn );
-
-		libcnotify_printf(
-		 "%s: file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-		 function,
-		 internal_attribute->file_reference & 0xffffffffffffUL,
-		 internal_attribute->file_reference >> 48 );
-
-		libcnotify_printf(
-		 "%s: identifier\t\t: %" PRIu16 "\n",
-		 function,
-		 internal_attribute->identifier );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-	return( 1 );
-}
-
-/* Reads the attribute from an attributes list
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libfsntfs_attribute_read_from_list(
-         libfsntfs_attribute_t *attribute,
-         const uint8_t *data,
-         size_t data_size,
-         size_t data_offset,
-         libcerror_error_t **error )
-{
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_read_from_list";
-	size_t unknown_data_size                           = 0;
-
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
-
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data offset value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset >= data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: data offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_attribute_read_attribute_list_entry_header(
-	     internal_attribute,
-	     &( data[ data_offset ] ),
-	     data_size - data_offset,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read attribute list entry header.",
-		 function );
-
-		goto on_error;
-	}
-	if( internal_attribute->size > ( data_size - data_offset ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: data size value too small.",
-		 function );
-
-		goto on_error;
-	}
-	if( internal_attribute->name_size > 0 )
-	{
-		if( internal_attribute->name_offset >= ( data_size - data_offset ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: attribute name offset value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	data_offset += sizeof( fsntfs_attribute_list_entry_header_t );
-
-	if( internal_attribute->name_size > 0 )
-	{
-		if( data_offset < internal_attribute->name_offset )
-		{
-			unknown_data_size = (size_t) internal_attribute->name_offset - data_offset;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: unknown data:\n",
-				 function );
-				libcnotify_print_data(
-				 &( data[ data_offset ] ),
-				 unknown_data_size,
-				 0 );
-			}
-#endif
-			data_offset += unknown_data_size;
-		}
-		internal_attribute->name_size *= 2;
-
-		if( ( data_offset + internal_attribute->name_size ) > data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: attribute list data size value too small.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: name data:\n",
-			 function );
-			libcnotify_print_data(
-			 &( data[ data_offset ] ),
-			 (size_t) internal_attribute->name_size,
-			 0 );
-		}
-#endif
-		internal_attribute->name = (uint8_t *) memory_allocate(
-		                                        sizeof( uint8_t ) * (size_t) internal_attribute->name_size );
-
-		if( internal_attribute->name == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create attribute name.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     internal_attribute->name,
-		     &( data[ data_offset ] ),
-		     (size_t) internal_attribute->name_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy attribute name.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( libfsntfs_debug_print_utf16_string_value(
-			     function,
-			     "name\t\t\t\t",
-			     internal_attribute->name,
-			     (size_t) internal_attribute->name_size,
-			     LIBUNA_ENDIAN_LITTLE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print UTF-16 string value.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-		data_offset += (size_t) internal_attribute->name_size;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( data_offset < internal_attribute->size )
-		{
-			libcnotify_printf(
-			 "%s: trailing data:\n",
-			 function );
-			libcnotify_print_data(
-			 &( data[ data_offset ] ),
-			 (size_t) internal_attribute->size - data_offset,
-			 0 );
-		}
-	}
-#endif
-	return( (ssize_t) internal_attribute->size );
-
-on_error:
-	if( internal_attribute->name != NULL )
-	{
-		memory_free(
-		 internal_attribute->name );
-
-		internal_attribute->name = NULL;
-	}
-	internal_attribute->name_size = 0;
 
 	return( -1 );
 }

@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list_entry.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_bitmap_values.c"
 				>
 			</File>
@@ -275,6 +279,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_header.c"
 				>
 			</File>
 			<File
@@ -436,6 +444,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list_entry.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_bitmap_values.h"
 				>
 			</File>
@@ -585,6 +597,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_header.h"
 				>
 			</File>
 			<File

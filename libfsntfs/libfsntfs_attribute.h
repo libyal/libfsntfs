@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_ATTRIBUTE_H )
-#define _LIBFSNTFS_INTERNAL_ATTRIBUTE_H
+#if !defined( _LIBFSNTFS_ATTRIBUTE_H )
+#define _LIBFSNTFS_ATTRIBUTE_H
 
 #include <common.h>
 #include <types.h>
@@ -31,6 +31,8 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
+#include "libfsntfs_mft_attribute_header.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -53,18 +55,6 @@ struct libfsntfs_internal_attribute
 	 */
 	uint8_t non_resident_flag;
 
-	/* Value to indicate the attribute is resident
-	 */
-	uint8_t is_resident;
-
-	/* The identifier
-	 */
-	uint16_t identifier;
-
-	/* The name
-	 */
-	uint8_t *name;
-
 	/* The name size
 	 */
 	uint16_t name_size;
@@ -73,6 +63,26 @@ struct libfsntfs_internal_attribute
 	 */
 	uint16_t name_offset;
 
+	/* The data flags
+	 */
+	uint16_t data_flags;
+
+	/* The identifier
+	 */
+	uint16_t identifier;
+
+	/* The MFT attribute header
+	 */
+	libfsntfs_mft_attribute_header_t *header;
+
+	/* Value to indicate the attribute is resident
+	 */
+	uint8_t is_resident;
+
+	/* The name
+	 */
+	uint8_t *name;
+
 	/* The data first VCN
 	 */
 	uint64_t data_first_vcn;
@@ -80,10 +90,6 @@ struct libfsntfs_internal_attribute
 	/* The data last VCN
 	 */
 	uint64_t data_last_vcn;
-
-	/* The data flags
-	 */
-	uint16_t data_flags;
 
 	/* The compression unit size
 	 */
@@ -134,6 +140,12 @@ struct libfsntfs_internal_attribute
 	/* The next attribute in the chain
 	 */
 	libfsntfs_attribute_t *next_attribute;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libfsntfs_attribute_initialize(
@@ -152,12 +164,6 @@ int libfsntfs_internal_attribute_free(
 int libfsntfs_attribute_compare_by_file_reference(
      libfsntfs_internal_attribute_t *first_attribute,
      libfsntfs_internal_attribute_t *second_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_read_mft_attribute_header(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint8_t *data,
-     size_t data_size,
      libcerror_error_t **error );
 
 ssize_t libfsntfs_attribute_read_mft_attribute_resident_data(
@@ -194,19 +200,6 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          size_t data_size,
          size_t mft_attribute_data_offset,
          uint8_t flags,
-         libcerror_error_t **error );
-
-int libfsntfs_attribute_read_attribute_list_entry_header(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error );
-
-ssize_t libfsntfs_attribute_read_from_list(
-         libfsntfs_attribute_t *attribute,
-         const uint8_t *data,
-         size_t data_size,
-         size_t data_offset,
          libcerror_error_t **error );
 
 int libfsntfs_attribute_read_value(
@@ -345,5 +338,5 @@ int libfsntfs_attribute_append_to_chain(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INTERNAL_ATTRIBUTE_H ) */
+#endif /* !defined( _LIBFSNTFS_ATTRIBUTE_H ) */
 
