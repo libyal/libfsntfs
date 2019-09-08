@@ -341,6 +341,28 @@ int fsntfs_test_attribute_list_entry_read_data(
 	libcerror_error_free(
 	 &error );
 
+	attribute_list_entry->name = (uint8_t *) 0x12345678UL;
+
+	result = libfsntfs_attribute_list_entry_read_data(
+	          attribute_list_entry,
+	          fsntfs_test_attribute_list_entry_data1,
+	          40,
+	          &error );
+
+	attribute_list_entry->name = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	result = libfsntfs_attribute_list_entry_read_data(
 	          attribute_list_entry,
 	          NULL,

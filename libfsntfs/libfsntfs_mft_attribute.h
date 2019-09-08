@@ -1,5 +1,5 @@
 /*
- * Master File Table (MFT) attribute header functions
+ * Master File Table (MFT) attribute functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_MFT_ATTRIBUTE_HEADER_H )
-#define _LIBFSNTFS_MFT_ATTRIBUTE_HEADER_H
+#if !defined( _LIBFSNTFS_MFT_ATTRIBUTE_H )
+#define _LIBFSNTFS_MFT_ATTRIBUTE_H
 
 #include <common.h>
 #include <types.h>
@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_mft_attribute_header libfsntfs_mft_attribute_header_t;
+typedef struct libfsntfs_mft_attribute libfsntfs_mft_attribute_t;
 
-struct libfsntfs_mft_attribute_header
+struct libfsntfs_mft_attribute
 {
 	/* The type
 	 */
@@ -51,10 +51,6 @@ struct libfsntfs_mft_attribute_header
 	 */
 	uint16_t name_size;
 
-	/* The name offset
-	 */
-	uint16_t name_offset;
-
 	/* The data flags
 	 */
 	uint16_t data_flags;
@@ -62,18 +58,54 @@ struct libfsntfs_mft_attribute_header
 	/* The identifier
 	 */
 	uint16_t identifier;
+
+	/* The data size
+	 */
+	uint64_t data_size;
+
+	/* The data offset
+	 */
+	uint16_t data_offset;
+
+	/* The data first VCN
+	 */
+	uint64_t data_first_vcn;
+
+	/* The data last VCN
+	 */
+	uint64_t data_last_vcn;
+
+	/* The data runs offset
+	 */
+	uint16_t data_runs_offset;
+
+	/* The compression unit size
+	 */
+	size_t compression_unit_size;
+
+	/* The allocated data size
+	 */
+	uint64_t allocated_data_size;
+
+	/* The valid data size
+	 */
+	uint64_t valid_data_size;
+
+	/* The name
+	 */
+	uint8_t *name;
 };
 
-int libfsntfs_mft_attribute_header_initialize(
-     libfsntfs_mft_attribute_header_t **mft_attribute_header,
+int libfsntfs_mft_attribute_initialize(
+     libfsntfs_mft_attribute_t **mft_attribute,
      libcerror_error_t **error );
 
-int libfsntfs_mft_attribute_header_free(
-     libfsntfs_mft_attribute_header_t **mft_attribute_header,
+int libfsntfs_mft_attribute_free(
+     libfsntfs_mft_attribute_t **mft_attribute,
      libcerror_error_t **error );
 
-int libfsntfs_mft_attribute_header_read_data(
-     libfsntfs_mft_attribute_header_t *mft_attribute_header,
+int libfsntfs_mft_attribute_read_data(
+     libfsntfs_mft_attribute_t *mft_attribute,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );
@@ -82,5 +114,5 @@ int libfsntfs_mft_attribute_header_read_data(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_MFT_ATTRIBUTE_HEADER_H ) */
+#endif /* !defined( _LIBFSNTFS_MFT_ATTRIBUTE_H ) */
 

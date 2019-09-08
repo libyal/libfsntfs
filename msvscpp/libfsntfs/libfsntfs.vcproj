@@ -282,7 +282,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_header.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute.c"
 				>
 			</File>
 			<File
@@ -600,7 +600,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_header.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute.h"
 				>
 			</File>
 			<File

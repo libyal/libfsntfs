@@ -240,7 +240,7 @@ int libfsntfs_txf_data_values_read_data(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: resource manager root file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: resource manager root file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
 		 function,
 		 txf_data_values->rm_root_file_reference & 0xffffffffffffUL,
 		 txf_data_values->rm_root_file_reference >> 48 );
@@ -249,7 +249,7 @@ int libfsntfs_txf_data_values_read_data(
 		 ( (fsntfs_txf_data_t *) data )->usn_index,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: update sequence number index\t\t\t: 0x%08" PRIx64 "\n",
+		 "%s: update sequence number index\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 value_64bit );
 
@@ -264,12 +264,12 @@ int libfsntfs_txf_data_values_read_data(
 		 txf_data_values->data_lsn );
 
 		libcnotify_printf(
-		 "%s: metadata log sequence number\t\t\t: 0x%08" PRIx64 "\n",
+		 "%s: metadata log sequence number\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 txf_data_values->metadata_lsn );
 
 		libcnotify_printf(
-		 "%s: directory index log sequence number\t\t: 0x%08" PRIx64 "\n",
+		 "%s: directory index log sequence number\t: 0x%08" PRIx64 "\n",
 		 function,
 		 txf_data_values->directory_index_lsn );
 
@@ -277,7 +277,7 @@ int libfsntfs_txf_data_values_read_data(
 		 ( (fsntfs_txf_data_t *) data )->flags,
 		 value_16bit );
 		libcnotify_printf(
-		 "%s: flags\t\t\t\t\t\t: 0x%04" PRIx16 "\n",
+		 "%s: flags\t\t\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
 		 value_16bit );
 
@@ -285,6 +285,7 @@ int libfsntfs_txf_data_values_read_data(
 		 "\n" );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 }
 

@@ -32,7 +32,6 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
-#include "libfsntfs_mft_attribute_header.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -43,6 +42,8 @@ typedef struct libfsntfs_internal_attribute libfsntfs_internal_attribute_t;
 
 struct libfsntfs_internal_attribute
 {
+/* MFT attribute header start */
+
 	/* The size
 	 */
 	uint32_t size;
@@ -71,17 +72,15 @@ struct libfsntfs_internal_attribute
 	 */
 	uint16_t identifier;
 
-	/* The MFT attribute header
-	 */
-	libfsntfs_mft_attribute_header_t *header;
-
-	/* Value to indicate the attribute is resident
-	 */
-	uint8_t is_resident;
+/* MFT attribute header end */
 
 	/* The name
 	 */
 	uint8_t *name;
+
+	/* Value to indicate the attribute is resident
+	 */
+	uint8_t is_resident;
 
 	/* The data first VCN
 	 */
@@ -110,14 +109,6 @@ struct libfsntfs_internal_attribute
 	/* The data size
 	 */
 	size64_t data_size;
-
-	/* The data offset
-	 */
-	uint16_t data_offset;
-
-	/* The data runs offset
-	 */
-	uint16_t data_runs_offset;
 
 	/* The data runs array
 	 */
@@ -166,25 +157,6 @@ int libfsntfs_attribute_compare_by_file_reference(
      libfsntfs_internal_attribute_t *second_attribute,
      libcerror_error_t **error );
 
-ssize_t libfsntfs_attribute_read_mft_attribute_resident_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error );
-
-ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         libfsntfs_io_handle_t *io_handle,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error );
-
-ssize_t libfsntfs_attribute_read_mft_attribute_name_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error );
-
 ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
          libfsntfs_internal_attribute_t *internal_attribute,
          libfsntfs_io_handle_t *io_handle,
@@ -198,7 +170,7 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_io_handle_t *io_handle,
          const uint8_t *data,
          size_t data_size,
-         size_t mft_attribute_data_offset,
+         size_t data_offset,
          uint8_t flags,
          libcerror_error_t **error );
 

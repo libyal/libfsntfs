@@ -151,6 +151,7 @@ int libfsntfs_attribute_list_entry_read_data(
 {
 	static char *function = "libfsntfs_attribute_list_entry_read_data";
 	size_t data_offset    = 0;
+	uint8_t name_offset   = 0;
 
 	if( attribute_list_entry == NULL )
 	{
@@ -229,7 +230,7 @@ int libfsntfs_attribute_list_entry_read_data(
 
 	attribute_list_entry->name_size = (uint16_t) ( (fsntfs_attribute_list_entry_header_t *) data )->name_size;
 
-	attribute_list_entry->name_offset = ( (fsntfs_attribute_list_entry_header_t *) data )->name_offset;
+	name_offset = ( (fsntfs_attribute_list_entry_header_t *) data )->name_offset;
 
 	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_attribute_list_entry_header_t *) data )->data_first_vcn,
@@ -266,7 +267,7 @@ int libfsntfs_attribute_list_entry_read_data(
 		libcnotify_printf(
 		 "%s: name offset\t\t\t: %" PRIu8 "\n",
 		 function,
-		 attribute_list_entry->name_offset );
+		 name_offset );
 
 		libcnotify_printf(
 		 "%s: data first VCN\t\t: %" PRIu64 "\n",
@@ -286,7 +287,7 @@ int libfsntfs_attribute_list_entry_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-	attribute_list_entry->name_size *= 2;
+	data_offset = sizeof( fsntfs_attribute_list_entry_header_t );
 
 	if( attribute_list_entry->size > data_size )
 	{
@@ -299,12 +300,12 @@ int libfsntfs_attribute_list_entry_read_data(
 
 		goto on_error;
 	}
-	data_offset = sizeof( fsntfs_attribute_list_entry_header_t );
+	attribute_list_entry->name_size *= 2;
 
 	if( attribute_list_entry->name_size > 0 )
 	{
-		if( ( attribute_list_entry->name_offset < sizeof( fsntfs_attribute_list_entry_header_t ) )
-		 || ( attribute_list_entry->name_offset >= attribute_list_entry->size ) )
+		if( ( name_offset < sizeof( fsntfs_attribute_list_entry_header_t ) )
+		 || ( name_offset >= attribute_list_entry->size ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -318,19 +319,19 @@ int libfsntfs_attribute_list_entry_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			if( data_offset < attribute_list_entry->name_offset )
+			if( data_offset < name_offset )
 			{
 				libcnotify_printf(
 				 "%s: unknown data:\n",
 				 function );
 				libcnotify_print_data(
 				 &( data[ data_offset ] ),
-				 (size_t) attribute_list_entry->name_offset - data_offset,
+				 (size_t) name_offset - data_offset,
 				 0 );
 			}
 		}
 #endif
-		if( attribute_list_entry->name_size > ( attribute_list_entry->size - attribute_list_entry->name_offset ) )
+		if( attribute_list_entry->name_size > ( attribute_list_entry->size - name_offset ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -341,7 +342,7 @@ int libfsntfs_attribute_list_entry_read_data(
 
 			goto on_error;
 		}
-		data_offset = (size_t) attribute_list_entry->name_offset;
+		data_offset = (size_t) name_offset;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -356,7 +357,7 @@ int libfsntfs_attribute_list_entry_read_data(
 		}
 #endif
 		attribute_list_entry->name = (uint8_t *) memory_allocate(
-		                                        sizeof( uint8_t ) * (size_t) attribute_list_entry->name_size );
+		                                          sizeof( uint8_t ) * (size_t) attribute_list_entry->name_size );
 
 		if( attribute_list_entry->name == NULL )
 		{

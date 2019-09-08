@@ -21,7 +21,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_io_handle/fsntfs_test_io_handle.vcproj \
 	fsntfs_test_logged_utility_stream_values/fsntfs_test_logged_utility_stream_values.vcproj \
 	fsntfs_test_mft/fsntfs_test_mft.vcproj \
-	fsntfs_test_mft_attribute_header/fsntfs_test_mft_attribute_header.vcproj \
+	fsntfs_test_mft_attribute/fsntfs_test_mft_attribute.vcproj \
 	fsntfs_test_mft_entry/fsntfs_test_mft_entry.vcproj \
 	fsntfs_test_mft_entry_header/fsntfs_test_mft_entry_header.vcproj \
 	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \

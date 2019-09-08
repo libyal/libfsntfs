@@ -1,6 +1,5 @@
 TODO
-* fix python module tests
-
+* fix TODO_CASE_INSENSITIVE
 * implement read/write lock support
 * add support for WofCompressedData NTFS alternate data streams
 

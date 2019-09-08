@@ -50,7 +50,7 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_logged_utility_stream_values.h"
-#include "libfsntfs_mft_attribute_header.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_object_identifier_values.h"
 #include "libfsntfs_reparse_point_values.h"
 #include "libfsntfs_security_descriptor_values.h"
@@ -234,22 +234,6 @@ int libfsntfs_internal_attribute_free(
 			result = -1;
 		}
 #endif
-		if( ( *internal_attribute )->header != NULL )
-		{
-			if( libfsntfs_mft_attribute_header_free(
-			     &( ( *internal_attribute )->header ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free MFT attribute header.",
-				 function );
-
-				result = -1;
-			}
-		}
 		if( ( *internal_attribute )->name != NULL )
 		{
 			memory_free(
@@ -260,19 +244,22 @@ int libfsntfs_internal_attribute_free(
 			memory_free(
 			 ( *internal_attribute )->data );
 		}
-		if( libcdata_array_free(
-		     &( ( *internal_attribute )->data_runs_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
-		     error ) != 1 )
+		if( ( *internal_attribute )->data_runs_array != NULL )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free data runs array.",
-			 function );
+			if( libcdata_array_free(
+			     &( ( *internal_attribute )->data_runs_array ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free data runs array.",
+				 function );
 
-			result = -1;
+				result = -1;
+			}
 		}
 		if( ( *internal_attribute )->value != NULL )
 		{
@@ -347,484 +334,6 @@ int libfsntfs_attribute_compare_by_file_reference(
 		return( LIBCDATA_COMPARE_GREATER );
 	}
 	return( LIBCDATA_COMPARE_EQUAL );
-}
-
-/* Reads the MFT attribute resident data
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libfsntfs_attribute_read_mft_attribute_resident_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_attribute_read_mft_attribute_resident_data";
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < sizeof( fsntfs_mft_attribute_resident_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: MFT attribute resident data:\n",
-		 function );
-		libcnotify_print_data(
-		 data,
-		 sizeof( fsntfs_mft_attribute_resident_t ),
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_mft_attribute_resident_t *) data )->data_size,
-	 internal_attribute->data_size );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_resident_t *) data )->data_offset,
-	 internal_attribute->data_offset );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: data size\t\t: %" PRIu64 "\n",
-		 function,
-		 internal_attribute->data_size );
-
-		libcnotify_printf(
-		 "%s: data offset\t: %" PRIu16 "\n",
-		 function,
-		 internal_attribute->data_offset );
-
-		libcnotify_printf(
-		 "%s: indexed flag\t: 0x%02" PRIx8 "\n",
-		 function,
-		 ( (fsntfs_mft_attribute_resident_t *) data )->indexed_flag );
-
-		libcnotify_printf(
-		 "%s: padding\t\t: 0x%02" PRIx8 "\n",
-		 function,
-		 ( (fsntfs_mft_attribute_resident_t *) data )->padding );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-	internal_attribute->allocated_data_size = (size64_t) internal_attribute->data_size;
-	internal_attribute->is_resident         = 1;
-
-	return( (ssize_t) sizeof( fsntfs_mft_attribute_resident_t ) );
-}
-
-/* Reads the MFT attribute non-resident data
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libfsntfs_attribute_read_mft_attribute_non_resident_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         libfsntfs_io_handle_t *io_handle,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error )
-{
-	static char *function          = "libfsntfs_attribute_read_mft_attribute_non_resident_data";
-	size_t non_resident_data_size  = 0;
-	uint16_t compression_unit_size = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit           = 0;
-	uint32_t value_32bit           = 0;
-#endif
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < sizeof( fsntfs_mft_attribute_non_resident_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->compression_unit_size,
-	 compression_unit_size );
-
-	if( compression_unit_size == 0 )
-	{
-		non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_t );
-	}
-	else
-	{
-		non_resident_data_size += sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
-	}
-	if( data_size < non_resident_data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: MFT attribute non-resident data:\n",
-		 function );
-		libcnotify_print_data(
-		 data,
-		 non_resident_data_size,
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->data_first_vcn,
-	 internal_attribute->data_first_vcn );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->data_last_vcn,
-	 internal_attribute->data_last_vcn );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->data_runs_offset,
-	 internal_attribute->data_runs_offset );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->allocated_data_size,
-	 internal_attribute->allocated_data_size );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->data_size,
-	 internal_attribute->data_size );
-
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_mft_attribute_non_resident_t *) data )->valid_data_size,
-	 internal_attribute->valid_data_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: data first VCN\t: %" PRIi64 "\n",
-		 function,
-		 (int64_t) internal_attribute->data_first_vcn );
-
-		libcnotify_printf(
-		 "%s: data last VCN\t\t: %" PRIi64 "\n",
-		 function,
-		 (int64_t) internal_attribute->data_last_vcn );
-
-		libcnotify_printf(
-		 "%s: data runs offset\t: 0x%04" PRIx16 "\n",
-		 function,
-		 internal_attribute->data_runs_offset );
-
-		libcnotify_printf(
-		 "%s: compression unit size\t: %" PRIu16 " (%" PRIzd ")\n",
-		 function,
-		 compression_unit_size,
-		 internal_attribute->compression_unit_size );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_mft_attribute_non_resident_t *) data )->padding,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: padding\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: allocated data size\t: %" PRIu64 "\n",
-		 function,
-		 internal_attribute->allocated_data_size );
-
-		libcnotify_printf(
-		 "%s: data size\t\t: %" PRIu64 "\n",
-		 function,
-		 internal_attribute->data_size );
-
-		libcnotify_printf(
-		 "%s: valid data size\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 internal_attribute->valid_data_size,
-		 internal_attribute->valid_data_size );
-
-		if( compression_unit_size > 0 )
-		{
-			byte_stream_copy_to_uint64_little_endian(
-			 ( (fsntfs_mft_attribute_non_resident_compressed_t *) data )->total_data_size,
-			 value_64bit );
-			libcnotify_printf(
-			 "%s: total data size\t: %" PRIu64 "\n",
-			 function,
-			 value_64bit );
-		}
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
-	if( internal_attribute->valid_data_size > internal_attribute->data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: attribute valid data size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: data is flagged as compressed but no compression unit size set.\n",
-			 function );
-		}
-#endif
-		internal_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
-	}
-	else if( compression_unit_size != 0 )
-	{
-/* TODO add bounds checks */
-		/* The size is calculated as: 2 ^ value
-		 */
-		internal_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
-		internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
-	}
-	internal_attribute->is_resident = 0;
-
-	return( (ssize_t) non_resident_data_size );
-}
-
-/* Reads the MFT attribute name data
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libfsntfs_attribute_read_mft_attribute_name_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         const uint8_t *data,
-         size_t data_size,
-         libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_attribute_read_mft_attribute_name_data";
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < internal_attribute->name_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: unsupported data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: MFT attribute name data:\n",
-		 function );
-		libcnotify_print_data(
-		 data,
-		 (size_t) internal_attribute->name_size,
-		 0 );
-	}
-#endif
-	if( internal_attribute->name_size > 0 )
-	{
-		internal_attribute->name = (uint8_t *) memory_allocate(
-		                                        sizeof( uint8_t ) * (size_t) internal_attribute->name_size );
-
-		if( internal_attribute->name == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create attribute name.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     internal_attribute->name,
-		     data,
-		     (size_t) internal_attribute->name_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy attribute name.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( libfsntfs_debug_print_utf16_string_value(
-			     function,
-			     "name\t\t\t",
-			     internal_attribute->name,
-			     (size_t) internal_attribute->name_size,
-			     LIBUNA_ENDIAN_LITTLE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print UTF-16 string value.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-	}
-	return( (ssize_t) internal_attribute->name_size );
-
-on_error:
-	if( internal_attribute->name != NULL )
-	{
-		memory_free(
-		 internal_attribute->name );
-
-		internal_attribute->name = NULL;
-	}
-	internal_attribute->name_size = 0;
-
-	return( -1 );
 }
 
 /* Reads the MFT attribute data runs data
@@ -1134,17 +643,6 @@ ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
 	return( (ssize_t) data_offset );
 
 on_error:
-	if( data_run != NULL )
-	{
-		libfsntfs_data_run_free(
-		 &data_run,
-		 NULL );
-	}
-	libcdata_array_empty(
-	 internal_attribute->data_runs_array,
-	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
-	 NULL );
-
 	return( -1 );
 }
 
@@ -1156,14 +654,13 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_io_handle_t *io_handle,
          const uint8_t *data,
          size_t data_size,
-         size_t mft_attribute_data_offset,
+         size_t data_offset,
          uint8_t flags,
          libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute           = NULL;
 	static char *function                              = "libfsntfs_attribute_read_from_mft_entry_data";
-	size_t header_data_size                            = 0;
-	size_t unknown_data_size                           = 0;
 	ssize_t read_count                                 = 0;
 
 	if( attribute == NULL )
@@ -1179,17 +676,6 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->header != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid attribute - header value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -1223,385 +709,195 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 
 		return( -1 );
 	}
-	if( mft_attribute_data_offset > (size_t) SSIZE_MAX )
+	if( data_offset > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: MFT attribute data offset value exceeds maximum.",
+		 "%s: data offset value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( mft_attribute_data_offset >= data_size )
+	if( data_offset >= data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: MFT attribute data offset value out of bounds.",
+		 "%s: data offset value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_header_initialize(
-	     &( internal_attribute->header ),
+	if( libfsntfs_mft_attribute_initialize(
+	     &mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT attribute header.",
+		 "%s: unable to create MFT attribute.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_attribute_header_read_data(
-	     internal_attribute->header,
-	     &( data[ mft_attribute_data_offset ] ),
-	     data_size - mft_attribute_data_offset,
+	if( libfsntfs_mft_attribute_read_data(
+	     mft_attribute,
+	     &( data[ data_offset ] ),
+	     data_size - data_offset,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT attribute header.",
+		 "%s: unable to read MFT attribute.",
 		 function );
 
 		goto on_error;
 	}
 /* TODO refactor */
-	internal_attribute->size              = internal_attribute->header->size;
-	internal_attribute->type              = internal_attribute->header->type;
-	internal_attribute->non_resident_flag = internal_attribute->header->non_resident_flag;
-	internal_attribute->name_size         = internal_attribute->header->name_size;
-	internal_attribute->name_offset       = internal_attribute->header->name_offset;
-	internal_attribute->data_flags        = internal_attribute->header->data_flags;
-	internal_attribute->identifier        = internal_attribute->header->identifier;
+	internal_attribute->size                = mft_attribute->size;
+	internal_attribute->type                = mft_attribute->type;
+	internal_attribute->non_resident_flag   = mft_attribute->non_resident_flag;
+	internal_attribute->name_size           = mft_attribute->name_size;
+	internal_attribute->data_flags          = mft_attribute->data_flags;
+	internal_attribute->identifier          = mft_attribute->identifier;
 
-/* TODO check size of LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES */
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
+	internal_attribute->data_size           = mft_attribute->data_size;
+	internal_attribute->data_first_vcn      = mft_attribute->data_first_vcn;
+	internal_attribute->data_last_vcn       = mft_attribute->data_last_vcn;
+	internal_attribute->allocated_data_size = mft_attribute->allocated_data_size;
+	internal_attribute->valid_data_size     = mft_attribute->valid_data_size;
+
+	if( ( mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	{
-		if( internal_attribute->size > ( data_size - mft_attribute_data_offset ) )
+		if( io_handle->cluster_block_size > 4096 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: data size value too small.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compression flags: 0x%04" PRIx16 " for volume with cluster block size: %" PRIzd ".",
+			 function,
+			 mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK,
+			 io_handle->cluster_block_size );
+
+			goto on_error;
+		}
+	}
+	if( ( mft_attribute->non_resident_flag & 0x01 ) == 0 )
+	{
+		internal_attribute->data = (uint8_t *) memory_allocate(
+		                                        sizeof( uint8_t ) * (size_t) internal_attribute->data_size );
+
+		if( internal_attribute->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create attribute data.",
 			 function );
 
 			goto on_error;
 		}
-		if( internal_attribute->name_size > 0 )
-		{
-			if( internal_attribute->name_offset >= ( data_size - mft_attribute_data_offset ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: attribute name offset value out of bounds.",
-				 function );
+		data_offset += mft_attribute->data_offset;
 
-				goto on_error;
-			}
+		if( memory_copy(
+		     internal_attribute->data,
+		     &( data[ data_offset ] ),
+		     (size_t) internal_attribute->data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy attribute data.",
+			 function );
+
+			goto on_error;
 		}
+		internal_attribute->allocated_data_size = (size64_t) mft_attribute->data_size;
+
+		internal_attribute->is_resident = 1;
+	}
+	else
+	{
 		if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 		{
-			if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0x0001 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-				 "%s: unsupported compression flags: 0x%04" PRIx16 ".",
-				 function,
-				 internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK );
-
-				goto on_error;
-			}
-			if( io_handle->cluster_block_size > 4096 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-				 "%s: unsupported compression flags: 0x%04" PRIx16 " for volume with cluster block size: %" PRIzd ".",
-				 function,
-				 internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK,
-				 io_handle->cluster_block_size );
-
-				goto on_error;
-			}
-		}
-		mft_attribute_data_offset += sizeof( fsntfs_mft_attribute_header_t );
-
-		if( mft_attribute_data_offset >= data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: data size value too small.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( internal_attribute->non_resident_flag & 0x01 ) == 0 )
-		{
-			read_count = libfsntfs_attribute_read_mft_attribute_resident_data(
-			              internal_attribute,
-			              &( data[ mft_attribute_data_offset ] ),
-			              data_size - mft_attribute_data_offset,
-			              error );
-
-			if( read_count <= -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read MFT attribute resident data.",
-				 function );
-
-				goto on_error;
-			}
-			if( internal_attribute->data_offset > 0 )
-			{
-				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + read_count;
-
-				if( ( internal_attribute->data_offset < header_data_size )
-				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( data_size - header_data_size ) ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: data offset value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				internal_attribute->data_offset += mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t );
-			}
-			mft_attribute_data_offset += read_count;
-		}
-		else
-		{
-			read_count = libfsntfs_attribute_read_mft_attribute_non_resident_data(
-			              internal_attribute,
-			              io_handle,
-			              &( data[ mft_attribute_data_offset ] ),
-			              data_size - mft_attribute_data_offset,
-			              error );
-
-			if( read_count <= -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read MFT attribute non-resident data.",
-				 function );
-
-				goto on_error;
-			}
-			if( internal_attribute->data_runs_offset > 0 )
-			{
-				header_data_size = sizeof( fsntfs_mft_attribute_header_t ) + read_count;
-
-				if( ( internal_attribute->data_runs_offset < header_data_size )
-				 || ( ( mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t ) ) >= ( data_size - header_data_size ) ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: data runs offset value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				internal_attribute->data_runs_offset += mft_attribute_data_offset - sizeof( fsntfs_mft_attribute_header_t );
-			}
-			mft_attribute_data_offset += read_count;
-		}
-		if( internal_attribute->name_size > 0 )
-		{
-			if( mft_attribute_data_offset < internal_attribute->name_offset )
-			{
-				unknown_data_size = (size_t) internal_attribute->name_offset - mft_attribute_data_offset;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unknown data:\n",
-					 function );
-					libcnotify_print_data(
-					 &( data[ mft_attribute_data_offset ] ),
-					 unknown_data_size,
-					 0 );
-				}
-#endif
-				mft_attribute_data_offset += unknown_data_size;
-			}
-			read_count = libfsntfs_attribute_read_mft_attribute_name_data(
-			              internal_attribute,
-			              &( data[ mft_attribute_data_offset ] ),
-			              data_size - mft_attribute_data_offset,
-			              error );
-
-			if( read_count <= -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read MFT attribute name data.",
-				 function );
-
-				goto on_error;
-			}
-			mft_attribute_data_offset += read_count;
-		}
-		if( internal_attribute->data_runs_offset > 0 )
-		{
-			if( mft_attribute_data_offset < internal_attribute->data_runs_offset )
-			{
-				unknown_data_size = (size_t) internal_attribute->data_runs_offset - mft_attribute_data_offset;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unknown data:\n",
-					 function );
-					libcnotify_print_data(
-					 &( data[ mft_attribute_data_offset ] ),
-					 unknown_data_size,
-					 0 );
-				}
-#endif
-				mft_attribute_data_offset += unknown_data_size;
-			}
-			read_count = libfsntfs_attribute_read_mft_attribute_data_runs_data(
-			              internal_attribute,
-			              io_handle,
-			              &( data[ mft_attribute_data_offset ] ),
-			              data_size - mft_attribute_data_offset,
-			              flags,
-			              error );
-
-			if( read_count <= -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read MFT attribute data runs data.",
-				 function );
-
-				goto on_error;
-			}
-			mft_attribute_data_offset += read_count;
-		}
-		else
-		{
-			if( mft_attribute_data_offset < internal_attribute->data_offset )
-			{
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					libcnotify_printf(
-					 "%s: unknown data:\n",
-					 function );
-					libcnotify_print_data(
-					 &( data[ mft_attribute_data_offset ] ),
-					 (size_t) internal_attribute->data_offset - mft_attribute_data_offset,
-					 0 );
-				}
-#endif
-				mft_attribute_data_offset = internal_attribute->data_offset;
-			}
-#if SIZEOF_SIZE_T <= 4
-			if( internal_attribute->data_size > (size64_t) SSIZE_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: attribute data size value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
-#endif
-			internal_attribute->data = (uint8_t *) memory_allocate(
-			                                        sizeof( uint8_t ) * (size_t) internal_attribute->data_size );
-
-			if( internal_attribute->data == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create attribute data.",
-				 function );
-
-				goto on_error;
-			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: resident data:\n",
+				 "%s: data is flagged as compressed but no compression unit size set.\n",
 				 function );
-				libcnotify_print_data(
-				 &( data[ mft_attribute_data_offset ] ),
-				 (size_t) internal_attribute->data_size,
-				 0 );
 			}
 #endif
-			if( memory_copy(
-			     internal_attribute->data,
-			     &( data[ mft_attribute_data_offset ] ),
-			     (size_t) internal_attribute->data_size ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy attribute data.",
-				 function );
-
-				goto on_error;
-			}
-			mft_attribute_data_offset += (size_t) internal_attribute->data_size;
+			internal_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
+		else if( mft_attribute->compression_unit_size != 0 )
 		{
-			if( mft_attribute_data_offset < internal_attribute->size )
-			{
-				libcnotify_printf(
-				 "%s: trailing data:\n",
-				 function );
-				libcnotify_print_data(
-				 &( data[ mft_attribute_data_offset ] ),
-				 (size_t) internal_attribute->size - mft_attribute_data_offset,
-				 0 );
-			}
+/* TODO add bounds checks */
+			/* The size is calculated as: 2 ^ value
+			 */
+			internal_attribute->compression_unit_size  = (size_t) 1 << mft_attribute->compression_unit_size;
+			internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
 		}
-#endif
+		internal_attribute->is_resident = 0;
+
+		data_offset += mft_attribute->data_runs_offset;
+
+		read_count = libfsntfs_attribute_read_mft_attribute_data_runs_data(
+		              internal_attribute,
+		              io_handle,
+		              &( data[ data_offset ] ),
+		              data_size - data_offset,
+		              flags,
+		              error );
+
+		if( read_count <= -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read MFT attribute data runs data.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	internal_attribute->name = mft_attribute->name;
+
+	mft_attribute->name = NULL;
+
+	if( libfsntfs_mft_attribute_free(
+	     &mft_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free MFT attribute.",
+		 function );
+
+		goto on_error;
 	}
 	return( (ssize_t) internal_attribute->size );
 
 on_error:
+	if( internal_attribute->data != NULL )
+	{
+		memory_free(
+		 internal_attribute->data );
+
+		internal_attribute->data = NULL;
+	}
 	if( internal_attribute->name != NULL )
 	{
 		memory_free(
@@ -1611,10 +907,10 @@ on_error:
 	}
 	internal_attribute->name_size = 0;
 
-	if( internal_attribute->header != NULL )
+	if( mft_attribute != NULL )
 	{
-		libfsntfs_mft_attribute_header_free(
-		 &( internal_attribute->header ),
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
 		 NULL );
 	}
 	libcdata_array_empty(

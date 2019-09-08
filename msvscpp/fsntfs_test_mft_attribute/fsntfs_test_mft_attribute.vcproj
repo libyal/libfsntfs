@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_mft_attribute_header"
-	ProjectGUID="{72913316-A54E-4BFB-8D14-01A99025A7EA}"
-	RootNamespace="fsntfs_test_mft_attribute_header"
+	Name="fsntfs_test_mft_attribute"
+	ProjectGUID="{33B72873-D87D-480A-8371-3334AEE49B6C}"
+	RootNamespace="fsntfs_test_mft_attribute"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -180,7 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_mft_attribute_header.c"
+				RelativePath="..\..\tests\fsntfs_test_mft_attribute.c"
 				>
 			</File>
 		</Filter>

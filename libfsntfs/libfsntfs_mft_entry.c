@@ -1098,7 +1098,6 @@ int libfsntfs_mft_entry_read_attributes_data(
 	 &( data[ data_offset ] ),
 	 attribute_type );
 
-/* TODO change into a do while loop ? */
 	while( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES )
 	{
 		if( libfsntfs_attribute_initialize(
@@ -1525,7 +1524,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 /* TODO refactor */
 		( (libfsntfs_internal_attribute_t *) list_attribute )->type           = attribute_list_entry->type;
 		( (libfsntfs_internal_attribute_t *) list_attribute )->size           = attribute_list_entry->size;
-		( (libfsntfs_internal_attribute_t *) list_attribute )->name_size      = attribute_list_entry->name_offset;
+		( (libfsntfs_internal_attribute_t *) list_attribute )->name_size      = attribute_list_entry->name_size;
 		( (libfsntfs_internal_attribute_t *) list_attribute )->data_first_vcn = attribute_list_entry->data_first_vcn;
 		( (libfsntfs_internal_attribute_t *) list_attribute )->file_reference = attribute_list_entry->file_reference;
 		( (libfsntfs_internal_attribute_t *) list_attribute )->identifier     = attribute_list_entry->identifier;

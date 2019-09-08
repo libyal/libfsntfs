@@ -39,6 +39,7 @@
 
 #include "../libfsntfs/libfsntfs_definitions.h"
 #include "../libfsntfs/libfsntfs_mft_entry.h"
+#include "../libfsntfs/libfsntfs_mft_entry_header.h"
 
 uint8_t fsntfs_test_mft_entry_data1[ 1024 ] = {
 	0x46, 0x49, 0x4c, 0x45, 0x30, 0x00, 0x03, 0x00, 0x52, 0x51, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -959,27 +960,6 @@ int fsntfs_test_mft_entry_read_data(
 	 "error",
 	 error );
 
-	/* Test error cases
-	 */
-	result = libfsntfs_mft_entry_read_data(
-	          mft_entry,
-	          mft_entry_data,
-	          1024,
-	          0,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
 	/* Clean up
 	 */
 	result = libfsntfs_mft_entry_free(
@@ -1035,6 +1015,29 @@ int fsntfs_test_mft_entry_read_data(
 	          1024,
 	          0,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry->header = (libfsntfs_mft_entry_header_t *) 0x12345678UL;
+
+	result = libfsntfs_mft_entry_read_data(
+	          mft_entry,
+	          mft_entry_data,
+	          1024,
+	          0,
+	          &error );
+
+	mft_entry->header = NULL;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",

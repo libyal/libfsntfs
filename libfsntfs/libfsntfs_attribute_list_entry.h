@@ -47,10 +47,6 @@ struct libfsntfs_attribute_list_entry
 	 */
 	uint16_t name_size;
 
-	/* The name offset
-	 */
-	uint8_t name_offset;
-
 	/* The data first VCN
 	 */
 	uint64_t data_first_vcn;
