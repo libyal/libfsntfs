@@ -157,20 +157,11 @@ int libfsntfs_attribute_compare_by_file_reference(
      libfsntfs_internal_attribute_t *second_attribute,
      libcerror_error_t **error );
 
-ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         libfsntfs_io_handle_t *io_handle,
-         const uint8_t *data,
-         size_t data_size,
-         uint8_t flags,
-         libcerror_error_t **error );
-
 ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_attribute_t *attribute,
          libfsntfs_io_handle_t *io_handle,
          const uint8_t *data,
          size_t data_size,
-         size_t data_offset,
          uint8_t flags,
          libcerror_error_t **error );
 

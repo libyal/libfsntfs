@@ -381,7 +381,6 @@ int main(
 	              fsntfs_test_volume_information_attribute_data1,
 	              40,
 	              0,
-	              0,
 	              &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(

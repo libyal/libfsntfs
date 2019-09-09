@@ -595,7 +595,6 @@ int main(
 	              fsntfs_test_volume_name_attribute_data1,
 	              48,
 	              0,
-	              0,
 	              &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
@@ -705,6 +704,7 @@ on_error:
 		 NULL );
 	}
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	return( EXIT_FAILURE );
 }
 

@@ -165,6 +165,38 @@ int fsntfs_test_attribute_list_read_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	/* Test libfsntfs_attribute_list_read_data with malloc failing in libfsntfs_attribute_list_entry_initialize
+	 */
+	fsntfs_test_malloc_attempts_before_fail = 0;
+
+	result = libfsntfs_attribute_list_read_data(
+	          attribute_list,
+	          fsntfs_test_attribute_list_data1,
+	          344,
+	          &error );
+
+	if( fsntfs_test_malloc_attempts_before_fail != -1 )
+	{
+		fsntfs_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libcdata_array_free(

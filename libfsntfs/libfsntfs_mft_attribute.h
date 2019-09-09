@@ -25,6 +25,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_io_handle.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 
 #if defined( __cplusplus )
@@ -75,10 +77,6 @@ struct libfsntfs_mft_attribute
 	 */
 	uint64_t data_last_vcn;
 
-	/* The data runs offset
-	 */
-	uint16_t data_runs_offset;
-
 	/* The compression unit size
 	 */
 	size_t compression_unit_size;
@@ -94,6 +92,10 @@ struct libfsntfs_mft_attribute
 	/* The name
 	 */
 	uint8_t *name;
+
+	/* The data runs array
+	 */
+	libcdata_array_t *data_runs_array;
 };
 
 int libfsntfs_mft_attribute_initialize(
@@ -106,8 +108,31 @@ int libfsntfs_mft_attribute_free(
 
 int libfsntfs_mft_attribute_read_data(
      libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_utf8_name_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_utf8_name(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_utf16_name_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_utf16_name(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

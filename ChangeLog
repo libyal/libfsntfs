@@ -1,4 +1,5 @@
 TODO
+* enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 * fix TODO_CASE_INSENSITIVE
 * implement read/write lock support
 * add support for WofCompressedData NTFS alternate data streams

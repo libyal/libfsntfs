@@ -1114,12 +1114,12 @@ int libfsntfs_mft_entry_read_attributes_data(
 
 			goto on_error;
 		}
+/* TODO refactor use mft_attribute */
 		read_count = libfsntfs_attribute_read_from_mft_entry_data(
 			      attribute,
 			      io_handle,
-			      data,
-			      data_size,
-			      data_offset,
+		              &( data[ data_offset ] ),
+		              data_size - data_offset,
 			      flags,
 			      error );
 

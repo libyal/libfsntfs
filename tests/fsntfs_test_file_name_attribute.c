@@ -1181,7 +1181,6 @@ int main(
 	              fsntfs_test_file_name_attribute_data1,
 	              104,
 	              0,
-	              0,
 	              &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(

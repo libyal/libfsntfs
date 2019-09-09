@@ -978,7 +978,6 @@ int main(
 	              fsntfs_test_reparse_point_attribute_data1,
 	              88,
 	              0,
-	              0,
 	              &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(

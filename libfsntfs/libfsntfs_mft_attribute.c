@@ -24,8 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libuna.h"
@@ -33,7 +35,7 @@
 
 #include "fsntfs_mft_attribute.h"
 
-/* Creates MFT attribute
+/* Creates a MFT attribute
  * Make sure the value mft_attribute is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -91,23 +93,13 @@ int libfsntfs_mft_attribute_initialize(
 		 "%s: unable to clear MFT attribute.",
 		 function );
 
-		memory_free(
-		 *mft_attribute );
-
-		*mft_attribute = NULL;
-
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 
 on_error:
 	if( *mft_attribute != NULL )
 	{
-		if( ( *mft_attribute )->name != NULL )
-		{
-			memory_free(
-			 ( *mft_attribute )->name );
-		}
 		memory_free(
 		 *mft_attribute );
 
@@ -116,7 +108,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees MFT attribute
+/* Frees a MFT attribute
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_mft_attribute_free(
@@ -124,6 +116,7 @@ int libfsntfs_mft_attribute_free(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_attribute_free";
+	int result            = 1;
 
 	if( mft_attribute == NULL )
 	{
@@ -138,12 +131,29 @@ int libfsntfs_mft_attribute_free(
 	}
 	if( *mft_attribute != NULL )
 	{
+		if( ( *mft_attribute )->data_runs_array != NULL )
+		{
+			if( libcdata_array_free(
+			     &( ( *mft_attribute )->data_runs_array ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free data runs array.",
+				 function );
+
+				result = -1;
+			}
+		}
 		memory_free(
 		 *mft_attribute );
 
 		*mft_attribute = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Reads the MFT attribute
@@ -151,21 +161,34 @@ int libfsntfs_mft_attribute_free(
  */
 int libfsntfs_mft_attribute_read_data(
      libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
-	const uint8_t *non_resident_data = NULL;
-	const uint8_t *resident_data     = NULL;
-	static char *function            = "libfsntfs_mft_attribute_read_data";
-	size_t data_offset               = 0;
-	size_t non_resident_data_size    = 0;
-	uint16_t compression_unit_size   = 0;
-	uint16_t name_offset             = 0;
+	libfsntfs_data_run_t *data_run              = NULL;
+	const uint8_t *non_resident_data            = NULL;
+	const uint8_t *resident_data                = NULL;
+	static char *function                       = "libfsntfs_mft_attribute_read_data";
+	size_t data_offset                          = 0;
+	size_t data_run_data_size                   = 0;
+	size_t non_resident_data_size               = 0;
+	uint64_t data_run_number_of_cluster_blocks  = 0;
+	uint64_t last_data_run_cluster_block_number = 0;
+	int64_t data_run_cluster_block_number       = 0;
+	uint16_t compression_unit_size              = 0;
+	uint16_t data_runs_offset                   = 0;
+	uint16_t name_offset                        = 0;
+	uint8_t data_run_value1_size                = 0;
+	uint8_t data_run_value2_size                = 0;
+	uint8_t data_run_value_index                = 0;
+	uint8_t data_run_value_size_tuple           = 0;
+	int data_run_index                          = 0;
+	int entry_index                             = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit             = 0;
-	uint32_t value_32bit             = 0;
+	uint64_t value_64bit                        = 0;
+	uint32_t value_32bit                        = 0;
 #endif
 
 	if( mft_attribute == NULL )
@@ -186,6 +209,28 @@ int libfsntfs_mft_attribute_read_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid MFT attribute - name value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->data_runs_array != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid MFT attribute - data runs array value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -437,6 +482,26 @@ int libfsntfs_mft_attribute_read_data(
 
 				goto on_error;
 			}
+			if( ( mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: data is flagged as compressed but no compression unit size set.\n",
+					 function );
+				}
+#endif
+				mft_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
+			}
+			else if( compression_unit_size != 0 )
+			{
+/* TODO add bounds checks */
+				/* The size is calculated as: 2 ^ value
+				 */
+				mft_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
+				mft_attribute->compression_unit_size *= io_handle->cluster_block_size;
+			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -460,7 +525,7 @@ int libfsntfs_mft_attribute_read_data(
 
 		byte_stream_copy_to_uint16_little_endian(
 		 ( (fsntfs_mft_attribute_non_resident_t *) non_resident_data )->data_runs_offset,
-		 mft_attribute->data_runs_offset );
+		 data_runs_offset );
 
 		byte_stream_copy_to_uint64_little_endian(
 		 ( (fsntfs_mft_attribute_non_resident_t *) non_resident_data )->allocated_data_size,
@@ -490,7 +555,7 @@ int libfsntfs_mft_attribute_read_data(
 			libcnotify_printf(
 			 "%s: data runs offset\t\t\t: 0x%04" PRIx16 "\n",
 			 function,
-			 mft_attribute->data_runs_offset );
+			 data_runs_offset );
 
 			libcnotify_printf(
 			 "%s: compression unit size\t\t: %" PRIu16 " (%" PRIzd ")\n",
@@ -692,8 +757,8 @@ int libfsntfs_mft_attribute_read_data(
 		}
 		else
 		{
-			if( ( mft_attribute->data_runs_offset < data_offset )
-			 || ( mft_attribute->data_runs_offset >= mft_attribute->size ) )
+			if( ( data_runs_offset < data_offset )
+			 || ( data_runs_offset >= mft_attribute->size ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -714,12 +779,226 @@ int libfsntfs_mft_attribute_read_data(
 					 function );
 					libcnotify_print_data(
 					 &( data[ data_offset ] ),
-					 (size_t) mft_attribute->data_runs_offset - data_offset,
+					 (size_t) data_runs_offset - data_offset,
 					 0 );
 				}
 			}
 #endif
-			data_offset = (size_t) mft_attribute->data_runs_offset;
+			data_offset = (size_t) data_runs_offset;
+
+			if( libcdata_array_initialize(
+			     &( mft_attribute->data_runs_array ),
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create data runs array.",
+				 function );
+
+				goto on_error;
+			}
+			do
+			{
+				if( data_offset >= data_size )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+					 "%s: data size value too small.",
+					 function );
+
+					goto on_error;
+				}
+				data_run_value_size_tuple = data[ data_offset ];
+
+				data_run_value1_size = data_run_value_size_tuple & 0x0f;
+				data_run_value2_size = ( data_run_value_size_tuple >> 4 ) & 0x0f;
+				data_run_data_size   = 1 + data_run_value1_size + data_run_value2_size;
+
+				if( data_run_data_size > ( data_size - data_offset ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+					 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+					 "%s: data size value too small.",
+					 function );
+
+					goto on_error;
+				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: data run: %02d data:\n",
+					 function,
+					 data_run_index );
+					libcnotify_print_data(
+					 &( data[ data_offset ] ),
+					 data_run_data_size,
+					 0 );
+
+					libcnotify_printf(
+					 "%s: data run: %02d value sizes\t\t\t: %" PRIu8 ", %" PRIu8 "\n",
+					 function,
+					 data_run_index,
+					 data_run_value1_size,
+					 data_run_value2_size );
+				}
+#endif
+				/* An empty number of cluster blocks value size indicates the end of the data runs.
+				 */
+				if( data_run_value1_size == 0 )
+				{
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "\n" );
+
+						libcnotify_printf(
+						 "%s: end of data runs (empty number of cluster blocks value size).\n",
+						 function );
+
+						libcnotify_printf(
+						 "\n" );
+					}
+#endif
+					break;
+				}
+				data_offset++;
+
+				/* Determine the number of cluster blocks value
+				 */
+				data_run_number_of_cluster_blocks = 0;
+
+				for( data_run_value_index = data_run_value1_size;
+				     data_run_value_index > 0;
+				     data_run_value_index-- )
+				{
+					data_run_number_of_cluster_blocks <<= 8;
+					data_run_number_of_cluster_blocks  |= data[ data_offset + data_run_value_index - 1 ];
+				}
+				data_offset += data_run_value1_size;
+
+				if( data_run_value2_size != 0 )
+				{
+					/* Determine the cluster block number value
+					 */
+					if( ( last_data_run_cluster_block_number != 0 )
+					 && ( ( data[ data_offset + data_run_value2_size - 1 ] & 0x80 ) != 0 ) )
+					{
+						data_run_cluster_block_number = -1;
+					}
+					else
+					{
+						data_run_cluster_block_number = 0;
+					}
+					for( data_run_value_index = data_run_value2_size;
+					     data_run_value_index > 0;
+					     data_run_value_index-- )
+					{
+						data_run_cluster_block_number <<= 8;
+						data_run_cluster_block_number  |= data[ data_offset + data_run_value_index - 1 ];
+					}
+					data_offset += data_run_value2_size;
+				}
+#if defined( HAVE_DEBUG_OUTPUT )
+				else if( libcnotify_verbose != 0 )
+				{
+					if( ( ( mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
+					 && ( ( mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
+					{
+						libcnotify_printf(
+						 "\n" );
+
+						libcnotify_printf(
+						 "%s: data run is sparse but no flags set.\n",
+						 function );
+
+						libcnotify_printf(
+						 "\n" );
+					}
+				}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+				if( libfsntfs_data_run_initialize(
+				     &data_run,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create data run.",
+					 function );
+
+					goto on_error;
+				}
+				if( data_run_value2_size != 0 )
+				{
+					last_data_run_cluster_block_number += data_run_cluster_block_number;
+
+					data_run->start_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
+				}
+				else
+				{
+					data_run->range_flags = LIBFDATA_RANGE_FLAG_IS_SPARSE;
+				}
+				data_run->size = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: data run: %02d number of cluster blocks\t: %" PRIu64 " (size: %" PRIu64 ")\n",
+					 function,
+					 data_run_index,
+					 data_run_number_of_cluster_blocks,
+					 data_run->size );
+
+					libcnotify_printf(
+					 "%s: data run: %02d cluster block number\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
+					 function,
+					 data_run_index,
+					 last_data_run_cluster_block_number,
+					 data_run_cluster_block_number,
+					 data_run->start_offset );
+
+					if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+					{
+						libcnotify_printf(
+						 "\tIs sparse\n" );
+					}
+					libcnotify_printf(
+					 "\n" );
+				}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+				if( libcdata_array_append_entry(
+				     mft_attribute->data_runs_array,
+				     &entry_index,
+				     (intptr_t *) data_run,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append data run to array.",
+					 function );
+
+					goto on_error;
+				}
+				data_run = NULL;
+
+				data_run_index++;
+			}
+			while( data_run_value_size_tuple != 0 );
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -740,6 +1019,19 @@ int libfsntfs_mft_attribute_read_data(
 	return( 1 );
 
 on_error:
+	if( data_run != NULL )
+	{
+		libfsntfs_data_run_free(
+		 &data_run,
+		 NULL );
+	}
+	if( mft_attribute->data_runs_array != NULL )
+	{
+		libcdata_array_free(
+		 &( mft_attribute->data_runs_array ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
+		 NULL );
+	}
 	if( mft_attribute->name != NULL )
 	{
 		memory_free(
@@ -750,5 +1042,233 @@ on_error:
 	mft_attribute->name_size = 0;
 
 	return( -1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_utf8_name_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_utf8_name_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_attribute->name == NULL )
+	 || ( mft_attribute->name_size == 0 ) )
+	{
+		if( utf8_string_size == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
+		*utf8_string_size = 0;
+	}
+	else
+	{
+		if( libuna_utf8_string_size_from_utf16_stream(
+		     mft_attribute->name,
+		     (size_t) mft_attribute->name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     utf8_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_utf8_name(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_utf8_name";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT attribute - missing name.",
+		 function );
+
+		return( -1 );
+	}
+	if( libuna_utf8_string_copy_from_utf16_stream(
+	     utf8_string,
+	     utf8_string_size,
+	     mft_attribute->name,
+	     (size_t) mft_attribute->name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_utf16_name_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_utf16_name_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_attribute->name == NULL )
+	 || ( mft_attribute->name_size == 0 ) )
+	{
+		if( utf16_string_size == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
+		*utf16_string_size = 0;
+	}
+	else
+	{
+		if( libuna_utf16_string_size_from_utf16_stream(
+		     mft_attribute->name,
+		     (size_t) mft_attribute->name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     utf16_string_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_utf16_name(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_utf16_name";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT attribute - missing name.",
+		 function );
+
+		return( -1 );
+	}
+	if( libuna_utf16_string_copy_from_utf16_stream(
+	     utf16_string,
+	     utf16_string_size,
+	     mft_attribute->name,
+	     (size_t) mft_attribute->name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 

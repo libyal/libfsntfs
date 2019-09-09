@@ -127,20 +127,6 @@ int libfsntfs_attribute_initialize(
 
 		return( -1 );
 	}
-	if( libcdata_array_initialize(
-	     &( internal_attribute->data_runs_array ),
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data runs array.",
-		 function );
-
-		goto on_error;
-	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_initialize(
 	     &( internal_attribute->read_write_lock ),
@@ -336,316 +322,6 @@ int libfsntfs_attribute_compare_by_file_reference(
 	return( LIBCDATA_COMPARE_EQUAL );
 }
 
-/* Reads the MFT attribute data runs data
- * Returns the number of bytes read if successful or -1 on error
- */
-ssize_t libfsntfs_attribute_read_mft_attribute_data_runs_data(
-         libfsntfs_internal_attribute_t *internal_attribute,
-         libfsntfs_io_handle_t *io_handle,
-         const uint8_t *data,
-         size_t data_size,
-         uint8_t flags,
-         libcerror_error_t **error )
-{
-	libfsntfs_data_run_t *data_run              = NULL;
-	static char *function                       = "libfsntfs_attribute_read_mft_attribute_data_runs_data";
-	size64_t data_run_size                      = 0;
-	size_t data_offset                          = 0;
-	off64_t data_block_offset                   = 0;
-	off64_t data_run_offset                     = 0;
-	uint64_t data_run_number_of_cluster_blocks  = 0;
-	uint64_t last_data_run_cluster_block_number = 0;
-	int64_t data_run_cluster_block_number       = 0;
-	uint32_t range_flags                        = 0;
-	uint8_t data_run_value_index                = 0;
-	uint8_t data_run_value_size                 = 0;
-	uint8_t data_run_value_size_tuple           = 0;
-	int data_run_index                          = 0;
-	int entry_index                             = 0;
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset >= data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	while( data[ data_offset ] != 0 )
-	{
-		data_run_value_size_tuple = data[ data_offset ];
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: data run: %02d data:\n",
-			 function,
-			 data_run_index );
-			libcnotify_print_data(
-			 &( data[ data_offset ] ),
-			 (size_t) ( 1 + ( data_run_value_size_tuple & 0x0f ) + ( ( data_run_value_size_tuple >> 4 ) & 0x0f ) ),
-			 0 );
-
-			libcnotify_printf(
-			 "%s: data run: %02d value sizes\t\t\t: %" PRIu8 ", %" PRIu8 "\n",
-			 function,
-			 data_run_index,
-			 data_run_value_size_tuple & 0x0f,
-			 ( data_run_value_size_tuple >> 4 ) & 0x0f );
-		}
-#endif
-		data_offset++;
-
-		data_run_number_of_cluster_blocks = 0;
-		range_flags                       = 0;
-
-		data_run_value_size = data_run_value_size_tuple & 0x0f;
-
-/* TODO determine if is this a corrupt data run */
-		/* Determine the number of cluster blocks value */
-		if( data_run_value_size == 0 )
-		{
-			/* An empty number of cluster blocks value size indicates the end of the data runs.
-			 */
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: detected empty number of cluster blocks value size.\n",
-				 function );
-			}
-#endif
-			break;
-		}
-		if( ( data_offset >= data_size )
-		 || ( data_run_value_size > ( data_size - data_offset ) ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: data size value too small.",
-			 function );
-
-			goto on_error;
-		}
-		for( data_run_value_index = data_run_value_size;
-		     data_run_value_index > 0;
-		     data_run_value_index-- )
-		{
-			data_run_number_of_cluster_blocks <<= 8;
-			data_run_number_of_cluster_blocks  |= data[ data_offset + data_run_value_index - 1 ];
-		}
-		data_offset += data_run_value_size;
-
-		/* Determine the cluster block number value */
-		data_run_value_size = ( data_run_value_size_tuple >> 4 ) & 0x0f;
-
-		if( data_run_value_size == 0 )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				if( ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
-				 && ( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE ) == 0 ) )
-				{
-					libcnotify_printf(
-					 "%s: data run is sparse but no flags set.\n",
-					 function );
-				}
-			}
-#endif
-/* TODO: assuming a data run is sparse even if LIBFSNTFS_ATTRIBUTE_FLAG_SPARSE or LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK is not set ? */
-			range_flags |= LIBFDATA_RANGE_FLAG_IS_SPARSE;
-		}
-		else
-		{
-			if( ( data_offset >= data_size )
-			 || ( data_run_value_size > ( data_size - data_offset ) ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: MFT data run value size value out of bounds.",
-				 function );
-
-				goto on_error;
-			}
-			if( ( last_data_run_cluster_block_number != 0 )
-			 && ( ( data[ data_offset + data_run_value_size - 1 ] & 0x80 ) != 0 ) )
-			{
-				data_run_cluster_block_number = -1;
-			}
-			else
-			{
-				data_run_cluster_block_number = 0;
-			}
-			for( data_run_value_index = data_run_value_size;
-			     data_run_value_index > 0;
-			     data_run_value_index-- )
-			{
-				data_run_cluster_block_number <<= 8;
-				data_run_cluster_block_number  |= data[ data_offset + data_run_value_index - 1 ];
-			}
-			data_offset += data_run_value_size;
-		}
-		if( data_run_value_size == 0 )
-		{
-			data_run_offset = 0;
-		}
-		else
-		{
-			last_data_run_cluster_block_number += data_run_cluster_block_number;
-
-			data_run_offset = (off64_t) ( last_data_run_cluster_block_number * io_handle->cluster_block_size );
-		}
-		data_run_size = (size64_t) ( data_run_number_of_cluster_blocks * io_handle->cluster_block_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: data run: %02d number of cluster blocks\t: %" PRIu64 " (size: %" PRIu64 ")\n",
-			 function,
-			 data_run_index,
-			 data_run_number_of_cluster_blocks,
-			 data_run_size );
-
-			libcnotify_printf(
-			 "%s: data run: %02d cluster block number\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
-			 function,
-			 data_run_index,
-			 last_data_run_cluster_block_number,
-			 data_run_cluster_block_number,
-			 data_run_offset );
-
-			if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-			{
-				libcnotify_printf(
-				 "\tIs sparse\n" );
-			}
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-		if( data_offset >= data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: data size value too small.",
-			 function );
-
-			goto on_error;
-		}
-/* TODO this breaks internal_attribute->data_size is not always larger than data_block_offset
-* seen in multi data attribute MFT
-
-		if( internal_attribute->data_size != 0 )
-		{
-			if( ( data_block_offset + data_run_size ) >= internal_attribute->data_size )
-			{
-				data_run_size = internal_attribute->data_size - data_block_offset;
-			}
-		}
-*/
-		data_block_offset += data_run_size;
-
-		if( libfsntfs_data_run_initialize(
-		     &data_run,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create data run.",
-			 function );
-
-			goto on_error;
-		}
-		data_run->start_offset = data_run_offset;
-		data_run->size         = data_run_size;
-		data_run->range_flags  = range_flags;
-
-		if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
-		{
-			if( libcdata_array_append_entry(
-			     internal_attribute->data_runs_array,
-			     &entry_index,
-			     (intptr_t *) data_run,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append data run to array.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		data_run = NULL;
-
-		data_run_index++;
-	}
-	return( (ssize_t) data_offset );
-
-on_error:
-	return( -1 );
-}
-
 /* Reads the attribute from MFT entry data
  * Returns the number of bytes read if successful or -1 on error
  */
@@ -654,14 +330,12 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
          libfsntfs_io_handle_t *io_handle,
          const uint8_t *data,
          size_t data_size,
-         size_t data_offset,
          uint8_t flags,
          libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute           = NULL;
 	static char *function                              = "libfsntfs_attribute_read_from_mft_entry_data";
-	ssize_t read_count                                 = 0;
 
 	if( attribute == NULL )
 	{
@@ -709,28 +383,6 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 
 		return( -1 );
 	}
-	if( data_offset > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data offset value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset >= data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: data offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_mft_attribute_initialize(
 	     &mft_attribute,
 	     error ) != 1 )
@@ -746,8 +398,9 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 	}
 	if( libfsntfs_mft_attribute_read_data(
 	     mft_attribute,
-	     &( data[ data_offset ] ),
-	     data_size - data_offset,
+	     io_handle,
+	     data,
+	     data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -805,11 +458,9 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 
 			goto on_error;
 		}
-		data_offset += mft_attribute->data_offset;
-
 		if( memory_copy(
 		     internal_attribute->data,
-		     &( data[ data_offset ] ),
+		     &( data[ mft_attribute->data_offset ] ),
 		     (size_t) internal_attribute->data_size ) == NULL )
 		{
 			libcerror_error_set(
@@ -827,49 +478,11 @@ ssize_t libfsntfs_attribute_read_from_mft_entry_data(
 	}
 	else
 	{
-		if( ( internal_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-		{
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: data is flagged as compressed but no compression unit size set.\n",
-				 function );
-			}
-#endif
-			internal_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
-		}
-		else if( mft_attribute->compression_unit_size != 0 )
-		{
-/* TODO add bounds checks */
-			/* The size is calculated as: 2 ^ value
-			 */
-			internal_attribute->compression_unit_size  = (size_t) 1 << mft_attribute->compression_unit_size;
-			internal_attribute->compression_unit_size *= io_handle->cluster_block_size;
-		}
+		internal_attribute->data_runs_array = mft_attribute->data_runs_array;
+
+		mft_attribute->data_runs_array = NULL;
+
 		internal_attribute->is_resident = 0;
-
-		data_offset += mft_attribute->data_runs_offset;
-
-		read_count = libfsntfs_attribute_read_mft_attribute_data_runs_data(
-		              internal_attribute,
-		              io_handle,
-		              &( data[ data_offset ] ),
-		              data_size - data_offset,
-		              flags,
-		              error );
-
-		if( read_count <= -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT attribute data runs data.",
-			 function );
-
-			goto on_error;
-		}
 	}
 	internal_attribute->name = mft_attribute->name;
 
@@ -2709,19 +2322,37 @@ int libfsntfs_attribute_get_number_of_data_runs(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( libcdata_array_get_number_of_entries(
-	     internal_attribute->data_runs_array,
-	     number_of_data_runs,
-	     error ) != 1 )
+	if( internal_attribute->data_runs_array == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of data runs.",
-		 function );
+		if( number_of_data_runs == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of data runs.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*number_of_data_runs = 0;
+	}
+	else
+	{
+		if( libcdata_array_get_number_of_entries(
+		     internal_attribute->data_runs_array,
+		     number_of_data_runs,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of data runs.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
