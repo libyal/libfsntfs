@@ -22,7 +22,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_data_run.h"
@@ -30,6 +29,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_unused.h"
 
 /* Creates a cluster block vector
@@ -39,14 +39,14 @@
 int libfsntfs_cluster_block_vector_initialize(
      libfdata_vector_t **cluster_block_vector,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error )
 {
 	libfsntfs_data_run_t *data_run = NULL;
 	static char *function          = "libfsntfs_cluster_block_vector_initialize";
 	int attribute_index            = 0;
-	int entry_index                = 0;
-	int number_of_entries          = 0;
+	int data_run_index             = 0;
+	int number_of_data_runs        = 0;
 	int segment_index              = 0;
 	uint16_t attribute_data_flags  = 0;
 
@@ -72,19 +72,8 @@ int libfsntfs_cluster_block_vector_initialize(
 
 		return( -1 );
 	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_attribute_get_data_flags(
-	     attribute,
+	if( libfsntfs_mft_attribute_get_data_flags(
+	     mft_attribute,
 	     &attribute_data_flags,
 	     error ) != 1 )
 	{
@@ -128,12 +117,12 @@ int libfsntfs_cluster_block_vector_initialize(
 
 		goto on_error;
 	}
-	while( attribute != NULL )
+	while( mft_attribute != NULL )
 	{
 /* TODO check VCN of previous attribute? */
-		if( libfsntfs_attribute_get_number_of_data_runs(
-		     attribute,
-		     &number_of_entries,
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     mft_attribute,
+		     &number_of_data_runs,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -146,13 +135,13 @@ int libfsntfs_cluster_block_vector_initialize(
 
 			goto on_error;
 		}
-		for( entry_index = 0;
-		     entry_index < number_of_entries;
-		     entry_index++ )
+		for( data_run_index = 0;
+		     data_run_index < number_of_data_runs;
+		     data_run_index++ )
 		{
-			if( libfsntfs_attribute_get_data_run_by_index(
-			     attribute,
-			     entry_index,
+			if( libfsntfs_mft_attribute_get_data_run_by_index(
+			     mft_attribute,
+			     data_run_index,
 			     &data_run,
 			     error ) != 1 )
 			{
@@ -163,7 +152,7 @@ int libfsntfs_cluster_block_vector_initialize(
 				 "%s: unable to retrieve attribute: %d data runs array entry: %d.",
 				 function,
 				 attribute_index,
-				 entry_index );
+				 data_run_index );
 
 				goto on_error;
 			}
@@ -176,7 +165,7 @@ int libfsntfs_cluster_block_vector_initialize(
 				 "%s: missing attribute: %d data run: %d.",
 				 function,
 				 attribute_index,
-				 entry_index );
+				 data_run_index );
 
 				goto on_error;
 			}
@@ -196,23 +185,23 @@ int libfsntfs_cluster_block_vector_initialize(
 				 "%s: unable to append attribute: %d data run: %d vector segment.",
 				 function,
 				 attribute_index,
-				 entry_index );
+				 data_run_index );
 
 				goto on_error;
 			}
 		}
 		attribute_index++;
 
-		if( libfsntfs_attribute_get_chained_attribute(
-		     attribute,
-		     &attribute,
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     mft_attribute,
+		     &mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve chained attribute: %d.",
+			 "%s: unable to retrieve next MFT attribute: %d.",
 			 function,
 			 attribute_index );
 

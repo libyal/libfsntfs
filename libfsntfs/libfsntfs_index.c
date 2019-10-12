@@ -40,6 +40,7 @@
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_libuna.h"
 #include "libfsntfs_unused.h"
 
 #include "fsntfs_index.h"
@@ -336,9 +337,11 @@ int libfsntfs_index_set_index_allocation_attribute(
 	}
 	else
 	{
-		if( libfsntfs_attribute_append_to_chain(
-		     &( index->index_allocation_attribute ),
-		     attribute,
+/* TODO pass mft_attribute to function */
+		if( libfsntfs_mft_attribute_append_to_chain(
+		     ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute,
+		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
+		     &( ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -392,9 +395,11 @@ int libfsntfs_index_set_bitmap_attribute(
 	}
 	else
 	{
-		if( libfsntfs_attribute_append_to_chain(
-		     &( index->bitmap_attribute ),
-		     attribute,
+/* TODO pass mft_attribute to function */
+		if( libfsntfs_mft_attribute_append_to_chain(
+		     ( (libfsntfs_internal_attribute_t *) index->bitmap_attribute )->mft_attribute,
+		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
+		     &( ( (libfsntfs_internal_attribute_t *) index->bitmap_attribute )->mft_attribute ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -538,10 +543,11 @@ int libfsntfs_index_read(
 	 */
 	if( index->index_allocation_attribute != NULL )
 	{
+/* TODO pass mft_attribute to function */
 		if( libfsntfs_index_entry_vector_initialize(
 		     &( index->index_entry_vector ),
 		     io_handle,
-		     index->index_allocation_attribute,
+		     ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute,
 		     index->index_entry_size,
 		     error ) != 1 )
 		{
@@ -664,8 +670,8 @@ int libfsntfs_index_read_root(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_data(
-	     index->index_root_attribute,
+	if( libfsntfs_internal_attribute_get_data(
+	     (libfsntfs_internal_attribute_t *) index->index_root_attribute,
 	     &index_root_attribute_data,
 	     &index_root_attribute_data_size,
 	     error ) != 1 )
@@ -1597,5 +1603,53 @@ int libfsntfs_index_get_index_value_by_index(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Compares the name with an UTF-8 encoded string
+ * Returns 1 if the strings are equal, 0 if not or -1 on error
+ */
+int libfsntfs_index_compare_name_with_utf8_string(
+     libfsntfs_index_t *index,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_compare_name_with_utf8_string";
+	int result            = 0;
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	result = libuna_utf8_string_compare_with_utf8_stream(
+		  utf8_string,
+		  utf8_string_length,
+		  index->name,
+		  index->name_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare index name with UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 

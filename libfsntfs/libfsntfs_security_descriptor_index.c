@@ -128,11 +128,12 @@ int libfsntfs_security_descriptor_index_initialize(
 
 		goto on_error;
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     &( ( *security_descriptor_index )->data_stream ),
 	     file_io_handle,
 	     io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

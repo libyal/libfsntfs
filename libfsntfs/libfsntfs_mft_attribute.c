@@ -32,6 +32,7 @@
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_name.h"
 
 #include "fsntfs_mft_attribute.h"
 
@@ -131,6 +132,16 @@ int libfsntfs_mft_attribute_free(
 	}
 	if( *mft_attribute != NULL )
 	{
+		if( ( *mft_attribute )->name != NULL )
+		{
+			memory_free(
+			 ( *mft_attribute )->name );
+		}
+		if( ( *mft_attribute )->data != NULL )
+		{
+			memory_free(
+			 ( *mft_attribute )->data );
+		}
 		if( ( *mft_attribute )->data_runs_array != NULL )
 		{
 			if( libcdata_array_free(
@@ -209,6 +220,17 @@ int libfsntfs_mft_attribute_read_data(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid MFT attribute - name value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->data != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid MFT attribute - data value already set.",
 		 function );
 
 		return( -1 );
@@ -378,6 +400,22 @@ int libfsntfs_mft_attribute_read_data(
 		 mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK );
 
 		goto on_error;
+	}
+	if( ( mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	{
+		if( io_handle->cluster_block_size > 4096 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compression flags: 0x%04" PRIx16 " for volume with cluster block size: %" PRIzd ".",
+			 function,
+			 mft_attribute->data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK,
+			 io_handle->cluster_block_size );
+
+			goto on_error;
+		}
 	}
 	mft_attribute->name_size *= 2;
 
@@ -679,7 +717,7 @@ int libfsntfs_mft_attribute_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create attribute name.",
+			 "%s: unable to create name.",
 			 function );
 
 			goto on_error;
@@ -693,7 +731,7 @@ int libfsntfs_mft_attribute_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy attribute name.",
+			 "%s: unable to copy name.",
 			 function );
 
 			goto on_error;
@@ -753,6 +791,34 @@ int libfsntfs_mft_attribute_read_data(
 				 0 );
 			}
 #endif
+			mft_attribute->data = (uint8_t *) memory_allocate(
+			                                   sizeof( uint8_t ) * (size_t) mft_attribute->data_size );
+
+			if( mft_attribute->data == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create data.",
+				 function );
+
+				goto on_error;
+			}
+			if( memory_copy(
+			     mft_attribute->data,
+			     &( data[ mft_attribute->data_offset ] ),
+			     (size_t) mft_attribute->data_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy data.",
+				 function );
+
+				goto on_error;
+			}
 			data_offset = (size_t) mft_attribute->data_offset + (size_t) mft_attribute->data_size;
 		}
 		else
@@ -962,7 +1028,7 @@ int libfsntfs_mft_attribute_read_data(
 					 data_run->size );
 
 					libcnotify_printf(
-					 "%s: data run: %02d cluster block number\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
+					 "%s: data run: %02d cluster block number\t\t: %" PRIu64 " (%" PRIi64 ") (offset: 0x%08" PRIx64 ")\n",
 					 function,
 					 data_run_index,
 					 last_data_run_cluster_block_number,
@@ -1032,6 +1098,13 @@ on_error:
 		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
 		 NULL );
 	}
+	if( mft_attribute->data != NULL )
+	{
+		memory_free(
+		 mft_attribute->data );
+
+		mft_attribute->data = NULL;
+	}
 	if( mft_attribute->name != NULL )
 	{
 		memory_free(
@@ -1042,6 +1115,208 @@ on_error:
 	mft_attribute->name_size = 0;
 
 	return( -1 );
+}
+
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_type(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint32_t *type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_type";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid type.",
+		 function );
+
+		return( -1 );
+	}
+	*type = mft_attribute->type;
+
+	return( 1 );
+}
+
+/* Retrieves the data flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_data_flags(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_data_flags";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data flags.",
+		 function );
+
+		return( -1 );
+	}
+	*data_flags = mft_attribute->data_flags;
+
+	return( 1 );
+}
+
+/* Retrieves the data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_data_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data size.",
+		 function );
+
+		return( -1 );
+	}
+	*data_size = mft_attribute->data_size;
+
+	return( 1 );
+}
+
+/* Retrieves the data VCN range
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_mft_attribute_get_data_vcn_range(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *data_first_vcn,
+     uint64_t *data_last_vcn,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_data_vcn_range";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_first_vcn == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data first VCN.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_last_vcn == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data last VCN.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_attribute->non_resident_flag & 0x01 ) != 0 )
+	{
+		*data_first_vcn = mft_attribute->data_first_vcn;
+		*data_last_vcn  = mft_attribute->data_last_vcn;
+
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Retrieves the valid data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_valid_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *valid_data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_valid_data_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( valid_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid valid data size.",
+		 function );
+
+		return( -1 );
+	}
+	*valid_data_size = mft_attribute->valid_data_size;
+
+	return( 1 );
 }
 
 /* Retrieves the size of the UTF-8 encoded name
@@ -1268,6 +1543,437 @@ int libfsntfs_mft_attribute_get_utf16_name(
 		 function );
 
 		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Compares the name with an UTF-8 encoded string
+ * Returns 1 if the strings are equal, 0 if not or -1 on error
+ */
+int libfsntfs_mft_attribute_compare_name_with_utf8_string(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_compare_name_with_utf8_string";
+	int result            = 0;
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->name == NULL )
+	{
+		return( 0 );
+	}
+	result = libfsapfs_name_compare_with_utf8_string(
+	          mft_attribute->name,
+	          mft_attribute->name_size,
+	          utf8_string,
+	          utf8_string_length,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-8 string with name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Compares the name with an UTF-16 encoded string
+ * Returns 1 if the strings are equal, 0 if not or -1 on error
+ */
+int libfsntfs_mft_attribute_compare_name_with_utf16_string(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_compare_name_with_utf16_string";
+	int result            = 0;
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->name == NULL )
+	{
+		return( 0 );
+	}
+	result = libfsapfs_name_compare_with_utf16_string(
+	          mft_attribute->name,
+	          mft_attribute->name_size,
+	          utf16_string,
+	          utf16_string_length,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-16 string with name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Retrieves the compression unit size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_compression_unit_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *compression_unit_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_compression_unit_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( compression_unit_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression unit size.",
+		 function );
+
+		return( -1 );
+	}
+	*compression_unit_size = mft_attribute->compression_unit_size;
+
+	return( 1 );
+}
+
+/* Retrieves the data
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_data(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint8_t **data,
+     size_t *data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_data";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->data_size > (uint64_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid MFT attribute - data size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data size.",
+		 function );
+
+		return( -1 );
+	}
+	*data      = mft_attribute->data;
+	*data_size = (size_t) mft_attribute->data_size;
+
+	return( 1 );
+}
+
+/* Retrieves the number of data runs
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_number_of_data_runs(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     int *number_of_data_runs,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_number_of_data_runs";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->data_runs_array == NULL )
+	{
+		if( number_of_data_runs == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid number of data runs.",
+			 function );
+
+			return( -1 );
+		}
+		*number_of_data_runs = 0;
+	}
+	else
+	{
+		if( libcdata_array_get_number_of_entries(
+		     mft_attribute->data_runs_array,
+		     number_of_data_runs,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of data runs.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific data run
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_data_run_by_index(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     int data_run_index,
+     libfsntfs_data_run_t **data_run,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_data_run_by_index";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     mft_attribute->data_runs_array,
+	     data_run_index,
+	     (intptr_t **) data_run,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data run: %d.",
+		 function,
+		 data_run_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the next attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_next_attribute(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t **next_attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_next_attribute";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( next_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid next attribute.",
+		 function );
+
+		return( -1 );
+	}
+	*next_attribute = mft_attribute->next_attribute;
+
+	return( 1 );
+}
+
+/* Appends the attribute to the attribute chain
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_append_to_chain(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *additional_attribute,
+     libfsntfs_mft_attribute_t **first_attribute,
+     libcerror_error_t **error )
+{
+	libfsntfs_mft_attribute_t *previous_attribute = NULL;
+	static char *function                         = "libfsntfs_mft_attribute_append_to_chain";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( additional_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid additional attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( first_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_attribute->type != additional_attribute->type )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: unable to chain attributes of different types.",
+		 function );
+
+		return( -1 );
+	}
+	*first_attribute = mft_attribute;
+
+	while( mft_attribute != NULL )
+	{
+		if( mft_attribute == additional_attribute )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid chained attribute value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+		if( mft_attribute->data_first_vcn > additional_attribute->data_first_vcn )
+		{
+			break;
+		}
+		previous_attribute = mft_attribute;
+	        mft_attribute      = mft_attribute->next_attribute;
+	}
+	if( previous_attribute == NULL )
+	{
+		additional_attribute->next_attribute = mft_attribute;
+
+		*first_attribute = additional_attribute;
+	}
+	else
+	{
+		if( previous_attribute->next_attribute != NULL )
+		{
+			additional_attribute->next_attribute = previous_attribute->next_attribute;
+		}
+		previous_attribute->next_attribute = additional_attribute;
 	}
 	return( 1 );
 }

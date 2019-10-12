@@ -185,10 +185,11 @@ int libfsntfs_file_entry_initialize(
 		}
 		if( mft_entry->data_attribute != NULL )
 		{
+/* TODO pass mft_attribute to function */
 			if( libfsntfs_cluster_block_stream_initialize(
 			     &( internal_file_entry->data_cluster_block_stream ),
 			     io_handle,
-			     mft_entry->data_attribute,
+			     ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2687,11 +2688,12 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_index(
 
 		return( -1 );
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2875,11 +2877,12 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
 	{
 		return( 0 );
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2966,11 +2969,12 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
 	{
 		return( 0 );
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     alternate_data_stream,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

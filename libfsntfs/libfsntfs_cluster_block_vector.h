@@ -25,10 +25,10 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -37,7 +37,7 @@ extern "C" {
 int libfsntfs_cluster_block_vector_initialize(
      libfdata_vector_t **cluster_block_vector,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

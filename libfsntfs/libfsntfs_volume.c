@@ -1400,10 +1400,11 @@ int libfsntfs_internal_volume_read_bitmap(
 
 		goto on_error;
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_cluster_block_vector_initialize(
 	     &cluster_block_vector,
 	     internal_volume->io_handle,
-	     mft_entry->data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1715,8 +1716,8 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	result = libfsntfs_attribute_compare_name_with_utf8_string(
-	          mft_entry->file_name_attribute,
+	result = libfsntfs_internal_attribute_compare_name_with_utf8_string(
+	          (libfsntfs_internal_attribute_t *) mft_entry->file_name_attribute,
 	          (uint8_t *) "$Secure",
 	          7,
 	          error );

@@ -120,11 +120,12 @@ int libfsntfs_usn_change_journal_initialize(
 
 		return( -1 );
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     &( internal_usn_change_journal->data_stream ),
 	     file_io_handle,
 	     io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

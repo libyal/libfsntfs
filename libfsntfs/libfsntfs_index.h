@@ -174,6 +174,12 @@ int libfsntfs_index_get_index_value_by_index(
      libfsntfs_index_value_t **index_value,
      libcerror_error_t **error );
 
+int libfsntfs_index_compare_name_with_utf8_string(
+     libfsntfs_index_t *index,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

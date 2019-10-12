@@ -22,7 +22,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_index_entry.h"
@@ -31,6 +30,7 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_unused.h"
 
 /* Creates an index entry vector
@@ -40,7 +40,7 @@
 int libfsntfs_index_entry_vector_initialize(
      libfdata_vector_t **index_entry_vector,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      uint32_t index_entry_size,
      libcerror_error_t **error )
 {
@@ -74,19 +74,8 @@ int libfsntfs_index_entry_vector_initialize(
 
 		return( -1 );
 	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_attribute_get_data_flags(
-	     attribute,
+	if( libfsntfs_mft_attribute_get_data_flags(
+	     mft_attribute,
 	     &attribute_data_flags,
 	     error ) != 1 )
 	{
@@ -130,11 +119,11 @@ int libfsntfs_index_entry_vector_initialize(
 
 		goto on_error;
 	}
-	while( attribute != NULL )
+	while( mft_attribute != NULL )
 	{
 /* TODO check VCN of previous attribute? */
-		if( libfsntfs_attribute_get_number_of_data_runs(
-		     attribute,
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     mft_attribute,
 		     &number_of_entries,
 		     error ) != 1 )
 		{
@@ -152,8 +141,8 @@ int libfsntfs_index_entry_vector_initialize(
 		     entry_index < number_of_entries;
 		     entry_index++ )
 		{
-			if( libfsntfs_attribute_get_data_run_by_index(
-			     attribute,
+			if( libfsntfs_mft_attribute_get_data_run_by_index(
+			     mft_attribute,
 			     entry_index,
 			     &data_run,
 			     error ) != 1 )
@@ -205,16 +194,16 @@ int libfsntfs_index_entry_vector_initialize(
 		}
 		attribute_index++;
 
-		if( libfsntfs_attribute_get_chained_attribute(
-		     attribute,
-		     &attribute,
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     mft_attribute,
+		     &mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve chained attribute: %d.",
+			 "%s: unable to retrieve next MFT attribute: %d.",
 			 function,
 			 attribute_index );
 

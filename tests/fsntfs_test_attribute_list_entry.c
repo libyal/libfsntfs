@@ -593,6 +593,84 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_attribute_list_entry_get_type function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_attribute_list_entry_get_type(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t type            = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_attribute_list_entry_get_type(
+	          attribute_list_entry,
+	          &type,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "type",
+	 type,
+	 (uint32_t) 0x00000080UL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_attribute_list_entry_get_type(
+	          NULL,
+	          &type,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_get_type(
+	          attribute_list_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_attribute_list_entry_get_file_reference function
  * Returns 1 if successful or 0 if not
  */
@@ -1215,6 +1293,226 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_attribute_list_entry_compare_name_with_utf8_string function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+{
+	uint8_t utf8_name1[ 5 ]  = { '$', 'S', 'D', 'S', 0 };
+	uint8_t utf8_name2[ 6 ]  = { 'b', 'o', 'g', 'u', 's', 0 };
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          attribute_list_entry,
+	          utf8_name1,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          attribute_list_entry,
+	          utf8_name2,
+	          5,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          NULL,
+	          utf8_name1,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          attribute_list_entry,
+	          NULL,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          attribute_list_entry,
+	          utf8_name1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_attribute_list_entry_compare_name_with_utf16_string function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+{
+	uint16_t utf16_name1[ 5 ] = { '$', 'S', 'D', 'S', 0 };
+	uint16_t utf16_name2[ 6 ] = { 'b', 'o', 'g', 'u', 's', 0 };
+	libcerror_error_t *error  = NULL;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          attribute_list_entry,
+	          utf16_name1,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          attribute_list_entry,
+	          utf16_name2,
+	          5,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          NULL,
+	          utf16_name1,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          attribute_list_entry,
+	          NULL,
+	          4,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          attribute_list_entry,
+	          utf16_name1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -1293,6 +1591,11 @@ int main(
 	/* Run tests
 	 */
 	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_attribute_list_entry_get_type",
+	 fsntfs_test_attribute_list_entry_get_type,
+	 attribute_list_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_attribute_list_entry_get_file_reference",
 	 fsntfs_test_attribute_list_entry_get_file_reference,
 	 attribute_list_entry );
@@ -1315,6 +1618,16 @@ int main(
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_attribute_list_entry_get_utf16_name",
 	 fsntfs_test_attribute_list_entry_get_utf16_name,
+	 attribute_list_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_attribute_list_entry_compare_name_with_utf8_string",
+	 fsntfs_test_attribute_list_entry_compare_name_with_utf8_string,
+	 attribute_list_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_attribute_list_entry_compare_name_with_utf16_string",
+	 fsntfs_test_attribute_list_entry_compare_name_with_utf16_string,
 	 attribute_list_entry );
 
 	/* Clean up

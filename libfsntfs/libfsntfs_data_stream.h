@@ -25,12 +25,12 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -47,7 +47,7 @@ struct libfsntfs_internal_data_stream
 
 	/* The $DATA attribute
 	 */
-	libfsntfs_attribute_t *data_attribute;
+	libfsntfs_mft_attribute_t *data_attribute;
 
 	/* The $DATA attribute cluster block stream
 	 */
@@ -62,7 +62,7 @@ int libfsntfs_data_stream_initialize(
      libfsntfs_data_stream_t **data_stream,
      libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

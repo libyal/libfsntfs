@@ -38,9 +38,10 @@ int libfsntfs_object_identifier_attribute_get_droid_file_identifier(
      size_t size,
      libcerror_error_t **error )
 {
-	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute             = NULL;
+	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	static char *function                                          = "libfsntfs_object_identifier_attribute_get_droid_file_identifier";
+	uint32_t attribute_type                                        = 0;
 
 	if( attribute == NULL )
 	{
@@ -55,17 +56,6 @@ int libfsntfs_object_identifier_attribute_get_droid_file_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -73,6 +63,31 @@ int libfsntfs_object_identifier_attribute_get_droid_file_identifier(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );
@@ -138,9 +153,11 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
      size_t size,
      libcerror_error_t **error )
 {
-	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute             = NULL;
+	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	static char *function                                          = "libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier";
+	uint64_t attribute_data_size                                   = 0;
+	uint32_t attribute_type                                        = 0;
 
 	if( attribute == NULL )
 	{
@@ -155,17 +172,6 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -173,6 +179,31 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );
@@ -212,7 +243,21 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier(
 
 		return( -1 );
 	}
-	if( internal_attribute->data_size < 64 )
+	if( libfsntfs_internal_attribute_get_data_size(
+	     internal_attribute,
+	     &attribute_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_data_size < 64 )
 	{
 		return( 0 );
 	}
@@ -242,9 +287,11 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
      size_t size,
      libcerror_error_t **error )
 {
-	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute             = NULL;
+	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	static char *function                                          = "libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier";
+	uint64_t attribute_data_size                                   = 0;
+	uint32_t attribute_type                                        = 0;
 
 	if( attribute == NULL )
 	{
@@ -259,17 +306,6 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -277,6 +313,31 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );
@@ -316,7 +377,21 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier(
 
 		return( -1 );
 	}
-	if( internal_attribute->data_size < 64 )
+	if( libfsntfs_internal_attribute_get_data_size(
+	     internal_attribute,
+	     &attribute_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_data_size < 64 )
 	{
 		return( 0 );
 	}
@@ -346,9 +421,11 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
      size_t size,
      libcerror_error_t **error )
 {
-	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute             = NULL;
+	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
 	static char *function                                          = "libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier";
+	uint64_t attribute_data_size                                   = 0;
+	uint32_t attribute_type                                        = 0;
 
 	if( attribute == NULL )
 	{
@@ -363,17 +440,6 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -381,6 +447,31 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );
@@ -420,7 +511,21 @@ int libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier(
 
 		return( -1 );
 	}
-	if( internal_attribute->data_size < 64 )
+	if( libfsntfs_internal_attribute_get_data_size(
+	     internal_attribute,
+	     &attribute_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_data_size < 64 )
 	{
 		return( 0 );
 	}

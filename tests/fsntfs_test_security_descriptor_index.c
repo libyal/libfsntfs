@@ -82,6 +82,8 @@ int fsntfs_test_security_descriptor_index_initialize(
 
 	result = libfsntfs_attribute_initialize(
 	          &data_attribute,
+	          NULL,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

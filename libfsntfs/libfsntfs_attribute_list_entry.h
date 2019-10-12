@@ -78,6 +78,11 @@ int libfsntfs_attribute_list_entry_read_data(
      size_t data_size,
      libcerror_error_t **error );
 
+int libfsntfs_attribute_list_entry_get_type(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint32_t *type,
+     libcerror_error_t **error );
+
 int libfsntfs_attribute_list_entry_get_file_reference(
      libfsntfs_attribute_list_entry_t *attribute_list_entry,
      uint64_t *mft_entry_index,
@@ -104,6 +109,18 @@ int libfsntfs_attribute_list_entry_get_utf16_name(
      libfsntfs_attribute_list_entry_t *attribute_list_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
+int libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

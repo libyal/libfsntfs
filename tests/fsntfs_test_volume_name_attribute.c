@@ -112,16 +112,16 @@ int fsntfs_test_volume_name_attribute_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
-	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type;
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = 0;
 
 	result = libfsntfs_volume_name_attribute_get_utf8_name_size(
 	          attribute,
 	          &utf8_name_size,
 	          &error );
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -249,9 +249,9 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type;
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = 0;
 
 	result = libfsntfs_volume_name_attribute_get_utf8_name(
 	          attribute,
@@ -259,7 +259,7 @@ int fsntfs_test_volume_name_attribute_get_utf8_name(
 	          16,
 	          &error );
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -352,16 +352,16 @@ int fsntfs_test_volume_name_attribute_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
-	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type;
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = 0;
 
 	result = libfsntfs_volume_name_attribute_get_utf16_name_size(
 	          attribute,
 	          &utf16_name_size,
 	          &error );
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -489,9 +489,9 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-	type = ( (libfsntfs_internal_attribute_t *) attribute )->type;
+	type = ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type;
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = 0;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = 0;
 
 	result = libfsntfs_volume_name_attribute_get_utf16_name(
 	          attribute,
@@ -499,7 +499,7 @@ int fsntfs_test_volume_name_attribute_get_utf16_name(
 	          16,
 	          &error );
 
-	( (libfsntfs_internal_attribute_t *) attribute )->type = type;
+	( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute->type = type;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -539,11 +539,11 @@ int main(
 #endif
 {
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
-	libcerror_error_t *error         = NULL;
-	libfsntfs_attribute_t *attribute = NULL;
-	libfsntfs_io_handle_t *io_handle = NULL;
-	ssize_t read_count               = 0;
-	int result                       = 0;
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_attribute_t *attribute         = NULL;
+	libfsntfs_io_handle_t *io_handle         = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	int result                               = 0;
 #endif
 
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
@@ -572,8 +572,43 @@ int main(
 	 "error",
 	 error );
 
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_volume_name_attribute_data1,
+	          48,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
+	          mft_attribute,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -584,23 +619,6 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "attribute",
 	 attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	read_count = libfsntfs_attribute_read_from_mft_entry_data(
-	              attribute,
-	              io_handle,
-	              fsntfs_test_volume_name_attribute_data1,
-	              48,
-	              0,
-	              &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) 48 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -695,6 +713,12 @@ on_error:
 	{
 		libfsntfs_internal_attribute_free(
 	         (libfsntfs_internal_attribute_t **) &attribute,
+	         &error );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+	         &mft_attribute,
 	         &error );
 	}
 	if( io_handle != NULL )

@@ -29,6 +29,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libuna.h"
+#include "libfsntfs_name.h"
 
 #include "fsntfs_attribute_list.h"
 
@@ -365,7 +366,7 @@ int libfsntfs_attribute_list_entry_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create attribute name.",
+			 "%s: unable to create name.",
 			 function );
 
 			goto on_error;
@@ -379,7 +380,7 @@ int libfsntfs_attribute_list_entry_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy attribute name.",
+			 "%s: unable to copy name.",
 			 function );
 
 			goto on_error;
@@ -444,6 +445,43 @@ on_error:
 	attribute_list_entry->name_size = 0;
 
 	return( -1 );
+}
+
+/* Retrieves the type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_entry_get_type(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint32_t *type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_entry_get_type";
+
+	if( attribute_list_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid type.",
+		 function );
+
+		return( -1 );
+	}
+	*type = attribute_list_entry->type;
+
+	return( 1 );
 }
 
 /* Retrieves the file references as an MFT entry index and sequence number
@@ -715,5 +753,109 @@ int libfsntfs_attribute_list_entry_get_utf16_name(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Compares the name with an UTF-8 encoded string
+ * Returns 1 if the strings are equal, 0 if not or -1 on error
+ */
+int libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_entry_compare_name_with_utf8_string";
+	int result            = 0;
+
+	if( attribute_list_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_list_entry->name == NULL )
+	{
+		return( 0 );
+	}
+	result = libfsapfs_name_compare_with_utf8_string(
+	          attribute_list_entry->name,
+	          attribute_list_entry->name_size,
+	          utf8_string,
+	          utf8_string_length,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-8 string with name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Compares the name with an UTF-16 encoded string
+ * Returns 1 if the strings are equal, 0 if not or -1 on error
+ */
+int libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_entry_compare_name_with_utf16_string";
+	int result            = 0;
+
+	if( attribute_list_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_list_entry->name == NULL )
+	{
+		return( 0 );
+	}
+	result = libfsapfs_name_compare_with_utf16_string(
+	          attribute_list_entry->name,
+	          attribute_list_entry->name_size,
+	          utf16_string,
+	          utf16_string_length,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare UTF-16 string with name.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 

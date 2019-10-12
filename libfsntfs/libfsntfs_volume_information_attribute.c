@@ -38,9 +38,10 @@ int libfsntfs_volume_information_attribute_get_version(
      uint8_t *minor_version,
      libcerror_error_t **error )
 {
-	libfsntfs_volume_information_values_t *volume_information_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute               = NULL;
+	libfsntfs_volume_information_values_t *volume_information_values = NULL;
 	static char *function                                            = "libfsntfs_volume_information_attribute_get_flags";
+	uint32_t attribute_type                                          = 0;
 
 	if( attribute == NULL )
 	{
@@ -55,17 +56,6 @@ int libfsntfs_volume_information_attribute_get_version(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -73,6 +63,31 @@ int libfsntfs_volume_information_attribute_get_version(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );
@@ -115,9 +130,10 @@ int libfsntfs_volume_information_attribute_get_flags(
      uint16_t *flags,
      libcerror_error_t **error )
 {
-	libfsntfs_volume_information_values_t *volume_information_values = NULL;
 	libfsntfs_internal_attribute_t *internal_attribute               = NULL;
+	libfsntfs_volume_information_values_t *volume_information_values = NULL;
 	static char *function                                            = "libfsntfs_volume_information_attribute_get_flags";
+	uint32_t attribute_type                                          = 0;
 
 	if( attribute == NULL )
 	{
@@ -132,17 +148,6 @@ int libfsntfs_volume_information_attribute_get_flags(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported attribute type.",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_attribute->value == NULL )
 	{
 		libcerror_error_set(
@@ -150,6 +155,31 @@ int libfsntfs_volume_information_attribute_get_flags(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid attribute - missing value.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_internal_attribute_get_type(
+	     internal_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
 		 function );
 
 		return( -1 );

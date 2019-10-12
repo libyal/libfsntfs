@@ -1,5 +1,5 @@
 /*
- * The index entry vector functions
+ * Name functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,31 +19,36 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INDEX_ENTRY_VECTOR_H )
-#define _LIBFSNTFS_INDEX_ENTRY_VECTOR_H
+#if !defined( _LIBFSNTFS_NAME_H )
+#define _LIBFSNTFS_NAME_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfdata.h"
-#include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_libuna.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libfsntfs_index_entry_vector_initialize(
-     libfdata_vector_t **index_entry_vector,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
-     uint32_t index_entry_size,
+int libfsapfs_name_compare_with_utf8_string(
+     const uint8_t *name,
+     size_t name_size,
+     const libuna_utf8_character_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
+int libfsapfs_name_compare_with_utf16_string(
+     const uint8_t *name,
+     size_t name_size,
+     const libuna_utf16_character_t *utf16_string,
+     size_t utf16_string_length,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INDEX_ENTRY_VECTOR_H ) */
+#endif /* !defined( _LIBFSNTFS_NAME_H ) */
 

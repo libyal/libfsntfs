@@ -234,8 +234,8 @@ int libfsntfs_attribute_list_read_from_attribute(
 	}
 	if( number_of_data_runs == 0 )
 	{
-		if( libfsntfs_attribute_get_data(
-		     attribute,
+		if( libfsntfs_internal_attribute_get_data(
+		     (libfsntfs_internal_attribute_t *) attribute,
 		     &data,
 		     &data_size,
 		     error ) != 1 )
@@ -317,10 +317,11 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
+/* TODO pass mft_attribute to function */
 		if( libfsntfs_cluster_block_vector_initialize(
 		     &cluster_block_vector,
 		     io_handle,
-		     attribute,
+		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

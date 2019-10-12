@@ -261,15 +261,16 @@ int libfsntfs_mft_set_data_runs(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_attribute_t *data_attribute = NULL;
-	libfsntfs_data_run_t *data_run                 = NULL;
-	static char *function                          = "libfsntfs_mft_set_data_runs";
-	size64_t mft_data_size                         = 0;
-	size64_t mft_entry_size                        = 0;
-	int data_run_index                             = 0;
-	int number_of_data_runs                        = 0;
-	int segment_index                              = 0;
-	uint16_t attribute_data_flags                  = 0;
+	libfsntfs_data_run_t *data_run            = NULL;
+	libfsntfs_mft_attribute_t *data_attribute = NULL;
+	static char *function                     = "libfsntfs_mft_set_data_runs";
+	size64_t mft_data_size                    = 0;
+	size64_t mft_entry_size                   = 0;
+	uint16_t attribute_data_flags             = 0;
+	int attribute_index                       = 0;
+	int data_run_index                        = 0;
+	int number_of_data_runs                   = 0;
+	int segment_index                         = 0;
 
 	if( mft == NULL )
 	{
@@ -293,6 +294,7 @@ int libfsntfs_mft_set_data_runs(
 
 		return( -1 );
 	}
+/* TODO pass mft_attribute to function */
 	if( mft_entry->data_attribute == NULL )
 	{
 		libcerror_error_set(
@@ -358,12 +360,12 @@ int libfsntfs_mft_set_data_runs(
 
 		return( -1 );
 	}
-	data_attribute = (libfsntfs_internal_attribute_t *) mft_entry->data_attribute;
+	data_attribute = ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute;
 
 	while( data_attribute != NULL )
 	{
-		if( libfsntfs_attribute_get_data_flags(
-		     (libfsntfs_attribute_t *) data_attribute,
+		if( libfsntfs_mft_attribute_get_data_flags(
+		     data_attribute,
 		     &attribute_data_flags,
 		     error ) != 1 )
 		{
@@ -387,8 +389,8 @@ int libfsntfs_mft_set_data_runs(
 
 			return( -1 );
 		}
-		if( libfsntfs_attribute_get_number_of_data_runs(
-		     (libfsntfs_attribute_t *) data_attribute,
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     data_attribute,
 		     &number_of_data_runs,
 		     error ) != 1 )
 		{
@@ -405,8 +407,8 @@ int libfsntfs_mft_set_data_runs(
 		     data_run_index < number_of_data_runs;
 		     data_run_index++ )
 		{
-			if( libfsntfs_attribute_get_data_run_by_index(
-			     (libfsntfs_attribute_t *) data_attribute,
+			if( libfsntfs_mft_attribute_get_data_run_by_index(
+			     data_attribute,
 			     data_run_index,
 			     &data_run,
 			     error ) != 1 )
@@ -432,8 +434,12 @@ int libfsntfs_mft_set_data_runs(
 
 				return( -1 );
 			}
+/* TODO refactor data_attribute == ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute
+ * To be clear what it is supposed to check, likely the first data attribute
+ * use attribute_index ?
+ */
 			if( ( data_run_index == 0 )
-			 && ( data_attribute == (libfsntfs_internal_attribute_t *) mft_entry->data_attribute ) )
+			 && ( data_attribute == ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute ) )
 			{
 				if( libfdata_vector_set_segment_by_index(
 				     mft->mft_entry_vector,
@@ -477,7 +483,21 @@ int libfsntfs_mft_set_data_runs(
 				}
 			}
 		}
-		data_attribute = (libfsntfs_internal_attribute_t *) data_attribute->next_attribute;
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     data_attribute,
+		     &data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next MFT entry: 0 data attribute: %d.",
+			 function,
+			 attribute_index );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }

@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_compressed_block.h"
 #include "libfsntfs_compressed_block_descriptor.h"
@@ -35,6 +34,7 @@
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_unused.h"
 
 /* Creates a data handle
@@ -688,7 +688,7 @@ off64_t libfsntfs_cluster_block_stream_data_handle_seek_segment_offset(
 int libfsntfs_cluster_block_stream_initialize(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error )
 {
 	libfsntfs_cluster_block_stream_data_handle_t *data_handle            = NULL;
@@ -733,19 +733,9 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		return( -1 );
 	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_attribute_get_data(
-	     attribute,
+/* TODO replace data_size by resident_data_size */
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
 	     &resident_data,
 	     &data_size,
 	     error ) != 1 )
@@ -759,8 +749,8 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_attribute_get_valid_data_size(
-	     attribute,
+	if( libfsntfs_mft_attribute_get_valid_data_size(
+	     mft_attribute,
 	     &valid_data_size,
 	     error ) != 1 )
 	{
@@ -777,8 +767,8 @@ int libfsntfs_cluster_block_stream_initialize(
 	{
 		valid_data_size = data_size;
 	}
-	if( libfsntfs_attribute_get_data_flags(
-	     attribute,
+	if( libfsntfs_mft_attribute_get_data_flags(
+	     mft_attribute,
 	     &data_flags,
 	     error ) != 1 )
 	{
@@ -809,8 +799,8 @@ int libfsntfs_cluster_block_stream_initialize(
 	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	 && ( resident_data == NULL ) )
 	{
-		if( libfsntfs_attribute_get_compression_unit_size(
-		     attribute,
+		if( libfsntfs_mft_attribute_get_compression_unit_size(
+		     mft_attribute,
 		     &compression_unit_size,
 		     error ) != 1 )
 		{
@@ -886,7 +876,7 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
-	while( attribute != NULL )
+	while( mft_attribute != NULL )
 	{
 		if( ( attribute_index > 0 )
 		 && ( data_handle->resident_data != NULL ) )
@@ -915,8 +905,8 @@ int libfsntfs_cluster_block_stream_initialize(
 
 			goto on_error;
 		}
-		result = libfsntfs_attribute_get_data_vcn_range(
-		          attribute,
+		result = libfsntfs_mft_attribute_get_data_vcn_range(
+		          mft_attribute,
 		          (uint64_t *) &attribute_data_vcn_offset,
 		          (uint64_t *) &attribute_data_vcn_size,
 		          error );
@@ -960,8 +950,8 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		else if( attribute_data_vcn_size == 0xffffffffffffffffULL )
 		{
-			if( libfsntfs_attribute_get_data_size(
-			     attribute,
+			if( libfsntfs_mft_attribute_get_data_size(
+			     mft_attribute,
 			     &attribute_data_size,
 			     error ) != 1 )
 			{
@@ -1050,8 +1040,8 @@ int libfsntfs_cluster_block_stream_initialize(
 
 				goto on_error;
 			}
-			if( libfsntfs_attribute_get_data_flags(
-			     attribute,
+			if( libfsntfs_mft_attribute_get_data_flags(
+			     mft_attribute,
 			     &attribute_data_flags,
 			     error ) != 1 )
 			{
@@ -1079,8 +1069,8 @@ int libfsntfs_cluster_block_stream_initialize(
 
 				goto on_error;
 			}
-			if( libfsntfs_attribute_get_number_of_data_runs(
-			     attribute,
+			if( libfsntfs_mft_attribute_get_number_of_data_runs(
+			     mft_attribute,
 			     &number_of_data_runs,
 			     error ) != 1 )
 			{
@@ -1099,8 +1089,8 @@ int libfsntfs_cluster_block_stream_initialize(
 			     data_run_index < number_of_data_runs;
 			     data_run_index++ )
 			{
-				if( libfsntfs_attribute_get_data_run_by_index(
-				     attribute,
+				if( libfsntfs_mft_attribute_get_data_run_by_index(
+				     mft_attribute,
 				     data_run_index,
 				     &data_run,
 				     error ) != 1 )
@@ -1392,16 +1382,16 @@ int libfsntfs_cluster_block_stream_initialize(
 			}
 			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
 		}
-		if( libfsntfs_attribute_get_chained_attribute(
-		     attribute,
-		     &attribute,
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     mft_attribute,
+		     &mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve chained attribute: %d.",
+			 "%s: unable to retrieve next MFT attribute: %d.",
 			 function,
 			 attribute_index );
 

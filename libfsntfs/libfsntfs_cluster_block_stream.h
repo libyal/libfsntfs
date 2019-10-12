@@ -25,11 +25,11 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -116,7 +116,7 @@ off64_t libfsntfs_cluster_block_stream_data_handle_seek_segment_offset(
 int libfsntfs_cluster_block_stream_initialize(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

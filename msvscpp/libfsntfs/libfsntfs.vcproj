@@ -298,6 +298,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_name.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_notify.c"
 				>
 			</File>
@@ -613,6 +617,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft_metadata_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_name.h"
 				>
 			</File>
 			<File

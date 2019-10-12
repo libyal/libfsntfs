@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_data_run.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
@@ -93,9 +94,17 @@ struct libfsntfs_mft_attribute
 	 */
 	uint8_t *name;
 
+	/* The data
+	 */
+	uint8_t *data;
+
 	/* The data runs array
 	 */
 	libcdata_array_t *data_runs_array;
+
+	/* The next attribute in an attribute chain
+	 */
+	libfsntfs_mft_attribute_t *next_attribute;
 };
 
 int libfsntfs_mft_attribute_initialize(
@@ -111,6 +120,32 @@ int libfsntfs_mft_attribute_read_data(
      libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_type(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint32_t *type,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_data_flags(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint16_t *data_flags,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_data_vcn_range(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *data_first_vcn,
+     uint64_t *data_last_vcn,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_valid_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *valid_data_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_get_utf8_name_size(
@@ -133,6 +168,51 @@ int libfsntfs_mft_attribute_get_utf16_name(
      libfsntfs_mft_attribute_t *mft_attribute,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_compare_name_with_utf8_string(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_compare_name_with_utf16_string(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_compression_unit_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     size_t *compression_unit_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_data(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint8_t **data,
+     size_t *data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_number_of_data_runs(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     int *number_of_data_runs,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_data_run_by_index(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     int data_run_index,
+     libfsntfs_data_run_t **data_run,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_get_next_attribute(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t **next_attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_attribute_append_to_chain(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *additional_attribute,
+     libfsntfs_mft_attribute_t **first_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

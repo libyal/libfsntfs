@@ -31,6 +31,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 
 /* Creates a data stream
@@ -41,7 +42,7 @@ int libfsntfs_data_stream_initialize(
      libfsntfs_data_stream_t **data_stream,
      libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
@@ -112,7 +113,7 @@ int libfsntfs_data_stream_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_number_of_data_runs(
+	if( libfsntfs_mft_attribute_get_number_of_data_runs(
 	     data_attribute,
 	     &number_of_data_runs,
 	     error ) != 1 )
@@ -126,10 +127,11 @@ int libfsntfs_data_stream_initialize(
 
 		goto on_error;
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_cluster_block_stream_initialize(
 	     &( internal_data_stream->data_cluster_block_stream ),
 	     io_handle,
-	     data_attribute,
+	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -141,7 +143,7 @@ int libfsntfs_data_stream_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_attribute_get_data_size(
+	if( libfsntfs_mft_attribute_get_data_size(
 	     data_attribute,
 	     &( internal_data_stream->data_size ),
 	     error ) != 1 )
@@ -247,7 +249,7 @@ int libfsntfs_data_stream_get_utf8_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( libfsntfs_attribute_get_utf8_name_size(
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     internal_data_stream->data_attribute,
 	     utf8_string_size,
 	     error ) != 1 )
@@ -290,7 +292,7 @@ int libfsntfs_data_stream_get_utf8_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( libfsntfs_attribute_get_utf8_name(
+	if( libfsntfs_mft_attribute_get_utf8_name(
 	     internal_data_stream->data_attribute,
 	     utf8_string,
 	     utf8_string_size,
@@ -333,7 +335,7 @@ int libfsntfs_data_stream_get_utf16_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( libfsntfs_attribute_get_utf16_name_size(
+	if( libfsntfs_mft_attribute_get_utf16_name_size(
 	     internal_data_stream->data_attribute,
 	     utf16_string_size,
 	     error ) != 1 )
@@ -376,7 +378,7 @@ int libfsntfs_data_stream_get_utf16_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( libfsntfs_attribute_get_utf16_name(
+	if( libfsntfs_mft_attribute_get_utf16_name(
 	     internal_data_stream->data_attribute,
 	     utf16_string,
 	     utf16_string_size,
