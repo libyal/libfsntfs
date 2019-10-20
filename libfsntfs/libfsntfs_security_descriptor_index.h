@@ -29,6 +29,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_values.h"
 
@@ -44,10 +45,6 @@ struct libfsntfs_security_descriptor_index
 	 */
 	libcdata_btree_t *security_descriptors_index_values_tree;
 
-	/* The $SDS $DATA attribute
-	 */
-	libfsntfs_attribute_t *data_attribute;
-
 	/* The $SDS data stream
 	 */
 	libfsntfs_data_stream_t *data_stream;
@@ -57,7 +54,7 @@ int libfsntfs_security_descriptor_index_initialize(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_security_descriptor_index_free(

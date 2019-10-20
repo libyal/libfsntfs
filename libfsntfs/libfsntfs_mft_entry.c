@@ -2662,39 +2662,6 @@ int libfsntfs_mft_entry_append_index(
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_index_initialize(
 	     index,
 	     utf8_string,
@@ -2708,7 +2675,7 @@ int libfsntfs_mft_entry_append_index(
 		 "%s: unable to create index.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libcdata_array_append_entry(
 	     mft_entry->index_array,
@@ -2723,11 +2690,7 @@ int libfsntfs_mft_entry_append_index(
 		 "%s: unable to append index to array.",
 		 function );
 
-		libfsntfs_index_free(
-		 index,
-		 NULL );
-
-		return( -1 );
+		goto on_error;
 	}
 	if( mft_entry->i30_index == NULL )
 	{
@@ -2746,7 +2709,7 @@ int libfsntfs_mft_entry_append_index(
 			 "%s: unable to compare index name with $I30.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result != 0 )
 		{
@@ -2770,7 +2733,7 @@ int libfsntfs_mft_entry_append_index(
 			 "%s: unable to compare index name with $SII.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result != 0 )
 		{
@@ -2778,6 +2741,15 @@ int libfsntfs_mft_entry_append_index(
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( *index != NULL )
+	{
+		libfsntfs_index_free(
+		 index,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Retrieves an index with the specified name
@@ -2951,11 +2923,24 @@ int libfsntfs_mft_entry_get_index_by_utf8_name(
 
 			return( -1 );
 		}
-		if( ( ( *index )->name_size == utf8_string_size )
-		 && ( memory_compare(
-		       ( *index )->name,
-		       utf8_string,
-		       utf8_string_size ) == 0 ) )
+		result = libfsntfs_index_compare_name_with_utf8_string(
+			  *index,
+			  utf8_string,
+			  utf8_string_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare index name with UTF-8 string.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
 		{
 			return( 1 );
 		}
@@ -3682,9 +3667,10 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 			return( -1 );
 		}
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_index_set_index_allocation_attribute(
 	     index,
-	     attribute,
+	     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3802,9 +3788,10 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 			return( -1 );
 		}
 	}
+/* TODO pass mft_attribute to function */
 	if( libfsntfs_index_set_index_root_attribute(
 	     index,
-	     attribute,
+	     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

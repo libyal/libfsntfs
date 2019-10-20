@@ -33,6 +33,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -48,7 +49,7 @@ struct libfsntfs_index
 
 	/* The name
 	 */
-	const uint8_t *name;
+	uint8_t *name;
 
 	/* The name size
 	 */
@@ -62,15 +63,15 @@ struct libfsntfs_index
 	 */
 	uint32_t flags;
 
-	/* The $INDEX_ROOT attribute
+	/* The $INDEX_ROOT MFT attribute
 	 */
-	libfsntfs_attribute_t *index_root_attribute;
+	libfsntfs_mft_attribute_t *index_root_attribute;
 
-	/* The $INDEX_ALLOCATION attribute
+	/* The $INDEX_ALLOCATION MFT attribute
 	 */
-	libfsntfs_attribute_t *index_allocation_attribute;
+	libfsntfs_mft_attribute_t *index_allocation_attribute;
 
-	/* The $BITMAP attribute
+	/* The $BITMAP MFT attribute
 	 */
 	libfsntfs_attribute_t *bitmap_attribute;
 
@@ -111,12 +112,12 @@ int libfsntfs_index_free(
 
 int libfsntfs_index_set_index_root_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_index_set_index_allocation_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_index_set_bitmap_attribute(

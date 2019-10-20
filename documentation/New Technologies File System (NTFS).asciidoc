@@ -933,10 +933,10 @@ See section: <<file_reference,The file reference>>
 [yellow-background]*An unique identifier to distinguish between attributes that contain segmented data.*
 |===
 
-The data first VCN is used when the attribute data is stored in multiple MFT
-entries. The attribute list contains an attribute list entry for every MFT
-entry. The corresponding MFT entry will contain an MFT attribute containing the
-attribute data. See `[CARRIER05]` pages 365 and 366 for more information.
+The data first VCN is used when the attribute data is stored. The attribute list
+contains an attribute list entry for every cluster block. The corresponding
+cluster block will contain an MFT attribute containing the attribute data. See
+`[CARRIER05]` pages 365 and 366 for more information.
 
 ===== Attribute name
 

@@ -283,6 +283,9 @@ on_error:
 int fsntfs_test_file_name_values_clone(
      void )
 {
+	uint8_t name_utf16_stream[ 10 ] = {
+		't', 0, 'e', 0, 's', 0, 't', 0, 0, 0 };
+
 	libcerror_error_t *error                                   = NULL;
 	libfsntfs_file_name_values_t *destination_file_name_values = NULL;
 	libfsntfs_file_name_values_t *source_file_name_values      = NULL;
@@ -302,6 +305,21 @@ int fsntfs_test_file_name_values_clone(
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "source_file_name_values",
 	 source_file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_file_name_values_set_name(
+	          source_file_name_values,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -442,8 +460,8 @@ int fsntfs_test_file_name_values_clone(
 		libcerror_error_free(
 		 &error );
 	}
+#if defined( OPTIMIZATION_DISABLED )
 
-#ifdef TODO
 	/* Test libfsntfs_file_name_values_clone with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
@@ -482,7 +500,7 @@ int fsntfs_test_file_name_values_clone(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* TODO */
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up
@@ -522,6 +540,268 @@ on_error:
 	{
 		libfsntfs_file_name_values_free(
 		 &source_file_name_values,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_name_values_set_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_name_values_set_name(
+     void )
+{
+	uint8_t name_utf16_stream[ 10 ] = {
+		't', 0, 'e', 0, 's', 0, 't', 0, 0, 0 };
+
+	libcerror_error_t *error                       = NULL;
+	libfsntfs_file_name_values_t *file_name_values = NULL;
+	int result                                     = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_file_name_values_initialize(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_file_name_values_free(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_file_name_values_initialize(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_name_values_set_name(
+	          NULL,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          NULL,
+	          10,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          name_utf16_stream,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	/* Test libfsntfs_file_name_values_set_name with malloc failing
+	 */
+	fsntfs_test_malloc_attempts_before_fail = 0;
+
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	if( fsntfs_test_malloc_attempts_before_fail != -1 )
+	{
+		fsntfs_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libfsntfs_file_name_values_set_name with memcpy failing
+	 */
+	fsntfs_test_memcpy_attempts_before_fail = 0;
+
+	result = libfsntfs_file_name_values_set_name(
+	          file_name_values,
+	          name_utf16_stream,
+	          10,
+	          &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libfsntfs_file_name_values_free(
+	          &file_name_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "file_name_values",
+	 file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
 		 NULL );
 	}
 	return( 0 );
@@ -1603,10 +1883,12 @@ int main(
 	 fsntfs_test_file_name_values_clone );
 
 	FSNTFS_TEST_RUN(
+	 "libfsntfs_file_name_values_set_name",
+	 fsntfs_test_file_name_values_set_name );
+
+	FSNTFS_TEST_RUN(
 	 "libfsntfs_file_name_values_read_data",
 	 fsntfs_test_file_name_values_read_data );
-
-	/* TODO: add tests for libfsntfs_file_name_values_read_from_attribute */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
@@ -1693,8 +1975,6 @@ int main(
 	 "libfsntfs_file_name_values_get_utf16_name",
 	 fsntfs_test_file_name_values_get_utf16_name,
 	 file_name_values );
-
-	/* TODO: add tests for libfsntfs_file_name_values_set_name */
 
 	/* TODO: add tests for libfsntfs_file_name_values_compare_short_name */
 

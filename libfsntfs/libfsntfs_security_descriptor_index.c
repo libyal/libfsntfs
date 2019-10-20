@@ -28,6 +28,7 @@
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_index_value.h"
 #include "libfsntfs_security_descriptor_values.h"
@@ -43,7 +44,7 @@ int libfsntfs_security_descriptor_index_initialize(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_security_descriptor_index_initialize";
@@ -128,12 +129,12 @@ int libfsntfs_security_descriptor_index_initialize(
 
 		goto on_error;
 	}
-/* TODO pass mft_attribute to function */
+/* TODO move out of index ? */
 	if( libfsntfs_data_stream_initialize(
 	     &( ( *security_descriptor_index )->data_stream ),
 	     file_io_handle,
 	     io_handle,
-	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
+	     data_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -145,19 +146,11 @@ int libfsntfs_security_descriptor_index_initialize(
 
 		goto on_error;
 	}
-	( *security_descriptor_index )->data_attribute = data_attribute;
-
 	return( 1 );
 
 on_error:
 	if( *security_descriptor_index != NULL )
 	{
-		if( ( *security_descriptor_index )->data_stream != NULL )
-		{
-			libfsntfs_data_stream_free(
-			 &( ( *security_descriptor_index )->data_stream ),
-			 NULL );
-		}
 		if( ( *security_descriptor_index )->security_descriptors_index_values_tree != NULL )
 		{
 			libcdata_btree_free(
@@ -196,8 +189,6 @@ int libfsntfs_security_descriptor_index_free(
 	}
 	if( *security_descriptor_index != NULL )
 	{
-		/* The data_attribute reference is freed elsewhere
-		 */
 		if( libcdata_btree_free(
 		     &( ( *security_descriptor_index )->security_descriptors_index_values_tree ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_security_descriptor_index_value_free,

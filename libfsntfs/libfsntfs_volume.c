@@ -1755,7 +1755,7 @@ int libfsntfs_internal_volume_read_security_descriptors(
 		     &( internal_volume->security_descriptor_index ),
 		     internal_volume->io_handle,
 		     file_io_handle,
-		     data_attribute,
+		     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

@@ -63,13 +63,13 @@ struct libfsntfs_file_name_values
 	 */
 	uint8_t name_namespace;
 
-	/* The name
+	/* The UTF-16 little-endian formatted name
 	 */
 	uint8_t *name;
 
 	/* The name size
 	 */
-	uint16_t name_size;
+	size_t name_size;
 };
 
 int libfsntfs_file_name_values_initialize(
@@ -85,15 +85,16 @@ int libfsntfs_file_name_values_clone(
      libfsntfs_file_name_values_t *source_file_name_values,
      libcerror_error_t **error );
 
+int libfsntfs_file_name_values_set_name(
+     libfsntfs_file_name_values_t *file_name_values,
+     const uint8_t *utf16_stream,
+     size_t utf16_stream_size,
+     libcerror_error_t **error );
+
 int libfsntfs_file_name_values_read_data(
      libfsntfs_file_name_values_t *file_name_values,
      const uint8_t *data,
      size_t data_size,
-     libcerror_error_t **error );
-
-int libfsntfs_file_name_values_read_from_attribute(
-     libfsntfs_file_name_values_t *file_name_values,
-     libfsntfs_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_parent_file_reference(
@@ -146,12 +147,6 @@ int libfsntfs_file_name_values_get_utf16_name(
      libfsntfs_file_name_values_t *file_name_values,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     libcerror_error_t **error );
-
-int libfsntfs_file_name_values_set_name(
-     libfsntfs_file_name_values_t *file_name_values,
-     const uint8_t *name,
-     uint16_t name_size,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_compare_short_name(

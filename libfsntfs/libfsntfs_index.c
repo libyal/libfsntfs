@@ -79,6 +79,29 @@ int libfsntfs_index_initialize(
 
 		return( -1 );
 	}
+	if( name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid name.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( name_size <= 1 )
+	 || ( name_size > (size_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid name size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
 	*index = memory_allocate_structure(
 	          libfsntfs_index_t );
 
@@ -112,6 +135,36 @@ int libfsntfs_index_initialize(
 
 		return( -1 );
 	}
+	( *index )->name = (uint8_t *) memory_allocate(
+	                                sizeof( uint8_t ) * name_size );
+
+	if( ( *index )->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create name.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     ( *index )->name,
+	     name,
+	     sizeof( uint8_t ) * name_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy name.",
+		 function );
+
+		goto on_error;
+	}
+	( *index )->name_size = name_size;
+
 	if( libcdata_array_initialize(
 	     &( ( *index )->root_values_array ),
 	     0,
@@ -126,14 +179,16 @@ int libfsntfs_index_initialize(
 
 		goto on_error;
 	}
-	( *index )->name      = name;
-	( *index )->name_size = name_size;
-
 	return( 1 );
 
 on_error:
 	if( *index != NULL )
 	{
+		if( ( *index )->name != NULL )
+		{
+			memory_free(
+			 ( *index )->name );
+		}
 		memory_free(
 		 *index );
 
@@ -165,6 +220,8 @@ int libfsntfs_index_free(
 	}
 	if( *index != NULL )
 	{
+		/* The index_root_attribute is freed elsewhere
+		 */
 		if( libcdata_array_free(
 		     &( ( *index )->root_values_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_value_free,
@@ -243,6 +300,11 @@ int libfsntfs_index_free(
 				result = -1;
 			}
 		}
+		if( ( *index )->name != NULL )
+		{
+			memory_free(
+			 ( *index )->name );
+		}
 		memory_free(
 		 *index );
 
@@ -256,7 +318,7 @@ int libfsntfs_index_free(
  */
 int libfsntfs_index_set_index_root_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_index_set_index_root_attribute";
@@ -272,17 +334,6 @@ int libfsntfs_index_set_index_root_attribute(
 
 		return( -1 );
 	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( index->index_root_attribute != NULL )
 	{
 		libcerror_error_set(
@@ -290,6 +341,17 @@ int libfsntfs_index_set_index_root_attribute(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid index - index root attribute already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
 		 function );
 
 		return( -1 );
@@ -304,7 +366,7 @@ int libfsntfs_index_set_index_root_attribute(
  */
 int libfsntfs_index_set_index_allocation_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_index_set_index_allocation_attribute";
@@ -331,17 +393,17 @@ int libfsntfs_index_set_index_allocation_attribute(
 
 		return( -1 );
 	}
+/* TODO move this into append to chain ? */
 	if( index->index_allocation_attribute == NULL )
 	{
 		index->index_allocation_attribute = attribute;
 	}
 	else
 	{
-/* TODO pass mft_attribute to function */
 		if( libfsntfs_mft_attribute_append_to_chain(
-		     ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute,
-		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
-		     &( ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute ),
+		     index->index_allocation_attribute,
+		     attribute,
+		     &( index->index_allocation_attribute ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -519,6 +581,7 @@ int libfsntfs_index_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	/* The index does not necessarily have a $BITMAP attribute
 	 */
+/* TODO check bitmap attribute instead of allocation attribute */
 	if( index->index_allocation_attribute != NULL )
 	{
 		if( libfsntfs_index_read_bitmap(
@@ -543,11 +606,10 @@ int libfsntfs_index_read(
 	 */
 	if( index->index_allocation_attribute != NULL )
 	{
-/* TODO pass mft_attribute to function */
 		if( libfsntfs_index_entry_vector_initialize(
 		     &( index->index_entry_vector ),
 		     io_handle,
-		     ( (libfsntfs_internal_attribute_t *) index->index_allocation_attribute )->mft_attribute,
+		     index->index_allocation_attribute,
 		     index->index_entry_size,
 		     error ) != 1 )
 		{
@@ -670,8 +732,8 @@ int libfsntfs_index_read_root(
 
 		return( -1 );
 	}
-	if( libfsntfs_internal_attribute_get_data(
-	     (libfsntfs_internal_attribute_t *) index->index_root_attribute,
+	if( libfsntfs_mft_attribute_get_data(
+	     index->index_root_attribute,
 	     &index_root_attribute_data,
 	     &index_root_attribute_data_size,
 	     error ) != 1 )

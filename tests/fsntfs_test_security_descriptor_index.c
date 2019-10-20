@@ -34,9 +34,16 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_attribute.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 #include "../libfsntfs/libfsntfs_security_descriptor_index.h"
+
+uint8_t fsntfs_test_security_descriptor_index_data1[ 80 ] = {
+	0x80, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0x01, 0x04, 0x40, 0x00, 0x00, 0x00, 0x08, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x48, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xfc, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x24, 0x00, 0x53, 0x00, 0x44, 0x00, 0x53, 0x00, 0x21, 0x41, 0xd2, 0x50, 0x00, 0xf8, 0xff, 0xff };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -48,8 +55,8 @@ int fsntfs_test_security_descriptor_index_initialize(
 {
 	libbfio_handle_t *file_io_handle                                 = NULL;
 	libcerror_error_t *error                                         = NULL;
-	libfsntfs_attribute_t *data_attribute                            = NULL;
 	libfsntfs_io_handle_t *io_handle                                 = NULL;
+	libfsntfs_mft_attribute_t *data_attribute                        = NULL;
 	libfsntfs_security_descriptor_index_t *security_descriptor_index = NULL;
 	int result                                                       = 0;
 
@@ -80,10 +87,8 @@ int fsntfs_test_security_descriptor_index_initialize(
 
 	io_handle->cluster_block_size = 4096;
 
-	result = libfsntfs_attribute_initialize(
+	result = libfsntfs_mft_attribute_initialize(
 	          &data_attribute,
-	          NULL,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -94,6 +99,22 @@ int fsntfs_test_security_descriptor_index_initialize(
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "data_attribute",
 	 data_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          data_attribute,
+	          io_handle,
+	          fsntfs_test_security_descriptor_index_data1,
+	          80,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -297,8 +318,8 @@ int fsntfs_test_security_descriptor_index_initialize(
 
 	/* Clean up
 	 */
-	result = libfsntfs_internal_attribute_free(
-	          (libfsntfs_internal_attribute_t **) &data_attribute,
+	result = libfsntfs_mft_attribute_free(
+	          &data_attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -347,8 +368,8 @@ on_error:
 	}
 	if( data_attribute != NULL )
 	{
-		libfsntfs_internal_attribute_free(
-		 (libfsntfs_internal_attribute_t **) &data_attribute,
+		libfsntfs_mft_attribute_free(
+		 &data_attribute,
 		 NULL );
 	}
 	if( io_handle != NULL )

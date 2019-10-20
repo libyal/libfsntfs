@@ -127,11 +127,10 @@ int libfsntfs_data_stream_initialize(
 
 		goto on_error;
 	}
-/* TODO pass mft_attribute to function */
 	if( libfsntfs_cluster_block_stream_initialize(
 	     &( internal_data_stream->data_cluster_block_stream ),
 	     io_handle,
-	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
+	     data_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
