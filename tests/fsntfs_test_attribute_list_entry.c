@@ -325,6 +325,64 @@ int fsntfs_test_attribute_list_entry_read_data(
 	/* Test error cases
 	 */
 	result = libfsntfs_attribute_list_entry_read_data(
+	          attribute_list_entry,
+	          fsntfs_test_attribute_list_entry_data1,
+	          40,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_attribute_list_entry_free(
+	          &attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "attribute_list_entry",
+	 attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_attribute_list_entry_initialize(
+	          &attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "attribute_list_entry",
+	 attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_attribute_list_entry_read_data(
 	          NULL,
 	          fsntfs_test_attribute_list_entry_data1,
 	          40,

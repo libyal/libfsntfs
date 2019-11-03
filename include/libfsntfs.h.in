@@ -1711,7 +1711,7 @@ int libfsntfs_mft_metadata_file_close(
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf8_volume_name_size,
+     size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded volume name
@@ -1722,8 +1722,8 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint8_t *utf8_volume_name,
-     size_t utf8_volume_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded volume name
@@ -1734,7 +1734,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     size_t *utf16_volume_name_size,
+     size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded volume name
@@ -1745,8 +1745,8 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
-     uint16_t *utf16_volume_name,
-     size_t utf16_volume_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* Retrieves the volume version

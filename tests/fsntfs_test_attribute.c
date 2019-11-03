@@ -280,6 +280,25 @@ int fsntfs_test_attribute_initialize(
 	}
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
+	/* Clean up
+	 */
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
