@@ -51,23 +51,7 @@ struct libfsntfs_internal_attribute
 	 */
 	libfsntfs_attribute_list_entry_t *attribute_list_entry;
 
-/* TODO remove */
-	/* Value to indicate the attribute is resident
-	 */
-	uint8_t is_resident;
-
-	/* The data first VCN
-	 */
-	uint64_t data_first_vcn;
-
-	/* The data last VCN
-	 */
-	uint64_t data_last_vcn;
-
-	/* The compression unit size
-	 */
-	size_t compression_unit_size;
-
+/* TODO remove file_reference */
 	/* The file reference
 	 */
 	uint64_t file_reference;
@@ -101,6 +85,10 @@ int libfsntfs_attribute_free(
      libcerror_error_t **error );
 
 int libfsntfs_internal_attribute_free(
+     libfsntfs_internal_attribute_t **internal_attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_attribute_free_new(
      libfsntfs_internal_attribute_t **internal_attribute,
      libcerror_error_t **error );
 
@@ -169,18 +157,6 @@ int libfsntfs_attribute_get_utf16_name(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libfsntfs_internal_attribute_compare_name_with_utf8_string(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcerror_error_t **error );
-
-int libfsntfs_internal_attribute_compare_name_with_utf16_string(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libcerror_error_t **error );
-
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_data_vcn_range(
      libfsntfs_attribute_t *attribute,
@@ -206,27 +182,10 @@ int libfsntfs_attribute_get_data_size(
      size64_t *data_size,
      libcerror_error_t **error );
 
-int libfsntfs_internal_attribute_get_data(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     uint8_t **data,
-     size64_t *data_size,
-     libcerror_error_t **error );
-
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_valid_data_size(
      libfsntfs_attribute_t *attribute,
      size64_t *valid_data_size,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_get_number_of_data_runs(
-     libfsntfs_attribute_t *attribute,
-     int *number_of_data_runs,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_get_data_run_by_index(
-     libfsntfs_attribute_t *attribute,
-     int data_run_index,
-     libfsntfs_data_run_t **data_run,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -34,6 +34,7 @@
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 
 /* Reads the attribute list
  * Returns 1 if successful or -1 on error
@@ -181,7 +182,7 @@ int libfsntfs_attribute_list_read_from_attribute(
      libcdata_array_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	libfcache_cache_t *cluster_block_cache   = NULL;
@@ -218,7 +219,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_number_of_data_runs(
+	if( libfsntfs_mft_attribute_get_number_of_data_runs(
 	     attribute,
 	     &number_of_data_runs,
 	     error ) != 1 )
@@ -232,10 +233,11 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 		goto on_error;
 	}
+/* TODO move support of no data run into cluster block vector */
 	if( number_of_data_runs == 0 )
 	{
-		if( libfsntfs_internal_attribute_get_data(
-		     (libfsntfs_internal_attribute_t *) attribute,
+		if( libfsntfs_mft_attribute_get_data(
+		     attribute,
 		     &data,
 		     &data_size,
 		     error ) != 1 )
@@ -278,7 +280,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 	}
 	else
 	{
-		if( libfsntfs_attribute_get_data_flags(
+		if( libfsntfs_mft_attribute_get_data_flags(
 		     attribute,
 		     &attribute_data_flags,
 		     error ) != 1 )
@@ -303,7 +305,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_get_data_size(
+		if( libfsntfs_mft_attribute_get_data_size(
 		     attribute,
 		     &data_size,
 		     error ) != 1 )
@@ -317,11 +319,10 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-/* TODO pass mft_attribute to function */
 		if( libfsntfs_cluster_block_vector_initialize(
 		     &cluster_block_vector,
 		     io_handle,
-		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
+		     attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

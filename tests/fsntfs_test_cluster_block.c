@@ -360,6 +360,105 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_cluster_block_clear function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_cluster_block_clear(
+     void )
+{
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_cluster_block_t *cluster_block = NULL;
+	int result                               = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_cluster_block_initialize(
+	          &cluster_block,
+	          1024,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "cluster_block",
+	 cluster_block );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_cluster_block_clear(
+	          cluster_block,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_cluster_block_clear(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_cluster_block_free(
+	          &cluster_block,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "cluster_block",
+	 cluster_block );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( cluster_block != NULL )
+	{
+		libfsntfs_cluster_block_free(
+		 &cluster_block,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_cluster_block_read_file_io_handle function
  * Returns 1 if successful or 0 if not
  */
@@ -620,6 +719,8 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_cluster_block_free",
 	 fsntfs_test_cluster_block_free );
+
+	/* TODO: add tests for libfsntfs_cluster_block_clear */
 
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_cluster_block_read_file_io_handle",

@@ -174,6 +174,43 @@ int libfsntfs_cluster_block_free(
 	return( 1 );
 }
 
+/* Clears a cluster block
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_cluster_block_clear(
+     libfsntfs_cluster_block_t *cluster_block,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_cluster_block_clear";
+
+	if( cluster_block == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cluster block.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     cluster_block->data,
+	     0,
+	     cluster_block->data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear cluster block data.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Reads a cluster block
  * Returns 1 if successful or -1 on error
  */
@@ -250,7 +287,7 @@ int libfsntfs_cluster_block_read_file_io_handle(
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_cluster_block_read_element_data(
-     libfsntfs_io_handle_t *io_handle,
+     intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,
@@ -265,21 +302,11 @@ int libfsntfs_cluster_block_read_element_data(
 	libfsntfs_cluster_block_t *cluster_block = NULL;
 	static char *function                    = "libfsntfs_cluster_block_read_element_data";
 
+	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( cluster_block_size == 0 )
 	 || ( cluster_block_size > (size64_t) SSIZE_MAX ) )
 	{
@@ -306,29 +333,17 @@ int libfsntfs_cluster_block_read_element_data(
 
 		goto on_error;
 	}
-	if( cluster_block == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing cluster block.",
-		 function );
-
-		goto on_error;
-	}
 	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
-		if( memory_set(
-		     cluster_block->data,
-		     0,
-		     cluster_block->data_size ) == NULL )
+		if( libfsntfs_cluster_block_clear(
+		     cluster_block,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear cluster block data.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to clear cluster block.",
 			 function );
 
 			goto on_error;
@@ -346,8 +361,10 @@ int libfsntfs_cluster_block_read_element_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read cluster block.",
-			 function );
+			 "%s: unable to read cluster block at offset: %" PRIi64 " (0x%08" PRIX64 ").",
+			 function,
+			 cluster_block_offset,
+			 cluster_block_offset );
 
 			goto on_error;
 		}

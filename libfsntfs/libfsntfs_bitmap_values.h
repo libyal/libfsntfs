@@ -25,7 +25,10 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_io_handle.h"
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -52,6 +55,14 @@ int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_bitmap_values_read_from_mft_attribute(
+     libfsntfs_bitmap_values_t *bitmap_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     uint8_t flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

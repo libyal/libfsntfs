@@ -1385,79 +1385,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_get_number_of_data_runs function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_attribute_get_number_of_data_runs(
-     libfsntfs_attribute_t *attribute )
-{
-	libcerror_error_t *error = NULL;
-	int number_of_data_runs  = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_attribute_get_number_of_data_runs(
-	          attribute,
-	          &number_of_data_runs,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_attribute_get_number_of_data_runs(
-	          NULL,
-	          &number_of_data_runs,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_attribute_get_number_of_data_runs(
-	          attribute,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -1646,15 +1573,6 @@ int main(
 	 "libfsntfs_attribute_get_valid_data_size",
 	 fsntfs_test_attribute_get_valid_data_size,
 	 attribute );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_get_number_of_data_runs",
-	 fsntfs_test_attribute_get_number_of_data_runs,
-	 attribute );
-
-	/* TODO: add tests for libfsntfs_attribute_get_data_run_by_index */
-
-	/* TODO: add tests for libfsntfs_attribute_append_to_chain */
 
 	/* Clean up
 	 */

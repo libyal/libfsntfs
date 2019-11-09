@@ -24,9 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_volume_information_values.h"
 
 #include "fsntfs_volume_information.h"
@@ -240,6 +241,115 @@ int libfsntfs_volume_information_values_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+	return( 1 );
+}
+
+/* Reads the volume information values from an MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_information_values_read_from_mft_attribute(
+     libfsntfs_volume_information_values_t *volume_information_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error )
+{
+	uint8_t *data           = NULL;
+	static char *function   = "libfsntfs_volume_information_values_read_from_mft_attribute";
+	size_t data_size        = 0;
+	uint32_t attribute_type = 0;
+	int result              = 0;
+
+	if( volume_information_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume information values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_type(
+	     mft_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve resident data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_volume_information_values_read_data(
+	     volume_information_values,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read volume information values.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

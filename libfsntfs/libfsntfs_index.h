@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -73,7 +72,7 @@ struct libfsntfs_index
 
 	/* The $BITMAP MFT attribute
 	 */
-	libfsntfs_attribute_t *bitmap_attribute;
+	libfsntfs_mft_attribute_t *bitmap_attribute;
 
 	/* The root values array
 	 */
@@ -122,7 +121,7 @@ int libfsntfs_index_set_index_allocation_attribute(
 
 int libfsntfs_index_set_bitmap_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_index_read(

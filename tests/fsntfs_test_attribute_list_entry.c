@@ -757,21 +757,6 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_entry_get_file_reference(
-	          attribute_list_entry,
-	          &mft_entry_index,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	/* Test error cases
 	 */
 	result = libfsntfs_attribute_list_entry_get_file_reference(
@@ -796,6 +781,24 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
 	          NULL,
 	          &sequence_number,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_get_file_reference(
+	          attribute_list_entry,
+	          &mft_entry_index,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

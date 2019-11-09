@@ -34,8 +34,9 @@
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_attribute.h"
-#include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_file_name_attribute.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 
 uint8_t fsntfs_test_file_name_attribute_data1[ 104 ] = {
 	0x30, 0x00, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x03, 0x00,

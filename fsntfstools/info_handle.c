@@ -3942,7 +3942,7 @@ int info_handle_mft_entry_fprint(
 on_error:
 	if( attribute != NULL )
 	{
-		libfsntfs_file_entry_free(
+		libfsntfs_attribute_free(
 		 &attribute,
 		 NULL );
 	}

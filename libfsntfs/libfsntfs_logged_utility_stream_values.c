@@ -24,10 +24,11 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_libbfio.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_logged_utility_stream_values.h"
+#include "libfsntfs_mft_attribute.h"
 
 #include "fsntfs_logged_utility_stream.h"
 
@@ -190,6 +191,115 @@ int libfsntfs_logged_utility_stream_values_read_data(
 		 0 );
 	}
 #endif
+	return( 1 );
+}
+
+/* Reads the logged utility stream values from an MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_logged_utility_stream_values_read_from_mft_attribute(
+     libfsntfs_logged_utility_stream_values_t *logged_utility_stream_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error )
+{
+	uint8_t *data           = NULL;
+	static char *function   = "libfsntfs_logged_utility_stream_values_read_from_mft_attribute";
+	size_t data_size        = 0;
+	uint32_t attribute_type = 0;
+	int result              = 0;
+
+	if( logged_utility_stream_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid logged utility stream values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_type(
+	     mft_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_LOGGED_UTILITY_STREAM )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve resident data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_logged_utility_stream_values_read_data(
+	     logged_utility_stream_values,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read logged utility stream values.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

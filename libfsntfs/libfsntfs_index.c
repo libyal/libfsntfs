@@ -24,7 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
@@ -41,6 +40,7 @@
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_unused.h"
 
 #include "fsntfs_index.h"
@@ -424,7 +424,7 @@ int libfsntfs_index_set_index_allocation_attribute(
  */
 int libfsntfs_index_set_bitmap_attribute(
      libfsntfs_index_t *index,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_index_set_bitmap_attribute";
@@ -451,17 +451,17 @@ int libfsntfs_index_set_bitmap_attribute(
 
 		return( -1 );
 	}
+/* TODO move this into append to chain ? */
 	if( index->bitmap_attribute == NULL )
 	{
 		index->bitmap_attribute = attribute;
 	}
 	else
 	{
-/* TODO pass mft_attribute to function */
 		if( libfsntfs_mft_attribute_append_to_chain(
-		     ( (libfsntfs_internal_attribute_t *) index->bitmap_attribute )->mft_attribute,
-		     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
-		     &( ( (libfsntfs_internal_attribute_t *) index->bitmap_attribute )->mft_attribute ),
+		     index->bitmap_attribute,
+		     attribute,
+		     &( index->bitmap_attribute ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1080,56 +1080,61 @@ int libfsntfs_index_read_bitmap(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_value(
-	     index->bitmap_attribute,
-	     (intptr_t **) &bitmap_values,
+	if( libfsntfs_bitmap_values_initialize(
+	     &bitmap_values,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute value.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create bitmap values.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( bitmap_values == NULL )
+	if( libfsntfs_bitmap_values_read_from_mft_attribute(
+	     bitmap_values,
+	     index->bitmap_attribute,
+	     io_handle,
+	     file_io_handle,
+	     flags,
+	     error ) != 1 )
 	{
-		if( libfsntfs_attribute_read_value(
-		     index->bitmap_attribute,
-		     io_handle,
-		     file_io_handle,
-		     flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attribute value.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read bitmap values from attribute.",
+		 function );
 
-			return( -1 );
-		}
-		if( libfsntfs_attribute_get_value(
-		     index->bitmap_attribute,
-		     (intptr_t **) &bitmap_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute value.",
-			 function );
-
-			return( -1 );
-		}
+		goto on_error;
 	}
 /* TODO get a range list from the bitmap values */
 
+	if( libfsntfs_bitmap_values_free(
+	     &bitmap_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free bitmap values.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
+
+on_error:
+	if( bitmap_values != NULL )
+	{
+		libfsntfs_bitmap_values_free(
+		 &bitmap_values,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Reads the index sub nodes

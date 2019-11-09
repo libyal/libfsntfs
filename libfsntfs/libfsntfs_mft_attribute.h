@@ -122,6 +122,10 @@ int libfsntfs_mft_attribute_read_data(
      size_t data_size,
      libcerror_error_t **error );
 
+int libfsntfs_mft_attribute_data_is_resident(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_attribute_get_type(
      libfsntfs_mft_attribute_t *mft_attribute,
      uint32_t *type,

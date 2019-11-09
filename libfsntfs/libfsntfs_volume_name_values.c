@@ -27,9 +27,11 @@
 #include <wide_string.h>
 
 #include "libfsntfs_debug.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libuna.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_volume_name_values.h"
 
 /* Creates volume name values
@@ -173,16 +175,21 @@ int libfsntfs_volume_name_values_read_data(
 
 		return( -1 );
 	}
-	if( data == NULL )
+	/* The volume name attribute can contain an empty volume name
+	 */
+	if( data_size > 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid data.",
-		 function );
+		if( data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid data.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
 	if( data_size > (size_t) SSIZE_MAX )
 	{
@@ -279,6 +286,115 @@ on_error:
 	volume_name_values->name_size = 0;
 
 	return( -1 );
+}
+
+/* Reads the volume name values from an MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_name_values_read_from_mft_attribute(
+     libfsntfs_volume_name_values_t *volume_name_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error )
+{
+	uint8_t *data           = NULL;
+	static char *function   = "libfsntfs_volume_name_values_read_from_mft_attribute";
+	size_t data_size        = 0;
+	uint32_t attribute_type = 0;
+	int result              = 0;
+
+	if( volume_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_type(
+	     mft_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve resident data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_volume_name_values_read_data(
+	     volume_name_values,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read volume name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Retrieves the size of the UTF-8 encoded name

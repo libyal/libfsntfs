@@ -395,16 +395,6 @@ int main(
 
 	/* TODO: add tests for libfsntfs_mft_read_mft_entry */
 
-	/* TODO: add tests for libfsntfs_mft_get_utf8_volume_name_size */
-
-	/* TODO: add tests for libfsntfs_mft_get_utf8_volume_name */
-
-	/* TODO: add tests for libfsntfs_mft_get_utf16_volume_name_size */
-
-	/* TODO: add tests for libfsntfs_mft_get_utf16_volume_name */
-
-	/* TODO: add tests for libfsntfs_mft_get_volume_version */
-
 	/* TODO: add tests for libfsntfs_mft_get_number_of_entries */
 
 	/* TODO: add tests for libfsntfs_mft_get_mft_entry_by_index */

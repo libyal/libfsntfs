@@ -1117,6 +1117,33 @@ on_error:
 	return( -1 );
 }
 
+/* Determines if the attribute data is resident
+ * Returns 1 if the attribute data is resident, 0 if not or -1 on error
+ */
+int libfsntfs_mft_attribute_data_is_resident(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_data_is_resident";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_attribute->non_resident_flag & 0x01 ) == 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
 /* Retrieves the type
  * Returns 1 if successful or -1 on error
  */

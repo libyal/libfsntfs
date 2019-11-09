@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H )
-#define _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H
+#if !defined( _LIBFSNTFS_MFT_METADATA_FILE_H )
+#define _LIBFSNTFS_MFT_METADATA_FILE_H
 
 #include <common.h>
 #include <types.h>
@@ -29,6 +29,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft.h"
 #include "libfsntfs_types.h"
 
@@ -59,6 +60,24 @@ struct libfsntfs_internal_mft_metadata_file
 	/* The MFT
 	 */
 	libfsntfs_mft_t *mft;
+
+	/* The volume MFT entry
+	 */
+	libfsntfs_mft_entry_t *volume_mft_entry;
+
+	/* The volume information ($VOLUME_INFORMATION) attribute
+	 */
+	libfsntfs_attribute_t *volume_information_attribute;
+
+	/* The volume name ($VOLUME_NAME) attribute
+	 */
+	libfsntfs_attribute_t *volume_name_attribute;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBFSNTFS_EXTERN \
@@ -106,9 +125,19 @@ int libfsntfs_mft_metadata_file_close(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libcerror_error_t **error );
 
-int libfsntfs_mft_metadata_file_open_read(
+int libfsntfs_internal_mft_metadata_file_open_read(
      libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
      libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_mft_metadata_file_get_volume_information_attribute(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
+     libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -161,5 +190,5 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INTERNAL_MFT_METADATA_FILE_H ) */
+#endif /* !defined( _LIBFSNTFS_MFT_METADATA_FILE_H ) */
 

@@ -347,7 +347,7 @@ int libfsntfs_volume_get_index_entry_size(
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name_size(
@@ -358,7 +358,7 @@ int libfsntfs_volume_get_utf8_name_size(
 /* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf8_name(
@@ -370,7 +370,7 @@ int libfsntfs_volume_get_utf8_name(
 /* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name_size(
@@ -381,7 +381,7 @@ int libfsntfs_volume_get_utf16_name_size(
 /* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_utf16_name(
@@ -391,7 +391,7 @@ int libfsntfs_volume_get_utf16_name(
      libfsntfs_error_t **error );
 
 /* Retrieves the version
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_version(
@@ -1706,7 +1706,7 @@ int libfsntfs_mft_metadata_file_close(
 /* Retrieves the size of the UTF-8 encoded volume name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
@@ -1717,7 +1717,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 /* Retrieves the UTF-8 encoded volume name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf8_volume_name(
@@ -1729,7 +1729,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 /* Retrieves the size of the UTF-16 encoded volume name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
@@ -1740,7 +1740,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 /* Retrieves the UTF-16 encoded volume name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_utf16_volume_name(
@@ -1750,7 +1750,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      libfsntfs_error_t **error );
 
 /* Retrieves the volume version
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_volume_version(

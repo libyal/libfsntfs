@@ -23,11 +23,15 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_cluster_block_stream.h"
+#include "libfsntfs_definitions.h"
+#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libfwnt.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_security_descriptor_values.h"
 
 /* Creates security descriptor values
@@ -522,6 +526,192 @@ on_error:
 	}
 	security_descriptor_values->data_size = 0;
 
+	return( -1 );
+}
+
+/* Reads the security descriptor values from an MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_values_read_from_mft_attribute(
+     libfsntfs_security_descriptor_values_t *security_descriptor_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     uint8_t flags,
+     libcerror_error_t **error )
+{
+	libfdata_stream_t *cluster_block_stream = NULL;
+	uint8_t *data                           = NULL;
+	static char *function                   = "libfsntfs_security_descriptor_values_read_from_mft_attribute";
+	size_t data_size                        = 0;
+	uint32_t attribute_type                 = 0;
+	uint16_t attribute_data_flags           = 0;
+	int result                              = 0;
+
+	if( security_descriptor_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_type(
+	     mft_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from attribute.",
+		 function );
+
+		goto on_error;
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		goto on_error;
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if attribute data is resident.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_mft_attribute_get_data(
+		     mft_attribute,
+		     &data,
+		     &data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve resident data from attribute.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_values_read_buffer(
+		     security_descriptor_values,
+		     data,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read security descriptor values.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	else if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
+	{
+		if( libfsntfs_mft_attribute_get_data_flags(
+		     mft_attribute,
+		     &attribute_data_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data flags.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compressed attribute data.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_cluster_block_stream_initialize(
+		     &cluster_block_stream,
+		     io_handle,
+		     mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create cluster block stream.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_security_descriptor_values_read_stream(
+		     security_descriptor_values,
+		     file_io_handle,
+		     cluster_block_stream,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read security descriptor values from stream.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfdata_stream_free(
+		     &cluster_block_stream,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free cluster block stream.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( cluster_block_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &cluster_block_stream,
+		 NULL );
+	}
 	return( -1 );
 }
 

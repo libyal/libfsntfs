@@ -25,11 +25,11 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -45,7 +45,7 @@ int libfsntfs_attribute_list_read_from_attribute(
      libcdata_array_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

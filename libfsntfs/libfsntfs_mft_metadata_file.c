@@ -25,6 +25,7 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include "libfsntfs_attribute.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
@@ -34,6 +35,9 @@
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_mft_metadata_file.h"
+#include "libfsntfs_types.h"
+#include "libfsntfs_volume_information_attribute.h"
+#include "libfsntfs_volume_name_attribute.h"
 
 /* Creates a MFT metadata file
  * Make sure the value mft_metadata_file is referencing, is set to NULL
@@ -94,7 +98,10 @@ int libfsntfs_mft_metadata_file_initialize(
 		 "%s: unable to clear MFT metadata file.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_mft_metadata_file );
+
+		return( -1 );
 	}
 	if( libfsntfs_io_handle_initialize(
 	     &( internal_mft_metadata_file->io_handle ),
@@ -109,6 +116,21 @@ int libfsntfs_mft_metadata_file_initialize(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_mft_metadata_file->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	*mft_metadata_file = (libfsntfs_mft_metadata_file_t *) internal_mft_metadata_file;
 
 	return( 1 );
@@ -116,6 +138,12 @@ int libfsntfs_mft_metadata_file_initialize(
 on_error:
 	if( internal_mft_metadata_file != NULL )
 	{
+		if( internal_mft_metadata_file->io_handle != NULL )
+		{
+			libfsntfs_io_handle_free(
+			 &( internal_mft_metadata_file->io_handle ),
+			 NULL );
+		}
 		memory_free(
 		 internal_mft_metadata_file );
 	}
@@ -166,6 +194,21 @@ int libfsntfs_mft_metadata_file_free(
 		}
 		*mft_metadata_file = NULL;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_mft_metadata_file->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		if( libfsntfs_io_handle_free(
 		     &( internal_mft_metadata_file->io_handle ),
 		     error ) != 1 )
@@ -345,8 +388,40 @@ int libfsntfs_mft_metadata_file_open(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_mft_metadata_file->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -482,8 +557,40 @@ int libfsntfs_mft_metadata_file_open_wide(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_mft_metadata_file->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -496,7 +603,7 @@ on_error:
         return( -1 );
 }
 
-#endif
+#endif /* #if defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a MFT metadata file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
@@ -508,9 +615,10 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
-	static char *function                                              = "libfsntfs_mft_metadata_file_open_file_io_handle";
+	static char *function                                              = "libfsntfs_volume_open_file_io_handle";
 	int bfio_access_flags                                              = 0;
 	int file_io_handle_is_open                                         = 0;
+	int file_io_handle_opened_in_library                               = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -584,7 +692,7 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file.",
+		 "%s: unable to open volume.",
 		 function );
 
 		goto on_error;
@@ -605,9 +713,9 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 
 			goto on_error;
 		}
-		internal_mft_metadata_file->file_io_handle_opened_in_library = 1;
+		file_io_handle_opened_in_library = 1;
 	}
-	if( libfsntfs_mft_metadata_file_open_read(
+	if( libfsntfs_internal_mft_metadata_file_open_read(
 	     internal_mft_metadata_file,
 	     file_io_handle,
 	     error ) != 1 )
@@ -621,22 +729,51 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 
 		goto on_error;
 	}
-	internal_mft_metadata_file->file_io_handle = file_io_handle;
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		goto on_error;
+	}
+#endif
+	internal_mft_metadata_file->file_io_handle                   = file_io_handle;
+	internal_mft_metadata_file->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_mft_metadata_file->file_io_handle                   = NULL;
+		internal_mft_metadata_file->file_io_handle_opened_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
-	if( ( file_io_handle_is_open == 0 )
-	 && ( internal_mft_metadata_file->file_io_handle_opened_in_library != 0 ) )
+	if( file_io_handle_opened_in_library != 0 )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
 		 error );
-
-		internal_mft_metadata_file->file_io_handle_opened_in_library = 0;
 	}
-	internal_mft_metadata_file->file_io_handle = NULL;
-
 	return( -1 );
 }
 
@@ -675,6 +812,21 @@ int libfsntfs_mft_metadata_file_close(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -758,19 +910,82 @@ int libfsntfs_mft_metadata_file_close(
 
 		result = -1;
 	}
+	if( internal_mft_metadata_file->volume_mft_entry != NULL )
+	{
+		if( libfsntfs_mft_entry_free(
+		     &( internal_mft_metadata_file->volume_mft_entry ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free volume MFT entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_mft_metadata_file->volume_information_attribute != NULL )
+	{
+		if( libfsntfs_internal_attribute_free_new(
+		     (libfsntfs_internal_attribute_t **) &( internal_mft_metadata_file->volume_information_attribute ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free volume information attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+	if( internal_mft_metadata_file->volume_name_attribute != NULL )
+	{
+		if( libfsntfs_internal_attribute_free_new(
+		     (libfsntfs_internal_attribute_t **) &( internal_mft_metadata_file->volume_name_attribute ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free volume name attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
 /* Opens a MFT metadata file for reading
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_metadata_file_open_read(
+int libfsntfs_internal_mft_metadata_file_open_read(
      libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
-	static char *function            = "libfsntfs_mft_metadata_file_open_read";
+	static char *function            = "libfsntfs_internal_mft_metadata_file_open_read";
 	size64_t file_size               = 0;
 
 	if( internal_mft_metadata_file == NULL )
@@ -779,7 +994,7 @@ int libfsntfs_mft_metadata_file_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid internal MFT metadata file.",
+		 "%s: invalid MFT metadata file.",
 		 function );
 
 		return( -1 );
@@ -790,7 +1005,7 @@ int libfsntfs_mft_metadata_file_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid internal MFT metadata file - missing IO handle.",
+		 "%s: invalid MFT metadata file - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -801,7 +1016,7 @@ int libfsntfs_mft_metadata_file_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid internal MFT metadata file - MFT value already set.",
+		 "%s: invalid MFT metadata file - MFT value already set.",
 		 function );
 
 		return( -1 );
@@ -943,18 +1158,274 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the size of the UTF-8 encoded volume name
+/* Retrieves the $VOLUME_INFORMATION attribute from MFT entry 3
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_internal_mft_metadata_file_get_volume_information_attribute(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	static char *function                    = "libfsntfs_internal_mft_metadata_file_get_volume_information_attribute";
+
+	if( internal_mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_mft_metadata_file->volume_mft_entry == NULL )
+	{
+		if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
+		     internal_mft_metadata_file->mft,
+		     internal_mft_metadata_file->file_io_handle,
+		     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
+		     &( internal_mft_metadata_file->volume_mft_entry ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry: %d.",
+			 function,
+			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+			return( -1 );
+		}
+	}
+	if( internal_mft_metadata_file->volume_mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+		return( -1 );
+	}
+	if( internal_mft_metadata_file->volume_mft_entry->volume_information_attribute_index == -1 )
+	{
+		return( 0 );
+	}
+	if( internal_mft_metadata_file->volume_information_attribute == NULL )
+	{
+		if( libfsntfs_mft_entry_get_attribute_by_index(
+		     internal_mft_metadata_file->volume_mft_entry,
+		     internal_mft_metadata_file->volume_mft_entry->volume_information_attribute_index,
+		     &mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d from MFT entry: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_information_attribute_index,
+			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+			return( -1 );
+		}
+		if( libfsntfs_attribute_initialize(
+		     &( internal_mft_metadata_file->volume_information_attribute ),
+		     mft_attribute,
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create attribute: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_information_attribute_index );
+
+			return( -1 );
+		}
+		if( libfsntfs_attribute_read_value(
+		     internal_mft_metadata_file->volume_information_attribute,
+		     internal_mft_metadata_file->io_handle,
+		     internal_mft_metadata_file->file_io_handle,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read value of attribute: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_information_attribute_index );
+
+			return( -1 );
+		}
+	}
+	*attribute = internal_mft_metadata_file->volume_information_attribute;
+
+	return( 1 );
+}
+
+/* Retrieves the $VOLUME_NAME attribute from MFT entry 3
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+     libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	static char *function                    = "libfsntfs_internal_mft_metadata_file_get_volume_name_attribute";
+
+	if( internal_mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_mft_metadata_file->volume_mft_entry == NULL )
+	{
+		if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
+		     internal_mft_metadata_file->mft,
+		     internal_mft_metadata_file->file_io_handle,
+		     LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME,
+		     &( internal_mft_metadata_file->volume_mft_entry ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry: %d.",
+			 function,
+			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+			return( -1 );
+		}
+	}
+	if( internal_mft_metadata_file->volume_mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+		return( -1 );
+	}
+	if( internal_mft_metadata_file->volume_mft_entry->volume_name_attribute_index == -1 )
+	{
+		return( 0 );
+	}
+	if( internal_mft_metadata_file->volume_name_attribute == NULL )
+	{
+		if( libfsntfs_mft_entry_get_attribute_by_index(
+		     internal_mft_metadata_file->volume_mft_entry,
+		     internal_mft_metadata_file->volume_mft_entry->volume_name_attribute_index,
+		     &mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d from MFT entry: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_name_attribute_index,
+			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+
+			return( -1 );
+		}
+		if( libfsntfs_attribute_initialize(
+		     &( internal_mft_metadata_file->volume_name_attribute ),
+		     mft_attribute,
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create attribute: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_name_attribute_index );
+
+			return( -1 );
+		}
+		if( libfsntfs_attribute_read_value(
+		     internal_mft_metadata_file->volume_name_attribute,
+		     internal_mft_metadata_file->io_handle,
+		     internal_mft_metadata_file->file_io_handle,
+		     0,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read value of attribute: %d.",
+			 function,
+			 internal_mft_metadata_file->volume_mft_entry->volume_name_attribute_index );
+
+			return( -1 );
+		}
+	}
+	*attribute = internal_mft_metadata_file->volume_name_attribute;
+
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *volume_name_attribute                       = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf8_volume_name_size";
+	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -969,28 +1440,76 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( libfsntfs_mft_get_utf8_volume_name_size(
-	     internal_mft_metadata_file->mft,
-	     internal_mft_metadata_file->file_io_handle,
-	     utf8_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-8 volume name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+	          internal_mft_metadata_file,
+	          &volume_name_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_name_attribute_get_utf8_name_size(
+		     volume_name_attribute,
+		     utf8_string_size,
+		     error ) != 1 )
+	        {
+	                libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size of UTF-8 name from volume name attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
-/* Retrieves the UTF-8 encoded volume name
+/* Retrieves the UTF-8 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_metadata_file_get_utf8_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
@@ -998,8 +1517,10 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *volume_name_attribute                       = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf8_volume_name";
+	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1014,37 +1535,87 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( libfsntfs_mft_get_utf8_volume_name(
-	     internal_mft_metadata_file->mft,
-	     internal_mft_metadata_file->file_io_handle,
-	     utf8_string,
-	     utf8_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 volume name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+	          internal_mft_metadata_file,
+	          &volume_name_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_name_attribute_get_utf8_name(
+		     volume_name_attribute,
+		     utf8_string,
+		     utf8_string_size,
+		     error ) != 1 )
+	        {
+	                libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 name from volume name attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
-/* Retrieves the size of the UTF-16 encoded volume name
+/* Retrieves the size of the UTF-16 encoded name
  * The returned size includes the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *volume_name_attribute                       = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf16_volume_name_size";
+	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1059,28 +1630,76 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( libfsntfs_mft_get_utf16_volume_name_size(
-	     internal_mft_metadata_file->mft,
-	     internal_mft_metadata_file->file_io_handle,
-	     utf16_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-16 volume name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+	          internal_mft_metadata_file,
+	          &volume_name_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_name_attribute_get_utf16_name_size(
+		     volume_name_attribute,
+		     utf16_string_size,
+		     error ) != 1 )
+	        {
+	                libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size of UTF-16 name from volume name attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
-/* Retrieves the UTF-16 encoded volume name
+/* Retrieves the UTF-16 encoded name
  * The size should include the end of string character
  * This value is retrieved from the $VOLUME_NAME attribute of the $Volume metadata file
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
@@ -1088,8 +1707,10 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *volume_name_attribute                       = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_utf16_volume_name";
+	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1104,27 +1725,75 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( libfsntfs_mft_get_utf16_volume_name(
-	     internal_mft_metadata_file->mft,
-	     internal_mft_metadata_file->file_io_handle,
-	     utf16_string,
-	     utf16_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 volume name.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_name_attribute(
+	          internal_mft_metadata_file,
+	          &volume_name_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_name_attribute_get_utf16_name(
+		     volume_name_attribute,
+		     utf16_string,
+		     utf16_string_size,
+		     error ) != 1 )
+	        {
+	                libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 name from volume name attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the volume version
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_mft_metadata_file_get_volume_version(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
@@ -1132,8 +1801,10 @@ int libfsntfs_mft_metadata_file_get_volume_version(
      uint8_t *minor_version,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *volume_information_attribute                = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
-	static char *function                                              = "libfsntfs_mft_metadata_file_get_volume_version";
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_version";
+	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1148,23 +1819,71 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-	if( libfsntfs_mft_get_volume_version(
-	     internal_mft_metadata_file->mft,
-	     internal_mft_metadata_file->file_io_handle,
-	     major_version,
-	     minor_version,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve volume version.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_information_attribute(
+	          internal_mft_metadata_file,
+	          &volume_information_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume information attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_information_attribute_get_version(
+		     volume_information_attribute,
+		     major_version,
+		     minor_version,
+		     error ) != 1 )
+	        {
+	                libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve version from volume information attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the number of file entries (MFT entries)
@@ -1256,7 +1975,7 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_get_mft_entry_by_index(
+	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
 	     internal_mft_metadata_file->mft,
 	     internal_mft_metadata_file->file_io_handle,
 	     mft_entry_index,
@@ -1271,9 +1990,10 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 		 function,
 		 mft_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
-/* TODO clone MFT entry */
+	/* file_entry takes over management of mft_entry
+	 */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_mft_metadata_file->io_handle,
@@ -1292,8 +2012,17 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 		 "%s: unable to create file entry.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
+
+on_error:
+	if( mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 &mft_entry,
+		 NULL );
+	}
+	return( -1 );
 }
 

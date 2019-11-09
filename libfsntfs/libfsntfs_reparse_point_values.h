@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -76,6 +77,11 @@ int libfsntfs_reparse_point_values_read_data(
      libfsntfs_reparse_point_values_t *reparse_point_values,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_read_from_mft_attribute(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_tag(

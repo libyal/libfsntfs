@@ -28,6 +28,7 @@
 #include "libfsntfs_extern.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -45,10 +46,6 @@ struct libfsntfs_internal_usn_change_journal
 	/* The directory entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
-
-	/* The $J $DATA attribute
-	 */
-	libfsntfs_attribute_t *data_attribute;
 
 	/* The $J data stream
 	 */
@@ -100,7 +97,7 @@ int libfsntfs_usn_change_journal_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_directory_entry_t *directory_entry,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

@@ -24,9 +24,9 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_attribute_list.h"
 #include "libfsntfs_attribute_list_entry.h"
+#include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_directory_entry.h"
@@ -415,6 +415,12 @@ int libfsntfs_mft_entry_initialize(
 
 		goto on_error;
 	}
+	( *mft_entry )->reparse_point_attribute_index        = -1;
+	( *mft_entry )->security_descriptor_attribute_index  = -1;
+	( *mft_entry )->standard_information_attribute_index = -1;
+	( *mft_entry )->volume_information_attribute_index   = -1;
+	( *mft_entry )->volume_name_attribute_index          = -1;
+
 	return( 1 );
 
 on_error:
@@ -491,7 +497,7 @@ int libfsntfs_mft_entry_free(
 		 */
 		if( libcdata_array_free(
 		     &( ( *mft_entry )->attributes_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_internal_attribute_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -520,10 +526,6 @@ int libfsntfs_mft_entry_free(
 
 			result = -1;
 		}
-		/* The standard_information_attribute, object_identifier_attribute,
-		 * volume_information_attribute and volume_name_attibute references
-		 * are managed by the attributes_array
-		 */
 		if( libcdata_array_free(
 		     &( ( *mft_entry )->index_array ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_free,
@@ -1022,7 +1024,6 @@ int libfsntfs_mft_entry_read_attributes_data(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *attribute         = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	static char *function                    = "libfsntfs_mft_entry_read_attributes_data";
 	size_t data_offset                       = 0;
@@ -1141,47 +1142,15 @@ int libfsntfs_mft_entry_read_attributes_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read MFT attribute: %d.",
+			 "%s: unable to read MFT attribute: %d of type: 0x08" PRIx32 ".",
 			 function,
-			 attribute_index );
+			 attribute_index,
+			 attribute_type );
 
 			goto on_error;
 		}
 		data_offset += mft_attribute->size;
 
-		if( libfsntfs_attribute_initialize(
-		     &attribute,
-		     mft_attribute,
-		     NULL,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute: %d.",
-			 function,
-			 attribute_index );
-
-			goto on_error;
-		}
-		mft_attribute = NULL;
-
-		if( libfsntfs_attribute_get_type(
-		     attribute,
-		     &attribute_type,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d type.",
-			 function,
-			 attribute_index );
-
-			goto on_error;
-		}
 		if( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_ATTRIBUTE_LIST )
 		{
 			if( mft_entry->list_attribute != NULL )
@@ -1193,15 +1162,15 @@ int libfsntfs_mft_entry_read_attributes_data(
 				 "%s: invalid MFT entry - list attribute value already set.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
-			mft_entry->list_attribute = attribute;
+			mft_entry->list_attribute = mft_attribute;
 		}
 		if( libfsntfs_mft_entry_append_attribute(
 		     mft_entry,
 		     io_handle,
 		     file_io_handle,
-		     attribute,
+		     mft_attribute,
 		     flags,
 		     error ) != 1 )
 		{
@@ -1213,13 +1182,9 @@ int libfsntfs_mft_entry_read_attributes_data(
 			 function,
 			 attribute_index );
 
-			/* Prevent a double free of the attribute */
-/* TODO fix libfsntfs_mft_entry_append_attribute so that this is not needed */
-			attribute = NULL;
-
 			goto on_error;
 		}
-		attribute = NULL;
+		mft_attribute = NULL;
 
 		attribute_index++;
 	}
@@ -1257,12 +1222,8 @@ int libfsntfs_mft_entry_read_attributes_data(
 	return( 1 );
 
 on_error:
-	if( attribute != NULL )
-	{
-		libfsntfs_internal_attribute_free(
-		 (libfsntfs_internal_attribute_t **) &attribute,
-		 NULL );
-	}
+	mft_entry->list_attribute = NULL;
+
 	if( mft_attribute != NULL )
 	{
 		libfsntfs_mft_attribute_free(
@@ -1271,7 +1232,7 @@ on_error:
 	}
 	libcdata_array_empty(
 	 mft_entry->attributes_array,
-	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_internal_attribute_free,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
 	 NULL );
 
 	return( -1 );
@@ -1413,7 +1374,7 @@ on_error:
 
 	libcdata_array_empty(
 	 mft_entry->attributes_array,
-	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_internal_attribute_free,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
 	 NULL );
 
 	return( -1 );
@@ -1431,22 +1392,17 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libcdata_array_t *list_mft_entry_array                 = NULL;
 	libfcache_cache_t *mft_entry_cache                     = NULL;
-	libfsntfs_attribute_t *attribute                       = NULL;
-	libfsntfs_attribute_t *list_attribute                  = NULL;
 	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute               = NULL;
 	libfsntfs_mft_entry_t *list_mft_entry                  = NULL;
 	static char *function                                  = "libfsntfs_mft_entry_read_attributes_from_attribute_list";
 	uint64_t list_mft_entry_index                          = 0;
 	uint16_t sequence_number                               = 0;
 	int attribute_index                                    = 0;
-	int entry_index                                        = 0;
 	int attribute_list_entry_index                         = 0;
-	int list_attribute_index                               = 0;
 	int number_of_attribute_list_entries                   = 0;
 	int number_of_attributes                               = 0;
-	int number_of_list_attributes                          = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -1459,6 +1415,22 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		return( -1 );
 	}
+	/* Use a local cache to prevent cache outs
+	 */
+	if( libfcache_cache_initialize(
+	     &mft_entry_cache,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT entry cache.",
+		 function );
+
+		goto on_error;
+	}
 	if( libcdata_array_get_number_of_entries(
 	     attribute_list,
 	     &number_of_attribute_list_entries,
@@ -1469,20 +1441,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of attribute list entries.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_initialize(
-	     &list_mft_entry_array,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create list MFT entry array.",
 		 function );
 
 		goto on_error;
@@ -1510,7 +1468,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		if( libfsntfs_attribute_list_entry_get_file_reference(
 		     attribute_list_entry,
 		     &list_mft_entry_index,
-		     NULL,
+		     &sequence_number,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1520,114 +1478,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 "%s: unable to retrieve attribute list entry: %d file reference.",
 			 function,
 			 attribute_list_entry_index );
-
-			goto on_error;
-		}
-		/* Ignore the current MFT entry
-		 */
-		if( list_mft_entry_index == (uint64_t) mft_entry->index )
-		{
-			continue;
-		}
-		if( libfsntfs_attribute_initialize(
-		     &list_attribute,
-		     NULL,
-		     attribute_list_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create list attribute.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcdata_array_insert_entry(
-		     list_mft_entry_array,
-		     &entry_index,
-		     (intptr_t *) list_attribute,
-		     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_attribute_compare_by_file_reference,
-		     LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to insert list attribute in list MFT entry array.",
-			 function );
-
-			goto on_error;
-		}
-		list_attribute = NULL;
-	}
-	/* Use a local cache to prevent cache outs
-	 */
-	if( libfcache_cache_initialize(
-	     &mft_entry_cache,
-	     8,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
-		 function );
-
-		goto on_error;
-	}
-	/* Read the list MFT entries
-	 */
-	if( libcdata_array_get_number_of_entries(
-	     list_mft_entry_array,
-	     &number_of_list_attributes,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of list MFT entries.",
-		 function );
-
-		goto on_error;
-	}
-	for( list_attribute_index = 0;
-	     list_attribute_index < number_of_list_attributes;
-	     list_attribute_index++ )
-	{
-		if( libcdata_array_get_entry_by_index(
-		     list_mft_entry_array,
-		     list_attribute_index,
-		     (intptr_t **) &list_attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve list attribute: %d.",
-			 function,
-			 list_attribute_index );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_get_file_reference(
-		     list_attribute,
-		     &list_mft_entry_index,
-		     &sequence_number,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve list attribute: %d file reference.",
-			 function,
-			 list_attribute_index );
 
 			goto on_error;
 		}
@@ -1654,6 +1504,12 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 			goto on_error;
 		}
+		/* Ignore the current MFT entry
+		 */
+		if( list_mft_entry_index == (uint64_t) mft_entry->index )
+		{
+			continue;
+		}
 		if( libfdata_vector_get_element_value_by_index(
 		     mft_entry_vector,
 		     (intptr_t *) file_io_handle,
@@ -1668,18 +1524,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
-			 function,
-			 list_mft_entry_index );
-
-			goto on_error;
-		}
-		if( list_mft_entry == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing MFT entry: %" PRIu64 ".",
 			 function,
 			 list_mft_entry_index );
 
@@ -1703,29 +1547,17 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		     attribute_index < number_of_attributes;
 		     attribute_index++ )
 		{
-			if( libfsntfs_mft_entry_get_attribute_by_index(
-			     list_mft_entry,
+			if( libcdata_array_get_entry_by_index(
+			     list_mft_entry->attributes_array,
 			     attribute_index,
-			     &attribute,
+			     (intptr_t **) &mft_attribute,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute: %d.",
-				 function,
-				 attribute_index );
-
-				goto on_error;
-			}
-			if( attribute == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing attribute: %d.",
+				 "%s: unable to retrieve attribute: %d from list MFT entry.",
 				 function,
 				 attribute_index );
 
@@ -1741,18 +1573,17 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set entry: %d in attributes array.",
+				 "%s: unable to set attribute: %d in list MFT entry.",
 				 function,
 				 attribute_index );
 
 				goto on_error;
 			}
-/* TODO convert attribute list attributes into readable attributes */
 			if( libfsntfs_mft_entry_append_attribute(
 			     mft_entry,
 			     io_handle,
 			     file_io_handle,
-			     attribute,
+			     mft_attribute,
 			     flags,
 			     error ) != 1 )
 			{
@@ -1780,20 +1611,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		goto on_error;
 	}
-	if( libcdata_array_free(
-	     &list_mft_entry_array,
-	     NULL,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free list MFT entry array.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
 
 on_error:
@@ -1801,19 +1618,6 @@ on_error:
 	{
 		libfcache_cache_free(
 		 &mft_entry_cache,
-		 NULL );
-	}
-	if( list_mft_entry_array != NULL )
-	{
-		libcdata_array_free(
-		 &list_mft_entry_array,
-		 NULL,
-		 NULL );
-	}
-	if( list_attribute != NULL )
-	{
-		libfsntfs_internal_attribute_free(
-		 (libfsntfs_internal_attribute_t **) &list_attribute,
 		 NULL );
 	}
 	return( -1 );
@@ -2317,7 +2121,7 @@ int libfsntfs_mft_entry_get_number_of_attributes(
 int libfsntfs_mft_entry_get_attribute_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_get_attribute_by_index";
@@ -2396,7 +2200,7 @@ int libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_get_alternate_data_attribute_by_index";
@@ -2438,7 +2242,7 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error )
 {
 	static char *function    = "libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name";
@@ -2502,8 +2306,8 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
 
 			return( -1 );
 		}
-		result = libfsntfs_internal_attribute_compare_name_with_utf8_string(
-			  (libfsntfs_internal_attribute_t *) *attribute,
+		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
+			  *attribute,
 			  utf8_string,
 			  utf8_string_length,
 			  error );
@@ -2541,7 +2345,7 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error )
 {
 	static char *function    = "libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name";
@@ -2605,8 +2409,8 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
 
 			return( -1 );
 		}
-		result = libfsntfs_internal_attribute_compare_name_with_utf16_string(
-			  (libfsntfs_internal_attribute_t *) *attribute,
+		result = libfsntfs_mft_attribute_compare_name_with_utf16_string(
+			  *attribute,
 			  utf16_string,
 			  utf16_string_length,
 			  error );
@@ -2957,18 +2761,22 @@ int libfsntfs_mft_entry_append_attribute(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      uint8_t flags,
      libcerror_error_t **error )
 {
 	uint8_t utf8_attribute_name[ 64 ];
 
-	libfsntfs_index_t *index        = NULL;
-	static char *function           = "libfsntfs_mft_entry_append_attribute";
-	size_t utf8_attribute_name_size = 0;
-	uint32_t attribute_type         = 0;
-	int entry_index                 = 0;
-	int result                      = 0;
+	libfsntfs_index_t *index                 = NULL;
+	static char *function                    = "libfsntfs_mft_entry_append_attribute";
+	size_t utf8_attribute_name_size          = 0;
+	uint32_t attribute_type                  = 0;
+	int entry_index                          = 0;
+	int result                               = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libfsntfs_bitmap_values_t *bitmap_values = NULL;
+#endif
 
 	if( mft_entry == NULL )
 	{
@@ -3005,9 +2813,9 @@ int libfsntfs_mft_entry_append_attribute(
 		 "%s: unable to append attribute to array.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( libfsntfs_attribute_get_utf8_name_size(
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     attribute,
 	     &utf8_attribute_name_size,
 	     error ) != 1 )
@@ -3019,9 +2827,9 @@ int libfsntfs_mft_entry_append_attribute(
 		 "%s: unable to retrieve UTF-8 attribute name size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( libfsntfs_attribute_get_type(
+	if( libfsntfs_mft_attribute_get_type(
 	     attribute,
 	     &attribute_type,
 	     error ) != 1 )
@@ -3033,14 +2841,14 @@ int libfsntfs_mft_entry_append_attribute(
 		 "%s: unable to retrieve attribute type.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	switch( attribute_type )
 	{
 		case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
 			if( utf8_attribute_name_size > 1 )
 			{
-				if( libfsntfs_attribute_get_utf8_name(
+				if( libfsntfs_mft_attribute_get_utf8_name(
 				     attribute,
 				     utf8_attribute_name,
 				     64,
@@ -3053,7 +2861,7 @@ int libfsntfs_mft_entry_append_attribute(
 					 "%s: unable to retrieve UTF-8 attribute name.",
 					 function );
 
-					return( -1 );
+					goto on_error;
 				}
 				result = libfsntfs_mft_entry_get_index_by_utf8_name(
 					  mft_entry,
@@ -3071,7 +2879,7 @@ int libfsntfs_mft_entry_append_attribute(
 					 "%s: unable to retrieve index.",
 					 function );
 
-					return( -1 );
+					goto on_error;
 				}
 				else if( result != 0 )
 				{
@@ -3089,14 +2897,28 @@ int libfsntfs_mft_entry_append_attribute(
 						 "%s: unable to set bitmap attribute in index.",
 						 function );
 
-						return( -1 );
+						goto on_error;
 					}
 				}
 			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
-				if( libfsntfs_attribute_read_value(
+				if( libfsntfs_bitmap_values_initialize(
+				     &bitmap_values,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create bitmap values.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfsntfs_bitmap_values_read_from_mft_attribute(
+				     bitmap_values,
 				     attribute,
 				     io_handle,
 				     file_io_handle,
@@ -3107,13 +2929,26 @@ int libfsntfs_mft_entry_append_attribute(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read attribute value.",
+					 "%s: unable to read bitmap values from attribute.",
 					 function );
 
-					return( -1 );
+					goto on_error;
+				}
+				if( libfsntfs_bitmap_values_free(
+				     &bitmap_values,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free bitmap values.",
+					 function );
+
+					goto on_error;
 				}
 			}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_DATA:
@@ -3129,10 +2964,11 @@ int libfsntfs_mft_entry_append_attribute(
 				 "%s: unable to append data attribute to MFT entry.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			break;
 
+/* TODO refactor
 		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
 #if defined( HAVE_DEBUG_OUTPUT )
 		case LIBFSNTFS_ATTRIBUTE_TYPE_LOGGED_UTILITY_STREAM:
@@ -3154,10 +2990,19 @@ int libfsntfs_mft_entry_append_attribute(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read attribute value.",
-				 function );
+				 "%s: unable to read attribute value of type: 0x%08" PRIx32 ".",
+				 function,
+				 attribute_type );
 
-				return( -1 );
+				goto on_error;
+			}
+			break;
+*/
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
+			if( mft_entry->file_name_attribute_index == -1 )
+			{
+				mft_entry->file_name_attribute_index = entry_index;
 			}
 			break;
 
@@ -3174,7 +3019,7 @@ int libfsntfs_mft_entry_append_attribute(
 				 "%s: unable to append index allocation attribute to MFT entry.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			break;
 
@@ -3191,67 +3036,47 @@ int libfsntfs_mft_entry_append_attribute(
 				 "%s: unable to append index root attribute to MFT entry.",
 				 function );
 
-				return( -1 );
-			}
-			break;
-
-		default:
-			break;
-	}
-	switch( attribute_type )
-	{
-		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
-			if( mft_entry->file_name_attribute == NULL )
-			{
-				mft_entry->file_name_attribute = attribute;
-			}
-			break;
-
-		case LIBFSNTFS_ATTRIBUTE_TYPE_OBJECT_IDENTIFIER:
-			if( ( mft_entry->object_identifier_attribute == NULL )
-			 && ( utf8_attribute_name_size <= 1 ) )
-			{
-				mft_entry->object_identifier_attribute = attribute;
+				goto on_error;
 			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
-			if( ( mft_entry->reparse_point_attribute == NULL )
+			if( ( mft_entry->reparse_point_attribute_index == -1 )
 			 && ( utf8_attribute_name_size <= 1 ) )
 			{
-				mft_entry->reparse_point_attribute = attribute;
-			}
-			break;
-
-		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
-			if( ( mft_entry->standard_information_attribute == NULL )
-			 && ( utf8_attribute_name_size <= 1 ) )
-			{
-				mft_entry->standard_information_attribute = attribute;
+				mft_entry->reparse_point_attribute_index = entry_index;
 			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
-			if( ( mft_entry->security_descriptor_attribute == NULL )
+			if( ( mft_entry->security_descriptor_attribute_index == -1 )
 			 && ( utf8_attribute_name_size <= 1 ) )
 			{
-				mft_entry->security_descriptor_attribute = attribute;
+				mft_entry->security_descriptor_attribute_index = entry_index;
+			}
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
+			if( ( mft_entry->standard_information_attribute_index == -1 )
+			 && ( utf8_attribute_name_size <= 1 ) )
+			{
+				mft_entry->standard_information_attribute_index = entry_index;
 			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION:
-			if( ( mft_entry->volume_information_attribute == NULL )
+			if( ( mft_entry->volume_information_attribute_index == -1 )
 			 && ( utf8_attribute_name_size <= 1 ) )
 			{
-				mft_entry->volume_information_attribute = attribute;
+				mft_entry->volume_information_attribute_index = entry_index;
 			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME:
-			if( ( mft_entry->volume_name_attibute == NULL )
+			if( ( mft_entry->volume_name_attribute_index == -1 )
 			 && ( utf8_attribute_name_size <= 1 ) )
 			{
-				mft_entry->volume_name_attibute = attribute;
+				mft_entry->volume_name_attribute_index = entry_index;
 			}
 			break;
 
@@ -3259,6 +3084,17 @@ int libfsntfs_mft_entry_append_attribute(
 			break;
 	}
 	return( 1 );
+
+on_error:
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( bitmap_values != NULL )
+	{
+		libfsntfs_bitmap_values_free(
+		 &bitmap_values,
+		 NULL );
+	}
+#endif
+	return( -1 );
 }
 
 /* Appends a $DATA attribute
@@ -3266,17 +3102,17 @@ int libfsntfs_mft_entry_append_attribute(
  */
 int libfsntfs_mft_entry_append_data_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	uint8_t utf8_attribute_name[ 64 ];
 
-	libfsntfs_attribute_t *data_attribute = NULL;
-	static char *function                 = "libfsntfs_mft_entry_append_data_attribute";
-	size_t utf8_attribute_name_size       = 0;
-	int attribute_index                   = 0;
-	int entry_index                       = 0;
-	int result                            = 0;
+	libfsntfs_mft_attribute_t *data_attribute = NULL;
+	static char *function                     = "libfsntfs_mft_entry_append_data_attribute";
+	size_t utf8_attribute_name_size           = 0;
+	int attribute_index                       = 0;
+	int entry_index                           = 0;
+	int result                                = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -3289,7 +3125,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_utf8_name_size(
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     attribute,
 	     &utf8_attribute_name_size,
 	     error ) != 1 )
@@ -3305,17 +3141,17 @@ int libfsntfs_mft_entry_append_data_attribute(
 	}
 	if( utf8_attribute_name_size <= 1 )
 	{
+/* TODO move this into append to chain ? */
 		if( mft_entry->data_attribute == NULL )
 		{
 			mft_entry->data_attribute = attribute;
 		}
 		else
 		{
-/* TODO pass mft_attribute to function */
 			if( libfsntfs_mft_attribute_append_to_chain(
-			     ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute,
-			     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
-			     &( ( (libfsntfs_internal_attribute_t *) mft_entry->data_attribute )->mft_attribute ),
+			     mft_entry->data_attribute,
+			     attribute,
+			     &( mft_entry->data_attribute ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3331,7 +3167,7 @@ int libfsntfs_mft_entry_append_data_attribute(
 	}
 	else
 	{
-		if( libfsntfs_attribute_get_utf8_name(
+		if( libfsntfs_mft_attribute_get_utf8_name(
 		     attribute,
 		     utf8_attribute_name,
 		     64,
@@ -3385,11 +3221,10 @@ int libfsntfs_mft_entry_append_data_attribute(
 		}
 		else
 		{
-/* TODO pass mft_attribute to function */
 			if( libfsntfs_mft_attribute_append_to_chain(
-			     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
-			     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
-			     &( ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute ),
+			     data_attribute,
+			     attribute,
+			     &data_attribute,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3430,14 +3265,14 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      int *attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *safe_attribute = NULL;
-	static char *function                 = "libfsntfs_mft_entry_get_data_attribute_by_utf8_name";
-	int number_of_attributes              = 0;
-	int result                            = 0;
-	int safe_attribute_index              = 0;
+	libfsntfs_mft_attribute_t *safe_attribute = NULL;
+	static char *function                     = "libfsntfs_mft_entry_get_data_attribute_by_utf8_name";
+	int number_of_attributes                  = 0;
+	int result                                = 0;
+	int safe_attribute_index                  = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -3528,8 +3363,8 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
 
 			return( -1 );
 		}
-		result = libfsntfs_internal_attribute_compare_name_with_utf8_string(
-			  (libfsntfs_internal_attribute_t *) safe_attribute,
+		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
+			  safe_attribute,
 			  utf8_string,
 			  utf8_string_length,
 			  error );
@@ -3569,7 +3404,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
  */
 int libfsntfs_mft_entry_append_index_allocation_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	uint8_t utf8_attribute_name[ 64 ];
@@ -3590,7 +3425,7 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_utf8_name_size(
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     attribute,
 	     &utf8_attribute_name_size,
 	     error ) != 1 )
@@ -3615,7 +3450,7 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_utf8_name(
+	if( libfsntfs_mft_attribute_get_utf8_name(
 	     attribute,
 	     utf8_attribute_name,
 	     64,
@@ -3667,10 +3502,9 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 			return( -1 );
 		}
 	}
-/* TODO pass mft_attribute to function */
 	if( libfsntfs_index_set_index_allocation_attribute(
 	     index,
-	     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
+	     attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3690,7 +3524,7 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
  */
 int libfsntfs_mft_entry_append_index_root_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
 	uint8_t utf8_attribute_name[ 64 ];
@@ -3711,7 +3545,7 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_utf8_name_size(
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     attribute,
 	     &utf8_attribute_name_size,
 	     error ) != 1 )
@@ -3736,7 +3570,7 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_attribute_get_utf8_name(
+	if( libfsntfs_mft_attribute_get_utf8_name(
 	     attribute,
 	     utf8_attribute_name,
 	     64,
@@ -3788,10 +3622,9 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 			return( -1 );
 		}
 	}
-/* TODO pass mft_attribute to function */
 	if( libfsntfs_index_set_index_root_attribute(
 	     index,
-	     ( (libfsntfs_internal_attribute_t *) attribute )->mft_attribute,
+	     attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -3947,7 +3780,7 @@ int libfsntfs_mft_entry_read_element_data(
 	     element_index,
 	     (intptr_t *) mft_entry,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_entry_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+	     LIBFDATA_VECTOR_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

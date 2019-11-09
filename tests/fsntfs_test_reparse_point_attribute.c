@@ -35,6 +35,7 @@
 
 #include "../libfsntfs/libfsntfs_attribute.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 #include "../libfsntfs/libfsntfs_reparse_point_attribute.h"

@@ -27,6 +27,7 @@
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_usn_change_journal.h"
 
@@ -39,7 +40,7 @@ int libfsntfs_usn_change_journal_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_directory_entry_t *directory_entry,
-     libfsntfs_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
@@ -120,12 +121,11 @@ int libfsntfs_usn_change_journal_initialize(
 
 		return( -1 );
 	}
-/* TODO pass mft_attribute to function */
 	if( libfsntfs_data_stream_initialize(
 	     &( internal_usn_change_journal->data_stream ),
 	     file_io_handle,
 	     io_handle,
-	     ( (libfsntfs_internal_attribute_t *) data_attribute )->mft_attribute,
+	     data_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -202,7 +202,6 @@ int libfsntfs_usn_change_journal_initialize(
 	}
 	internal_usn_change_journal->file_io_handle  = file_io_handle;
 	internal_usn_change_journal->directory_entry = directory_entry;
-	internal_usn_change_journal->data_attribute  = data_attribute;
 
 	*usn_change_journal = (libfsntfs_usn_change_journal_t *) internal_usn_change_journal;
 
@@ -250,7 +249,7 @@ int libfsntfs_usn_change_journal_free(
 		internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) *usn_change_journal;
 		*usn_change_journal         = NULL;
 
-		/* The file_io_handle and data_attribute references are freed elsewhere
+		/* The file_io_handle reference is freed elsewhere
 		 */
 		if( libfsntfs_directory_entry_free(
 		     &( internal_usn_change_journal->directory_entry ),

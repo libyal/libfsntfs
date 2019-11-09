@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INTERNAL_VOLUME_H )
-#define _LIBFSNTFS_INTERNAL_VOLUME_H
+#if !defined( _LIBFSNTFS_VOLUME_H )
+#define _LIBFSNTFS_VOLUME_H
 
 #include <common.h>
 #include <types.h>
@@ -72,6 +72,18 @@ struct libfsntfs_internal_volume
 	/* The MFT
 	 */
 	libfsntfs_mft_t *mft;
+
+	/* The volume MFT entry
+	 */
+	libfsntfs_mft_entry_t *volume_mft_entry;
+
+	/* The volume information ($VOLUME_INFORMATION) attribute
+	 */
+	libfsntfs_attribute_t *volume_information_attribute;
+
+	/* The volume name ($VOLUME_NAME) attribute
+	 */
+	libfsntfs_attribute_t *volume_name_attribute;
 
 	/* The security descriptor index
 	 */
@@ -152,6 +164,16 @@ int libfsntfs_volume_has_bitlocker_drive_encryption(
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_has_volume_shadow_snapshots(
      libfsntfs_volume_t *volume,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_volume_get_volume_information_attribute(
+     libfsntfs_internal_volume_t *internal_volume,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_volume_get_volume_name_attribute(
+     libfsntfs_internal_volume_t *internal_volume,
+     libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -278,5 +300,5 @@ int libfsntfs_volume_get_usn_change_journal(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INTERNAL_VOLUME_H ) */
+#endif /* !defined( _LIBFSNTFS_VOLUME_H ) */
 

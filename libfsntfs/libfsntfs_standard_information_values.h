@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -80,6 +81,11 @@ int libfsntfs_standard_information_values_read_data(
      libfsntfs_standard_information_values_t *standard_information_values,
      const uint8_t *data,
      size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_standard_information_values_read_from_mft_attribute(
+     libfsntfs_standard_information_values_t *standard_information_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_standard_information_values_get_creation_time(

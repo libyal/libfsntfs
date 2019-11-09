@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
@@ -56,6 +55,10 @@ int libfsntfs_cluster_block_free(
      libfsntfs_cluster_block_t **cluster_block,
      libcerror_error_t **error );
 
+int libfsntfs_cluster_block_clear(
+     libfsntfs_cluster_block_t *cluster_block,
+     libcerror_error_t **error );
+
 int libfsntfs_cluster_block_read_file_io_handle(
      libfsntfs_cluster_block_t *cluster_block,
      libbfio_handle_t *file_io_handle,
@@ -63,7 +66,7 @@ int libfsntfs_cluster_block_read_file_io_handle(
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_read_element_data(
-     libfsntfs_io_handle_t *io_handle,
+     intptr_t *data_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,

@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -58,9 +59,9 @@ int libfsntfs_volume_name_values_read_data(
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_volume_name_values_read_from_attribute(
+int libfsntfs_volume_name_values_read_from_mft_attribute(
      libfsntfs_volume_name_values_t *volume_name_values,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_volume_name_values_get_utf8_name_size(

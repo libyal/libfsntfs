@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_index.h"
 #include "libfsntfs_io_handle.h"
@@ -33,6 +32,7 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry_header.h"
 
 #if defined( __cplusplus )
@@ -89,43 +89,39 @@ struct libfsntfs_mft_entry
 
 	/* The (attribute) list attribute
 	 */
-	libfsntfs_attribute_t *list_attribute;
+	libfsntfs_mft_attribute_t *list_attribute;
 
 	/* The default (nameless) $DATA attribute
 	 */
-	libfsntfs_attribute_t *data_attribute;
+	libfsntfs_mft_attribute_t *data_attribute;
 
 	/* The alternate data attributes array
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
 
-	/* The (first) file name attribute
+	/* The index of the (first) file name attribute
 	 */
-	libfsntfs_attribute_t *file_name_attribute;
+	int file_name_attribute_index;
 
-	/* The object identifier attribute
+	/* The index of the reparse point attribute or -1 if not set
 	 */
-	libfsntfs_attribute_t *object_identifier_attribute;
+	int reparse_point_attribute_index;
 
-	/* The reparse point attribute
+	/* The index of the security descriptor attribute or -1 if not set
 	 */
-	libfsntfs_attribute_t *reparse_point_attribute;
+	int security_descriptor_attribute_index;
 
-	/* The standard information attribute
+	/* The index of the standard information attribute or -1 if not set
 	 */
-	libfsntfs_attribute_t *standard_information_attribute;
+	int standard_information_attribute_index;
 
-	/* The security descriptor attribute
+	/* The index of the volume information attribute or -1 if not set
 	 */
-	libfsntfs_attribute_t *security_descriptor_attribute;
+	int volume_information_attribute_index;
 
-	/* The volume information attribute
+	/* The index of the volume name attribute or -1 if not set
 	 */
-	libfsntfs_attribute_t *volume_information_attribute;
-
-	/* The volume name attribute
-	 */
-	libfsntfs_attribute_t *volume_name_attibute;
+	int volume_name_attribute_index;
 
 	/* The index array
 	 */
@@ -248,7 +244,7 @@ int libfsntfs_mft_entry_get_number_of_attributes(
 int libfsntfs_mft_entry_get_attribute_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
@@ -259,21 +255,21 @@ int libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
      libfsntfs_mft_entry_t *mft_entry,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_index(
@@ -294,13 +290,13 @@ int libfsntfs_mft_entry_append_attribute(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_data_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
@@ -308,22 +304,17 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      int *attribute_index,
-     libfsntfs_attribute_t **attribute,
+     libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_index_allocation_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_append_index_root_attribute(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_set_reparse_point_attribute(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_has_directory_entries_index(

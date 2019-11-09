@@ -518,12 +518,20 @@ int libfsntfs_attribute_list_entry_get_file_reference(
 
 		return( -1 );
 	}
-	*mft_entry_index = attribute_list_entry->file_reference & 0xffffffffffffUL;
-
-	if( sequence_number != NULL )
+	if( sequence_number == NULL )
 	{
-		*sequence_number = (uint16_t) ( attribute_list_entry->file_reference >> 48 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry index.",
+		 function );
+
+		return( -1 );
 	}
+	*mft_entry_index = attribute_list_entry->file_reference & 0xffffffffffffUL;
+	*sequence_number = (uint16_t) ( attribute_list_entry->file_reference >> 48 );
+
 	return( 1 );
 }
 

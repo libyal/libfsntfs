@@ -58,7 +58,7 @@ int fsntfs_test_index_initialize(
 	int result                      = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 1;
+	int number_of_malloc_fail_tests = 3;
 	int number_of_memset_fail_tests = 1;
 	int test_number                 = 0;
 #endif
@@ -269,6 +269,41 @@ int fsntfs_test_index_initialize(
 			 &error );
 		}
 	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libfsntfs_index_initialize with memcpy failing
+	 */
+	fsntfs_test_memset_attempts_before_fail = 0;
+
+	result = libfsntfs_index_initialize(
+	          &index,
+	          (uint8_t *) "$I30",
+	          5,
+	          &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "index",
+		 index );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	return( 1 );

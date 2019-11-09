@@ -30,9 +30,11 @@
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_values.h"
@@ -85,7 +87,23 @@ struct libfsntfs_internal_file_entry
 
 	/* The default (nameless) $DATA attribute
 	 */
-	libfsntfs_attribute_t *data_attribute;
+	libfsntfs_mft_attribute_t *data_attribute;
+
+	/* The attributes array
+	 */
+	libcdata_array_t *attributes_array;
+
+	/* The reparse point ($REPARSE_POINT) attribute
+	 */
+	libfsntfs_attribute_t *reparse_point_attribute;
+
+	/* The security descriptor ($SECURITY_DESCRIPTOR) attribute
+	 */
+	libfsntfs_attribute_t *security_descriptor_attribute;
+
+	/* The standard information ($STANDARD_INFORMATION) attribute
+	 */
+	libfsntfs_attribute_t *standard_information_attribute;
 
 	/* The default (nameless) $DATA attribute cluster block stream
 	 */
@@ -120,6 +138,27 @@ int libfsntfs_file_entry_is_empty(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_file_entry_get_attribute_by_index(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     int attribute_index,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_file_entry_get_reparse_point_attribute(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_file_entry_get_security_descriptor_attribute(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_file_entry_get_standard_information_attribute(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

@@ -28,12 +28,13 @@
 #include <wide_string.h>
 
 #include "libfsntfs_debug.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_file_name_values.h"
-#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfdatetime.h"
 #include "libfsntfs_libuna.h"
+#include "libfsntfs_mft_attribute.h"
 
 #include "fsntfs_file_name.h"
 
@@ -653,6 +654,115 @@ on_error:
 	return( -1 );
 }
 
+/* Reads the file name values from an MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_read_from_mft_attribute(
+     libfsntfs_file_name_values_t *file_name_values,
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error )
+{
+	uint8_t *data           = NULL;
+	static char *function   = "libfsntfs_file_name_values_read_from_mft_attribute";
+	size_t data_size        = 0;
+	uint32_t attribute_type = 0;
+	int result              = 0;
+
+	if( file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_type(
+	     mft_attribute,
+	     &attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve resident data from attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_read_data(
+	     file_name_values,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the parent file reference
  * Returns 1 if successful or -1 on error
  */
@@ -1052,10 +1162,10 @@ int libfsntfs_file_name_values_compare_short_name(
      libcerror_error_t **error )
 {
 	static char *function   = "libfsntfs_file_name_values_compare_short_name";
+	size_t name_index       = 0;
+	size_t name_iterator    = 0;
+	size_t short_name_index = 0;
 	uint8_t in_tilde_suffix = 0;
-	int name_index          = 0;
-	int name_iterator       = 0;
-	int short_name_index    = 0;
 
 	if( file_name_values == NULL )
 	{

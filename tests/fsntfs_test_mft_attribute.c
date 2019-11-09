@@ -958,6 +958,59 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_mft_attribute_data_is_resident function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_attribute_data_is_resident(
+     libfsntfs_mft_attribute_t *mft_attribute )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_mft_attribute_get_type function
  * Returns 1 if successful or 0 if not
  */
@@ -1960,6 +2013,11 @@ int main(
 
 	/* Run tests
 	 */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_attribute_data_is_resident",
+	 fsntfs_test_mft_attribute_data_is_resident,
+	 mft_attribute );
+
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_attribute_get_type",
 	 fsntfs_test_mft_attribute_get_type,
