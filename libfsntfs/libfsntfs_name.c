@@ -38,17 +38,14 @@ int libfsntfs_name_compare_with_utf8_string(
      size_t name_size,
      const libuna_utf8_character_t *utf8_string,
      size_t utf8_string_length,
+     uint8_t use_case_folding,
      libcerror_error_t **error )
 {
 	static char *function                       = "libfsntfs_name_compare_with_utf8_string";
-	int result                                  = 0;
-
-#ifdef TODO_CASE_INSENSITIVE
 	libuna_unicode_character_t name_character   = 0;
 	libuna_unicode_character_t string_character = 0;
 	size_t name_index                           = 0;
 	size_t utf8_string_index                    = 0;
-#endif
 
 	if( name == NULL )
 	{
@@ -105,18 +102,29 @@ int libfsntfs_name_compare_with_utf8_string(
 
 		return( -1 );
 	}
-#ifdef TODO_CASE_INSENSITIVE
-	while( name_index < (size_t) name_size )
+	/* Check if the UTF-16 stream is terminated with zero bytes
+	 */
+	if( ( name_size >= 2 )
+	 && ( name[ name_size - 2 ] == 0 )
+	 && ( name[ name_size - 1 ] == 0 ) )
 	{
-		result = libuna_unicode_character_copy_from_utf16_stream(
-			  &name_character,
-			  name,
-			  name_size,
-			  &name_index,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
+		name_size -= 2;
+	}
+	if( ( utf8_string_length >= 1 )
+	 && ( utf8_string[ utf8_string_length - 1 ] == 0 ) )
+	{
+		utf8_string_length -= 1;
+	}
+	while( ( name_index < name_size )
+	    && ( utf8_string_index < utf8_string_length ) )
+	{
+		if( libuna_unicode_character_copy_from_utf16_stream(
+		     &name_character,
+		     name,
+		     name_size,
+		     &name_index,
+		     LIBUNA_ENDIAN_LITTLE,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -143,40 +151,29 @@ int libfsntfs_name_compare_with_utf8_string(
 
 			return( -1 );
 		}
-		if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+		if( use_case_folding )
 		{
-			break;
+			name_character   = (libuna_unicode_character_t) towupper( (wint_t) name_character );
+			string_character = (libuna_unicode_character_t) towupper( (wint_t) string_character );
+		}
+		if( string_character < name_character )
+		{
+			return( LIBUNA_COMPARE_LESS );
+		}
+		else if( string_character > name_character )
+		{
+			return( LIBUNA_COMPARE_GREATER );
 		}
 	}
-	if( ( name_index == name_size )
-	 && ( utf8_string_index == utf8_string_length ) )
+	if( utf8_string_index < utf8_string_length )
 	{
-		return( 1 );
+		return( LIBUNA_COMPARE_GREATER );
 	}
-	return( 0 );
-#else
-	result = libuna_utf8_string_compare_with_utf16_stream(
-	          utf8_string,
-	          utf8_string_length,
-	          name,
-	          name_size,
-	          LIBUNA_ENDIAN_LITTLE,
-	          error );
-
-	if( result == -1 )
+	else if( name_index < name_size )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare UTF-8 string with UTF-16 encoded name.",
-		 function );
-
-		return( -1 );
+		return( LIBUNA_COMPARE_LESS );
 	}
-	return( result );
-
-#endif /* TODO_CASE_INSENSITIVE */
+	return( LIBUNA_COMPARE_EQUAL );
 }
 
 /* Compares an UTF-16 string with an UTF-16 encoded attribute, file entry or index name
@@ -187,17 +184,14 @@ int libfsntfs_name_compare_with_utf16_string(
      size_t name_size,
      const libuna_utf16_character_t *utf16_string,
      size_t utf16_string_length,
+     uint8_t use_case_folding,
      libcerror_error_t **error )
 {
 	static char *function                       = "libfsntfs_name_compare_with_utf16_string";
-	int result                                  = 0;
-
-#ifdef TODO_CASE_INSENSITIVE
 	libuna_unicode_character_t name_character   = 0;
 	libuna_unicode_character_t string_character = 0;
 	size_t name_index                           = 0;
 	size_t utf16_string_index                   = 0;
-#endif
 
 	if( name == NULL )
 	{
@@ -254,18 +248,29 @@ int libfsntfs_name_compare_with_utf16_string(
 
 		return( -1 );
 	}
-#ifdef TODO_CASE_INSENSITIVE
-	while( name_index < (size_t) name_size )
+	/* Check if the UTF-16 stream is terminated with zero bytes
+	 */
+	if( ( name_size >= 2 )
+	 && ( name[ name_size - 2 ] == 0 )
+	 && ( name[ name_size - 1 ] == 0 ) )
 	{
-		result = libuna_unicode_character_copy_from_utf16_stream(
-			  &name_character,
-			  name,
-			  name_size,
-			  &name_index,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
+		name_size -= 2;
+	}
+	if( ( utf16_string_length >= 1 )
+	 && ( utf16_string[ utf16_string_length - 1 ] == 0 ) )
+	{
+		utf16_string_length -= 1;
+	}
+	while( ( name_index < name_size )
+	    && ( utf16_string_index < utf16_string_length ) )
+	{
+		if( libuna_unicode_character_copy_from_utf16_stream(
+		     &name_character,
+		     name,
+		     name_size,
+		     &name_index,
+		     LIBUNA_ENDIAN_LITTLE,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -292,39 +297,28 @@ int libfsntfs_name_compare_with_utf16_string(
 
 			return( -1 );
 		}
-		if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+		if( use_case_folding )
 		{
-			break;
+			name_character   = (libuna_unicode_character_t) towupper( (wint_t) name_character );
+			string_character = (libuna_unicode_character_t) towupper( (wint_t) string_character );
+		}
+		if( string_character < name_character )
+		{
+			return( LIBUNA_COMPARE_LESS );
+		}
+		else if( string_character > name_character )
+		{
+			return( LIBUNA_COMPARE_GREATER );
 		}
 	}
-	if( ( name_index == name_size )
-	 && ( utf16_string_index == utf16_string_length ) )
+	if( utf16_string_index < utf16_string_length )
 	{
-		return( 1 );
+		return( LIBUNA_COMPARE_GREATER );
 	}
-	return( 0 );
-#else
-	result = libuna_utf16_string_compare_with_utf16_stream(
-	          utf16_string,
-	          utf16_string_length,
-	          name,
-	          name_size,
-	          LIBUNA_ENDIAN_LITTLE,
-	          error );
-
-	if( result == -1 )
+	else if( name_index < name_size )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare UTF-16 string with UTF-16 encoded name.",
-		 function );
-
-		return( -1 );
+		return( LIBUNA_COMPARE_LESS );
 	}
-	return( result );
-
-#endif /* TODO_CASE_INSENSITIVE */
+	return( LIBUNA_COMPARE_EQUAL );
 }
 

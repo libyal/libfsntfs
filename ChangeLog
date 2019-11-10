@@ -1,14 +1,13 @@
 TODO
+* refactor index to resolve on demand
 * refactor libfsntfs_mft_attribute_append_to_chain
 
 * remove libfsntfs_attribute_get_file_reference?
 * rename libfsntfs_internal_attribute_get_data to libfsntfs_internal_attribute_get_resident_data
 * libfsntfs_attribute add read / seek functions
-* refactor libfsntfs_attribute_get_value to libfsntfs_internal_attribute_get_value
 * change calls to libfsntfs_mft_entry_get_index_by_utf8_name to utf16 for optimization
 * change calls to libfsntfs_mft_entry_get_data_attribute_by_utf8_name to utf16 for optimization
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
-* fix or remove TODO_CASE_INSENSITIVE
 * implement read/write lock support
 * add support for WofCompressedData NTFS alternate data streams
 

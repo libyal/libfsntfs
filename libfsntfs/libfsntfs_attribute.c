@@ -997,15 +997,14 @@ int libfsntfs_attribute_get_data_flags(
 /* Retrieves the value
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_attribute_get_value(
-     libfsntfs_attribute_t *attribute,
+int libfsntfs_internal_attribute_get_value(
+     libfsntfs_internal_attribute_t *internal_attribute,
      intptr_t **value,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_get_value";
+	static char *function = "libfsntfs_internal_attribute_get_value";
 
-	if( attribute == NULL )
+	if( internal_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1016,8 +1015,6 @@ int libfsntfs_attribute_get_value(
 
 		return( -1 );
 	}
-	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
-
 	if( value == NULL )
 	{
 		libcerror_error_set(

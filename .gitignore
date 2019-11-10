@@ -124,6 +124,7 @@ stamp-h[1-9]
 /pyfsntfs-python[23]/*.[ch]
 /fsntfstools/*.exe
 /fsntfstools/fsntfsinfo
+/fsntfstools/fsntfsmount
 /tests/*.exe
 /tests/fsntfs_test_attribute
 /tests/fsntfs_test_attribute_list

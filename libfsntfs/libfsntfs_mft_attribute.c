@@ -1606,6 +1606,7 @@ int libfsntfs_mft_attribute_compare_name_with_utf8_string(
 	          mft_attribute->name_size,
 	          utf8_string,
 	          utf8_string_length,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -1658,6 +1659,7 @@ int libfsntfs_mft_attribute_compare_name_with_utf16_string(
 	          mft_attribute->name_size,
 	          utf16_string,
 	          utf16_string_length,
+	          0,
 	          error );
 
 	if( result == -1 )

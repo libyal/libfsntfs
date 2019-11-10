@@ -16,12 +16,14 @@ AM_CPPFLAGS = \
 	@LIBFGUID_CPPFLAGS@ \
 	@LIBFUSN_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
+	@LIBFUSE_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
 
 bin_PROGRAMS = \
-	fsntfsinfo
+	fsntfsinfo \
+	fsntfsmount
 
 fsntfsinfo_SOURCES = \
 	fsntfsinfo.c \
@@ -49,6 +51,41 @@ fsntfsinfo_LDADD = \
 	@LIBFUSN_LIBADD@ \
 	@LIBFGUID_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+fsntfsmount_SOURCES = \
+	fsntfsmount.c \
+	fsntfstools_getopt.c fsntfstools_getopt.h \
+	fsntfstools_i18n.h \
+	fsntfstools_libbfio.h \
+	fsntfstools_libcdata.h \
+	fsntfstools_libcerror.h \
+	fsntfstools_libclocale.h \
+	fsntfstools_libcnotify.h \
+	fsntfstools_libcpath.h \
+	fsntfstools_libfsntfs.h \
+	fsntfstools_libuna.h \
+	fsntfstools_output.c fsntfstools_output.h \
+	fsntfstools_signal.c fsntfstools_signal.h \
+	fsntfstools_unused.h \
+	mount_dokan.c mount_dokan.h \
+	mount_file_entry.c mount_file_entry.h \
+	mount_file_system.c mount_file_system.h \
+	mount_fuse.c mount_fuse.h \
+	mount_handle.c mount_handle.h
+
+fsntfsmount_LDADD = \
+	@LIBFUSE_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

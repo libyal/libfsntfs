@@ -1,5 +1,5 @@
 /*
- * Name functions
+ * The libcpath header wrapper
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,38 +19,30 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_NAME_H )
-#define _LIBFSNTFS_NAME_H
+#if !defined( _FSNTFSTOOLS_LIBCPATH_H )
+#define _FSNTFSTOOLS_LIBCPATH_H
 
 #include <common.h>
-#include <types.h>
 
-#include "libfsntfs_libcerror.h"
-#include "libfsntfs_libuna.h"
+/* Define HAVE_LOCAL_LIBCPATH for local use of libcpath
+ */
+#if defined( HAVE_LOCAL_LIBCPATH )
 
-#if defined( __cplusplus )
-extern "C" {
+#include <libcpath_definitions.h>
+#include <libcpath_path.h>
+
+#else
+
+/* If libtool DLL support is enabled set LIBCPATH_DLL_IMPORT
+ * before including libcpath.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
+#define LIBCPATH_DLL_IMPORT
 #endif
 
-int libfsntfs_name_compare_with_utf8_string(
-     const uint8_t *name,
-     size_t name_size,
-     const libuna_utf8_character_t *utf8_string,
-     size_t utf8_string_length,
-     uint8_t use_case_folding,
-     libcerror_error_t **error );
+#include <libcpath.h>
 
-int libfsntfs_name_compare_with_utf16_string(
-     const uint8_t *name,
-     size_t name_size,
-     const libuna_utf16_character_t *utf16_string,
-     size_t utf16_string_length,
-     uint8_t use_case_folding,
-     libcerror_error_t **error );
+#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
 
-#if defined( __cplusplus )
-}
-#endif
-
-#endif /* !defined( _LIBFSNTFS_NAME_H ) */
+#endif /* !defined( _FSNTFSTOOLS_LIBCPATH_H ) */
 

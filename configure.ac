@@ -130,6 +130,9 @@ AS_IF(
 dnl Check if libfusn or required headers and functions are available
 AX_LIBFUSN_CHECK_ENABLE
 
+dnl Check if libfuse or required headers and functions are available
+AX_LIBFUSE_CHECK_ENABLE
+
 dnl Check if fsntfstools required headers and functions are available
 AX_FSNTFSTOOLS_CHECK_LOCAL
 
@@ -172,7 +175,7 @@ AS_IF(
  ])
 
 AS_IF(
- [test "x$ac_cv_libfusn" = xyes],
+ [test "x$ac_cv_libfusn" = xyes || test "x$ac_cv_libfuse" != xno],
  [AC_SUBST(
   [libfsntfs_spec_tools_build_requires],
   [BuildRequires:])
@@ -254,6 +257,7 @@ Building:
    libfguid support:                            $ac_cv_libfguid
    libfwnt support:                             $ac_cv_libfwnt
    libfusn support:                             $ac_cv_libfusn
+   FUSE support:                                $ac_cv_libfuse
 
 Features:
    Multi-threading support:                     $ac_cv_libcthreads_multi_threading

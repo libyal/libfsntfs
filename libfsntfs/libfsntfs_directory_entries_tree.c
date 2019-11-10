@@ -30,110 +30,7 @@
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libuna.h"
-
-/* Compares the directory entry name with an UTF-8 encoded string
- * Returns 1 if the strings are equal, 0 if not or -1 on error
- */
-int libfsntfs_directory_entries_tree_compare_name_with_utf8_string(
-     const uint8_t *directory_entry_name,
-     size_t directory_entry_name_size,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcerror_error_t **error )
-{
-	static char *function                       = "libfsntfs_directory_entries_tree_compare_name_with_utf8_string";
-	libuna_unicode_character_t name_character   = 0;
-	libuna_unicode_character_t string_character = 0;
-	size_t name_index                           = 0;
-	size_t utf8_string_index                    = 0;
-	int result                                  = 0;
-
-	if( directory_entry_name_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid directory entry name size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_length > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string length value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( directory_entry_name == NULL )
-	{
-		return( 0 );
-	}
-	while( name_index < (size_t) directory_entry_name_size )
-	{
-		result = libuna_unicode_character_copy_from_utf16_stream(
-			  &name_character,
-			  directory_entry_name,
-			  directory_entry_name_size,
-			  &name_index,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy directory entry name to Unicode character.",
-			 function );
-
-			return( -1 );
-		}
-		if( libuna_unicode_character_copy_from_utf8(
-		     &string_character,
-		     utf8_string,
-		     utf8_string_length,
-		     &utf8_string_index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy UTF-8 string to Unicode character.",
-			 function );
-
-			return( -1 );
-		}
-		if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
-		{
-			break;
-		}
-	}
-	if( ( name_index == (size_t) directory_entry_name_size )
-	 && ( utf8_string_index == utf8_string_length ) )
-	{
-		return( 1 );
-	}
-	return( 0 );
-}
+#include "libfsntfs_name.h"
 
 /* Retrieves the directory entry for an UTF-8 encoded name
  * Returns 1 if successful, 0 if no such directory entry or -1 on error
@@ -230,22 +127,14 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
 
 				goto on_error;
 			}
-#ifdef TODO_CASE_INSENSITIVE
-			result = libfsntfs_directory_entries_tree_compare_name_with_utf8_string(
+			result = libfsntfs_name_compare_with_utf8_string(
 				  ( *directory_entry )->file_name_values->name,
 				  ( *directory_entry )->file_name_values->name_size,
 				  utf8_string,
 				  utf8_string_length,
+				  1,
 				  error );
-#else
-			result = libuna_utf8_string_compare_with_utf16_stream(
-				  utf8_string,
-				  utf8_string_length,
-				  ( *directory_entry )->file_name_values->name,
-				  ( *directory_entry )->file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
+
 			if( result == -1 )
 			{
 				libcerror_error_set(
@@ -275,22 +164,14 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
 
 				goto on_error;
 			}
-#ifdef TODO_CASE_INSENSITIVE
-			result = libfsntfs_directory_entries_tree_compare_name_with_utf8_string(
+			result = libfsntfs_name_compare_with_utf8_string(
 				  ( *directory_entry )->short_file_name_values->name,
 				  ( *directory_entry )->short_file_name_values->name_size,
 				  utf8_string,
 				  utf8_string_length,
+				  1,
 				  error );
-#else
-			result = libuna_utf8_string_compare_with_utf16_stream(
-				  utf8_string,
-				  utf8_string_length,
-				  ( *directory_entry )->short_file_name_values->name,
-				  ( *directory_entry )->short_file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
+
 			if( result == -1 )
 			{
 				libcerror_error_set(
@@ -316,110 +197,6 @@ on_error:
 	*directory_entry = NULL;
 
 	return( -1 );
-}
-
-/* Compares the directory entry name with an UTF-16 encoded string
- * Returns 1 if the strings are equal, 0 if not or -1 on error
- */
-int libfsntfs_directory_entries_tree_compare_name_with_utf16_string(
-     const uint8_t *directory_entry_name,
-     size_t directory_entry_name_size,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libcerror_error_t **error )
-{
-	static char *function                       = "libfsntfs_directory_entries_tree_compare_name_with_utf16_string";
-	libuna_unicode_character_t name_character   = 0;
-	libuna_unicode_character_t string_character = 0;
-	size_t name_index                           = 0;
-	size_t utf16_string_index                   = 0;
-	int result                                  = 0;
-
-	if( directory_entry_name_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid directory entry name size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string_length > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-16 string length value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( directory_entry_name == NULL )
-	{
-		return( 0 );
-	}
-	while( name_index < (size_t) directory_entry_name_size )
-	{
-		result = libuna_unicode_character_copy_from_utf16_stream(
-			  &name_character,
-			  directory_entry_name,
-			  directory_entry_name_size,
-			  &name_index,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy directory entry name to Unicode character.",
-			 function );
-
-			return( -1 );
-		}
-		if( libuna_unicode_character_copy_from_utf16(
-		     &string_character,
-		     utf16_string,
-		     utf16_string_length,
-		     &utf16_string_index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy UTF-16 string to Unicode character.",
-			 function );
-
-			return( -1 );
-		}
-		if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
-		{
-			break;
-		}
-	}
-	if( ( name_index == (size_t) directory_entry_name_size )
-	 && ( utf16_string_index == utf16_string_length ) )
-	{
-		return( 1 );
-	}
-	return( 0 );
 }
 
 /* Retrieves the directory entry for an UTF-16 encoded name
@@ -517,22 +294,14 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
 
 				goto on_error;
 			}
-#ifdef TODO_CASE_INSENSITIVE
-			result = libfsntfs_directory_entries_tree_compare_name_with_utf16_string(
+			result = libfsntfs_name_compare_with_utf16_string(
 				  ( *directory_entry )->file_name_values->name,
 				  ( *directory_entry )->file_name_values->name_size,
 				  utf16_string,
 				  utf16_string_length,
+				  1,
 				  error );
-#else
-			result = libuna_utf16_string_compare_with_utf16_stream(
-				  utf16_string,
-				  utf16_string_length,
-				  ( *directory_entry )->file_name_values->name,
-				  ( *directory_entry )->file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
+
 			if( result == -1 )
 			{
 				libcerror_error_set(
@@ -562,22 +331,14 @@ int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
 
 				goto on_error;
 			}
-#ifdef TODO_CASE_INSENSITIVE
-			result = libfsntfs_directory_entries_tree_compare_name_with_utf16_string(
+			result = libfsntfs_name_compare_with_utf16_string(
 				  ( *directory_entry )->short_file_name_values->name,
 				  ( *directory_entry )->short_file_name_values->name_size,
 				  utf16_string,
 				  utf16_string_length,
+				  1,
 				  error );
-#else
-			result = libuna_utf16_string_compare_with_utf16_stream(
-				  utf16_string,
-				  utf16_string_length,
-				  ( *directory_entry )->short_file_name_values->name,
-				  ( *directory_entry )->short_file_name_values->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
+
 			if( result == -1 )
 			{
 				libcerror_error_set(

@@ -116,8 +116,8 @@ int libfsntfs_attribute_get_data_flags(
      uint16_t *data_flags,
      libcerror_error_t **error );
 
-int libfsntfs_attribute_get_value(
-     libfsntfs_attribute_t *attribute,
+int libfsntfs_internal_attribute_get_value(
+     libfsntfs_internal_attribute_t *internal_attribute,
      intptr_t **value,
      libcerror_error_t **error );
 

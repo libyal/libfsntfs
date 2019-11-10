@@ -52,8 +52,8 @@ Python 3 bindings for libfsntfs
 %package -n libfsntfs-tools
 Summary: Several tools for reading Windows New Technology File System (NTFS) volumes
 Group: Applications/System
-Requires: libfsntfs = %{version}-%{release} @ax_libfusn_spec_requires@
-@libfsntfs_spec_tools_build_requires@ @ax_libfusn_spec_build_requires@
+Requires: libfsntfs = %{version}-%{release} @ax_libfuse_spec_requires@ @ax_libfusn_spec_requires@
+@libfsntfs_spec_tools_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libfusn_spec_build_requires@
 
 %description -n libfsntfs-tools
 Several tools for reading Windows New Technology File System (NTFS) volumes

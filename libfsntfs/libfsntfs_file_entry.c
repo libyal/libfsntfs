@@ -1113,8 +1113,8 @@ int libfsntfs_file_entry_get_creation_time(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_attribute_get_value(
-		     standard_information_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 		     (intptr_t **) &standard_information_values,
 		     error ) != 1 )
 		{
@@ -1191,8 +1191,8 @@ int libfsntfs_file_entry_get_modification_time(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_attribute_get_value(
-		     standard_information_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 		     (intptr_t **) &standard_information_values,
 		     error ) != 1 )
 		{
@@ -1269,8 +1269,8 @@ int libfsntfs_file_entry_get_access_time(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_attribute_get_value(
-		     standard_information_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 		     (intptr_t **) &standard_information_values,
 		     error ) != 1 )
 		{
@@ -1347,8 +1347,8 @@ int libfsntfs_file_entry_get_entry_modification_time(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_attribute_get_value(
-		     standard_information_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 		     (intptr_t **) &standard_information_values,
 		     error ) != 1 )
 		{
@@ -1425,8 +1425,8 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_attribute_get_value(
-		     standard_information_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 		     (intptr_t **) &standard_information_values,
 		     error ) != 1 )
 		{
@@ -1800,8 +1800,8 @@ int libfsntfs_file_entry_get_name_attribute_index(
 		{
 			continue;
 		}
-		if( libfsntfs_attribute_get_value(
-		     attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) attribute,
 		     (intptr_t **) &file_name_values,
 		     error ) != 1 )
 		{
@@ -2644,8 +2644,8 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 		{
 			return( 0 );
 		}
-		if( libfsntfs_attribute_get_value(
-		     security_descriptor_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) security_descriptor_attribute,
 		     (intptr_t **) &security_descriptor_values,
 		     error ) != 1 )
 		{
@@ -2683,8 +2683,8 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 		}
 		if( internal_file_entry->security_descriptor_values == NULL )
 		{
-			if( libfsntfs_attribute_get_value(
-			     standard_information_attribute,
+			if( libfsntfs_internal_attribute_get_value(
+			     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 			     (intptr_t **) &standard_information_values,
 			     error ) != 1 )
 			{
@@ -2811,8 +2811,8 @@ int libfsntfs_file_entry_get_security_descriptor(
 		{
 			return( 0 );
 		}
-		if( libfsntfs_attribute_get_value(
-		     security_descriptor_attribute,
+		if( libfsntfs_internal_attribute_get_value(
+		     (libfsntfs_internal_attribute_t *) security_descriptor_attribute,
 		     (intptr_t **) &security_descriptor_values,
 		     error ) != 1 )
 		{
@@ -2850,8 +2850,8 @@ int libfsntfs_file_entry_get_security_descriptor(
 		}
 		if( internal_file_entry->security_descriptor_values == NULL )
 		{
-			if( libfsntfs_attribute_get_value(
-			     standard_information_attribute,
+			if( libfsntfs_internal_attribute_get_value(
+			     (libfsntfs_internal_attribute_t *) standard_information_attribute,
 			     (intptr_t **) &standard_information_values,
 			     error ) != 1 )
 			{
@@ -4294,17 +4294,6 @@ int libfsntfs_file_entry_get_size(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->data_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing data attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( size == NULL )
 	{
 		libcerror_error_set(

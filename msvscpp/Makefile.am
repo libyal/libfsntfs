@@ -44,6 +44,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_volume_name_attribute/fsntfs_test_volume_name_attribute.vcproj \
 	fsntfs_test_volume_name_values/fsntfs_test_volume_name_values.vcproj \
 	fsntfsinfo/fsntfsinfo.vcproj \
+	fsntfsmount/fsntfsmount.vcproj \
 	libbfio/libbfio.vcproj \
 	libcdata/libcdata.vcproj \
 	libcerror/libcerror.vcproj \

@@ -844,6 +844,7 @@ int libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry->name_size,
 	          utf8_string,
 	          utf8_string_length,
+	          0,
 	          error );
 
 	if( result == -1 )
@@ -896,6 +897,7 @@ int libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry->name_size,
 	          utf16_string,
 	          utf16_string_length,
+	          0,
 	          error );
 
 	if( result == -1 )

@@ -43,17 +43,18 @@
 int fsntfs_test_name_compare_with_utf8_string(
      void )
 {
-        uint8_t utf16_stream_equal[ 12 ]  = { 'e', 0, 'q', 0, 'u', 0, 'a', 0, 'l', 0, 0 };
-        uint8_t utf16_stream_great[ 12 ]  = { 'g', 0, 'r', 0, 'e', 0, 'a', 0, 't', 0, 0, 0 };
-        uint8_t utf16_stream_less[ 10 ]   = { 'l', 0, 'e', 0, 's', 0, 's', 0, 0, 0 };
-        uint8_t utf16_stream_lesser[ 14 ] = { 'l', 0, 'e', 0, 's', 0, 's', 0, 'e', 0, 'r', 0, 0, 0 };
-        uint8_t utf16_stream_more[ 10 ]   = { 'm', 0, 'o', 0, 'r', 0, 'e', 0, 0, 0 };
-        uint8_t utf8_string_equal[ 6 ]    = { 'e', 'q', 'u', 'a', 'l', 0 };
-        uint8_t utf8_string_greater[ 7 ]  = { 'g', 'r', 'e', 'a', 't', 'e', 'r' };
-        uint8_t utf8_string_less[ 4 ]     = { 'l', 'e', 's', 's' };
-        uint8_t utf8_string_more[ 4 ]     = { 'm', 'o', 'r', 'e' };
-	libcerror_error_t *error          = NULL;
-	int result                        = 0;
+        uint8_t utf16_stream_equal[ 12 ]     = { 'e', 0, 'q', 0, 'u', 0, 'a', 0, 'l', 0, 0 };
+        uint8_t utf16_stream_great[ 12 ]     = { 'g', 0, 'r', 0, 'e', 0, 'a', 0, 't', 0, 0, 0 };
+        uint8_t utf16_stream_less[ 10 ]      = { 'l', 0, 'e', 0, 's', 0, 's', 0, 0, 0 };
+        uint8_t utf16_stream_lesser[ 14 ]    = { 'l', 0, 'e', 0, 's', 0, 's', 0, 'e', 0, 'r', 0, 0, 0 };
+        uint8_t utf16_stream_more[ 10 ]      = { 'm', 0, 'o', 0, 'r', 0, 'e', 0, 0, 0 };
+        uint8_t utf8_string_equal[ 6 ]       = { 'e', 'q', 'u', 'a', 'l', 0 };
+        uint8_t utf8_string_equal_upper[ 6 ] = { 'E', 'Q', 'U', 'A', 'L', 0 };
+        uint8_t utf8_string_greater[ 7 ]     = { 'g', 'r', 'e', 'a', 't', 'e', 'r' };
+        uint8_t utf8_string_less[ 4 ]        = { 'l', 'e', 's', 's' };
+        uint8_t utf8_string_more[ 4 ]        = { 'm', 'o', 'r', 'e' };
+	libcerror_error_t *error             = NULL;
+	int result                           = 0;
 
 	/* Test regular cases
 	 */
@@ -62,6 +63,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          utf8_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -78,6 +80,24 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          utf8_string_equal,
 	          6,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBUNA_COMPARE_EQUAL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_name_compare_with_utf8_string(
+	          utf16_stream_equal,
+	          12,
+	          utf8_string_equal_upper,
+	          5,
+	          1,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -94,6 +114,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          utf8_string_greater,
 	          7,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -110,6 +131,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          10,
 	          utf8_string_more,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -126,6 +148,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          10,
 	          utf8_string_less,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -142,6 +165,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          14,
 	          utf8_string_less,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -160,6 +184,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          utf8_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -179,6 +204,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          (size_t) SSIZE_MAX + 1,
 	          utf8_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -198,6 +224,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          NULL,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -217,6 +244,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	          12,
 	          utf8_string_equal,
 	          (size_t) SSIZE_MAX + 1,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -248,17 +276,18 @@ on_error:
 int fsntfs_test_name_compare_with_utf16_string(
      void )
 {
-        uint8_t utf16_stream_equal[ 12 ]   = { 'e', 0, 'q', 0, 'u', 0, 'a', 0, 'l', 0, 0 };
-        uint8_t utf16_stream_great[ 12 ]   = { 'g', 0, 'r', 0, 'e', 0, 'a', 0, 't', 0, 0, 0 };
-        uint8_t utf16_stream_less[ 10 ]    = { 'l', 0, 'e', 0, 's', 0, 's', 0, 0, 0 };
-        uint8_t utf16_stream_lesser[ 14 ]  = { 'l', 0, 'e', 0, 's', 0, 's', 0, 'e', 0, 'r', 0, 0, 0 };
-        uint8_t utf16_stream_more[ 10 ]    = { 'm', 0, 'o', 0, 'r', 0, 'e', 0, 0, 0 };
-        uint16_t utf16_string_equal[ 6 ]   = { 'e', 'q', 'u', 'a', 'l', 0 };
-        uint16_t utf16_string_greater[ 7 ] = { 'g', 'r', 'e', 'a', 't', 'e', 'r' };
-        uint16_t utf16_string_less[ 4 ]    = { 'l', 'e', 's', 's' };
-        uint16_t utf16_string_more[ 4 ]    = { 'm', 'o', 'r', 'e' };
-	libcerror_error_t *error           = NULL;
-	int result                         = 0;
+        uint8_t utf16_stream_equal[ 12 ]       = { 'e', 0, 'q', 0, 'u', 0, 'a', 0, 'l', 0, 0 };
+        uint8_t utf16_stream_great[ 12 ]       = { 'g', 0, 'r', 0, 'e', 0, 'a', 0, 't', 0, 0, 0 };
+        uint8_t utf16_stream_less[ 10 ]        = { 'l', 0, 'e', 0, 's', 0, 's', 0, 0, 0 };
+        uint8_t utf16_stream_lesser[ 14 ]      = { 'l', 0, 'e', 0, 's', 0, 's', 0, 'e', 0, 'r', 0, 0, 0 };
+        uint8_t utf16_stream_more[ 10 ]        = { 'm', 0, 'o', 0, 'r', 0, 'e', 0, 0, 0 };
+        uint16_t utf16_string_equal[ 6 ]       = { 'e', 'q', 'u', 'a', 'l', 0 };
+        uint16_t utf16_string_equal_upper[ 6 ] = { 'E', 'Q', 'U', 'A', 'L', 0 };
+        uint16_t utf16_string_greater[ 7 ]     = { 'g', 'r', 'e', 'a', 't', 'e', 'r' };
+        uint16_t utf16_string_less[ 4 ]        = { 'l', 'e', 's', 's' };
+        uint16_t utf16_string_more[ 4 ]        = { 'm', 'o', 'r', 'e' };
+	libcerror_error_t *error               = NULL;
+	int result                             = 0;
 
 	/* Test regular cases
 	 */
@@ -267,6 +296,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          utf16_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -283,6 +313,24 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          utf16_string_equal,
 	          6,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBUNA_COMPARE_EQUAL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_name_compare_with_utf16_string(
+	          utf16_stream_equal,
+	          12,
+	          utf16_string_equal_upper,
+	          5,
+	          1,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -299,6 +347,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          utf16_string_greater,
 	          7,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -315,6 +364,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          10,
 	          utf16_string_more,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -331,6 +381,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          10,
 	          utf16_string_less,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -347,6 +398,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          14,
 	          utf16_string_less,
 	          4,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -365,6 +417,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          utf16_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -384,6 +437,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          (size_t) SSIZE_MAX + 1,
 	          utf16_string_equal,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -403,6 +457,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          NULL,
 	          5,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -422,6 +477,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	          12,
 	          utf16_string_equal,
 	          (size_t) SSIZE_MAX + 1,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

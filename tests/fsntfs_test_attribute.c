@@ -549,10 +549,10 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_get_value function
+/* Tests the libfsntfs_internal_attribute_get_value function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_get_value(
+int fsntfs_test_internal_attribute_get_value(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
@@ -561,8 +561,8 @@ int fsntfs_test_attribute_get_value(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_get_value(
-	          attribute,
+	result = libfsntfs_internal_attribute_get_value(
+	          (libfsntfs_internal_attribute_t *) attribute,
 	          &value,
 	          &error );
 
@@ -577,7 +577,7 @@ int fsntfs_test_attribute_get_value(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_get_value(
+	result = libfsntfs_internal_attribute_get_value(
 	          NULL,
 	          &value,
 	          &error );
@@ -594,8 +594,8 @@ int fsntfs_test_attribute_get_value(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_get_value(
-	          attribute,
+	result = libfsntfs_internal_attribute_get_value(
+	          (libfsntfs_internal_attribute_t *) attribute,
 	          NULL,
 	          &error );
 
@@ -1277,8 +1277,8 @@ int main(
 	 attribute );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_get_value",
-	 fsntfs_test_attribute_get_value,
+	 "libfsntfs_internal_attribute_get_value",
+	 fsntfs_test_internal_attribute_get_value,
 	 attribute );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
