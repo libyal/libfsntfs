@@ -1,11 +1,9 @@
 TODO
-* complete read from mft attribute test in fsntfs_test_volume_name_values.c
-* complete read from mft attribute test in fsntfs_test_volume_information_values.c
+* refactor libfsntfs_mft_attribute_append_to_chain
 
-* libfsntfs_attribute add function to indicate partial attribute (has attribute_list_entry but no mft_attribute)
+* remove libfsntfs_attribute_get_file_reference?
 * rename libfsntfs_internal_attribute_get_data to libfsntfs_internal_attribute_get_resident_data
 * libfsntfs_attribute add read / seek functions
-* add tests for libfsntfs_name
 * refactor libfsntfs_attribute_get_value to libfsntfs_internal_attribute_get_value
 * change calls to libfsntfs_mft_entry_get_index_by_utf8_name to utf16 for optimization
 * change calls to libfsntfs_mft_entry_get_data_attribute_by_utf8_name to utf16 for optimization
@@ -17,6 +15,8 @@ TODO
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 
 * create directory type and wrap directory_entries_tree
+
+* libfsntfs_attribute add function to indicate partial attribute (has attribute_list_entry but no mft_attribute)
 
 * Check if mft_entry should be cloned before passing to
   libfsntfs_file_entry_initialize in case it is cached out

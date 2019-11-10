@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "fsntfs_test_libcdata.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
@@ -400,250 +399,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_attribute_compare_by_file_reference function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_attribute_compare_by_file_reference(
-     void )
-{
-	libcerror_error_t *error                 = NULL;
-	libfsntfs_attribute_t *first_attribute   = NULL;
-	libfsntfs_attribute_t *second_attribute  = NULL;
-	libfsntfs_mft_attribute_t *mft_attribute = NULL;
-	int result                               = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_mft_attribute_initialize(
-	          &mft_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_attribute",
-	 mft_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_attribute_initialize(
-	          &first_attribute,
-	          mft_attribute,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "first_attribute",
-	 first_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	mft_attribute = NULL;
-
-	result = libfsntfs_mft_attribute_initialize(
-	          &mft_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_attribute",
-	 mft_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_attribute_initialize(
-	          &second_attribute,
-	          mft_attribute,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "second_attribute",
-	 second_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	mft_attribute = NULL;
-
-	/* Test regular cases
-	 */
-	( (libfsntfs_internal_attribute_t *) first_attribute )->file_reference  = 1;
-	( (libfsntfs_internal_attribute_t *) second_attribute )->file_reference = 2;
-
-	result = libfsntfs_attribute_compare_by_file_reference(
-	          (libfsntfs_internal_attribute_t *) first_attribute,
-	          (libfsntfs_internal_attribute_t *) second_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_LESS );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	( (libfsntfs_internal_attribute_t *) first_attribute )->file_reference  = 1;
-	( (libfsntfs_internal_attribute_t *) second_attribute )->file_reference = 1;
-
-	result = libfsntfs_attribute_compare_by_file_reference(
-	          (libfsntfs_internal_attribute_t *) first_attribute,
-	          (libfsntfs_internal_attribute_t *) second_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_EQUAL );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	( (libfsntfs_internal_attribute_t *) first_attribute )->file_reference  = 2;
-	( (libfsntfs_internal_attribute_t *) second_attribute )->file_reference = 1;
-
-	result = libfsntfs_attribute_compare_by_file_reference(
-	          (libfsntfs_internal_attribute_t *) first_attribute,
-	          (libfsntfs_internal_attribute_t *) second_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_GREATER );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_attribute_compare_by_file_reference(
-	          NULL,
-	          (libfsntfs_internal_attribute_t *) second_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_attribute_compare_by_file_reference(
-	          (libfsntfs_internal_attribute_t *) first_attribute,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libfsntfs_internal_attribute_free(
-	          (libfsntfs_internal_attribute_t **) &second_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "second_attribute",
-	 second_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_internal_attribute_free(
-	          (libfsntfs_internal_attribute_t **) &first_attribute,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "first_attribute",
-	 first_attribute );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( second_attribute != NULL )
-	{
-		libfsntfs_internal_attribute_free(
-		 (libfsntfs_internal_attribute_t **) &second_attribute,
-		 NULL );
-	}
-	if( first_attribute != NULL )
-	{
-		libfsntfs_internal_attribute_free(
-		 (libfsntfs_internal_attribute_t **) &first_attribute,
-		 NULL );
-	}
-	if( mft_attribute != NULL )
-	{
-		libfsntfs_mft_attribute_free(
-		 &mft_attribute,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1430,10 +1185,6 @@ int main(
 	 "libfsntfs_internal_attribute_free",
 	 fsntfs_test_internal_attribute_free );
 
-	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_compare_by_file_reference",
-	 fsntfs_test_attribute_compare_by_file_reference );
-
 	/* TODO: add tests for libfsntfs_attribute_read_value */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
@@ -1508,8 +1259,6 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	mft_attribute = NULL;
 
 	/* Run tests
 	 */
@@ -1588,6 +1337,23 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "attribute",
 	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

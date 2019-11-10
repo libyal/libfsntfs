@@ -33,10 +33,14 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 #include "../libfsntfs/libfsntfs_object_identifier_values.h"
 
-uint8_t fsntfs_test_object_identifier_values_data1[ 16 ] = {
-	0xcc, 0xed, 0x85, 0x47, 0x32, 0xbf, 0x83, 0x4c, 0xb7, 0x65, 0x55, 0xef, 0x93, 0x4d, 0x21, 0x45 };
+uint8_t fsntfs_test_object_identifier_values_data1[ 40 ] = {
+	0x40, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00,
+	0x10, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0xcc, 0xed, 0x85, 0x47, 0x32, 0xbf, 0x83, 0x4c,
+	0xb7, 0x65, 0x55, 0xef, 0x93, 0x4d, 0x21, 0x45 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -306,7 +310,7 @@ int fsntfs_test_object_identifier_values_read_data(
 	 */
 	result = libfsntfs_object_identifier_values_read_data(
 	          object_identifier_values,
-	          fsntfs_test_object_identifier_values_data1,
+	          &( fsntfs_test_object_identifier_values_data1[ 24 ] ),
 	          16,
 	          &error );
 
@@ -323,7 +327,7 @@ int fsntfs_test_object_identifier_values_read_data(
 	 */
 	result = libfsntfs_object_identifier_values_read_data(
 	          NULL,
-	          fsntfs_test_object_identifier_values_data1,
+	          &( fsntfs_test_object_identifier_values_data1[ 24 ] ),
 	          16,
 	          &error );
 
@@ -359,7 +363,7 @@ int fsntfs_test_object_identifier_values_read_data(
 
 	result = libfsntfs_object_identifier_values_read_data(
 	          object_identifier_values,
-	          fsntfs_test_object_identifier_values_data1,
+	          &( fsntfs_test_object_identifier_values_data1[ 24 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -411,6 +415,221 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_object_identifier_values_read_from_mft_attribute function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_object_identifier_values_read_from_mft_attribute(
+     void )
+{
+	libcerror_error_t *error                                       = NULL;
+	libfsntfs_io_handle_t *io_handle                               = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute                       = NULL;
+	libfsntfs_object_identifier_values_t *object_identifier_values = NULL;
+	int result                                                     = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_object_identifier_values_data1,
+	          40,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_object_identifier_values_initialize(
+	          &object_identifier_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "object_identifier_values",
+	 object_identifier_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_object_identifier_values_read_from_mft_attribute(
+	          object_identifier_values,
+	          mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_object_identifier_values_read_from_mft_attribute(
+	          NULL,
+	          mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_object_identifier_values_read_from_mft_attribute(
+	          object_identifier_values,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_object_identifier_values_free(
+	          &object_identifier_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "object_identifier_values",
+	 object_identifier_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( object_identifier_values != NULL )
+	{
+		libfsntfs_object_identifier_values_free(
+		 &object_identifier_values,
+		 NULL );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -441,6 +660,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_object_identifier_values_read_data",
 	 fsntfs_test_object_identifier_values_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_object_identifier_values_read_from_mft_attribute",
+	 fsntfs_test_object_identifier_values_read_from_mft_attribute );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

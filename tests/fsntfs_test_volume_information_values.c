@@ -37,8 +37,10 @@
 #include "../libfsntfs/libfsntfs_standard_information_values.h"
 #include "../libfsntfs/libfsntfs_volume_information_values.h"
 
-uint8_t fsntfs_test_volume_information_values_data1[ 12 ] = {
-	0x00, 0x00, 0x00, 0x00, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t fsntfs_test_volume_information_values_data1[ 40 ] = {
+	0x70, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x05, 0x00,
+	0x0c, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x03, 0x01, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -308,7 +310,7 @@ int fsntfs_test_volume_information_values_read_data(
 	 */
 	result = libfsntfs_volume_information_values_read_data(
 	          volume_information_values,
-	          fsntfs_test_volume_information_values_data1,
+	          &( fsntfs_test_volume_information_values_data1[ 24 ] ),
 	          12,
 	          &error );
 
@@ -325,7 +327,7 @@ int fsntfs_test_volume_information_values_read_data(
 	 */
 	result = libfsntfs_volume_information_values_read_data(
 	          NULL,
-	          fsntfs_test_volume_information_values_data1,
+	          &( fsntfs_test_volume_information_values_data1[ 24 ] ),
 	          12,
 	          &error );
 
@@ -361,7 +363,7 @@ int fsntfs_test_volume_information_values_read_data(
 
 	result = libfsntfs_volume_information_values_read_data(
 	          volume_information_values,
-	          fsntfs_test_volume_information_values_data1,
+	          &( fsntfs_test_volume_information_values_data1[ 24 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -379,7 +381,7 @@ int fsntfs_test_volume_information_values_read_data(
 
 	result = libfsntfs_volume_information_values_read_data(
 	          volume_information_values,
-	          fsntfs_test_volume_information_values_data1,
+	          &( fsntfs_test_volume_information_values_data1[ 24 ] ),
 	          0,
 	          &error );
 
@@ -483,7 +485,7 @@ int fsntfs_test_volume_information_values_read_from_mft_attribute(
 	          mft_attribute,
 	          io_handle,
 	          fsntfs_test_volume_information_values_data1,
-	          104,
+	          40,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -676,6 +678,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_volume_information_values_read_data",
 	 fsntfs_test_volume_information_values_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_volume_information_values_read_from_mft_attribute",
+	 fsntfs_test_volume_information_values_read_from_mft_attribute );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

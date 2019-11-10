@@ -33,14 +33,14 @@
 /* Compares an UTF-8 string with an UTF-16 encoded attribute, file entry or index name
  * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
  */
-int libfsapfs_name_compare_with_utf8_string(
+int libfsntfs_name_compare_with_utf8_string(
      const uint8_t *name,
      size_t name_size,
      const libuna_utf8_character_t *utf8_string,
      size_t utf8_string_length,
      libcerror_error_t **error )
 {
-	static char *function                       = "libfsapfs_name_compare_with_utf8_string";
+	static char *function                       = "libfsntfs_name_compare_with_utf8_string";
 	int result                                  = 0;
 
 #ifdef TODO_CASE_INSENSITIVE
@@ -182,14 +182,14 @@ int libfsapfs_name_compare_with_utf8_string(
 /* Compares an UTF-16 string with an UTF-16 encoded attribute, file entry or index name
  * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
  */
-int libfsapfs_name_compare_with_utf16_string(
+int libfsntfs_name_compare_with_utf16_string(
      const uint8_t *name,
      size_t name_size,
      const libuna_utf16_character_t *utf16_string,
      size_t utf16_string_length,
      libcerror_error_t **error )
 {
-	static char *function                       = "libfsapfs_name_compare_with_utf16_string";
+	static char *function                       = "libfsntfs_name_compare_with_utf16_string";
 	int result                                  = 0;
 
 #ifdef TODO_CASE_INSENSITIVE

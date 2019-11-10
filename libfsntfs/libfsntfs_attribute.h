@@ -51,11 +51,6 @@ struct libfsntfs_internal_attribute
 	 */
 	libfsntfs_attribute_list_entry_t *attribute_list_entry;
 
-/* TODO remove file_reference */
-	/* The file reference
-	 */
-	uint64_t file_reference;
-
 	/* The item value
 	 */
         intptr_t *value;
@@ -90,11 +85,6 @@ int libfsntfs_internal_attribute_free(
 
 int libfsntfs_internal_attribute_free_new(
      libfsntfs_internal_attribute_t **internal_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_compare_by_file_reference(
-     libfsntfs_internal_attribute_t *first_attribute,
-     libfsntfs_internal_attribute_t *second_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_attribute_read_value(

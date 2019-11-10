@@ -361,7 +361,7 @@ int libfsntfs_cluster_block_read_element_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read cluster block at offset: %" PRIi64 " (0x%08" PRIX64 ").",
+			 "%s: unable to read cluster block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 cluster_block_offset,
 			 cluster_block_offset );

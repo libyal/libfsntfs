@@ -32,14 +32,14 @@
 extern "C" {
 #endif
 
-int libfsapfs_name_compare_with_utf8_string(
+int libfsntfs_name_compare_with_utf8_string(
      const uint8_t *name,
      size_t name_size,
      const libuna_utf8_character_t *utf8_string,
      size_t utf8_string_length,
      libcerror_error_t **error );
 
-int libfsapfs_name_compare_with_utf16_string(
+int libfsntfs_name_compare_with_utf16_string(
      const uint8_t *name,
      size_t name_size,
      const libuna_utf16_character_t *utf16_string,

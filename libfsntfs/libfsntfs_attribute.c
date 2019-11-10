@@ -212,7 +212,7 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
-		/* The attribute_list_entry reference is freed elsewhere
+		/* The mft_attribute and attribute_list_entry reference are freed elsewhere
 		 */
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 		if( libcthreads_read_write_lock_free(
@@ -229,22 +229,6 @@ int libfsntfs_internal_attribute_free(
 			result = -1;
 		}
 #endif
-		if( ( *internal_attribute )->mft_attribute != NULL )
-		{
-			if( libfsntfs_mft_attribute_free(
-			     &( ( *internal_attribute )->mft_attribute ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free MFT attribute.",
-				 function );
-
-				result = -1;
-			}
-		}
 		if( ( *internal_attribute )->value != NULL )
 		{
 			if( ( *internal_attribute )->free_value != NULL )
@@ -337,54 +321,6 @@ int libfsntfs_internal_attribute_free_new(
 		*internal_attribute = NULL;
 	}
 	return( result );
-}
-
-/* Compares attributes by their file reference
- * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
- */
-int libfsntfs_attribute_compare_by_file_reference(
-     libfsntfs_internal_attribute_t *first_attribute,
-     libfsntfs_internal_attribute_t *second_attribute,
-     libcerror_error_t **error )
-{
-	static char *function           = "libfsntfs_attribute_compare_by_file_reference";
-	uint64_t first_mft_entry_index  = 0;
-	uint64_t second_mft_entry_index = 0;
-
-	if( first_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid first attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( second_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid second attribute.",
-		 function );
-
-		return( -1 );
-	}
-	first_mft_entry_index  = first_attribute->file_reference & 0xffffffffffffUL;
-	second_mft_entry_index = second_attribute->file_reference & 0xffffffffffffUL;
-
-	if( first_mft_entry_index < second_mft_entry_index )
-	{
-		return( LIBCDATA_COMPARE_LESS );
-	}
-	else if( first_mft_entry_index > second_mft_entry_index )
-	{
-		return( LIBCDATA_COMPARE_GREATER );
-	}
-	return( LIBCDATA_COMPARE_EQUAL );
 }
 
 /* Reads the attribute value
@@ -1621,6 +1557,7 @@ int libfsntfs_attribute_get_file_reference(
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_attribute_get_file_reference";
+	uint16_t safe_sequence_number                      = 0;
 
 	if( attribute == NULL )
 	{
@@ -1635,22 +1572,42 @@ int libfsntfs_attribute_get_file_reference(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( mft_entry_index == NULL )
+	if( internal_attribute->mft_attribute != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry index.",
-		 function );
+		if( mft_entry_index == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid MFT entry index.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		*mft_entry_index = 0;
 	}
-	*mft_entry_index = internal_attribute->file_reference & 0xffffffffffffUL;
+	else
+	{
+		if( libfsntfs_attribute_list_entry_get_file_reference(
+		     internal_attribute->attribute_list_entry,
+		     mft_entry_index,
+		     &safe_sequence_number,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file reference.",
+			 function );
 
+			return( -1 );
+		}
+	}
 	if( sequence_number != NULL )
 	{
-		*sequence_number = (uint16_t) ( internal_attribute->file_reference >> 48 );
+		*sequence_number = safe_sequence_number;
 	}
 	return( 1 );
 }

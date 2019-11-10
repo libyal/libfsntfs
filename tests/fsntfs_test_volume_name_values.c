@@ -37,9 +37,10 @@
 #include "../libfsntfs/libfsntfs_standard_information_values.h"
 #include "../libfsntfs/libfsntfs_volume_name_values.h"
 
-uint8_t fsntfs_test_volume_name_values_data1[ 18 ] = {
-	0x4b, 0x00, 0x57, 0x00, 0x2d, 0x00, 0x53, 0x00, 0x52, 0x00, 0x43, 0x00, 0x48, 0x00, 0x2d, 0x00,
-	0x31, 0x00 };
+uint8_t fsntfs_test_volume_name_values_data1[ 48 ] = {
+	0x60, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x04, 0x00,
+	0x14, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x54, 0x00, 0x65, 0x00, 0x73, 0x00, 0x74, 0x00,
+	0x56, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x75, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -309,8 +310,8 @@ int fsntfs_test_volume_name_values_read_data(
 	 */
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -326,8 +327,8 @@ int fsntfs_test_volume_name_values_read_data(
 	 */
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -384,8 +385,8 @@ int fsntfs_test_volume_name_values_read_data(
 	 */
 	result = libfsntfs_volume_name_values_read_data(
 	          NULL,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -404,8 +405,8 @@ int fsntfs_test_volume_name_values_read_data(
 
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	volume_name_values->name = NULL;
@@ -425,7 +426,7 @@ int fsntfs_test_volume_name_values_read_data(
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
 	          NULL,
-	          18,
+	          20,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -442,7 +443,7 @@ int fsntfs_test_volume_name_values_read_data(
 
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -466,8 +467,8 @@ int fsntfs_test_volume_name_values_read_data(
 
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -495,8 +496,8 @@ int fsntfs_test_volume_name_values_read_data(
 
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
@@ -608,7 +609,7 @@ int fsntfs_test_volume_name_values_read_from_mft_attribute(
 	          mft_attribute,
 	          io_handle,
 	          fsntfs_test_volume_name_values_data1,
-	          104,
+	          48,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -798,7 +799,7 @@ int fsntfs_test_volume_name_values_get_utf8_name_size(
 	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
 	 "utf8_name_size",
 	 utf8_name_size,
-	 (size_t) 10 );
+	 (size_t) 11 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1124,7 +1125,7 @@ int fsntfs_test_volume_name_values_get_utf16_name_size(
 	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
 	 "utf16_name_size",
 	 utf16_name_size,
-	 (size_t) 10 );
+	 (size_t) 11 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -1460,7 +1461,9 @@ int main(
 	 "libfsntfs_volume_name_values_read_data",
 	 fsntfs_test_volume_name_values_read_data );
 
-	/* TODO: add tests for libfsntfs_volume_name_values_read_from_attribute */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_volume_name_values_read_from_mft_attribute",
+	 fsntfs_test_volume_name_values_read_from_mft_attribute );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
@@ -1485,8 +1488,8 @@ int main(
 
 	result = libfsntfs_volume_name_values_read_data(
 	          volume_name_values,
-	          fsntfs_test_volume_name_values_data1,
-	          18,
+	          &( fsntfs_test_volume_name_values_data1[ 24 ] ),
+	          20,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

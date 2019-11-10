@@ -1601,7 +1601,7 @@ int libfsntfs_mft_attribute_compare_name_with_utf8_string(
 	{
 		return( 0 );
 	}
-	result = libfsapfs_name_compare_with_utf8_string(
+	result = libfsntfs_name_compare_with_utf8_string(
 	          mft_attribute->name,
 	          mft_attribute->name_size,
 	          utf8_string,
@@ -1653,7 +1653,7 @@ int libfsntfs_mft_attribute_compare_name_with_utf16_string(
 	{
 		return( 0 );
 	}
-	result = libfsapfs_name_compare_with_utf16_string(
+	result = libfsntfs_name_compare_with_utf16_string(
 	          mft_attribute->name,
 	          mft_attribute->name_size,
 	          utf16_string,

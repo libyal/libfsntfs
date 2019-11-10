@@ -1392,15 +1392,17 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
      uint8_t flags,
      libcerror_error_t **error )
 {
+	libcdata_array_t *data_mft_entry_array                 = NULL;
 	libfcache_cache_t *mft_entry_cache                     = NULL;
 	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute               = NULL;
-	libfsntfs_mft_entry_t *list_mft_entry                  = NULL;
+	libfsntfs_mft_entry_t *data_mft_entry                  = NULL;
 	static char *function                                  = "libfsntfs_mft_entry_read_attributes_from_attribute_list";
-	uint64_t list_mft_entry_index                          = 0;
+	uint64_t data_mft_entry_index                          = 0;
 	uint16_t sequence_number                               = 0;
 	int attribute_index                                    = 0;
 	int attribute_list_entry_index                         = 0;
+	int entry_index                                        = 0;
 	int number_of_attribute_list_entries                   = 0;
 	int number_of_attributes                               = 0;
 
@@ -1415,18 +1417,18 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		return( -1 );
 	}
-	/* Use a local cache to prevent cache outs
+	/* Determine the individual data MFT entries in the attribute list
 	 */
-	if( libfcache_cache_initialize(
-	     &mft_entry_cache,
-	     1,
+	if( libcdata_array_initialize(
+	     &data_mft_entry_array,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create MFT entry cache.",
+		 "%s: unable to create data MFT entry array.",
 		 function );
 
 		goto on_error;
@@ -1467,7 +1469,109 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		}
 		if( libfsntfs_attribute_list_entry_get_file_reference(
 		     attribute_list_entry,
-		     &list_mft_entry_index,
+		     &data_mft_entry_index,
+		     &sequence_number,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute list entry: %d file reference.",
+			 function,
+			 attribute_list_entry_index );
+
+			goto on_error;
+		}
+		if( data_mft_entry_index > (uint64_t) INT_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: data MFT entry reference value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
+		/* Ignore the current MFT entry
+		 */
+		if( data_mft_entry_index == (uint64_t) mft_entry->index )
+		{
+			continue;
+		}
+		if( libcdata_array_insert_entry(
+		     data_mft_entry_array,
+		     &entry_index,
+		     (intptr_t *) attribute_list_entry,
+		     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_attribute_list_entry_compare_by_file_reference,
+		     LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to insert attribute list entry in data MFT entry array.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	/* Read the data MFT entries
+	 * Use a local cache to prevent cache outs
+	 */
+	if( libfcache_cache_initialize(
+	     &mft_entry_cache,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create MFT entry cache.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_get_number_of_entries(
+	     data_mft_entry_array,
+	     &number_of_attribute_list_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of attribute list entries.",
+		 function );
+
+		goto on_error;
+	}
+	for( attribute_list_entry_index = 0;
+	     attribute_list_entry_index < number_of_attribute_list_entries;
+	     attribute_list_entry_index++ )
+	{
+		if( libcdata_array_get_entry_by_index(
+		     data_mft_entry_array,
+		     attribute_list_entry_index,
+		     (intptr_t **) &attribute_list_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute list entry: %d.",
+			 function,
+			 attribute_list_entry_index );
+
+			goto on_error;
+		}
+		if( libfsntfs_attribute_list_entry_get_file_reference(
+		     attribute_list_entry,
+		     &data_mft_entry_index,
 		     &sequence_number,
 		     error ) != 1 )
 		{
@@ -1485,37 +1589,20 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: data file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu16 "\n",
+			 "%s: reading data file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu16 "\n",
 			 function,
-			 list_mft_entry_index,
+			 data_mft_entry_index,
 			 sequence_number );
 			libcnotify_printf(
 			 "\n" );
 		}
 #endif
-		if( list_mft_entry_index > (uint64_t) INT_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: list MFT entry reference value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-		/* Ignore the current MFT entry
-		 */
-		if( list_mft_entry_index == (uint64_t) mft_entry->index )
-		{
-			continue;
-		}
 		if( libfdata_vector_get_element_value_by_index(
 		     mft_entry_vector,
 		     (intptr_t *) file_io_handle,
 		     (libfdata_cache_t *) mft_entry_cache,
-		     (int) list_mft_entry_index,
-		     (intptr_t **) &list_mft_entry,
+		     (int) data_mft_entry_index,
+		     (intptr_t **) &data_mft_entry,
 		     0,
 		     error ) != 1 )
 		{
@@ -1525,12 +1612,12 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
 			 function,
-			 list_mft_entry_index );
+			 data_mft_entry_index );
 
 			goto on_error;
 		}
-		if( libfsntfs_mft_entry_get_number_of_attributes(
-		     list_mft_entry,
+		if( libcdata_array_get_number_of_entries(
+		     data_mft_entry->attributes_array,
 		     &number_of_attributes,
 		     error ) != 1 )
 		{
@@ -1548,7 +1635,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		     attribute_index++ )
 		{
 			if( libcdata_array_get_entry_by_index(
-			     list_mft_entry->attributes_array,
+			     data_mft_entry->attributes_array,
 			     attribute_index,
 			     (intptr_t **) &mft_attribute,
 			     error ) != 1 )
@@ -1564,7 +1651,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 				goto on_error;
 			}
 			if( libcdata_array_set_entry_by_index(
-			     list_mft_entry->attributes_array,
+			     data_mft_entry->attributes_array,
 			     attribute_index,
 			     NULL,
 			     error ) != 1 )
@@ -1591,8 +1678,9 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append attribute.",
-				 function );
+				 "%s: unable to append attribute: %d from list MFT entry.",
+				 function,
+				 attribute_index );
 
 				goto on_error;
 			}
@@ -1611,6 +1699,20 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		goto on_error;
 	}
+	if( libcdata_array_free(
+	     &data_mft_entry_array,
+	     NULL,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free data MFT entry array.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
@@ -1618,6 +1720,13 @@ on_error:
 	{
 		libfcache_cache_free(
 		 &mft_entry_cache,
+		 NULL );
+	}
+	if( data_mft_entry_array != NULL )
+	{
+		libcdata_array_free(
+		 &data_mft_entry_array,
+		 NULL,
 		 NULL );
 	}
 	return( -1 );

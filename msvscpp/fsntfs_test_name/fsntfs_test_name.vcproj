@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_attribute_list_entry"
-	ProjectGUID="{5A48EC58-BB35-47A7-9A5B-A13B2296E69F}"
-	RootNamespace="fsntfs_test_attribute_list_entry"
+	Name="fsntfs_test_name"
+	ProjectGUID="{A6FA8C02-6C70-455E-9B1B-0A3315BCEEBE}"
+	RootNamespace="fsntfs_test_name"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_attribute_list_entry.c"
+				RelativePath="..\..\tests\fsntfs_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
+				RelativePath="..\..\tests\fsntfs_test_name.c"
 				>
 			</File>
 		</Filter>
@@ -190,10 +190,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_libcdata.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
 			</File>
@@ -202,7 +198,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_macros.h"
+				RelativePath="..\..\tests\fsntfs_test_libuna.h"
 				>
 			</File>
 			<File

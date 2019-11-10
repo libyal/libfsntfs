@@ -78,6 +78,11 @@ int libfsntfs_attribute_list_entry_read_data(
      size_t data_size,
      libcerror_error_t **error );
 
+int libfsntfs_attribute_list_entry_compare_by_file_reference(
+     libfsntfs_attribute_list_entry_t *first_attribute_list_entry,
+     libfsntfs_attribute_list_entry_t *second_attribute_list_entry,
+     libcerror_error_t **error );
+
 int libfsntfs_attribute_list_entry_get_type(
      libfsntfs_attribute_list_entry_t *attribute_list_entry,
      uint32_t *type,

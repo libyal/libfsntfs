@@ -26,6 +26,7 @@
 
 #include "libfsntfs_attribute_list_entry.h"
 #include "libfsntfs_debug.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libuna.h"
@@ -447,6 +448,54 @@ on_error:
 	return( -1 );
 }
 
+/* Compares attribute list entriess by their file reference
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
+ */
+int libfsntfs_attribute_list_entry_compare_by_file_reference(
+     libfsntfs_attribute_list_entry_t *first_attribute_list_entry,
+     libfsntfs_attribute_list_entry_t *second_attribute_list_entry,
+     libcerror_error_t **error )
+{
+	static char *function           = "libfsntfs_attribute_list_entry_compare_by_file_reference";
+	uint64_t first_mft_entry_index  = 0;
+	uint64_t second_mft_entry_index = 0;
+
+	if( first_attribute_list_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first attribute list entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_attribute_list_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second attribute list entry.",
+		 function );
+
+		return( -1 );
+	}
+	first_mft_entry_index  = first_attribute_list_entry->file_reference & 0xffffffffffffUL;
+	second_mft_entry_index = second_attribute_list_entry->file_reference & 0xffffffffffffUL;
+
+	if( first_mft_entry_index < second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_LESS );
+	}
+	else if( first_mft_entry_index > second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_GREATER );
+	}
+	return( LIBCDATA_COMPARE_EQUAL );
+}
+
 /* Retrieves the type
  * Returns 1 if successful or -1 on error
  */
@@ -790,7 +839,7 @@ int libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
 	{
 		return( 0 );
 	}
-	result = libfsapfs_name_compare_with_utf8_string(
+	result = libfsntfs_name_compare_with_utf8_string(
 	          attribute_list_entry->name,
 	          attribute_list_entry->name_size,
 	          utf8_string,
@@ -842,7 +891,7 @@ int libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
 	{
 		return( 0 );
 	}
-	result = libfsapfs_name_compare_with_utf16_string(
+	result = libfsntfs_name_compare_with_utf16_string(
 	          attribute_list_entry->name,
 	          attribute_list_entry->name_size,
 	          utf16_string,

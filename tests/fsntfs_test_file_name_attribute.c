@@ -1211,8 +1211,6 @@ int main(
 	 "error",
 	 error );
 
-	mft_attribute = NULL;
-
 	result = libfsntfs_attribute_read_value(
 	          attribute,
 	          io_handle,
@@ -1293,6 +1291,23 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "attribute",
 	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

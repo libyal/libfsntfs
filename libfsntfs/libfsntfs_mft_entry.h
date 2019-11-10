@@ -247,6 +247,12 @@ int libfsntfs_mft_entry_get_attribute_by_index(
      libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_set_attribute_by_index(
+     libfsntfs_mft_entry_t *mft_entry,
+     int attribute_index,
+     libfsntfs_mft_attribute_t *attribute,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
      libfsntfs_mft_entry_t *mft_entry,
      int *number_of_attributes,

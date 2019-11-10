@@ -778,7 +778,7 @@ int libfsntfs_mft_get_mft_entry_by_index_no_cache(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to clear signle MFT entry cache entry: 1.",
+		 "%s: unable to clear single MFT entry cache entry: 0.",
 		 function );
 
 		return( -1 );

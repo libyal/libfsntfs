@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_libcdata.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
@@ -646,6 +647,201 @@ on_error:
 	{
 		libfsntfs_attribute_list_entry_free(
 		 &attribute_list_entry,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_attribute_list_entry_compare_by_file_reference function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_attribute_list_entry_compare_by_file_reference(
+     void )
+{
+	libcerror_error_t *error                                      = NULL;
+	libfsntfs_attribute_list_entry_t *first_attribute_list_entry  = NULL;
+	libfsntfs_attribute_list_entry_t *second_attribute_list_entry = NULL;
+	int result                                                    = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_attribute_list_entry_initialize(
+	          &first_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "first_attribute_list_entry",
+	 first_attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_list_entry_initialize(
+	          &second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "second_attribute_list_entry",
+	 second_attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	first_attribute_list_entry->file_reference  = 1;
+	second_attribute_list_entry->file_reference = 2;
+
+	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
+	          first_attribute_list_entry,
+	          second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBCDATA_COMPARE_LESS );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	first_attribute_list_entry->file_reference  = 1;
+	second_attribute_list_entry->file_reference = 1;
+
+	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
+	          first_attribute_list_entry,
+	          second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBCDATA_COMPARE_EQUAL );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	first_attribute_list_entry->file_reference  = 2;
+	second_attribute_list_entry->file_reference = 1;
+
+	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
+	          first_attribute_list_entry,
+	          second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 LIBCDATA_COMPARE_GREATER );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
+	          NULL,
+	          second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
+	          first_attribute_list_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_attribute_list_entry_free(
+	          &second_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "second_attribute_list_entry",
+	 second_attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_list_entry_free(
+	          &first_attribute_list_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "first_attribute_list_entry",
+	 first_attribute_list_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( second_attribute_list_entry != NULL )
+	{
+		libfsntfs_attribute_list_entry_free(
+		 &second_attribute_list_entry,
+		 NULL );
+	}
+	if( first_attribute_list_entry != NULL )
+	{
+		libfsntfs_attribute_list_entry_free(
+		 &first_attribute_list_entry,
 		 NULL );
 	}
 	return( 0 );
@@ -1612,6 +1808,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_attribute_list_entry_read_data",
 	 fsntfs_test_attribute_list_entry_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_attribute_list_entry_compare_by_file_reference",
+	 fsntfs_test_attribute_list_entry_compare_by_file_reference );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 

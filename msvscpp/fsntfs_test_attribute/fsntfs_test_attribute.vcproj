@@ -190,10 +190,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_libcdata.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
 			</File>

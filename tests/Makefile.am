@@ -68,6 +68,7 @@ check_PROGRAMS = \
 	fsntfs_test_mft_entry \
 	fsntfs_test_mft_entry_header \
 	fsntfs_test_mft_metadata_file \
+	fsntfs_test_name \
 	fsntfs_test_notify \
 	fsntfs_test_object_identifier_values \
 	fsntfs_test_reparse_point_attribute \
@@ -88,7 +89,6 @@ check_PROGRAMS = \
 
 fsntfs_test_attribute_SOURCES = \
 	fsntfs_test_attribute.c \
-	fsntfs_test_libcdata.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -96,7 +96,6 @@ fsntfs_test_attribute_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_attribute_LDADD = \
-	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -115,6 +114,7 @@ fsntfs_test_attribute_list_LDADD = \
 
 fsntfs_test_attribute_list_entry_SOURCES = \
 	fsntfs_test_attribute_list_entry.c \
+	fsntfs_test_libcdata.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -122,6 +122,7 @@ fsntfs_test_attribute_list_entry_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_attribute_list_entry_LDADD = \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -444,6 +445,18 @@ fsntfs_test_mft_metadata_file_LDADD = \
 	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
+
+fsntfs_test_name_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_libuna.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_name.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_name_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
 
 fsntfs_test_notify_SOURCES = \
 	fsntfs_test_libcerror.h \

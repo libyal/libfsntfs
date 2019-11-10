@@ -25,6 +25,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_mft_entry/fsntfs_test_mft_entry.vcproj \
 	fsntfs_test_mft_entry_header/fsntfs_test_mft_entry_header.vcproj \
 	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \
+	fsntfs_test_name/fsntfs_test_name.vcproj \
 	fsntfs_test_notify/fsntfs_test_notify.vcproj \
 	fsntfs_test_object_identifier_values/fsntfs_test_object_identifier_values.vcproj \
 	fsntfs_test_reparse_point_attribute/fsntfs_test_reparse_point_attribute.vcproj \
