@@ -1,5 +1,5 @@
 /*
- * Directory entries tree functions
+ * The NTFS index root header functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,46 +19,54 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H )
-#define _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H
+#if !defined( _LIBFSNTFS_INDEX_ROOT_HEADER_H )
+#define _LIBFSNTFS_INDEX_ROOT_HEADER_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_directory_entry.h"
-#include "libfsntfs_libcdata.h"
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_mft_entry.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libfsntfs_directory_entries_tree_read_from_mft_entry(
-     libcdata_btree_t *directory_entries_tree,
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     uint8_t flags,
+typedef struct libfsntfs_index_root_header libfsntfs_index_root_header_t;
+
+struct libfsntfs_index_root_header
+{
+	/* The index entry size
+	 */
+	uint32_t index_entry_size;
+
+	/* The attribute type
+	 */
+	uint32_t attribute_type;
+};
+
+int libfsntfs_index_root_header_initialize(
+     libfsntfs_index_root_header_t **index_root_header,
      libcerror_error_t **error );
 
-int libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
-     libcdata_btree_t *directory_entries_tree,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libfsntfs_directory_entry_t **directory_entry,
+int libfsntfs_index_root_header_free(
+     libfsntfs_index_root_header_t **index_root_header,
      libcerror_error_t **error );
 
-int libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
-     libcdata_btree_t *directory_entries_tree,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libfsntfs_directory_entry_t **directory_entry,
+int libfsntfs_index_root_header_read_data(
+     libfsntfs_index_root_header_t *index_root_header,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_index_root_header_get_index_entry_size(
+     libfsntfs_index_root_header_t *index_root_header,
+     uint32_t *index_entry_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_DIRECTORY_ENTRIES_TREE_H ) */
+#endif /* !defined( _LIBFSNTFS_INDEX_ROOT_HEADER_H ) */
 

@@ -31,6 +31,7 @@
 #include "libfsntfs_index_entry.h"
 #include "libfsntfs_index_entry_vector.h"
 #include "libfsntfs_index_node.h"
+#include "libfsntfs_index_root_header.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -693,22 +694,19 @@ int libfsntfs_index_read_root(
      libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_index_node_t *index_node      = NULL;
-	libfsntfs_index_value_t *index_value    = NULL;
-	uint8_t *index_root_attribute_data      = NULL;
-	static char *function                   = "libfsntfs_index_read_root";
-	size64_t index_root_attribute_data_size = 0;
-	size_t attribute_data_offset            = 0;
-	size_t unknown_data_size                = 0;
-	ssize_t read_count                      = 0;
-	uint32_t index_node_size                = 0;
-	uint32_t index_values_offset            = 0;
-	int entry_index                         = 0;
-	int index_value_entry                   = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit                    = 0;
-#endif
+	libfsntfs_index_node_t *index_node               = NULL;
+	libfsntfs_index_root_header_t *index_root_header = NULL;
+	libfsntfs_index_value_t *index_value             = NULL;
+	uint8_t *index_root_attribute_data               = NULL;
+	static char *function                            = "libfsntfs_index_read_root";
+	size64_t index_root_attribute_data_size          = 0;
+	size_t attribute_data_offset                     = 0;
+	size_t unknown_data_size                         = 0;
+	ssize_t read_count                               = 0;
+	uint32_t index_node_size                         = 0;
+	uint32_t index_values_offset                     = 0;
+	int entry_index                                  = 0;
+	int index_value_entry                            = 0;
 
 	if( index == NULL )
 	{
@@ -732,6 +730,17 @@ int libfsntfs_index_read_root(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( libfsntfs_mft_attribute_get_data(
 	     index->index_root_attribute,
 	     &index_root_attribute_data,
@@ -745,104 +754,70 @@ int libfsntfs_index_read_root(
 		 "%s: unable to retrieve index root attribute data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( index_root_attribute_data == NULL )
+	if( libfsntfs_index_root_header_initialize(
+	     &index_root_header,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid index root attribute data.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create index root header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( ( index_root_attribute_data_size < (size64_t) sizeof( fsntfs_index_root_header_t ) )
-	 || ( index_root_attribute_data_size > (size64_t) SSIZE_MAX ) )
+	if( libfsntfs_index_root_header_read_data(
+	     index_root_header,
+	     index_root_attribute_data,
+	     index_root_attribute_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read index root header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_index_root_header_get_index_entry_size(
+	     index_root_header,
+	     &( index->index_entry_size ),
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid index root attribute data size value out of bounds.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( io_handle == NULL )
+	if( libfsntfs_index_root_header_free(
+	     &index_root_header,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free index root header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: index root header data:\n",
-		 function );
-		libcnotify_print_data(
-		 index_root_attribute_data,
-		 sizeof( fsntfs_index_root_header_t ),
-		 0 );
-	}
-#endif
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->attribute_type,
-	 index->attribute_type );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->index_entry_size,
-	 index->index_entry_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: attribute type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
-		 function,
-		 index->attribute_type,
-		 libfsntfs_debug_print_attribute_type(
-		  index->attribute_type ) );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->collating_type,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: collating type\t\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: index entry size\t\t\t\t: %" PRIu32 "\n",
-		 function,
-		 index->index_entry_size );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_index_root_header_t *) index_root_attribute_data )->index_entry_number_of_cluster_blocks,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: index entry number of cluster blocks\t\t: %" PRIu32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( index->index_entry_size != io_handle->index_entry_size )
 		{
 			libcnotify_printf(
-			 "%s: mismatch in index entry size (in index root: %" PRIu32 ", in volume header: %" PRIu32 ").\n",
+			 "%s: mismatch in index entry size (in index root header: %" PRIu32 ", in volume header: %" PRIu32 ").\n",
 			 function,
 			 index->index_entry_size,
 			 io_handle->index_entry_size );
@@ -1051,6 +1026,12 @@ on_error:
 	{
 		libfsntfs_index_node_free(
 		 &index_node,
+		 NULL );
+	}
+	if( index_root_header != NULL )
+	{
+		libfsntfs_index_root_header_free(
+		 &index_root_header,
 		 NULL );
 	}
 	return( -1 );

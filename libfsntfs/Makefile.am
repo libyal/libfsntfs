@@ -57,10 +57,13 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_file_entry.c libfsntfs_file_entry.h \
 	libfsntfs_file_name_attribute.c libfsntfs_file_name_attribute.h \
 	libfsntfs_file_name_values.c libfsntfs_file_name_values.h \
+	libfsntfs_fixup_values.c libfsntfs_fixup_values.h \
 	libfsntfs_index.c libfsntfs_index.h \
 	libfsntfs_index_entry.c libfsntfs_index_entry.h \
+	libfsntfs_index_entry_header.c libfsntfs_index_entry_header.h \
 	libfsntfs_index_entry_vector.c libfsntfs_index_entry_vector.h \
 	libfsntfs_index_node.c libfsntfs_index_node.h \
+	libfsntfs_index_root_header.c libfsntfs_index_root_header.h \
 	libfsntfs_index_value.c libfsntfs_index_value.h \
 	libfsntfs_io_handle.c libfsntfs_io_handle.h \
 	libfsntfs_libbfio.h \

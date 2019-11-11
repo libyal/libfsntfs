@@ -33,13 +33,18 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 #include "../libfsntfs/libfsntfs_txf_data_values.h"
 
-uint8_t fsntfs_test_txf_data_values_data1[ 56 ] = {
-	0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+uint8_t fsntfs_test_txf_data_values_data1[ 104 ] = {
+	0x00, 0x01, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00, 0x09, 0x18, 0x00, 0x00, 0x00, 0x09, 0x00,
+	0x38, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x24, 0x00, 0x54, 0x00, 0x58, 0x00, 0x46, 0x00,
+	0x5f, 0x00, 0x44, 0x00, 0x41, 0x00, 0x54, 0x00, 0x41, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x05, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2c, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	0x00, 0x00, 0x00, 0x26, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -282,9 +287,9 @@ on_error:
 int fsntfs_test_txf_data_values_read_data(
      void )
 {
-	libcerror_error_t *error                                         = NULL;
+	libcerror_error_t *error                     = NULL;
 	libfsntfs_txf_data_values_t *txf_data_values = NULL;
-	int result                                                       = 0;
+	int result                                   = 0;
 
 	/* Initialize test
 	 */
@@ -309,7 +314,7 @@ int fsntfs_test_txf_data_values_read_data(
 	 */
 	result = libfsntfs_txf_data_values_read_data(
 	          txf_data_values,
-	          fsntfs_test_txf_data_values_data1,
+	          &( fsntfs_test_txf_data_values_data1[ 42 ] ),
 	          56,
 	          &error );
 
@@ -326,7 +331,7 @@ int fsntfs_test_txf_data_values_read_data(
 	 */
 	result = libfsntfs_txf_data_values_read_data(
 	          NULL,
-	          fsntfs_test_txf_data_values_data1,
+	          &( fsntfs_test_txf_data_values_data1[ 42 ] ),
 	          56,
 	          &error );
 
@@ -362,7 +367,7 @@ int fsntfs_test_txf_data_values_read_data(
 
 	result = libfsntfs_txf_data_values_read_data(
 	          txf_data_values,
-	          fsntfs_test_txf_data_values_data1,
+	          &( fsntfs_test_txf_data_values_data1[ 42 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -380,7 +385,7 @@ int fsntfs_test_txf_data_values_read_data(
 
 	result = libfsntfs_txf_data_values_read_data(
 	          txf_data_values,
-	          fsntfs_test_txf_data_values_data1,
+	          &( fsntfs_test_txf_data_values_data1[ 42 ] ),
 	          0,
 	          &error );
 
@@ -432,6 +437,221 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_txf_data_values_read_from_mft_attribute function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_txf_data_values_read_from_mft_attribute(
+     void )
+{
+	libcerror_error_t *error                     = NULL;
+	libfsntfs_io_handle_t *io_handle             = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute     = NULL;
+	libfsntfs_txf_data_values_t *txf_data_values = NULL;
+	int result                                   = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_txf_data_values_data1,
+	          104,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_txf_data_values_initialize(
+	          &txf_data_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "txf_data_values",
+	 txf_data_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_txf_data_values_read_from_mft_attribute(
+	          txf_data_values,
+	          mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_txf_data_values_read_from_mft_attribute(
+	          NULL,
+	          mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_txf_data_values_read_from_mft_attribute(
+	          txf_data_values,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_txf_data_values_free(
+	          &txf_data_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "txf_data_values",
+	 txf_data_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( txf_data_values != NULL )
+	{
+		libfsntfs_txf_data_values_free(
+		 &txf_data_values,
+		 NULL );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -462,6 +682,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_txf_data_values_read_data",
 	 fsntfs_test_txf_data_values_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_txf_data_values_read_from_mft_attribute",
+	 fsntfs_test_txf_data_values_read_from_mft_attribute );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

@@ -204,11 +204,11 @@ int libfsntfs_directory_read_file_io_handle(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_entry_read_directory_entries_tree(
+	if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+	     directory->directory_entries_tree,
 	     mft_entry,
 	     io_handle,
 	     file_io_handle,
-	     directory->directory_entries_tree,
 	     flags,
 	     error ) != 1 )
 	{

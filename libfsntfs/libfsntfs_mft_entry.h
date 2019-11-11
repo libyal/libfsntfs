@@ -149,13 +149,6 @@ int libfsntfs_mft_entry_check_for_empty_block(
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_apply_fixup_values(
-     uint8_t *data,
-     size_t data_size,
-     uint16_t fixup_values_offset,
-     uint16_t number_of_fixup_values,
-     libcerror_error_t **error );
-
 int libfsntfs_mft_entry_initialize(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error );
@@ -202,14 +195,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
      libcdata_array_t *attribute_list,
-     uint8_t flags,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_read_directory_entries_tree(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libcdata_btree_t *directory_entries_tree,
      uint8_t flags,
      libcerror_error_t **error );
 

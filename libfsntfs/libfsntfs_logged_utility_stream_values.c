@@ -191,6 +191,18 @@ int libfsntfs_logged_utility_stream_values_read_data(
 		 0 );
 	}
 #endif
+	if( data_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported logged utility stream data size: %" PRIzd "\n",
+		 function,
+		 data_size );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

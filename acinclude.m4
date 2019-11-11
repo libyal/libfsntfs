@@ -56,6 +56,15 @@ AC_DEFUN([AX_FSNTFSTOOLS_CHECK_LOCAL],
      [1])
   ])
 
+  dnl Headers included in fsntfstools/fsntfsmount.c
+  AC_CHECK_HEADERS([errno.h])
+
+  dnl Functions included in fsntfstools/fsntfsmount.c
+  AS_IF(
+    [test "x$ac_cv_enable_winapi" = xno],
+    [AC_CHECK_FUNCS([getegid geteuid])
+  ])
+
   dnl Check if tools should be build as static executables
   AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 

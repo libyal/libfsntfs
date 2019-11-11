@@ -3390,11 +3390,11 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 
 			goto on_error;
 		}
-		if( libfsntfs_mft_entry_read_directory_entries_tree(
+		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+		     directory_entries_tree,
 		     *mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
-		     directory_entries_tree,
 		     0,
 		     error ) != 1 )
 		{
@@ -3402,8 +3402,9 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read directory entries tree.",
-			 function );
+			 "%s: unable to read directory entries tree from MFT entry: %" PRIu64 ".",
+			 function,
+			 mft_entry_index );
 
 			goto on_error;
 		}
@@ -3816,11 +3817,11 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 
 			goto on_error;
 		}
-		if( libfsntfs_mft_entry_read_directory_entries_tree(
+		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+		     directory_entries_tree,
 		     *mft_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
-		     directory_entries_tree,
 		     0,
 		     error ) != 1 )
 		{
@@ -3828,8 +3829,9 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read directory entries tree.",
-			 function );
+			 "%s: unable to read directory entries tree from MFT entry: %" PRIu64 ".",
+			 function,
+			 mft_entry_index );
 
 			goto on_error;
 		}

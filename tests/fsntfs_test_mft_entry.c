@@ -291,188 +291,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_mft_entry_apply_fixup_values function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_mft_entry_apply_fixup_values(
-     void )
-{
-	uint8_t mft_entry_data[ 1024 ];
-
-	libcerror_error_t *error = NULL;
-	void *memcpy_result      = NULL;
-	int result               = 0;
-
-	/* Initialize test
-	 */
-	memcpy_result = memory_copy(
-	                 mft_entry_data,
-	                 fsntfs_test_mft_entry_data1,
-	                 sizeof( uint8_t ) * 1024 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "memcpy_result",
-	 memcpy_result );
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          mft_entry_data,
-	          1024,
-	          48,
-	          3,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-/* TODO check if fix-up values have been applied */
-
-	/* Initialize test
-	 */
-	memcpy_result = memory_copy(
-	                 mft_entry_data,
-	                 fsntfs_test_mft_entry_data1,
-	                 sizeof( uint8_t ) * 1024 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "memcpy_result",
-	 memcpy_result );
-
-	/* Test error case where fix-up value is invalid
-	 */
-	byte_stream_copy_from_uint16_little_endian(
-	 &( mft_entry_data[ 510 ] ),
-	 0xffff );
-
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          mft_entry_data,
-	          1024,
-	          48,
-	          3,
-	          &error );
-
-	byte_stream_copy_from_uint16_little_endian(
-	 &( mft_entry_data[ 510 ] ),
-	 0x0200 );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-/* TODO check if fix-up values have been applied */
-
-	/* Initialize test
-	 */
-	memcpy_result = memory_copy(
-	                 mft_entry_data,
-	                 fsntfs_test_mft_entry_data1,
-	                 sizeof( uint8_t ) * 1024 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "memcpy_result",
-	 memcpy_result );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          NULL,
-	          1024,
-	          48,
-	          3,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          mft_entry_data,
-	          (size_t) SSIZE_MAX + 1,
-	          48,
-	          3,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          mft_entry_data,
-	          1024,
-	          0xffff,
-	          3,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_mft_entry_apply_fixup_values(
-	          mft_entry_data,
-	          1024,
-	          48,
-	          0xffff,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 /* Tests the libfsntfs_mft_entry_initialize function
  * Returns 1 if successful or 0 if not
  */
@@ -1886,8 +1704,6 @@ on_error:
 
 /* TODO: add tests for libfsntfs_mft_entry_read_attributes_from_attribute_list */
 
-/* TODO: add tests for libfsntfs_mft_entry_read_directory_entries_tree */
-
 /* TODO: add tests for libfsntfs_mft_entry_is_empty */
 
 /* TODO: add tests for libfsntfs_mft_entry_is_allocated */
@@ -2534,10 +2350,6 @@ int main(
 	 fsntfs_test_mft_entry_check_for_empty_block );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_mft_entry_apply_fixup_values",
-	 fsntfs_test_mft_entry_apply_fixup_values );
-
-	FSNTFS_TEST_RUN(
 	 "libfsntfs_mft_entry_initialize",
 	 fsntfs_test_mft_entry_initialize );
 
@@ -2560,8 +2372,6 @@ int main(
 	/* TODO: add tests for libfsntfs_mft_entry_read_attributes */
 
 	/* TODO: add tests for libfsntfs_mft_entry_read_attributes_from_attribute_list */
-
-	/* TODO: add tests for libfsntfs_mft_entry_read_directory_entries_tree */
 
 /* TODO use FSNTFS_TEST_RUN_WITH_ARGS */
 

@@ -34,7 +34,7 @@
 #include "fsntfs_mft_entry.h"
 #include "fsntfs_volume_header.h"
 
-/* Creates volume header
+/* Creates a volume header
  * Make sure the value volume_header is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -107,7 +107,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees volume header
+/* Frees a volume header
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_volume_header_free(

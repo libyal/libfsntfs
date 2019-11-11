@@ -35,13 +35,13 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_reparse_point_attribute.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
-#include "libfsntfs_volume.h"
 
 /* Creates a file entry
  * Make sure the value file_entry is referencing, is set to NULL
@@ -216,6 +216,21 @@ int libfsntfs_file_entry_initialize(
 			}
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_file_entry->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_file_entry->io_handle                 = io_handle;
 	internal_file_entry->file_io_handle            = file_io_handle;
 	internal_file_entry->mft                       = mft;
@@ -232,6 +247,12 @@ int libfsntfs_file_entry_initialize(
 on_error:
 	if( internal_file_entry != NULL )
 	{
+		if( internal_file_entry->data_cluster_block_stream != NULL )
+		{
+			libfdata_stream_free(
+			 &( internal_file_entry->data_cluster_block_stream ),
+			 NULL );
+		}
 		if( internal_file_entry->directory != NULL )
 		{
 			libfsntfs_directory_free(
@@ -271,6 +292,21 @@ int libfsntfs_file_entry_free(
 		internal_file_entry = (libfsntfs_internal_file_entry_t *) *file_entry;
 		*file_entry         = NULL;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_file_entry->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		/* The file_io_handle, io_handle, mft and security_descriptor_index references are freed elsewhere
 		 */
 		if( internal_file_entry->data_cluster_block_stream != NULL )

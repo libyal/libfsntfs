@@ -26,9 +26,9 @@
 
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
-#include "libfsntfs_file_entry.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_entry.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_index_value.h"
 #include "libfsntfs_security_descriptor_values.h"

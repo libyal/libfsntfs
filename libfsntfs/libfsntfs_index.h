@@ -42,10 +42,6 @@ typedef struct libfsntfs_index libfsntfs_index_t;
 
 struct libfsntfs_index
 {
-	/* The index entry size
-	 */
-	uint32_t index_entry_size;
-
 	/* The name
 	 */
 	uint8_t *name;
@@ -54,9 +50,9 @@ struct libfsntfs_index
 	 */
 	uint16_t name_size;
 
-	/* The attribute type
+	/* The index entry size
 	 */
-	uint32_t attribute_type;
+	uint32_t index_entry_size;
 
 	/* The flags
 	 */

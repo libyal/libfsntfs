@@ -121,6 +121,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_file_name_value
 		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_fixup_values", "fsntfs_test_fixup_values\fsntfs_test_fixup_values.vcproj", "{8D5F07FD-41A4-4755-8BEF-E56AAD7AFD64}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_index", "fsntfs_test_index\fsntfs_test_index.vcproj", "{BA6DC222-C14D-40D2-B2EF-A99EE46CF530}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
@@ -134,6 +140,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_index_entry", "
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_index_node", "fsntfs_test_index_node\fsntfs_test_index_node.vcproj", "{452CFC63-00C3-4E8C-A70B-3A95C6B788A8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_index_entry_header", "fsntfs_test_index_entry_header\fsntfs_test_index_entry_header.vcproj", "{D5B437A3-9C0B-433C-9BD6-0D3B1FA4EDDB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_index_root_header", "fsntfs_test_index_root_header\fsntfs_test_index_root_header.vcproj", "{E6F1AE28-F1A0-423C-8810-0B5051E27384}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
 		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
@@ -577,6 +595,10 @@ Global
 		{4E267E4B-4F7C-4031-B8A3-D023803D6822}.Release|Win32.Build.0 = Release|Win32
 		{4E267E4B-4F7C-4031-B8A3-D023803D6822}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{4E267E4B-4F7C-4031-B8A3-D023803D6822}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{8D5F07FD-41A4-4755-8BEF-E56AAD7AFD64}.Release|Win32.ActiveCfg = Release|Win32
+		{8D5F07FD-41A4-4755-8BEF-E56AAD7AFD64}.Release|Win32.Build.0 = Release|Win32
+		{8D5F07FD-41A4-4755-8BEF-E56AAD7AFD64}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{8D5F07FD-41A4-4755-8BEF-E56AAD7AFD64}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{BA6DC222-C14D-40D2-B2EF-A99EE46CF530}.Release|Win32.ActiveCfg = Release|Win32
 		{BA6DC222-C14D-40D2-B2EF-A99EE46CF530}.Release|Win32.Build.0 = Release|Win32
 		{BA6DC222-C14D-40D2-B2EF-A99EE46CF530}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
@@ -589,6 +611,14 @@ Global
 		{452CFC63-00C3-4E8C-A70B-3A95C6B788A8}.Release|Win32.Build.0 = Release|Win32
 		{452CFC63-00C3-4E8C-A70B-3A95C6B788A8}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{452CFC63-00C3-4E8C-A70B-3A95C6B788A8}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{D5B437A3-9C0B-433C-9BD6-0D3B1FA4EDDB}.Release|Win32.ActiveCfg = Release|Win32
+		{D5B437A3-9C0B-433C-9BD6-0D3B1FA4EDDB}.Release|Win32.Build.0 = Release|Win32
+		{D5B437A3-9C0B-433C-9BD6-0D3B1FA4EDDB}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{D5B437A3-9C0B-433C-9BD6-0D3B1FA4EDDB}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{E6F1AE28-F1A0-423C-8810-0B5051E27384}.Release|Win32.ActiveCfg = Release|Win32
+		{E6F1AE28-F1A0-423C-8810-0B5051E27384}.Release|Win32.Build.0 = Release|Win32
+		{E6F1AE28-F1A0-423C-8810-0B5051E27384}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{E6F1AE28-F1A0-423C-8810-0B5051E27384}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{A62A34CD-C110-49D8-A4D6-9047A82856CE}.Release|Win32.ActiveCfg = Release|Win32
 		{A62A34CD-C110-49D8-A4D6-9047A82856CE}.Release|Win32.Build.0 = Release|Win32
 		{A62A34CD-C110-49D8-A4D6-9047A82856CE}.VSDebug|Win32.ActiveCfg = VSDebug|Win32

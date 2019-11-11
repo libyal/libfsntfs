@@ -32,6 +32,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
 #include "libfsntfs_mft_attribute.h"
@@ -112,6 +113,12 @@ struct libfsntfs_internal_file_entry
 	/* The flags
 	 */
 	uint8_t flags;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libfsntfs_file_entry_initialize(

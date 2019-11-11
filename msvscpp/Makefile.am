@@ -14,9 +14,12 @@ MSVSCPP_FILES = \
 	fsntfs_test_file_entry/fsntfs_test_file_entry.vcproj \
 	fsntfs_test_file_name_attribute/fsntfs_test_file_name_attribute.vcproj \
 	fsntfs_test_file_name_values/fsntfs_test_file_name_values.vcproj \
+	fsntfs_test_fixup_values/fsntfs_test_fixup_values.vcproj \
 	fsntfs_test_index/fsntfs_test_index.vcproj \
 	fsntfs_test_index_entry/fsntfs_test_index_entry.vcproj \
+	fsntfs_test_index_entry_header/fsntfs_test_index_entry_header.vcproj \
 	fsntfs_test_index_node/fsntfs_test_index_node.vcproj \
+	fsntfs_test_index_root_header/fsntfs_test_index_root_header.vcproj \
 	fsntfs_test_index_value/fsntfs_test_index_value.vcproj \
 	fsntfs_test_io_handle/fsntfs_test_io_handle.vcproj \
 	fsntfs_test_logged_utility_stream_values/fsntfs_test_logged_utility_stream_values.vcproj \

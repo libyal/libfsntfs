@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_fixup_values.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index.c"
 				>
 			</File>
@@ -258,11 +262,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_entry_header.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_entry_vector.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_node.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_root_header.c"
 				>
 			</File>
 			<File
@@ -524,6 +536,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_fixup_values.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index.h"
 				>
 			</File>
@@ -532,11 +548,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_entry_header.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_entry_vector.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_node.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_root_header.h"
 				>
 			</File>
 			<File

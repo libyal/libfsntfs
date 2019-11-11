@@ -27,7 +27,9 @@
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_fixup_values.h"
 #include "libfsntfs_index_entry.h"
+#include "libfsntfs_index_entry_header.h"
 #include "libfsntfs_index_node.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
@@ -39,8 +41,6 @@
 #include "libfsntfs_unused.h"
 
 #include "fsntfs_index.h"
-
-const char fsntfs_index_entry_signature[ 4 ] = "INDX";
 
 /* Creates an index entry
  * Make sure the value index_entry is referencing, is set to NULL
@@ -167,23 +167,16 @@ int libfsntfs_index_entry_read(
      uint32_t index_entry_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	libfsntfs_index_node_t *index_node          = NULL;
-	static char *function                       = "libfsntfs_index_entry_read";
-	size_t index_entry_data_offset              = 0;
-	size_t index_entry_fixup_offset             = 0;
-	size_t index_entry_fixup_placeholder_offset = 0;
-	size_t unknown_data_size                    = 0;
-	ssize_t read_count                          = 0;
-	uint32_t index_node_size                    = 0;
-	uint32_t index_values_offset                = 0;
-	uint16_t fixup_value_index                  = 0;
-	uint16_t fixup_values_offset                = 0;
-	uint16_t number_of_fixup_values             = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit                        = 0;
-	uint16_t value_16bit                        = 0;
-#endif
+	libfsntfs_index_entry_header_t *index_entry_header = NULL;
+	libfsntfs_index_node_t *index_node                 = NULL;
+	static char *function                              = "libfsntfs_index_entry_read";
+	size_t data_offset                                 = 0;
+	size_t unknown_data_size                           = 0;
+	ssize_t read_count                                 = 0;
+	uint32_t index_node_size                           = 0;
+	uint32_t index_values_offset                       = 0;
+	uint16_t fixup_values_offset                       = 0;
+	uint16_t number_of_fixup_values                    = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( index_entry_index )
 
@@ -291,98 +284,34 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: index entry header data:\n",
-		 function );
-		libcnotify_print_data(
-		 index_entry->data,
-		 sizeof( fsntfs_index_entry_header_t ),
-		 0 );
-	}
-#endif
-	if( memory_compare(
-	     ( (fsntfs_index_entry_header_t *) index_entry->data )->signature,
-	     fsntfs_index_entry_signature,
-	     4 ) != 0 )
+	if( libfsntfs_index_entry_header_initialize(
+	     &index_entry_header,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid index entry signature.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create index entry header.",
 		 function );
 
 		goto on_error;
 	}
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_index_entry_header_t *) index_entry->data )->fixup_values_offset,
-	 fixup_values_offset );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_index_entry_header_t *) index_entry->data )->number_of_fixup_values,
-	 number_of_fixup_values );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+	if( libfsntfs_index_entry_header_read_data(
+	     index_entry_header,
+	     index_entry->data,
+	     index_entry->data_size,
+	     error ) != 1 )
 	{
-		libcnotify_printf(
-		 "%s: signature\t\t\t\t\t: %c%c%c%c\n",
-		 function,
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->signature[ 0 ],
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->signature[ 1 ],
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->signature[ 2 ],
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->signature[ 3 ] );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read index entry header.",
+		 function );
 
-		libcnotify_printf(
-		 "%s: fixup values offset\t\t\t\t: %" PRIu16 "\n",
-		 function,
-		 fixup_values_offset );
-
-		libcnotify_printf(
-		 "%s: number of fixup values\t\t\t: %" PRIu16 "\n",
-		 function,
-		 number_of_fixup_values );
-
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->journal_sequence_number,
-		 value_64bit );
-		libcnotify_printf(
-		 "%s: journal sequence number\t\t\t: %" PRIu64 "\n",
-		 function,
-		 value_64bit );
-
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_index_entry_header_t *) index_entry->data )->vcn,
-		 value_64bit );
-		libcnotify_printf(
-		 "%s: VCN\t\t\t\t\t\t: %" PRIu64 "\n",
-		 function,
-		 value_64bit );
-
-		libcnotify_printf(
-		 "\n" );
+		goto on_error;
 	}
-#endif
-	if( number_of_fixup_values > 0 )
-	{
-		if( ( (size_t) fixup_values_offset < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t ) ) )
-		 || ( (size_t) fixup_values_offset >= index_entry->data_size ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: fixup values offset value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	index_entry_data_offset += sizeof( fsntfs_index_entry_header_t );
-
 	if( libfsntfs_index_node_initialize(
 	     &index_node,
 	     error ) != 1 )
@@ -396,11 +325,12 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
+/* TODO remove pass of offset ? */
 	read_count = libfsntfs_index_node_read_header_data(
 		      index_node,
 		      index_entry->data,
 		      index_entry->data_size,
-		      index_entry_data_offset,
+		      sizeof( fsntfs_index_entry_header_t ),
 		      error );
 
 	if( read_count <= -1 )
@@ -414,9 +344,9 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	index_entry_data_offset += read_count;
-	index_values_offset      = index_node->index_values_offset + (uint32_t) sizeof( fsntfs_index_entry_header_t );
-	index_node_size          = index_node->size;
+/* TODO check bounds of index_values_offset */
+	index_values_offset = index_node->index_values_offset + (uint32_t) sizeof( fsntfs_index_entry_header_t );
+	index_node_size     = index_node->size;
 
 	if( libfsntfs_index_node_free(
 	     &index_node,
@@ -444,132 +374,36 @@ int libfsntfs_index_entry_read(
 	}
 	index_node_size -= (uint32_t) sizeof( fsntfs_index_node_header_t );
 
-	if( index_values_offset < fixup_values_offset )
+	data_offset = sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t );
+
+	if( libfsntfs_index_entry_header_get_fixup_values_offset(
+	     index_entry_header,
+	     &fixup_values_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve fix-up values offset.",
+		 function );
+
+		goto on_error;
+	}
+	if( fixup_values_offset > index_values_offset )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid index values offset value exceeds fixup values offset.",
+		 "%s: fix-up values offset exceeds index values offset.",
 		 function );
 
 		goto on_error;
 	}
-	if( number_of_fixup_values > 0 )
+	if( data_offset < fixup_values_offset )
 	{
-		if( index_entry_data_offset < fixup_values_offset )
-		{
-			unknown_data_size = (size_t) fixup_values_offset - index_entry_data_offset;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: unknown data:\n",
-				 function );
-				libcnotify_print_data(
-				 &( index_entry->data[ index_entry_data_offset ] ),
-				 unknown_data_size,
-				 0 );
-			}
-#endif
-			index_entry_data_offset += unknown_data_size;
-			index_node_size         -= (uint32_t) unknown_data_size;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: fixup values data:\n",
-			 function );
-			libcnotify_print_data(
-			 &( index_entry->data[ index_entry_data_offset ] ),
-			 2 + ( number_of_fixup_values * 2 ),
-			 0 );
-		}
-#endif
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			byte_stream_copy_to_uint16_little_endian(
-			 &( index_entry->data[ index_entry_data_offset ] ),
-			 value_16bit );
-			libcnotify_printf(
-			 "%s: fixup placeholder value\t\t\t: 0x%04" PRIx16 "\n",
-			 function,
-			 value_16bit );
-		}
-#endif
-		index_entry_fixup_placeholder_offset = index_entry_data_offset;
-
-		index_entry_data_offset += 2;
-		index_node_size         -= 2;
-
-		for( fixup_value_index = 0;
-		     fixup_value_index < number_of_fixup_values;
-		     fixup_value_index++ )
-		{
-			index_entry_fixup_offset  = fixup_value_index + 1;
-			index_entry_fixup_offset *= io_handle->bytes_per_sector;
-			index_entry_fixup_offset -= 2;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				byte_stream_copy_to_uint16_little_endian(
-				 &( index_entry->data[ index_entry_data_offset ] ),
-				 value_16bit );
-				libcnotify_printf(
-				 "%s: fixup value: %" PRIu16 "\t\t\t\t: 0x%04" PRIx16 "\n",
-				 function,
-				 fixup_value_index,
-				 value_16bit );
-			}
-#endif
-			/* Ignore fixup values outside the available index entry data
-			 */
-			if( index_entry_fixup_offset >= index_entry->data_size )
-			{
-				index_entry_data_offset += 2;
-				index_node_size         -= 2;
-
-				continue;
-			}
-			if( ( index_entry->data[ index_entry_fixup_offset ] != index_entry->data[ index_entry_fixup_placeholder_offset ] )
-			 && ( index_entry->data[ index_entry_fixup_offset + 1 ] != index_entry->data[ index_entry_fixup_placeholder_offset + 1 ] ) )
-			{
-#if defined( HAVE_DEBUG_OUTPUT )
-				if( libcnotify_verbose != 0 )
-				{
-					byte_stream_copy_to_uint16_little_endian(
-					 &( index_entry->data[ index_entry_fixup_offset ] ),
-					 value_16bit );
-					libcnotify_printf(
-					 "%s: corruption detected - mismatch between placeholder and value at offset: %" PRIzd " (0x%04" PRIx16 ")\n",
-					 function,
-					 index_entry_fixup_offset,
-					 value_16bit );
-				}
-#endif
-/* TODO handle error */
-			}
-			index_entry->data[ index_entry_fixup_offset ]     = index_entry->data[ index_entry_data_offset ];
-			index_entry->data[ index_entry_fixup_offset + 1 ] = index_entry->data[ index_entry_data_offset + 1 ];
-
-			index_entry_data_offset += 2;
-			index_node_size         -= 2;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-	}
-	if( index_entry_data_offset < (size_t) index_values_offset )
-	{
-		unknown_data_size = (size_t) index_values_offset - index_entry_data_offset;
+		unknown_data_size = (size_t) fixup_values_offset - data_offset;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -578,13 +412,78 @@ int libfsntfs_index_entry_read(
 			 "%s: unknown data:\n",
 			 function );
 			libcnotify_print_data(
-			 &( index_entry->data[ index_entry_data_offset ] ),
+			 &( index_entry->data[ data_offset ] ),
 			 unknown_data_size,
 			 0 );
 		}
 #endif
-		index_entry_data_offset += unknown_data_size;
-		index_node_size         -= (uint32_t) unknown_data_size;
+		data_offset += unknown_data_size;
+	}
+	if( libfsntfs_index_entry_header_get_number_of_fixup_values(
+	     index_entry_header,
+	     &number_of_fixup_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of fix-up values.",
+		 function );
+
+		goto on_error;
+	}
+	if( number_of_fixup_values > 0 )
+	{
+		if( libfsntfs_fixup_values_apply(
+		     index_entry->data,
+		     index_entry->data_size,
+		     fixup_values_offset,
+		     number_of_fixup_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to apply fix-up values.",
+			 function );
+
+			goto on_error;
+		}
+		data_offset += 2 + ( (size_t) number_of_fixup_values * 2 );
+	}
+	if( libfsntfs_index_entry_header_free(
+	     &index_entry_header,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free index entry header.",
+		 function );
+
+		goto on_error;
+	}
+	if( data_offset < (size_t) index_values_offset )
+	{
+		unknown_data_size = (size_t) index_values_offset - data_offset;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: unknown data:\n",
+			 function );
+			libcnotify_print_data(
+			 &( index_entry->data[ data_offset ] ),
+			 unknown_data_size,
+			 0 );
+		}
+#endif
+		data_offset     += unknown_data_size;
+		index_node_size -= (uint32_t) unknown_data_size;
 	}
 	index_entry->values_data        = &( index_entry->data[ index_values_offset ] );
 	index_entry->values_data_offset = (size_t) index_values_offset;
@@ -593,16 +492,16 @@ int libfsntfs_index_entry_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		index_entry_data_offset += (size_t) index_node_size;
+		data_offset += (size_t) index_node_size;
 
-		if( index_entry_data_offset < index_entry->data_size )
+		if( data_offset < index_entry->data_size )
 		{
 			libcnotify_printf(
 			 "%s: trailing data:\n",
 			 function );
 			libcnotify_print_data(
-			 &( index_entry->data[ index_entry_data_offset ] ),
-			 index_entry->data_size - index_entry_data_offset,
+			 &( index_entry->data[ data_offset ] ),
+			 index_entry->data_size - data_offset,
 			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 	}
@@ -614,6 +513,12 @@ on_error:
 	{
 		libfsntfs_index_node_free(
 		 &index_node,
+		 NULL );
+	}
+	if( index_entry_header != NULL )
+	{
+		libfsntfs_index_entry_header_free(
+		 &index_entry_header,
 		 NULL );
 	}
 	if( index_entry->data != NULL )

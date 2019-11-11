@@ -65,7 +65,7 @@ int libfsntfs_index_node_initialize(
 		return( -1 );
 	}
 	*index_node = memory_allocate_structure(
-	                libfsntfs_index_node_t );
+	               libfsntfs_index_node_t );
 
 	if( *index_node == NULL )
 	{
