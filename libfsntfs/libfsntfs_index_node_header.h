@@ -1,5 +1,5 @@
 /*
- * Index node functions
+ * Index node header functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_INDEX_NODE_H )
-#define _LIBFSNTFS_INDEX_NODE_H
+#if !defined( _LIBFSNTFS_INDEX_NODE_HEADER_H )
+#define _LIBFSNTFS_INDEX_NODE_HEADER_H
 
 #include <common.h>
 #include <types.h>
@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_index_node libfsntfs_index_node_t;
+typedef struct libfsntfs_index_node_header libfsntfs_index_node_header_t;
 
-struct libfsntfs_index_node
+struct libfsntfs_index_node_header
 {
 	/* The size
 	 */
@@ -48,24 +48,23 @@ struct libfsntfs_index_node
 	uint32_t flags;
 };
 
-int libfsntfs_index_node_initialize(
-     libfsntfs_index_node_t **index_node,
+int libfsntfs_index_node_header_initialize(
+     libfsntfs_index_node_header_t **index_node_header,
      libcerror_error_t **error );
 
-int libfsntfs_index_node_free(
-     libfsntfs_index_node_t **index_node,
+int libfsntfs_index_node_header_free(
+     libfsntfs_index_node_header_t **index_node_header,
      libcerror_error_t **error );
 
-ssize_t libfsntfs_index_node_read_header_data(
-         libfsntfs_index_node_t *index_node,
-         uint8_t *index_node_data,
-         size_t index_node_data_size,
-         size_t index_node_data_offset,
-         libcerror_error_t **error );
+int libfsntfs_index_node_header_read_data(
+     libfsntfs_index_node_header_t *index_node_header,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_INDEX_NODE_H ) */
+#endif /* !defined( _LIBFSNTFS_INDEX_NODE_HEADER_H ) */
 

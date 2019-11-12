@@ -30,7 +30,7 @@
 #include "libfsntfs_fixup_values.h"
 #include "libfsntfs_index_entry.h"
 #include "libfsntfs_index_entry_header.h"
-#include "libfsntfs_index_node.h"
+#include "libfsntfs_index_node_header.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -168,7 +168,7 @@ int libfsntfs_index_entry_read(
      libcerror_error_t **error )
 {
 	libfsntfs_index_entry_header_t *index_entry_header = NULL;
-	libfsntfs_index_node_t *index_node                 = NULL;
+	libfsntfs_index_node_header_t *index_node_header   = NULL;
 	static char *function                              = "libfsntfs_index_entry_read";
 	size_t data_offset                                 = 0;
 	size_t unknown_data_size                           = 0;
@@ -312,28 +312,24 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_index_node_initialize(
-	     &index_node,
+	if( libfsntfs_index_node_header_initialize(
+	     &index_node_header,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index node.",
+		 "%s: unable to create index node header.",
 		 function );
 
 		goto on_error;
 	}
-/* TODO remove pass of offset ? */
-	read_count = libfsntfs_index_node_read_header_data(
-		      index_node,
-		      index_entry->data,
-		      index_entry->data_size,
-		      sizeof( fsntfs_index_entry_header_t ),
-		      error );
-
-	if( read_count <= -1 )
+	if( libfsntfs_index_node_header_read_data(
+	     index_node_header,
+	     &( index_entry->data[ sizeof( fsntfs_index_entry_header_t ) ] ),
+	     index_entry->data_size - sizeof( fsntfs_index_entry_header_t ),
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -345,18 +341,18 @@ int libfsntfs_index_entry_read(
 		goto on_error;
 	}
 /* TODO check bounds of index_values_offset */
-	index_values_offset = index_node->index_values_offset + (uint32_t) sizeof( fsntfs_index_entry_header_t );
-	index_node_size     = index_node->size;
+	index_values_offset = index_node_header->index_values_offset + (uint32_t) sizeof( fsntfs_index_entry_header_t );
+	index_node_size     = index_node_header->size;
 
-	if( libfsntfs_index_node_free(
-	     &index_node,
+	if( libfsntfs_index_node_header_free(
+	     &index_node_header,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free index node.",
+		 "%s: unable to free index node header.",
 		 function );
 
 		goto on_error;
@@ -509,10 +505,10 @@ int libfsntfs_index_entry_read(
 	return( 1 );
 
 on_error:
-	if( index_node != NULL )
+	if( index_node_header != NULL )
 	{
-		libfsntfs_index_node_free(
-		 &index_node,
+		libfsntfs_index_node_header_free(
+		 &index_node_header,
 		 NULL );
 	}
 	if( index_entry_header != NULL )

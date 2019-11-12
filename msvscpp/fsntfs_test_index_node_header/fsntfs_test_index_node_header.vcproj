@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_index_node"
-	ProjectGUID="{452CFC63-00C3-4E8C-A70B-3A95C6B788A8}"
-	RootNamespace="fsntfs_test_index_node"
+	Name="fsntfs_test_index_node_header"
+	ProjectGUID="{83A76DAD-2982-4A72-84B8-A355112A4A23}"
+	RootNamespace="fsntfs_test_index_node_header"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_index_node.c"
+				RelativePath="..\..\tests\fsntfs_test_index_node_header.c"
 				>
 			</File>
 			<File

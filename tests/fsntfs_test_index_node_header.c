@@ -1,5 +1,5 @@
 /*
- * Library index_node type test program
+ * Library index_node_header type test program
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,35 +33,33 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_index_node.h"
+#include "../libfsntfs/libfsntfs_index_node_header.h"
 
-uint8_t fsntfs_test_index_node_data1[ 40 ] = {
-	0x10, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-	0x0d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t fsntfs_test_index_node_header_data1[ 16 ] = {
+	0x10, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-/* Tests the libfsntfs_index_node_initialize function
+/* Tests the libfsntfs_index_node_header_initialize function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_index_node_initialize(
+int fsntfs_test_index_node_header_initialize(
      void )
 {
-	libcerror_error_t *error           = NULL;
-	libfsntfs_index_node_t *index_node = NULL;
-	int result                         = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_index_node_header_t *index_node_header = NULL;
+	int result                                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests    = 1;
-	int number_of_memset_fail_tests    = 1;
-	int test_number                    = 0;
+	int number_of_malloc_fail_tests                  = 1;
+	int number_of_memset_fail_tests                  = 1;
+	int test_number                                  = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_index_node_initialize(
-	          &index_node,
+	result = libfsntfs_index_node_header_initialize(
+	          &index_node_header,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -70,15 +68,15 @@ int fsntfs_test_index_node_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "index_node",
-	 index_node );
+	 "index_node_header",
+	 index_node_header );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libfsntfs_index_node_free(
-	          &index_node,
+	result = libfsntfs_index_node_header_free(
+	          &index_node_header,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -87,8 +85,8 @@ int fsntfs_test_index_node_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "index_node",
-	 index_node );
+	 "index_node_header",
+	 index_node_header );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -96,7 +94,7 @@ int fsntfs_test_index_node_initialize(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_index_node_initialize(
+	result = libfsntfs_index_node_header_initialize(
 	          NULL,
 	          &error );
 
@@ -112,13 +110,13 @@ int fsntfs_test_index_node_initialize(
 	libcerror_error_free(
 	 &error );
 
-	index_node = (libfsntfs_index_node_t *) 0x12345678UL;
+	index_node_header = (libfsntfs_index_node_header_t *) 0x12345678UL;
 
-	result = libfsntfs_index_node_initialize(
-	          &index_node,
+	result = libfsntfs_index_node_header_initialize(
+	          &index_node_header,
 	          &error );
 
-	index_node = NULL;
+	index_node_header = NULL;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -138,22 +136,22 @@ int fsntfs_test_index_node_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_index_node_initialize with malloc failing
+		/* Test libfsntfs_index_node_header_initialize with malloc failing
 		 */
 		fsntfs_test_malloc_attempts_before_fail = test_number;
 
-		result = libfsntfs_index_node_initialize(
-		          &index_node,
+		result = libfsntfs_index_node_header_initialize(
+		          &index_node_header,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
 		{
 			fsntfs_test_malloc_attempts_before_fail = -1;
 
-			if( index_node != NULL )
+			if( index_node_header != NULL )
 			{
-				libfsntfs_index_node_free(
-				 &index_node,
+				libfsntfs_index_node_header_free(
+				 &index_node_header,
 				 NULL );
 			}
 		}
@@ -165,8 +163,8 @@ int fsntfs_test_index_node_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "index_node",
-			 index_node );
+			 "index_node_header",
+			 index_node_header );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -180,22 +178,22 @@ int fsntfs_test_index_node_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_index_node_initialize with memset failing
+		/* Test libfsntfs_index_node_header_initialize with memset failing
 		 */
 		fsntfs_test_memset_attempts_before_fail = test_number;
 
-		result = libfsntfs_index_node_initialize(
-		          &index_node,
+		result = libfsntfs_index_node_header_initialize(
+		          &index_node_header,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
 		{
 			fsntfs_test_memset_attempts_before_fail = -1;
 
-			if( index_node != NULL )
+			if( index_node_header != NULL )
 			{
-				libfsntfs_index_node_free(
-				 &index_node,
+				libfsntfs_index_node_header_free(
+				 &index_node_header,
 				 NULL );
 			}
 		}
@@ -207,8 +205,8 @@ int fsntfs_test_index_node_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "index_node",
-			 index_node );
+			 "index_node_header",
+			 index_node_header );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -228,19 +226,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( index_node != NULL )
+	if( index_node_header != NULL )
 	{
-		libfsntfs_index_node_free(
-		 &index_node,
+		libfsntfs_index_node_header_free(
+		 &index_node_header,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_index_node_free function
+/* Tests the libfsntfs_index_node_header_free function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_index_node_free(
+int fsntfs_test_index_node_header_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -248,7 +246,7 @@ int fsntfs_test_index_node_free(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_index_node_free(
+	result = libfsntfs_index_node_header_free(
 	          NULL,
 	          &error );
 
@@ -275,21 +273,20 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_index_node_read_header_data function
+/* Tests the libfsntfs_index_node_header_read_data function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_index_node_read_header_data(
+int fsntfs_test_index_node_header_read_data(
      void )
 {
-	libcerror_error_t *error           = NULL;
-	libfsntfs_index_node_t *index_node = NULL;
-	ssize_t read_count                 = 0;
-	int result                         = 0;
+	libcerror_error_t *error                         = NULL;
+	libfsntfs_index_node_header_t *index_node_header = NULL;
+	int result                                       = 0;
 
 	/* Initialize test
 	 */
-	result = libfsntfs_index_node_initialize(
-	          &index_node,
+	result = libfsntfs_index_node_header_initialize(
+	          &index_node_header,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -298,8 +295,8 @@ int fsntfs_test_index_node_read_header_data(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "index_node",
-	 index_node );
+	 "index_node_header",
+	 index_node_header );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -307,17 +304,16 @@ int fsntfs_test_index_node_read_header_data(
 
 	/* Test regular cases
 	 */
-	read_count = libfsntfs_index_node_read_header_data(
-	              index_node,
-	              fsntfs_test_index_node_data1,
-	              40,
-	              0,
-	              &error );
+	result = libfsntfs_index_node_header_read_data(
+	          index_node_header,
+	          fsntfs_test_index_node_header_data1,
+	          16,
+	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) 16 );
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -325,36 +321,16 @@ int fsntfs_test_index_node_read_header_data(
 
 	/* Test error cases
 	 */
-	read_count = libfsntfs_index_node_read_header_data(
-	              NULL,
-	              fsntfs_test_index_node_data1,
-	              40,
-	              0,
-	              &error );
+	result = libfsntfs_index_node_header_read_data(
+	          NULL,
+	          fsntfs_test_index_node_header_data1,
+	          16,
+	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	read_count = libfsntfs_index_node_read_header_data(
-	              index_node,
-	              NULL,
-	              40,
-	              0,
-	              &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
@@ -363,17 +339,34 @@ int fsntfs_test_index_node_read_header_data(
 	libcerror_error_free(
 	 &error );
 
-	read_count = libfsntfs_index_node_read_header_data(
-	              index_node,
-	              fsntfs_test_index_node_data1,
-	              (size_t) SSIZE_MAX + 1,
-	              0,
-	              &error );
+	result = libfsntfs_index_node_header_read_data(
+	          index_node_header,
+	          NULL,
+	          16,
+	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_index_node_header_read_data(
+	          index_node_header,
+	          fsntfs_test_index_node_header_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 	 "error",
@@ -384,8 +377,8 @@ int fsntfs_test_index_node_read_header_data(
 
 	/* Clean up
 	 */
-	result = libfsntfs_index_node_free(
-	          &index_node,
+	result = libfsntfs_index_node_header_free(
+	          &index_node_header,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -394,8 +387,8 @@ int fsntfs_test_index_node_read_header_data(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "index_node",
-	 index_node );
+	 "index_node_header",
+	 index_node_header );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -409,10 +402,10 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( index_node != NULL )
+	if( index_node_header != NULL )
 	{
-		libfsntfs_index_node_free(
-		 &index_node,
+		libfsntfs_index_node_header_free(
+		 &index_node_header,
 		 NULL );
 	}
 	return( 0 );
@@ -438,16 +431,16 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_index_node_initialize",
-	 fsntfs_test_index_node_initialize );
+	 "libfsntfs_index_node_header_initialize",
+	 fsntfs_test_index_node_header_initialize );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_index_node_free",
-	 fsntfs_test_index_node_free );
+	 "libfsntfs_index_node_header_free",
+	 fsntfs_test_index_node_header_free );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_index_node_read_header_data",
-	 fsntfs_test_index_node_read_header_data );
+	 "libfsntfs_index_node_header_read_data",
+	 fsntfs_test_index_node_header_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

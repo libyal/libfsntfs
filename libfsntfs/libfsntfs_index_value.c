@@ -157,9 +157,9 @@ size_t libfsntfs_index_value_read(
         libfsntfs_index_value_t *index_value,
         off64_t index_value_offset,
         int *index_value_entry,
-        uint8_t *index_value_data,
-        size_t index_value_data_size,
-        size_t index_value_data_offset,
+        const uint8_t *data,
+        size_t data_size,
+        size_t data_offset,
         libcerror_error_t **error )
 {
 	static char *function   = "libfsntfs_index_value_read";
@@ -187,58 +187,58 @@ size_t libfsntfs_index_value_read(
 
 		return( -1 );
 	}
-	if( index_value_data == NULL )
+	if( data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index value data.",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_value_data_size > (size_t) SSIZE_MAX )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: index value data size value exceeds maximum.",
+		 "%s: data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_value_data_offset > (size_t) SSIZE_MAX )
+	if( data_offset > (size_t) SSIZE_MAX )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: index value data offset value exceeds maximum.",
+		 "%s: data offset value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
-	if( index_value_data_offset >= index_value_data_size )
+	if( data_offset >= data_size )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: index value data offset value out of bounds.",
+		 "%s: data offset value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( index_value_data_size < sizeof( fsntfs_index_value_t ) )
-	 || ( index_value_data_offset > ( index_value_data_size - sizeof( fsntfs_index_value_t ) ) ) )
+	if( ( data_size < sizeof( fsntfs_index_value_t ) )
+	 || ( data_offset > ( data_size - sizeof( fsntfs_index_value_t ) ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: index value data size value too small.",
+		 "%s: data size value too small.",
 		 function );
 
 		return( -1 );
@@ -253,25 +253,25 @@ size_t libfsntfs_index_value_read(
 		 function,
 		 *index_value_entry );
 		libcnotify_print_data(
-		 index_value_data,
+		 &( data[ data_offset ] ),
 		 sizeof( fsntfs_index_value_t ),
 		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint64_little_endian(
-	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->file_reference,
+	 ( (fsntfs_index_value_t *) &( data[ data_offset ] ) )->file_reference,
 	 index_value->file_reference );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->size,
+	 ( (fsntfs_index_value_t *) &( data[ data_offset ] ) )->size,
 	 index_value->size );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->key_data_size,
+	 ( (fsntfs_index_value_t *) &( data[ data_offset ] ) )->key_data_size,
 	 index_value->key_data_size );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_value_t *) &( index_value_data[ index_value_data_offset ] ) )->flags,
+	 ( (fsntfs_index_value_t *) &( data[ data_offset ] ) )->flags,
 	 index_value->flags );
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -306,17 +306,18 @@ size_t libfsntfs_index_value_read(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
-	index_value_data_offset += sizeof( fsntfs_index_value_t );
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	data_offset += sizeof( fsntfs_index_value_t );
 
 	if( ( (size_t) index_value->size < sizeof( fsntfs_index_value_t ) )
-	 || ( (size_t) index_value->size > index_value_data_size ) )
+	 || ( (size_t) index_value->size > data_size ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: index value: %03d size exceeds index value data size.",
+		 "%s: index value: %03d size exceeds data size.",
 		 function,
 		 *index_value_entry );
 
@@ -355,7 +356,7 @@ size_t libfsntfs_index_value_read(
 		}
 		if( memory_copy(
 		     index_value->key_data,
-		     &( index_value_data[ index_value_data_offset ] ),
+		     &( data[ data_offset ] ),
 		     (size_t) index_value->key_data_size ) == NULL )
 		{
 			libcerror_error_set(
@@ -376,13 +377,13 @@ size_t libfsntfs_index_value_read(
 			 function,
 			 *index_value_entry );
 			libcnotify_print_data(
-			 &( index_value_data[ index_value_data_offset ] ),
+			 &( data[ data_offset ] ),
 			 (size_t) index_value->key_data_size,
 			 0 );
 		}
 #endif
-		index_value_data_offset += index_value->key_data_size;
-		remaining_size          -= index_value->key_data_size;
+		data_offset    += index_value->key_data_size;
+		remaining_size -= index_value->key_data_size;
 	}
 	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
@@ -421,7 +422,7 @@ size_t libfsntfs_index_value_read(
 
 		if( memory_copy(
 		     index_value->value_data,
-		     &( index_value_data[ index_value_data_offset ] ),
+		     &( data[ data_offset ] ),
 		     (size_t) index_value->value_data_size ) == NULL )
 		{
 			libcerror_error_set(
@@ -447,7 +448,7 @@ size_t libfsntfs_index_value_read(
 			 0 );
 		}
 #endif
-		index_value_data_offset += remaining_size;
+		data_offset += remaining_size;
 	}
 	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
@@ -459,13 +460,13 @@ size_t libfsntfs_index_value_read(
 			 function,
 			 *index_value_entry );
 			libcnotify_print_data(
-			 &( index_value_data[ index_value_data_offset ] ),
+			 &( data[ data_offset ] ),
 			 8,
 			 0 );
 		}
 #endif
 		byte_stream_copy_to_uint32_little_endian(
-		 &( index_value_data[ index_value_data_offset ] ),
+		 &( data[ data_offset ] ),
 		 index_value->sub_node_vcn );
 
 #if defined( HAVE_DEBUG_OUTPUT )

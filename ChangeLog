@@ -1,6 +1,5 @@
 TODO
 * refactor $I30 index to file entry
-** create index_node_header ?
 ** store index root header in index?
 ** remove libfsntfs_mft_entry_append_index
 ** remove libfsntfs_mft_entry_get_index_by_utf8_name

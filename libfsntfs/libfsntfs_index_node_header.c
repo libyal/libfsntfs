@@ -1,5 +1,5 @@
 /*
- * Index node functions
+ * Index node header functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -26,144 +26,142 @@
 
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
-#include "libfsntfs_index_node.h"
+#include "libfsntfs_index_node_header.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 
 #include "fsntfs_index.h"
 
-/* Creates an index node
- * Make sure the value index_node is referencing, is set to NULL
+/* Creates an index node header
+ * Make sure the value index_node_header is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_index_node_initialize(
-     libfsntfs_index_node_t **index_node,
+int libfsntfs_index_node_header_initialize(
+     libfsntfs_index_node_header_t **index_node_header,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_index_node_initialize";
+	static char *function = "libfsntfs_index_node_header_initialize";
 
-	if( index_node == NULL )
+	if( index_node_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index node.",
+		 "%s: invalid index node header.",
 		 function );
 
 		return( -1 );
 	}
-	if( *index_node != NULL )
+	if( *index_node_header != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index node value already set.",
+		 "%s: invalid index node header value already set.",
 		 function );
 
 		return( -1 );
 	}
-	*index_node = memory_allocate_structure(
-	               libfsntfs_index_node_t );
+	*index_node_header = memory_allocate_structure(
+	                      libfsntfs_index_node_header_t );
 
-	if( *index_node == NULL )
+	if( *index_node_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create index node.",
+		 "%s: unable to create index node header.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     *index_node,
+	     *index_node_header,
 	     0,
-	     sizeof( libfsntfs_index_node_t ) ) == NULL )
+	     sizeof( libfsntfs_index_node_header_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear index node.",
+		 "%s: unable to clear index node header.",
 		 function );
 
 		memory_free(
-		 *index_node );
+		 *index_node_header );
 
-		*index_node = NULL;
+		*index_node_header = NULL;
 
 		return( -1 );
 	}
 	return( 1 );
 
 on_error:
-	if( *index_node != NULL )
+	if( *index_node_header != NULL )
 	{
 		memory_free(
-		 *index_node );
+		 *index_node_header );
 
-		*index_node = NULL;
+		*index_node_header = NULL;
 	}
 	return( -1 );
 }
 
-/* Frees an index node
+/* Frees an index node header
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_index_node_free(
-     libfsntfs_index_node_t **index_node,
+int libfsntfs_index_node_header_free(
+     libfsntfs_index_node_header_t **index_node_header,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_index_node_free";
+	static char *function = "libfsntfs_index_node_header_free";
 
-	if( index_node == NULL )
+	if( index_node_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index node.",
+		 "%s: invalid index node header.",
 		 function );
 
 		return( -1 );
 	}
-	if( *index_node != NULL )
+	if( *index_node_header != NULL )
 	{
 		memory_free(
-		 *index_node );
+		 *index_node_header );
 
-		*index_node = NULL;
+		*index_node_header = NULL;
 	}
 	return( 1 );
 }
 
-/* Reads the index node header
+/* Reads the index node header header
  * Returns the number of bytes read if successful or -1 on error
  */
-ssize_t libfsntfs_index_node_read_header_data(
-         libfsntfs_index_node_t *index_node,
-         uint8_t *data,
-         size_t data_size,
-         size_t data_offset,
-         libcerror_error_t **error )
+int libfsntfs_index_node_header_read_data(
+     libfsntfs_index_node_header_t *index_node_header,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
 {
-	uint8_t *index_node_header_data = NULL;
-	static char *function           = "libfsntfs_index_node_read_header_data";
+	static char *function = "libfsntfs_index_node_header_read_data";
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit            = 0;
+	uint32_t value_32bit  = 0;
 #endif
 
-	if( index_node == NULL )
+	if( index_node_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index node.",
+		 "%s: invalid index node header.",
 		 function );
 
 		return( -1 );
@@ -190,65 +188,41 @@ ssize_t libfsntfs_index_node_read_header_data(
 
 		return( -1 );
 	}
-	if( data_offset > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data offset value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_offset >= data_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: data offset value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( data_size < sizeof( fsntfs_index_node_header_t ) )
-	 || ( data_offset > ( data_size - sizeof( fsntfs_index_node_header_t ) ) ) )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: data size value too small.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-	index_node_header_data = &( data[ data_offset ] );
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: index node header data:\n",
+		 "%s: index node header header data:\n",
 		 function );
 		libcnotify_print_data(
-		 index_node_header_data,
+		 data,
 		 sizeof( fsntfs_index_node_header_t ),
 		 0 );
 	}
 #endif
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_node_header_t *) index_node_header_data )->index_values_offset,
-	 index_node->index_values_offset );
+	 ( (fsntfs_index_node_header_t *) data )->index_values_offset,
+	 index_node_header->index_values_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_node_header_t *) index_node_header_data )->size,
-	 index_node->size );
+	 ( (fsntfs_index_node_header_t *) data )->size,
+	 index_node_header->size );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (fsntfs_index_node_header_t *) index_node_header_data )->flags,
-	 index_node->flags );
+	 ( (fsntfs_index_node_header_t *) data )->flags,
+	 index_node_header->flags );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -256,15 +230,15 @@ ssize_t libfsntfs_index_node_read_header_data(
 		libcnotify_printf(
 		 "%s: index values offset\t\t: %" PRIu32 "\n",
 		 function,
-		 index_node->index_values_offset );
+		 index_node_header->index_values_offset );
 
 		libcnotify_printf(
 		 "%s: size\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 index_node->size );
+		 index_node_header->size );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_index_node_header_t *) index_node_header_data )->allocated_size,
+		 ( (fsntfs_index_node_header_t *) data )->allocated_size,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: allocated size\t\t\t: %" PRIu32 "\n",
@@ -274,30 +248,30 @@ ssize_t libfsntfs_index_node_read_header_data(
 		libcnotify_printf(
 		 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 index_node->flags );
+		 index_node_header->flags );
 		libfsntfs_debug_print_index_node_flags(
-		 index_node->flags );
+		 index_node_header->flags );
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
-	if( index_node->size > 0 )
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	if( index_node_header->size > 0 )
 	{
-		if( ( (size_t) index_node->size < sizeof( fsntfs_index_node_header_t ) )
-		 || ( ( data_offset + index_node->size ) > data_size ) )
+		if( (size_t) index_node_header->size < sizeof( fsntfs_index_node_header_t ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid index node size value out of bounds.",
+			 "%s: invalid index node header size value out of bounds.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( (size_t) index_node->index_values_offset < sizeof( fsntfs_index_node_header_t ) )
-		 || ( index_node->index_values_offset > index_node->size )
-		 || ( ( index_node->index_values_offset % 8 ) != 0 ) )
+		if( ( (size_t) index_node_header->index_values_offset < sizeof( fsntfs_index_node_header_t ) )
+		 || ( index_node_header->index_values_offset > index_node_header->size )
+		 || ( ( index_node_header->index_values_offset % 8 ) != 0 ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -309,6 +283,6 @@ ssize_t libfsntfs_index_node_read_header_data(
 			return( -1 );
 		}
 	}
-	return( (ssize_t) sizeof( fsntfs_index_node_header_t ) );
+	return( 1 );
 }
 

@@ -35,6 +35,10 @@
 
 #include "../libfsntfs/libfsntfs_index_value.h"
 
+uint8_t fsntfs_test_index_value_data1[ 24 ] = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 /* Tests the libfsntfs_index_value_initialize function
@@ -270,6 +274,158 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_index_index_value_read function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_index_value_read(
+     void )
+{
+	libcerror_error_t *error             = NULL;
+	libfsntfs_index_value_t *index_value = NULL;
+	ssize_t read_count                   = 0;
+	int index_value_entry                = 0;
+	int result                           = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_index_value_initialize(
+	          &index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "index_value",
+	 index_value );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libfsntfs_index_value_read(
+	              index_value,
+	              0,
+	              &index_value_entry,
+	              fsntfs_test_index_value_data1,
+	              24,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 24 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	read_count = libfsntfs_index_value_read(
+	              NULL,
+	              0,
+	              &index_value_entry,
+	              fsntfs_test_index_value_data1,
+	              24,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_index_value_read(
+	              index_value,
+	              0,
+	              &index_value_entry,
+	              NULL,
+	              24,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_index_value_read(
+	              index_value,
+	              0,
+	              &index_value_entry,
+	              fsntfs_test_index_value_data1,
+	              (size_t) SSIZE_MAX + 1,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_index_value_free(
+	          &index_value,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "index_value",
+	 index_value );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( index_value != NULL )
+	{
+		libfsntfs_index_value_free(
+		 &index_value,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -297,9 +453,15 @@ int main(
 	 "libfsntfs_index_value_free",
 	 fsntfs_test_index_value_free );
 
-	/* TODO: add tests for libfsntfs_index_value_read */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_index_value_read",
+	 fsntfs_test_index_value_read );
+
+#if defined( HAVE_DEBUG_OUTPUT )
 
 	/* TODO: add tests for libfsntfs_index_value_print */
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

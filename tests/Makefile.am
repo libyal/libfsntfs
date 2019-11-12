@@ -60,8 +60,8 @@ check_PROGRAMS = \
 	fsntfs_test_fixup_values \
 	fsntfs_test_index \
 	fsntfs_test_index_entry \
-	fsntfs_test_index_node \
 	fsntfs_test_index_entry_header \
+	fsntfs_test_index_node_header \
 	fsntfs_test_index_root_header \
 	fsntfs_test_index_value \
 	fsntfs_test_io_handle \
@@ -327,18 +327,6 @@ fsntfs_test_index_entry_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
-fsntfs_test_index_node_SOURCES = \
-	fsntfs_test_index_node.c \
-	fsntfs_test_libcerror.h \
-	fsntfs_test_libfsntfs.h \
-	fsntfs_test_macros.h \
-	fsntfs_test_memory.c fsntfs_test_memory.h \
-	fsntfs_test_unused.h
-
-fsntfs_test_index_node_LDADD = \
-	../libfsntfs/libfsntfs.la \
-	@LIBCERROR_LIBADD@
-
 fsntfs_test_index_entry_header_SOURCES = \
 	fsntfs_test_index_entry_header.c \
 	fsntfs_test_libcerror.h \
@@ -348,6 +336,18 @@ fsntfs_test_index_entry_header_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_index_entry_header_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_index_node_header_SOURCES = \
+	fsntfs_test_index_node_header.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_index_node_header_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

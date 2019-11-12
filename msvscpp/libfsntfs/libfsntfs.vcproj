@@ -270,7 +270,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_index_node.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_index_node_header.c"
 				>
 			</File>
 			<File
@@ -556,7 +556,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_index_node.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_index_node_header.h"
 				>
 			</File>
 			<File
