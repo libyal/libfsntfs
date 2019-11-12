@@ -270,6 +270,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_node.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_node_header.c"
 				>
 			</File>
@@ -553,6 +557,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_index_entry_vector.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_index_node.h"
 				>
 			</File>
 			<File

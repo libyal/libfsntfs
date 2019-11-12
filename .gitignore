@@ -145,6 +145,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_index
 /tests/fsntfs_test_index_entry
 /tests/fsntfs_test_index_entry_header
+/tests/fsntfs_test_index_node
 /tests/fsntfs_test_index_node_header
 /tests/fsntfs_test_index_root_header
 /tests/fsntfs_test_index_value

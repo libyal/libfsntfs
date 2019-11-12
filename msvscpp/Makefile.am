@@ -18,6 +18,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_index/fsntfs_test_index.vcproj \
 	fsntfs_test_index_entry/fsntfs_test_index_entry.vcproj \
 	fsntfs_test_index_entry_header/fsntfs_test_index_entry_header.vcproj \
+	fsntfs_test_index_node/fsntfs_test_index_node.vcproj \
 	fsntfs_test_index_node_header/fsntfs_test_index_node_header.vcproj \
 	fsntfs_test_index_root_header/fsntfs_test_index_root_header.vcproj \
 	fsntfs_test_index_value/fsntfs_test_index_value.vcproj \
