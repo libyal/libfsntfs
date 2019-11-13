@@ -37,7 +37,7 @@ then
 
 		make install DESTDIR=${PWD}/osx-pkg;
 		mkdir -p ${PWD}/osx-pkg/usr/share/doc/libfsntfs;
-		cp AUTHORS COPYING NEWS README ${PWD}/osx-pkg/usr/share/doc/libfsntfs;
+		cp AUTHORS COPYING COPYING.LESSER NEWS README ${PWD}/osx-pkg/usr/share/doc/libfsntfs;
 
 		pkgbuild --root osx-pkg --identifier com.github.libyal.libfsntfs --version ${VERSION} --ownership recommended ../libfsntfs-${VERSION}.pkg;
 	fi
