@@ -1515,8 +1515,8 @@ The remainder of the index node contains remnant data and/or zero-byte values.
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x00000001 | | Has index allocation attribute +
-Used in an index root attribute to indicate the presence of an index allocation attribute which contains the index values
+| 0x00000001 | | Is branch node +
+Used to indicate if the node is a branch node that has sub nodes
 |===
 
 === The index value
@@ -1538,7 +1538,8 @@ See section: <<file_reference,The file reference>>
 | ... | 8 | | Sub node Virtual Cluster Number (VCN)
 |===
 
-The index values appear to be stored 8 byte aligned.
+[NOTE]
+The index values ared stored 8 byte aligned.
 
 [NOTE]
 Some sources define the index value flags as a 16-bit value followed by

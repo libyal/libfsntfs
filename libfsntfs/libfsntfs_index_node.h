@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_index_node_header.h"
+#include "libfsntfs_index_value.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 
@@ -37,6 +38,10 @@ typedef struct libfsntfs_index_node libfsntfs_index_node_t;
 
 struct libfsntfs_index_node
 {
+	/* The node header data offset
+	 */
+	size_t header_data_offset;
+
 	/* The header
 	 */
 	libfsntfs_index_node_header_t *header;
@@ -54,10 +59,30 @@ int libfsntfs_index_node_free(
      libfsntfs_index_node_t **index_node,
      libcerror_error_t **error );
 
-int libfsntfs_index_node_read_data(
+int libfsntfs_index_node_read_header(
      libfsntfs_index_node_t *index_node,
      const uint8_t *data,
      size_t data_size,
+     size_t data_offset,
+     libcerror_error_t **error );
+
+int libfsntfs_index_node_read_values(
+     libfsntfs_index_node_t *index_node,
+     off64_t index_value_vcn_offset,
+     const uint8_t *data,
+     size_t data_size,
+     size_t data_offset,
+     libcerror_error_t **error );
+
+int libfsntfs_index_node_get_number_of_values(
+     libfsntfs_index_node_t *index_node,
+     int *number_of_values,
+     libcerror_error_t **error );
+
+int libfsntfs_index_node_get_value_by_index(
+     libfsntfs_index_node_t *index_node,
+     int value_entry,
+     libfsntfs_index_value_t **value,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

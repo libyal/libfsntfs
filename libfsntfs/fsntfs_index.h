@@ -38,10 +38,10 @@ struct fsntfs_index_root_header
 	 */
 	uint8_t attribute_type[ 4 ];
 
-	/* The collating type
+	/* The collation type
 	 * Consists of 4 bytes
 	 */
-	uint8_t collating_type[ 4 ];
+	uint8_t collation_type[ 4 ];
 
 	/* The index entry size
 	 * Consists of 4 bytes

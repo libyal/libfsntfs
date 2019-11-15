@@ -357,12 +357,12 @@ int libfsntfs_volume_open(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+	        libcerror_error_set(
+	         error,
+	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
+	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+	         "%s: unable to set track offsets read in file IO handle.",
+	         function );
 
 		goto on_error;
 	}
@@ -374,12 +374,12 @@ int libfsntfs_volume_open(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+	        libcerror_error_set(
+	         error,
+	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
+	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+	         "%s: unable to set filename in file IO handle.",
+	         function );
 
 		goto on_error;
 	}
@@ -442,7 +442,7 @@ on_error:
 		 &file_io_handle,
 		 NULL );
 	}
-        return( -1 );
+	return( -1 );
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -526,12 +526,12 @@ int libfsntfs_volume_open_wide(
 	     1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set track offsets read in file IO handle.",
-                 function );
+	        libcerror_error_set(
+	         error,
+	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
+	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+	         "%s: unable to set track offsets read in file IO handle.",
+	         function );
 
 		goto on_error;
 	}
@@ -543,12 +543,12 @@ int libfsntfs_volume_open_wide(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-                libcerror_error_set(
-                 error,
-                 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-                 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-                 "%s: unable to set filename in file IO handle.",
-                 function );
+	        libcerror_error_set(
+	         error,
+	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
+	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+	         "%s: unable to set filename in file IO handle.",
+	         function );
 
 		goto on_error;
 	}
@@ -611,7 +611,7 @@ on_error:
 		 &file_io_handle,
 		 NULL );
 	}
-        return( -1 );
+	return( -1 );
 }
 
 #endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
@@ -1845,7 +1845,6 @@ int libfsntfs_internal_volume_read_security_descriptors(
 		}
 		if( libfsntfs_security_descriptor_index_read_sii_index(
 		     internal_volume->security_descriptor_index,
-		     internal_volume->io_handle,
 		     file_io_handle,
 		     mft_entry,
 		     error ) != 1 )
@@ -3393,7 +3392,6 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
 		     directory_entries_tree,
 		     *mft_entry,
-		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     0,
 		     error ) != 1 )
@@ -3820,7 +3818,6 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
 		     directory_entries_tree,
 		     *mft_entry,
-		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     0,
 		     error ) != 1 )

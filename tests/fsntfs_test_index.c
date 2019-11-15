@@ -53,20 +53,41 @@ uint8_t fsntfs_test_index_data1[ 88 ] = {
 int fsntfs_test_index_initialize(
      void )
 {
-	libcerror_error_t *error        = NULL;
-	libfsntfs_index_t *index        = NULL;
-	int result                      = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_index_t *index         = NULL;
+	libfsntfs_io_handle_t *io_handle = NULL;
+	int result                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests = 3;
-	int number_of_memset_fail_tests = 1;
-	int test_number                 = 0;
+	int number_of_malloc_fail_tests  = 3;
+	int number_of_memset_fail_tests  = 1;
+	int test_number                  = 0;
 #endif
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test regular cases
 	 */
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -105,6 +126,7 @@ int fsntfs_test_index_initialize(
 	 */
 	result = libfsntfs_index_initialize(
 	          NULL,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -125,6 +147,7 @@ int fsntfs_test_index_initialize(
 
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -146,6 +169,7 @@ int fsntfs_test_index_initialize(
 	result = libfsntfs_index_initialize(
 	          &index,
 	          NULL,
+	          (uint8_t *) "$I30",
 	          5,
 	          &error );
 
@@ -163,6 +187,26 @@ int fsntfs_test_index_initialize(
 
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
+	          NULL,
+	          5,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_index_initialize(
+	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
@@ -191,6 +235,7 @@ int fsntfs_test_index_initialize(
 
 		result = libfsntfs_index_initialize(
 		          &index,
+		          io_handle,
 		          (uint8_t *) "$I30",
 		          5,
 		          &error );
@@ -235,6 +280,7 @@ int fsntfs_test_index_initialize(
 
 		result = libfsntfs_index_initialize(
 		          &index,
+		          io_handle,
 		          (uint8_t *) "$I30",
 		          5,
 		          &error );
@@ -277,6 +323,7 @@ int fsntfs_test_index_initialize(
 
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -306,6 +353,25 @@ int fsntfs_test_index_initialize(
 #endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
+	/* Clean up
+	 */
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -318,6 +384,12 @@ on_error:
 	{
 		libfsntfs_index_free(
 		 &index,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	return( 0 );
@@ -429,6 +501,7 @@ int fsntfs_test_index_set_index_root_attribute(
 
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -504,6 +577,7 @@ int fsntfs_test_index_set_index_root_attribute(
 	 */
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -707,6 +781,7 @@ int fsntfs_test_index_set_index_allocation_attribute(
 
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );
@@ -782,6 +857,7 @@ int fsntfs_test_index_set_index_allocation_attribute(
 	 */
 	result = libfsntfs_index_initialize(
 	          &index,
+	          io_handle,
 	          (uint8_t *) "$I30",
 	          5,
 	          &error );

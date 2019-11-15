@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_profiler.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -53,6 +53,12 @@ struct libfsntfs_io_handle
 	/* The number of bytes per sector
 	 */
 	uint16_t bytes_per_sector;
+
+#if defined( HAVE_PROFILER )
+	/* The profiler
+	 */
+	libfsntfs_profiler_t *profiler;
+#endif
 
 	/* Value to indicate if abort was signalled
 	 */

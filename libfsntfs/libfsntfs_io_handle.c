@@ -86,13 +86,56 @@ int libfsntfs_io_handle_initialize(
 		 "%s: unable to clear IO handle.",
 		 function );
 
+		memory_free(
+		 *io_handle );
+
+		*io_handle = NULL;
+
+		return( -1 );
+	}
+#if defined( HAVE_PROFILER )
+	if( libfsntfs_profiler_initialize(
+	     &( ( *io_handle )->profiler ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize profiler.",
+		 function );
+
 		goto on_error;
 	}
+	if( libfsntfs_profiler_open(
+	     ( *io_handle )->profiler,
+	     "profiler.csv",
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open profiler.",
+		 function );
+
+		goto on_error;
+	}
+#endif /* defined( HAVE_PROFILER ) */
+
 	return( 1 );
 
 on_error:
 	if( *io_handle != NULL )
 	{
+#if defined( HAVE_PROFILER )
+		if( ( *io_handle )->profiler != NULL )
+		{
+			libfsntfs_profiler_free(
+			 &( ( *io_handle )->profiler ),
+			 NULL );
+		}
+#endif
 		memory_free(
 		 *io_handle );
 
@@ -124,6 +167,35 @@ int libfsntfs_io_handle_free(
 	}
 	if( *io_handle != NULL )
 	{
+#if defined( HAVE_PROFILER )
+		if( libfsntfs_profiler_close(
+		     ( *io_handle )->profiler,
+		     error ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close profiler.",
+			 function );
+
+			result = -1;
+		}
+		if( libfsntfs_profiler_free(
+		     &( ( *io_handle )->profiler ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free profiler.",
+			 function );
+
+			result = -1;
+		}
+#endif /* defined( HAVE_PROFILER ) */
+
 		memory_free(
 		 *io_handle );
 
@@ -139,7 +211,11 @@ int libfsntfs_io_handle_clear(
      libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_io_handle_clear";
+	static char *function          = "libfsntfs_io_handle_clear";
+
+#if defined( HAVE_PROFILER )
+	libfsntfs_profiler_t *profiler = NULL;
+#endif
 
 	if( io_handle == NULL )
 	{
@@ -152,6 +228,9 @@ int libfsntfs_io_handle_clear(
 
 		return( -1 );
 	}
+#if defined( HAVE_PROFILER )
+	profiler = io_handle->profiler;
+#endif
 	if( memory_set(
 	     io_handle,
 	     0,
@@ -166,6 +245,9 @@ int libfsntfs_io_handle_clear(
 
 		return( -1 );
 	}
+#if defined( HAVE_PROFILER )
+	io_handle->profiler = profiler;
+#endif
 	return( 1 );
 }
 

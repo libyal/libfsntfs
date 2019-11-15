@@ -190,7 +190,7 @@ void libfsntfs_debug_print_index_node_flags(
 	if( ( index_node_flags & 0x00000001UL ) != 0 )
 	{
 		libcnotify_printf(
-		 "\tHas index allocation\n" );
+		 "\tIs branch node\n" );
 	}
 }
 
@@ -340,6 +340,37 @@ const char *libfsntfs_debug_print_attribute_type(
 	return( "Unknown" );
 }
 
+/* Prints the collation type
+ */
+const char *libfsntfs_debug_print_collation_type(
+             uint32_t collation_type )
+{
+	switch( collation_type )
+	{
+		case 0x00000000UL:
+			return( "COLLATION_BINARY" );
+
+		case 0x00000001UL:
+			return( "COLLATION_FILENAME" );
+
+		case 0x00000002UL:
+			return( "COLLATION_UNICODE_STRING" );
+
+		case 0x00000010UL:
+			return( "COLLATION_NTOFS_ULONG" );
+
+		case 0x00000011UL:
+			return( "COLLATION_NTOFS_SID" );
+
+		case 0x00000012UL:
+			return( "COLLATION_NTOFS_SECURITY_HASH" );
+
+		case 0x00000013UL:
+			return( "COLLATION_NTOFS_ULONGS" );
+	}
+	return( "Unknown" );
+}
+
 /* Prints the file name attribute namespace
  */
 const char *libfsntfs_debug_print_file_name_attribute_namespace(
@@ -467,9 +498,9 @@ int libfsntfs_debug_print_guid_value(
      uint32_t string_format_flags,
      libcerror_error_t **error )
 {
-        system_character_t guid_string[ 48 ];
+	system_character_t guid_string[ 48 ];
 
-        libfguid_identifier_t *guid = NULL;
+	libfguid_identifier_t *guid = NULL;
 	static char *function       = "libfsntfs_debug_print_guid_value";
 
 	if( libfguid_identifier_initialize(

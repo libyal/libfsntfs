@@ -53,7 +53,7 @@ struct libfsntfs_internal_attribute
 
 	/* The item value
 	 */
-        intptr_t *value;
+	intptr_t *value;
 
 	/* The item free value function
 	 */

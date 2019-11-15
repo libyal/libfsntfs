@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
@@ -54,7 +53,6 @@ int libfsntfs_directory_free(
 
 int libfsntfs_directory_read_file_io_handle(
      libfsntfs_directory_t *directory,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
      uint8_t flags,

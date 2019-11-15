@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_index_node.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
@@ -39,25 +40,9 @@ typedef struct libfsntfs_index_entry libfsntfs_index_entry_t;
 
 struct libfsntfs_index_entry
 {
-	/* The data
+	/* The index node
 	 */
-	uint8_t *data;
-
-	/* The data size
-	 */
-	size_t data_size;
-
-	/* The values data
-	 */
-	uint8_t *values_data;
-
-	/* The values data offset
-	 */
-	size_t values_data_offset;
-
-	/* The values data size
-	 */
-	size_t values_data_size;
+	libfsntfs_index_node_t *node;
 };
 
 int libfsntfs_index_entry_initialize(
@@ -75,13 +60,6 @@ int libfsntfs_index_entry_read(
      off64_t file_offset,
      uint32_t index_entry_size,
      uint32_t index_entry_index,
-     libcerror_error_t **error );
-
-int libfsntfs_index_entry_read_index_values(
-     libfsntfs_index_entry_t *index_entry,
-     off64_t index_entry_offset,
-     int *index_value_entry,
-     libcdata_array_t **index_values_array,
      libcerror_error_t **error );
 
 int libfsntfs_index_entry_read_element_data(

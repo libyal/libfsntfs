@@ -25,10 +25,11 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_index_node.h"
+#include "libfsntfs_index_root_header.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
@@ -42,6 +43,10 @@ typedef struct libfsntfs_index libfsntfs_index_t;
 
 struct libfsntfs_index
 {
+	/* The IO handle
+	 */
+	libfsntfs_io_handle_t *io_handle;
+
 	/* The name
 	 */
 	uint8_t *name;
@@ -70,17 +75,21 @@ struct libfsntfs_index
 	 */
 	libfsntfs_mft_attribute_t *bitmap_attribute;
 
-	/* The root values array
+	/* The root header
 	 */
-	libcdata_array_t *root_values_array;
+	libfsntfs_index_root_header_t *root_header;
+
+	/* The root node
+	 */
+	libfsntfs_index_node_t *root_node;
 
 	/* The index entry vector
 	 */
 	libfdata_vector_t *index_entry_vector;
 
-	/* The index entry cache
+	/* The index node cache
 	 */
-	libfcache_cache_t *index_entry_cache;
+	libfcache_cache_t *index_node_cache;
 
 	/* The index value list
 	 */
@@ -97,6 +106,7 @@ struct libfsntfs_index
 
 int libfsntfs_index_initialize(
      libfsntfs_index_t **index,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *name,
      size_t name_size,
      libcerror_error_t **error );
@@ -122,28 +132,34 @@ int libfsntfs_index_set_bitmap_attribute(
 
 int libfsntfs_index_read(
      libfsntfs_index_t *index,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_index_read_root(
      libfsntfs_index_t *index,
-     libfsntfs_io_handle_t *io_handle,
      libcerror_error_t **error );
 
 int libfsntfs_index_read_bitmap(
      libfsntfs_index_t *index,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
      libcerror_error_t **error );
 
+int libfsntfs_index_get_sub_node(
+     libfsntfs_index_t *index,
+     libbfio_handle_t *file_io_handle,
+     libfcache_cache_t *index_node_cache,
+     off64_t index_entry_offset,
+     int sub_node_vcn,
+     libfsntfs_index_node_t **index_node,
+     libcerror_error_t **error );
+
 int libfsntfs_index_read_sub_nodes(
      libfsntfs_index_t *index,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libcdata_array_t *node_values_array,
+     libfsntfs_index_node_t *index_node,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libfsntfs_index_read_index_value_element_data(

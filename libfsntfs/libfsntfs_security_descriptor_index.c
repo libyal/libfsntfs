@@ -229,7 +229,6 @@ int libfsntfs_security_descriptor_index_free(
  */
 int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error )
@@ -268,7 +267,6 @@ int libfsntfs_security_descriptor_index_read_sii_index(
 	}
 	if( libfsntfs_index_read(
 	     mft_entry->sii_index,
-	     io_handle,
 	     file_io_handle,
 	     0,
 	     error ) != 1 )

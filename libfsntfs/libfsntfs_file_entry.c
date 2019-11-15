@@ -166,7 +166,6 @@ int libfsntfs_file_entry_initialize(
 			}
 			if( libfsntfs_directory_read_file_io_handle(
 			     internal_file_entry->directory,
-			     io_handle,
 			     file_io_handle,
 			     mft_entry,
 			     flags,
@@ -326,7 +325,7 @@ int libfsntfs_file_entry_free(
 			}
 		}
 		/* The reparse_point_attribute, security_descriptor_attribute and standard_information_attribute references are managed by the attributes_array
-                 */
+		 */
 		if( internal_file_entry->attributes_array != NULL )
 		{
 			if( libcdata_array_free(

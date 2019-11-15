@@ -155,7 +155,7 @@ int libfsntfs_index_value_free(
  */
 size_t libfsntfs_index_value_read(
         libfsntfs_index_value_t *index_value,
-        off64_t index_value_offset,
+        off64_t index_value_vcn_offset,
         int *index_value_entry,
         const uint8_t *data,
         size_t data_size,
@@ -243,7 +243,7 @@ size_t libfsntfs_index_value_read(
 
 		return( -1 );
 	}
-	index_value->offset = index_value_offset;
+	index_value->offset = index_value_vcn_offset;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -283,6 +283,13 @@ size_t libfsntfs_index_value_read(
 		 *index_value_entry,
 		 index_value->file_reference & 0xffffffffffffUL,
 		 index_value->file_reference >> 48 );
+
+		libcnotify_printf(
+		 "%s: index value: %03d offset\t\t\t: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
+		 *index_value_entry,
+		 index_value->offset,
+		 index_value->offset );
 
 		libcnotify_printf(
 		 "%s: index value: %03d size\t\t\t: %" PRIu16 "\n",
@@ -508,65 +515,4 @@ on_error:
 
 	return( -1 );
 }
-
-#if defined( HAVE_DEBUG_OUTPUT )
-
-/* Debug prints the index value
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_value_print(
-     libfsntfs_index_value_t *index_value,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_value_print";
-
-	if( index_value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index value.",
-		 function );
-
-		return( -1 );
-	}
-	libcnotify_printf(
-	 "%s: file reference\t\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-	 function,
-	 index_value->file_reference & 0xffffffffffffUL,
-	 index_value->file_reference >> 48 );
-
-	libcnotify_printf(
-	 "%s: size\t\t\t\t\t: %" PRIu16 "\n",
-	 function,
-	 index_value->size );
-
-	libcnotify_printf(
-	 "%s: key data size\t\t\t\t: %" PRIu16 "\n",
-	 function,
-	 index_value->key_data_size );
-
-	libcnotify_printf(
-	 "%s: flags\t\t\t\t\t: 0x%08" PRIx32 "\n",
-	 function,
-	 index_value->flags );
-	libfsntfs_debug_print_index_value_flags(
-	 index_value->flags );
-	libcnotify_printf(
-	 "\n" );
-
-	libcnotify_printf(
-	 "%s: sub node VCN\t\t\t\t: %" PRIu64 "\n",
-	 function,
-	 index_value->sub_node_vcn );
-
-/* TODO add more debug information */
-	libcnotify_printf(
-	 "\n" );
-
-	return( 1 );
-}
-
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

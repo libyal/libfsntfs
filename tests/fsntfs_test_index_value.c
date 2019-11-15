@@ -457,12 +457,6 @@ int main(
 	 "libfsntfs_index_value_read",
 	 fsntfs_test_index_value_read );
 
-#if defined( HAVE_DEBUG_OUTPUT )
-
-	/* TODO: add tests for libfsntfs_index_value_print */
-
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );

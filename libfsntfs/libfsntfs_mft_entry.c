@@ -2099,6 +2099,7 @@ on_error:
  */
 int libfsntfs_mft_entry_append_index(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *utf8_string,
      size_t utf8_string_size,
      libfsntfs_index_t **index,
@@ -2121,6 +2122,7 @@ int libfsntfs_mft_entry_append_index(
 	}
 	if( libfsntfs_index_initialize(
 	     index,
+	     io_handle,
 	     utf8_string,
 	     utf8_string_size,
 	     error ) != 1 )
@@ -2662,6 +2664,7 @@ int libfsntfs_mft_entry_append_attribute(
 		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ALLOCATION:
 			if( libfsntfs_mft_entry_append_index_allocation_attribute(
 			     mft_entry,
+			     io_handle,
 			     attribute,
 			     error ) != 1 )
 			{
@@ -2679,6 +2682,7 @@ int libfsntfs_mft_entry_append_attribute(
 		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT:
 			if( libfsntfs_mft_entry_append_index_root_attribute(
 			     mft_entry,
+			     io_handle,
 			     attribute,
 			     error ) != 1 )
 			{
@@ -3057,6 +3061,7 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
  */
 int libfsntfs_mft_entry_append_index_allocation_attribute(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
@@ -3140,6 +3145,7 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
 	{
 		if( libfsntfs_mft_entry_append_index(
 		     mft_entry,
+		     io_handle,
 		     utf8_attribute_name,
 		     utf8_attribute_name_size,
 		     &index,
@@ -3177,6 +3183,7 @@ int libfsntfs_mft_entry_append_index_allocation_attribute(
  */
 int libfsntfs_mft_entry_append_index_root_attribute(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
@@ -3260,6 +3267,7 @@ int libfsntfs_mft_entry_append_index_root_attribute(
 	{
 		if( libfsntfs_mft_entry_append_index(
 		     mft_entry,
+		     io_handle,
 		     utf8_attribute_name,
 		     utf8_attribute_name_size,
 		     &index,

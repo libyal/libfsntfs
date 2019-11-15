@@ -47,7 +47,7 @@ struct libfsntfs_security_descriptor_index_value
 
 	/* The data offset
 	 */
-        uint64_t data_offset;
+	uint64_t data_offset;
 
 	/* The data size
 	 */

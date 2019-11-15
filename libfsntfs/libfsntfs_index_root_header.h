@@ -43,6 +43,10 @@ struct libfsntfs_index_root_header
 	/* The attribute type
 	 */
 	uint32_t attribute_type;
+
+	/* The collation type
+	 */
+	uint32_t collation_type;
 };
 
 int libfsntfs_index_root_header_initialize(

@@ -200,6 +200,10 @@ int libfsntfs_index_root_header_read_data(
 	 index_root_header->attribute_type );
 
 	byte_stream_copy_to_uint32_little_endian(
+	 ( (fsntfs_index_root_header_t *) data )->collation_type,
+	 index_root_header->collation_type );
+
+	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_index_root_header_t *) data )->index_entry_size,
 	 index_root_header->index_entry_size );
 
@@ -213,13 +217,12 @@ int libfsntfs_index_root_header_read_data(
 		 libfsntfs_debug_print_attribute_type(
 		  index_root_header->attribute_type ) );
 
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_index_root_header_t *) data )->collating_type,
-		 value_32bit );
 		libcnotify_printf(
-		 "%s: collating type\t\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: collation type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
-		 value_32bit );
+		 index_root_header->collation_type,
+		 libfsntfs_debug_print_collation_type(
+		  index_root_header->collation_type ) );
 
 		libcnotify_printf(
 		 "%s: index entry size\t\t\t\t: %" PRIu32 "\n",

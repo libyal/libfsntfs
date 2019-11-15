@@ -30,7 +30,7 @@
 #include "libfsntfs_fixup_values.h"
 #include "libfsntfs_index_entry.h"
 #include "libfsntfs_index_entry_header.h"
-#include "libfsntfs_index_node_header.h"
+#include "libfsntfs_index_node.h"
 #include "libfsntfs_index_value.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -128,6 +128,7 @@ int libfsntfs_index_entry_free(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_index_entry_free";
+	int result            = 1;
 
 	if( index_entry == NULL )
 	{
@@ -142,17 +143,28 @@ int libfsntfs_index_entry_free(
 	}
 	if( *index_entry != NULL )
 	{
-		if( ( *index_entry )->data != NULL )
+		if( ( *index_entry )->node != NULL )
 		{
-			memory_free(
-			 ( *index_entry )->data );
+			if( libfsntfs_index_node_free(
+			     &( ( *index_entry )->node ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free index node.",
+				 function );
+
+				result = -1;
+			}
 		}
 		memory_free(
 		 *index_entry );
 
 		*index_entry = NULL;
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Reads the index entry
@@ -164,21 +176,20 @@ int libfsntfs_index_entry_read(
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
      uint32_t index_entry_size,
-     uint32_t index_entry_index LIBFSNTFS_ATTRIBUTE_UNUSED,
+     uint32_t index_entry_index,
      libcerror_error_t **error )
 {
 	libfsntfs_index_entry_header_t *index_entry_header = NULL;
-	libfsntfs_index_node_header_t *index_node_header   = NULL;
+	uint8_t *index_entry_data                          = NULL;
 	static char *function                              = "libfsntfs_index_entry_read";
 	size_t data_offset                                 = 0;
+	size_t index_node_size                             = 0;
+	size_t index_values_offset                         = 0;
 	size_t unknown_data_size                           = 0;
 	ssize_t read_count                                 = 0;
-	uint32_t index_node_size                           = 0;
-	uint32_t index_values_offset                       = 0;
+	off64_t index_value_vcn_offset                     = 0;
 	uint16_t fixup_values_offset                       = 0;
 	uint16_t number_of_fixup_values                    = 0;
-
-	LIBFSNTFS_UNREFERENCED_PARAMETER( index_entry_index )
 
 	if( index_entry == NULL )
 	{
@@ -191,13 +202,13 @@ int libfsntfs_index_entry_read(
 
 		return( -1 );
 	}
-	if( index_entry->data != NULL )
+	if( index_entry->node != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index entry - data value already set.",
+		 "%s: invalid index entry - node value already set.",
 		 function );
 
 		return( -1 );
@@ -213,7 +224,7 @@ int libfsntfs_index_entry_read(
 
 		return( -1 );
 	}
-	if( index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_entry_header_t ) ) )
+	if( index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -251,10 +262,10 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	index_entry->data = (uint8_t *) memory_allocate(
-	                                 sizeof( uint8_t ) * index_entry_size );
+	index_entry_data = (uint8_t *) memory_allocate(
+	                                sizeof( uint8_t ) * index_entry_size );
 
-	if( index_entry->data == NULL )
+	if( index_entry_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -265,15 +276,13 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	index_entry->data_size = (size_t) index_entry_size;
-
 	read_count = libbfio_handle_read_buffer(
 	              file_io_handle,
-	              index_entry->data,
-	              index_entry->data_size,
+	              index_entry_data,
+	              (size_t) index_entry_size,
 	              error );
 
-	if( read_count != (ssize_t) index_entry->data_size )
+	if( read_count != (ssize_t) index_entry_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -299,8 +308,8 @@ int libfsntfs_index_entry_read(
 	}
 	if( libfsntfs_index_entry_header_read_data(
 	     index_entry_header,
-	     index_entry->data,
-	     index_entry->data_size,
+	     index_entry_data,
+	     (size_t) index_entry_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -312,23 +321,26 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_index_node_header_initialize(
-	     &index_node_header,
+	data_offset = sizeof( fsntfs_index_entry_header_t );
+
+	if( libfsntfs_index_node_initialize(
+	     &( index_entry->node ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index node header.",
+		 "%s: unable to create index node.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfsntfs_index_node_header_read_data(
-	     index_node_header,
-	     &( index_entry->data[ sizeof( fsntfs_index_entry_header_t ) ] ),
-	     index_entry->data_size - sizeof( fsntfs_index_entry_header_t ),
+	if( libfsntfs_index_node_read_header(
+	     index_entry->node,
+	     index_entry_data,
+	     (size_t) index_entry_size,
+	     data_offset,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -340,37 +352,7 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
-/* TODO check bounds of index_values_offset */
-	index_values_offset = index_node_header->index_values_offset + (uint32_t) sizeof( fsntfs_index_entry_header_t );
-	index_node_size     = index_node_header->size;
-
-	if( libfsntfs_index_node_header_free(
-	     &index_node_header,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free index node header.",
-		 function );
-
-		goto on_error;
-	}
-	if( (ssize_t) index_node_size < sizeof( fsntfs_index_node_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid index node size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	index_node_size -= (uint32_t) sizeof( fsntfs_index_node_header_t );
-
-	data_offset = sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t );
+	data_offset += sizeof( fsntfs_index_node_header_t );
 
 	if( libfsntfs_index_entry_header_get_fixup_values_offset(
 	     index_entry_header,
@@ -386,6 +368,9 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
+/* TODO check bounds of index_values_offset */
+	index_values_offset = (size_t) index_entry->node->header->index_values_offset + sizeof( fsntfs_index_entry_header_t );
+
 	if( fixup_values_offset > index_values_offset )
 	{
 		libcerror_error_set(
@@ -408,7 +393,7 @@ int libfsntfs_index_entry_read(
 			 "%s: unknown data:\n",
 			 function );
 			libcnotify_print_data(
-			 &( index_entry->data[ data_offset ] ),
+			 &( index_entry_data[ data_offset ] ),
 			 unknown_data_size,
 			 0 );
 		}
@@ -432,8 +417,8 @@ int libfsntfs_index_entry_read(
 	if( number_of_fixup_values > 0 )
 	{
 		if( libfsntfs_fixup_values_apply(
-		     index_entry->data,
-		     index_entry->data_size,
+		     index_entry_data,
+		     (size_t) index_entry_size,
 		     fixup_values_offset,
 		     number_of_fixup_values,
 		     error ) != 1 )
@@ -462,6 +447,28 @@ int libfsntfs_index_entry_read(
 
 		goto on_error;
 	}
+	index_value_vcn_offset = (off64_t) index_entry_index * index_entry_size;
+
+	if( libfsntfs_index_node_read_values(
+	     index_entry->node,
+	     index_value_vcn_offset,
+	     index_entry_data,
+	     (size_t) index_entry_size,
+	     data_offset,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read index node values.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO refactor */
+	index_node_size = (size_t) index_entry->node->header->size - sizeof( fsntfs_index_node_header_t );
+
 	if( data_offset < (size_t) index_values_offset )
 	{
 		unknown_data_size = (size_t) index_values_offset - data_offset;
@@ -473,42 +480,41 @@ int libfsntfs_index_entry_read(
 			 "%s: unknown data:\n",
 			 function );
 			libcnotify_print_data(
-			 &( index_entry->data[ data_offset ] ),
+			 &( index_entry_data[ data_offset ] ),
 			 unknown_data_size,
 			 0 );
 		}
 #endif
 		data_offset     += unknown_data_size;
-		index_node_size -= (uint32_t) unknown_data_size;
+		index_node_size -= unknown_data_size;
 	}
-	index_entry->values_data        = &( index_entry->data[ index_values_offset ] );
-	index_entry->values_data_offset = (size_t) index_values_offset;
-	index_entry->values_data_size   = (size_t) index_node_size;
-
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		data_offset += (size_t) index_node_size;
+		data_offset += index_node_size;
 
-		if( data_offset < index_entry->data_size )
+		if( data_offset < (size_t) index_entry_size )
 		{
 			libcnotify_printf(
 			 "%s: trailing data:\n",
 			 function );
 			libcnotify_print_data(
-			 &( index_entry->data[ data_offset ] ),
-			 index_entry->data_size - data_offset,
+			 &( index_entry_data[ data_offset ] ),
+			 (size_t) index_entry_size - data_offset,
 			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 	}
 #endif
+	memory_free(
+	 index_entry_data );
+
 	return( 1 );
 
 on_error:
-	if( index_node_header != NULL )
+	if( index_entry->node != NULL )
 	{
-		libfsntfs_index_node_header_free(
-		 &index_node_header,
+		libfsntfs_index_node_free(
+		 &( index_entry->node ),
 		 NULL );
 	}
 	if( index_entry_header != NULL )
@@ -517,152 +523,10 @@ on_error:
 		 &index_entry_header,
 		 NULL );
 	}
-	if( index_entry->data != NULL )
+	if( index_entry_data != NULL )
 	{
 		memory_free(
-		 index_entry->data );
-
-		index_entry->data = NULL;
-	}
-	index_entry->data_size = 0;
-
-	return( -1 );
-}
-
-/* Reads the index values
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_entry_read_index_values(
-     libfsntfs_index_entry_t *index_entry,
-     off64_t index_entry_offset,
-     int *index_value_entry,
-     libcdata_array_t **index_values_array,
-     libcerror_error_t **error )
-{
-	libfsntfs_index_value_t *index_value = NULL;
-	static char *function                = "libfsntfs_index_entry_read_index_values";
-	size_t index_value_data_offset       = 0;
-	ssize_t read_count                   = 0;
-	int entry_index                      = 0;
-
-	if( index_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( libcdata_array_initialize(
-	     index_values_array,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index values array.",
-		 function );
-
-		goto on_error;
-	}
-	index_entry_offset += index_entry->values_data_offset;
-
-	while( index_value_data_offset < index_entry->values_data_size )
-	{
-		if( libfsntfs_index_value_initialize(
-		     &index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create index value.",
-			 function );
-
-			goto on_error;
-		}
-		read_count = libfsntfs_index_value_read(
-			      index_value,
-			      index_entry_offset,
-			      index_value_entry,
-			      index_entry->values_data,
-			      index_entry->values_data_size,
-			      index_value_data_offset,
-			      error );
-
-		if( read_count == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read index value.",
-			 function );
-
-			goto on_error;
-		}
-		index_value_data_offset += read_count;
-		index_entry_offset      += read_count;
-
-		if( libcdata_array_append_entry(
-		     *index_values_array,
-		     &entry_index,
-		     (intptr_t *) index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append index value to array.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
-		{
-			break;
-		}
-		index_value = NULL;
-	}
-	index_value = NULL;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( index_value_data_offset < index_entry->values_data_size )
-	{
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: index values trailing data:\n",
-			 function );
-			libcnotify_print_data(
-			 &( index_entry->values_data[ index_value_data_offset ] ),
-			 index_entry->values_data_size - index_value_data_offset,
-			 0 );
-		}
-	}
-#endif
-	return( 1 );
-
-on_error:
-	if( index_value != NULL )
-	{
-		libfsntfs_index_value_free(
-		 &index_value,
-		 NULL );
-	}
-	if( index_values_array != NULL )
-	{
-		libcdata_array_free(
-		 index_values_array,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_value_free,
-		 NULL );
+		 index_entry_data );
 	}
 	return( -1 );
 }
@@ -728,9 +592,11 @@ int libfsntfs_index_entry_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read index entry: %d.",
+		 "%s: unable to read index entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 element_index );
+		 element_index,
+		 index_entry_offset,
+		 index_entry_offset );
 
 		goto on_error;
 	}
@@ -739,8 +605,8 @@ int libfsntfs_index_entry_read_element_data(
 	     (intptr_t *) file_io_handle,
 	     cache,
 	     element_index,
-	     (intptr_t *) index_entry,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_entry_free,
+	     (intptr_t *) index_entry->node,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_node_free,
 	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
@@ -748,7 +614,22 @@ int libfsntfs_index_entry_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set index entry as element value.",
+		 "%s: unable to set index node as element value.",
+		 function );
+
+		goto on_error;
+	}
+	index_entry->node = NULL;
+
+	if( libfsntfs_index_entry_free(
+	     &index_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free index entry.",
 		 function );
 
 		goto on_error;

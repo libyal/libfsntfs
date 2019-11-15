@@ -37,7 +37,6 @@ extern "C" {
 int libfsntfs_directory_entries_tree_read_from_mft_entry(
      libcdata_btree_t *directory_entries_tree,
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
      libcerror_error_t **error );

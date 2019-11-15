@@ -1,6 +1,5 @@
 TODO
 * refactor $I30 index to file entry
-** store index root header in index?
 ** remove libfsntfs_mft_entry_append_index
 ** remove libfsntfs_mft_entry_get_index_by_utf8_name
 ** remove libfsntfs_mft_entry_append_index_allocation_attribute
@@ -9,7 +8,13 @@ TODO
 ** remove libfsntfs_index_set_index_root_attribute, libfsntfs_index_set_index_allocation_attribute, libfsntfs_index_set_bitmap_attribute
 ** remove libfsntfs_index_compare_name_with_utf8_string
 ** refactor libfsntfs_mft_entry_has_directory_entries_index
-* refactor index to resolve on demand
+
+* refactor index to better handle get entry by identifier
+** make index value cache a passthrough for index node cache
+** use tree for get entry by filename
+** use tree for get entry by security identifier
+** remove the need for a local cache in libfsntfs_index_read_sub_nodes, use cache value lock instead
+
 * refactor libfsntfs_mft_attribute_append_to_chain
 
 * remove libfsntfs_attribute_get_file_reference?

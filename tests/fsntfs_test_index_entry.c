@@ -299,8 +299,6 @@ int main(
 
 	/* TODO: add tests for libfsntfs_index_entry_read */
 
-	/* TODO: add tests for libfsntfs_index_entry_read_index_values */
-
 	/* TODO: add tests for libfsntfs_index_entry_read_element_data */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
