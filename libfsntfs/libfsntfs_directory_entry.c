@@ -172,57 +172,6 @@ int libfsntfs_directory_entry_free(
 	return( result );
 }
 
-/* Frees a directory entry with a short name
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_directory_entry_free_short_name(
-     libfsntfs_directory_entry_t **directory_entry,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_directory_entry_free_short_name";
-	int result            = 1;
-
-	if( directory_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid directory entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( *directory_entry != NULL )
-	{
-		if( ( *directory_entry )->file_name_values == NULL )
-		{
-			if( ( *directory_entry )->short_file_name_values != NULL )
-			{
-				if( libfsntfs_file_name_values_free(
-				     &( ( *directory_entry )->short_file_name_values ),
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free short file name values.",
-					 function );
-
-					result = -1;
-				}
-/* TODO alert short file name was set without long file name */
-				result = -1;
-			}
-			memory_free(
-			 *directory_entry );
-		}
-		*directory_entry = NULL;
-	}
-	return( result );
-}
-
 /* Clones a directory entry
  * Returns 1 if successful or -1 on error
  */
@@ -375,59 +324,6 @@ int libfsntfs_directory_entry_compare_by_file_reference(
 		return( LIBCDATA_COMPARE_GREATER );
 	}
 	return( LIBCDATA_COMPARE_EQUAL );
-}
-
-/* Compares 2 directory entries by name
- * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
- */
-int libfsntfs_directory_entry_compare_by_name(
-     libfsntfs_directory_entry_t *first_directory_entry,
-     libfsntfs_directory_entry_t *second_directory_entry,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_directory_entry_compare_by_name";
-	int result            = 0;
-
-	if( first_directory_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid first directory entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( second_directory_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid second directory entry.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfsntfs_file_name_values_compare(
-	          first_directory_entry->file_name_values,
-	          second_directory_entry->file_name_values,
-	          1,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to compare file name values.",
-		 function );
-
-		return( -1 );
-	}
-	return( result );
 }
 
 /* Retrieves the MFT entry index

@@ -160,7 +160,7 @@ int libfsntfs_directory_entries_tree_free(
 		{
 			if( libcdata_btree_free(
 			     &( ( *directory_entries_tree )->short_names_tree ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free_short_name,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -318,8 +318,7 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 	}
 	file_name_namespace = file_name_values->name_namespace;
 
-	if( ( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
-	 || ( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS ) )
+	if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
 	{
 		if( libfsntfs_directory_entry_initialize(
 		     &directory_entry,
@@ -334,16 +333,9 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 
 			goto on_error;
 		}
-		directory_entry->file_reference = index_value->file_reference;
+		directory_entry->file_reference         = index_value->file_reference;
+		directory_entry->short_file_name_values = file_name_values;
 
-		if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
-		{
-			directory_entry->short_file_name_values = file_name_values;
-		}
-		else
-		{
-			directory_entry->file_name_values = file_name_values;
-		}
 		file_name_values = NULL;
 
 		result = libcdata_btree_insert_value(
@@ -874,7 +866,7 @@ on_error:
 	{
 		libcdata_btree_free(
 		 &( directory_entries_tree->short_names_tree ),
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free_short_name,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 		 NULL );
 	}
 	if( directory_entries_tree->entries_cache != NULL )
@@ -1353,15 +1345,17 @@ int libfsntfs_directory_entries_tree_read_element_data(
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	libfsntfs_directory_entry_t *directory_entry   = NULL;
-	libfsntfs_file_name_values_t *file_name_values = NULL;
-	libfsntfs_index_node_t *sub_node               = NULL;
-	libfsntfs_index_value_t *index_value           = NULL;
-	static char *function                          = "libfsntfs_directory_entries_tree_read_element_data";
-	off64_t index_entry_offset                     = 0;
-	off64_t sub_node_vcn                           = 0;
-	uint8_t file_name_namespace                    = 0;
-	int index_value_entry                          = 0;
+	libcdata_tree_node_t *upper_node                      = NULL;
+	libfsntfs_directory_entry_t *directory_entry          = NULL;
+	libfsntfs_directory_entry_t *existing_directory_entry = NULL;
+	libfsntfs_index_node_t *sub_node                      = NULL;
+	libfsntfs_index_value_t *index_value                  = NULL;
+	static char *function                                 = "libfsntfs_directory_entries_tree_read_element_data";
+	off64_t index_entry_offset                            = 0;
+	off64_t sub_node_vcn                                  = 0;
+	uint8_t file_name_namespace                           = 0;
+	int index_value_entry                                 = 0;
+	int result                                            = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_size )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
@@ -1489,36 +1483,6 @@ int libfsntfs_directory_entries_tree_read_element_data(
 			goto on_error;
 		}
 	}
-	if( libfsntfs_file_name_values_initialize(
-	     &file_name_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file name values.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_name_values_read_data(
-	     file_name_values,
-	     index_value->key_data,
-	     (size_t) index_value->key_data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file name values.",
-		 function );
-
-		goto on_error;
-	}
-	file_name_namespace = file_name_values->name_namespace;
-
 	if( libfsntfs_directory_entry_initialize(
 	     &directory_entry,
 	     error ) != 1 )
@@ -1532,14 +1496,85 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 		goto on_error;
 	}
-	directory_entry->file_reference   = index_value->file_reference;
-	directory_entry->file_name_values = file_name_values;
-
-	file_name_values = NULL;
-
-	if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+	if( libfsntfs_file_name_values_initialize(
+	     &( directory_entry->file_name_values ),
+	     error ) != 1 )
 	{
-/* TODO look up short file name values */
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file name values.",
+		 function );
+
+		goto on_error;
+	}
+	directory_entry->file_reference = index_value->file_reference;
+
+	if( libfsntfs_file_name_values_read_data(
+	     directory_entry->file_name_values,
+	     index_value->key_data,
+	     (size_t) index_value->key_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read file name values.",
+		 function );
+
+		goto on_error;
+	}
+	if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+	{
+		result = libcdata_btree_get_value_by_value(
+			  directory_entries_tree->short_names_tree,
+			  (intptr_t *) directory_entry,
+			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+			  &upper_node,
+			  (intptr_t **) &existing_directory_entry,
+			  error ) ;
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve directory entry from tree.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			if( existing_directory_entry == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing existing directory entry.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_file_name_values_clone(
+			     &( directory_entry->short_file_name_values ),
+			     existing_directory_entry->short_file_name_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to clone short file name values.",
+				 function );
+
+				goto on_error;
+			}
+		}
 	}
 /* TODO remove free function after pinning to libfcache >= 20191115 */
 	if( libfdata_list_element_set_element_value(
@@ -1567,12 +1602,6 @@ on_error:
 	{
 		libfsntfs_directory_entry_free(
 		 &directory_entry,
-		 NULL );
-	}
-	if( file_name_values != NULL )
-	{
-		libfsntfs_file_name_values_free(
-		 &file_name_values,
 		 NULL );
 	}
 	return( -1 );
