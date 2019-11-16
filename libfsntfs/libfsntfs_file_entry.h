@@ -183,7 +183,7 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_parent_file_reference(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *file_reference,
+     uint64_t *parent_file_reference,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

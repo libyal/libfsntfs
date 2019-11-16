@@ -26,6 +26,9 @@
 
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_index.h"
+#include "libfsntfs_index_node.h"
+#include "libfsntfs_index_value.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
@@ -189,6 +192,22 @@ int libfsntfs_security_descriptor_index_free(
 	}
 	if( *security_descriptor_index != NULL )
 	{
+		if( ( *security_descriptor_index )->sii_index != NULL )
+		{
+			if( libfsntfs_index_free(
+			     &( ( *security_descriptor_index )->sii_index ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free $SII index.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( libcdata_btree_free(
 		     &( ( *security_descriptor_index )->security_descriptors_index_values_tree ),
 		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_security_descriptor_index_value_free,
@@ -224,22 +243,20 @@ int libfsntfs_security_descriptor_index_free(
 	return( result );
 }
 
-/* Reads the security descriptor identifier ($SII) index
- * Returns 1 if successful or -1 on error
+/* Inserts an index value into the security descriptor index
+ * Returns 1 if a security descriptor was inserted, 0 if not or -1 on error
  */
-int libfsntfs_security_descriptor_index_read_sii_index(
+int libfsntfs_security_descriptor_index_insert_index_value(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
-     libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_entry_t *mft_entry,
+     int index_value_entry,
+     libfsntfs_index_value_t *index_value,
+     uint32_t index_value_flags,
      libcerror_error_t **error )
 {
 	libcdata_tree_node_t *upper_node                                             = NULL;
-	libfsntfs_index_value_t *index_value                                         = NULL;
 	libfsntfs_security_descriptor_index_value_t *existing_index_value            = NULL;
 	libfsntfs_security_descriptor_index_value_t *security_descriptor_index_value = NULL;
-	static char *function                                                        = "libfsntfs_security_descriptor_index_read_sii_index";
-	int index_value_entry                                                        = 0;
-	int number_of_index_values                                                   = 0;
+	static char *function                                                        = "libfsntfs_security_descriptor_index_insert_index_value";
 	int result                                                                   = 0;
 	int value_index                                                              = 0;
 
@@ -254,22 +271,399 @@ int libfsntfs_security_descriptor_index_read_sii_index(
 
 		return( -1 );
 	}
-	if( mft_entry == NULL )
+	if( index_value == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
+		 "%s: invalid index value.",
 		 function );
 
 		return( -1 );
 	}
-	if( libfsntfs_index_read(
-	     mft_entry->sii_index,
-	     file_io_handle,
-	     0,
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: $SII index value: %d key data:\n",
+		 function,
+		 index_value_entry );
+		libcnotify_print_data(
+		 index_value->key_data,
+		 (size_t) index_value->key_data_size,
+		 0 );
+	}
+#endif
+	if( libfsntfs_security_descriptor_index_value_initialize(
+	     &security_descriptor_index_value,
 	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create security descriptor index value.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_security_descriptor_index_value_read_data(
+	     security_descriptor_index_value,
+	     index_value->value_data,
+	     (size_t) index_value->value_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security descriptor index value.",
+		 function );
+
+		goto on_error;
+	}
+	result = libcdata_btree_insert_value(
+		  security_descriptor_index->security_descriptors_index_values_tree,
+		  &value_index,
+		  (intptr_t *) security_descriptor_index_value,
+		  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_security_descriptor_index_value_compare,
+		  &upper_node,
+		  (intptr_t **) &existing_index_value,
+		  error ) ;
+
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to insert security descriptor index value into tree.",
+		 function );
+
+		goto on_error;
+	}
+	security_descriptor_index_value = NULL;
+
+	return( 1 );
+
+on_error:
+	if( security_descriptor_index_value != NULL )
+	{
+		libfsntfs_security_descriptor_index_value_free(
+		 &security_descriptor_index_value,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the security descriptor index from an index node
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_index_read_from_index_node(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     int recursion_depth,
+     libcerror_error_t **error )
+{
+	libfcache_cache_t *sub_node_cache    = NULL;
+	libfsntfs_index_node_t *sub_node     = NULL;
+	libfsntfs_index_value_t *index_value = NULL;
+	static char *function                = "libfsntfs_security_descriptor_index_read_from_index_node";
+	off64_t index_entry_offset           = 0;
+	uint32_t index_value_flags           = 0;
+	int index_value_entry                = 0;
+	int number_of_index_values           = 0;
+	int result                           = 0;
+
+	if( security_descriptor_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor index.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_index->sii_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor index - missing $SII index.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_index->sii_index->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor index - invalid $SII index - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
+		 function );
+
+		return( -1 );
+        }
+	if( libfsntfs_index_node_get_number_of_values(
+	     index_node,
+	     &number_of_index_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values from index node.",
+		 function );
+
+		goto on_error;
+	}
+	/* Use a local cache to prevent cache invalidation of index node
+	 * when reading sub nodes.
+	 */
+	if( libfcache_cache_initialize(
+	     &sub_node_cache,
+	     1,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub node cache.",
+		 function );
+
+		goto on_error;
+	}
+	for( index_value_entry = 0;
+	     index_value_entry < number_of_index_values;
+	     index_value_entry++ )
+	{
+		if( libfsntfs_index_node_get_value_by_index(
+		     index_node,
+		     index_value_entry,
+		     &index_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value: %d from index node.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		{
+			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: node index value: %d sub node VCN value out of bounds.",
+				 function,
+				 index_value_entry );
+
+				goto on_error;
+			}
+			index_entry_offset = (off64_t) ( index_value->sub_node_vcn * security_descriptor_index->sii_index->io_handle->cluster_block_size );
+
+			if( libfsntfs_index_get_sub_node(
+			     security_descriptor_index->sii_index,
+			     file_io_handle,
+			     sub_node_cache,
+			     index_entry_offset,
+			     (int) index_value->sub_node_vcn,
+			     &sub_node,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset );
+
+				goto on_error;
+			}
+			if( libfsntfs_security_descriptor_index_read_from_index_node(
+			     security_descriptor_index,
+			     file_io_handle,
+			     sub_node,
+			     recursion_depth + 1,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read security descriptor index from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset );
+
+				goto on_error;
+			}
+		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 function,
+			 index_value_entry,
+			 index_value->file_reference & 0xffffffffffffUL,
+			 index_value->file_reference >> 48 );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+		index_value_flags  = 0;
+
+		if( index_node == security_descriptor_index->sii_index->root_node )
+		{
+			index_value_flags = LIBFSNTFS_INDEX_VALUE_LIST_FLAG_STORED_IN_ROOT;
+		}
+		/* Add the index values containing data in a depth first manner since
+		 * this will preserve the sorted by file name order of the security descriptors
+		 */
+		result = libfsntfs_security_descriptor_index_insert_index_value(
+		          security_descriptor_index,
+		          index_value_entry,
+		          index_value,
+		          index_value_flags,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to insert index value into security descriptor index.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfcache_cache_free(
+	     &sub_node_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free sub node cache.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( sub_node_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &sub_node_cache,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the security descriptor identifier ($SII) index
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_security_descriptor_index_read_sii_index(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_security_descriptor_index_read_sii_index";
+	int result            = 0;
+
+	if( security_descriptor_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor index.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_index->sii_index != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid directory entries tree - $SII index value already set.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO pass flags
+	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) != 0 )
+	{
+		return( 1 );
+	}
+*/
+	if( libfsntfs_index_initialize(
+	     &( security_descriptor_index->sii_index ),
+	     io_handle,
+	     (uint8_t *) "$SII",
+	     5,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create $SII index.",
+		 function );
+
+		goto on_error;
+	}
+	result = libfsntfs_index_read(
+	          security_descriptor_index->sii_index,
+	          file_io_handle,
+	          mft_entry,
+	          0,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -280,111 +674,32 @@ int libfsntfs_security_descriptor_index_read_sii_index(
 
 		goto on_error;
 	}
-	if( libfsntfs_index_get_number_of_index_values(
-	     mft_entry->sii_index,
-	     &number_of_index_values,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of $SII index values.",
-		 function );
-
-		goto on_error;
-	}
-	for( index_value_entry = 0;
-	     index_value_entry < number_of_index_values;
-	     index_value_entry++ )
-	{
-		if( libfsntfs_index_get_index_value_by_index(
-		     mft_entry->sii_index,
+		if( libfsntfs_security_descriptor_index_read_from_index_node(
+		     security_descriptor_index,
 		     file_io_handle,
-		     index_value_entry,
-		     &index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve $SII index value: %d.",
-			 function,
-			 index_value_entry );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: $SII index value: %d key data:\n",
-			 function,
-			 index_value_entry );
-			libcnotify_print_data(
-			 index_value->key_data,
-			 (size_t) index_value->key_data_size,
-			 0 );
-		}
-#endif
-		if( libfsntfs_security_descriptor_index_value_initialize(
-		     &security_descriptor_index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create security descriptor index value.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_security_descriptor_index_value_read_data(
-		     security_descriptor_index_value,
-		     index_value->value_data,
-		     (size_t) index_value->value_data_size,
+		     security_descriptor_index->sii_index->root_node,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read security descriptor index value.",
+			 "%s: unable to read security descriptor index from root node.",
 			 function );
 
 			goto on_error;
 		}
-		result = libcdata_btree_insert_value(
-			  security_descriptor_index->security_descriptors_index_values_tree,
-			  &value_index,
-			  (intptr_t *) security_descriptor_index_value,
-			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_security_descriptor_index_value_compare,
-			  &upper_node,
-			  (intptr_t **) &existing_index_value,
-			  error ) ;
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to insert security descriptor index value into tree.",
-			 function );
-
-			goto on_error;
-		}
-		security_descriptor_index_value = NULL;
 	}
 	return( 1 );
 
 on_error:
-	if( security_descriptor_index_value != NULL )
+	if( security_descriptor_index->sii_index != NULL )
 	{
-		libfsntfs_security_descriptor_index_value_free(
-		 &security_descriptor_index_value,
+		libfsntfs_index_free(
+		 &( security_descriptor_index->sii_index ),
 		 NULL );
 	}
 	return( -1 );

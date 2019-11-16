@@ -2306,19 +2306,11 @@ on_error:
 
 /* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name */
 
-/* TODO: add tests for libfsntfs_mft_entry_append_index */
-
-/* TODO: add tests for libfsntfs_mft_entry_get_index_by_name */
-
 /* TODO: add tests for libfsntfs_mft_entry_append_attribute */
 
 /* TODO: add tests for libfsntfs_mft_entry_append_data_attribute */
 
 /* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_name */
-
-/* TODO: add tests for libfsntfs_mft_entry_append_index_allocation_attribute */
-
-/* TODO: add tests for libfsntfs_mft_entry_append_index_root_attribute */
 
 /* TODO: add tests for libfsntfs_mft_entry_set_reparse_point_attribute */
 

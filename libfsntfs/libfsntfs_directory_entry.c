@@ -172,6 +172,57 @@ int libfsntfs_directory_entry_free(
 	return( result );
 }
 
+/* Frees a directory entry with a short name
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_free_short_name(
+     libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_free_short_name";
+	int result            = 1;
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *directory_entry != NULL )
+	{
+		if( ( *directory_entry )->file_name_values == NULL )
+		{
+			if( ( *directory_entry )->short_file_name_values != NULL )
+			{
+				if( libfsntfs_file_name_values_free(
+				     &( ( *directory_entry )->short_file_name_values ),
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free short file name values.",
+					 function );
+
+					result = -1;
+				}
+/* TODO alert short file name was set without long file name */
+				result = -1;
+			}
+			memory_free(
+			 *directory_entry );
+		}
+		*directory_entry = NULL;
+	}
+	return( result );
+}
+
 /* Clones a directory entry
  * Returns 1 if successful or -1 on error
  */
@@ -265,15 +316,15 @@ on_error:
 	return( -1 );
 }
 
-/* Compares 2 directory entries by the file reference
+/* Compares 2 directory entries by file reference
  * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  */
-int libfsntfs_directory_entry_compare(
+int libfsntfs_directory_entry_compare_by_file_reference(
      libfsntfs_directory_entry_t *first_directory_entry,
      libfsntfs_directory_entry_t *second_directory_entry,
      libcerror_error_t **error )
 {
-	static char *function           = "libfsntfs_directory_entry_compare";
+	static char *function           = "libfsntfs_directory_entry_compare_by_file_reference";
 	uint64_t first_mft_entry_index  = 0;
 	uint64_t second_mft_entry_index = 0;
 	uint16_t first_sequence_number  = 0;
@@ -326,6 +377,59 @@ int libfsntfs_directory_entry_compare(
 	return( LIBCDATA_COMPARE_EQUAL );
 }
 
+/* Compares 2 directory entries by name
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
+ */
+int libfsntfs_directory_entry_compare_by_name(
+     libfsntfs_directory_entry_t *first_directory_entry,
+     libfsntfs_directory_entry_t *second_directory_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_compare_by_name";
+	int result            = 0;
+
+	if( first_directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_file_name_values_compare(
+	          first_directory_entry->file_name_values,
+	          second_directory_entry->file_name_values,
+	          1,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to compare file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Retrieves the MFT entry index
  * Returns 1 if successful or -1 on error
  */
@@ -371,6 +475,44 @@ int libfsntfs_directory_entry_get_mft_entry_index(
 	}
 	*mft_entry_index = (int) ( directory_entry->file_reference & 0xffffffffffffUL );
 
+	return( 1 );
+}
+
+/* Retrieves the parent file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_parent_file_reference(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *parent_file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_parent_file_reference";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_parent_file_reference(
+	     directory_entry->file_name_values,
+	     parent_file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent reference from file name values.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

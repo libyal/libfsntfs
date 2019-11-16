@@ -67,6 +67,7 @@ Switched to asccidoc format.
 | 0.0.16 | J.B. Metz | January 2019 | Changes to format.
 | 0.0.17 | J.B. Metz | August 2019 | Additional information regarding volumes created by Windows 10 (1903) and mkntfs.
 | 0.0.18 | J.B. Metz | September 2019 | Additional information regarding WofCompressedData data stream.
+| 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
 |===
 
 :numbered:
@@ -1048,8 +1049,12 @@ In the long name:
 * ignore Unicode characters beyond the first 8-bit (extended ASCII)
 * ignore control characters and spaces (character < 0x20)
 * ignore non-allowed characters (" * + , / : ; < = > ? \)
-* ignore dots except the last one (extension) and one at the start of the name
+* ignore dots except the last one, which is used for the extension
 * make all letters upper case
+
+Additional observations:
+
+* `[` or `]` are replaced by an underscore (`_`)
 
 Make the name unique:
 
@@ -1067,8 +1072,7 @@ case 1: "Program Files" becomes "PROGRA\~1" or " ~PLAYMOVIE.REG" becomes "\~PLAY
 
 case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA~2"
 
-case 3:
-"x86_microsoft-windows-r..ry-editor.resources_31bf3856ad364e35_6.0.6000.16386_en-us_f89a7b0005d42fd4",
+case 3: "x86_microsoft-windows-r..ry-editor.resources_31bf3856ad364e35_6.0.6000.16386_en-us_f89a7b0005d42fd4",
 in a directory with a lot of filenames starting with "x86_microsoft", becomes "X8FCA6~1.163"
 
 === The volume version attribute

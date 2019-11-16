@@ -1919,21 +1919,21 @@ int libfsntfs_mft_attribute_get_next_attribute(
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_mft_attribute_append_to_chain(
-     libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_mft_attribute_t *additional_attribute,
      libfsntfs_mft_attribute_t **first_attribute,
+     libfsntfs_mft_attribute_t *additional_attribute,
      libcerror_error_t **error )
 {
+	libfsntfs_mft_attribute_t *mft_attribute      = NULL;
 	libfsntfs_mft_attribute_t *previous_attribute = NULL;
 	static char *function                         = "libfsntfs_mft_attribute_append_to_chain";
 
-	if( mft_attribute == NULL )
+	if( first_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT attribute.",
+		 "%s: invalid first attribute.",
 		 function );
 
 		return( -1 );
@@ -1949,30 +1949,22 @@ int libfsntfs_mft_attribute_append_to_chain(
 
 		return( -1 );
 	}
-	if( first_attribute == NULL )
+	mft_attribute = *first_attribute;
+
+	if( mft_attribute != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid first attribute.",
-		 function );
+		if( mft_attribute->type != additional_attribute->type )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: unable to chain attributes of different types.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
-	if( mft_attribute->type != additional_attribute->type )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: unable to chain attributes of different types.",
-		 function );
-
-		return( -1 );
-	}
-	*first_attribute = mft_attribute;
-
 	while( mft_attribute != NULL )
 	{
 		if( mft_attribute == additional_attribute )
@@ -1991,7 +1983,7 @@ int libfsntfs_mft_attribute_append_to_chain(
 			break;
 		}
 		previous_attribute = mft_attribute;
-	        mft_attribute      = mft_attribute->next_attribute;
+		mft_attribute      = mft_attribute->next_attribute;
 	}
 	if( previous_attribute == NULL )
 	{

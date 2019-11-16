@@ -34,6 +34,7 @@
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_entry.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -63,18 +64,6 @@ struct libfsntfs_index
 	 */
 	uint32_t flags;
 
-	/* The $INDEX_ROOT MFT attribute
-	 */
-	libfsntfs_mft_attribute_t *index_root_attribute;
-
-	/* The $INDEX_ALLOCATION MFT attribute
-	 */
-	libfsntfs_mft_attribute_t *index_allocation_attribute;
-
-	/* The $BITMAP MFT attribute
-	 */
-	libfsntfs_mft_attribute_t *bitmap_attribute;
-
 	/* The root header
 	 */
 	libfsntfs_index_root_header_t *root_header;
@@ -90,18 +79,6 @@ struct libfsntfs_index
 	/* The index node cache
 	 */
 	libfcache_cache_t *index_node_cache;
-
-	/* The index value list
-	 */
-	libfdata_list_t *index_value_list;
-
-	/* The index value cache
-	 */
-	libfcache_cache_t *index_value_cache;
-
-	/* Value to indicate the index was read
-	 */
-	uint8_t is_read;
 };
 
 int libfsntfs_index_initialize(
@@ -115,34 +92,22 @@ int libfsntfs_index_free(
      libfsntfs_index_t **index,
      libcerror_error_t **error );
 
-int libfsntfs_index_set_index_root_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_index_set_index_allocation_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_index_set_bitmap_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error );
-
 int libfsntfs_index_read(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_entry_t *mft_entry,
      uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_index_read_root(
      libfsntfs_index_t *index,
+     libfsntfs_mft_attribute_t *index_root_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_index_read_bitmap(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_attribute_t *bitmap_attribute,
      uint8_t flags,
      libcerror_error_t **error );
 
@@ -153,43 +118,6 @@ int libfsntfs_index_get_sub_node(
      off64_t index_entry_offset,
      int sub_node_vcn,
      libfsntfs_index_node_t **index_node,
-     libcerror_error_t **error );
-
-int libfsntfs_index_read_sub_nodes(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     libfsntfs_index_node_t *index_node,
-     int recursion_depth,
-     libcerror_error_t **error );
-
-int libfsntfs_index_read_index_value_element_data(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *element,
-     libfdata_cache_t *cache,
-     int element_file_index,
-     off64_t index_value_offset,
-     size64_t element_size,
-     uint32_t index_value_flags,
-     uint8_t read_flags,
-     libcerror_error_t **error );
-
-int libfsntfs_index_get_number_of_index_values(
-     libfsntfs_index_t *index,
-     int *number_of_index_values,
-     libcerror_error_t **error );
-
-int libfsntfs_index_get_index_value_by_index(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     int index_value_entry,
-     libfsntfs_index_value_t **index_value,
-     libcerror_error_t **error );
-
-int libfsntfs_index_compare_name_with_utf8_string(
-     libfsntfs_index_t *index,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -388,7 +388,7 @@ int libfsntfs_mft_metadata_file_open(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -405,7 +405,7 @@ int libfsntfs_mft_metadata_file_open(
 #endif
 	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -557,7 +557,7 @@ int libfsntfs_mft_metadata_file_open_wide(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -574,7 +574,7 @@ int libfsntfs_mft_metadata_file_open_wide(
 #endif
 	internal_mft_metadata_file->file_io_handle_created_in_library = 1;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -729,7 +729,7 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -747,7 +747,7 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 	internal_mft_metadata_file->file_io_handle                   = file_io_handle;
 	internal_mft_metadata_file->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -812,7 +812,7 @@ int libfsntfs_mft_metadata_file_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -958,7 +958,7 @@ int libfsntfs_mft_metadata_file_close(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1440,7 +1440,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1488,7 +1488,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1535,7 +1535,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1584,7 +1584,7 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1630,7 +1630,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1678,7 +1678,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1725,7 +1725,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1774,7 +1774,7 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1819,7 +1819,7 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )
@@ -1868,7 +1868,7 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_mft_metadata_file->read_write_lock,
 	     error ) != 1 )

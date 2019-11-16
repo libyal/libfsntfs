@@ -1,4 +1,4 @@
-.Dd September  5, 2019
+.Dd November 15, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -123,9 +123,9 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_base_record_file_reference "libfsntfs_file_entry_t *file_entry" "uint64_t *file_reference" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_parent_file_reference "libfsntfs_file_entry_t *file_entry" "uint64_t *file_reference" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_parent_file_reference "libfsntfs_file_entry_t *parent_file_reference" "uint64_t *file_reference" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_parent_file_reference_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint64_t *file_reference" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_parent_file_reference_by_attribute_index "libfsntfs_file_entry_t *parent_file_reference" "int attribute_index" "uint64_t *file_reference" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_journal_sequence_number "libfsntfs_file_entry_t *file_entry" "uint64_t *journal_sequence_number" "libfsntfs_error_t **error"
 .Ft int

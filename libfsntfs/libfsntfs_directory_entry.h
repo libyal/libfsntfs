@@ -57,12 +57,21 @@ int libfsntfs_directory_entry_free(
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error );
 
+int libfsntfs_directory_entry_free_short_name(
+     libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error );
+
 int libfsntfs_directory_entry_clone(
      libfsntfs_directory_entry_t **destination_directory_entry,
      libfsntfs_directory_entry_t *source_directory_entry,
      libcerror_error_t **error );
 
-int libfsntfs_directory_entry_compare(
+int libfsntfs_directory_entry_compare_by_file_reference(
+     libfsntfs_directory_entry_t *first_directory_entry,
+     libfsntfs_directory_entry_t *second_directory_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_compare_by_name(
      libfsntfs_directory_entry_t *first_directory_entry,
      libfsntfs_directory_entry_t *second_directory_entry,
      libcerror_error_t **error );
@@ -70,6 +79,11 @@ int libfsntfs_directory_entry_compare(
 int libfsntfs_directory_entry_get_mft_entry_index(
      libfsntfs_directory_entry_t *directory_entry,
      uint64_t *mft_entry_index,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_parent_file_reference(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *parent_file_reference,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

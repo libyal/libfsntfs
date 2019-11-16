@@ -35,6 +35,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
@@ -149,7 +150,7 @@ int libfsntfs_file_entry_initialize(
 	}
 	if( mft_entry->base_record_file_reference == 0 )
 	{
-		if( mft_entry->i30_index != NULL )
+		if( mft_entry->has_i30_index != 0 )
 		{
 			if( libfsntfs_directory_initialize(
 			     &( internal_file_entry->directory ),
@@ -166,6 +167,7 @@ int libfsntfs_file_entry_initialize(
 			}
 			if( libfsntfs_directory_read_file_io_handle(
 			     internal_file_entry->directory,
+			     io_handle,
 			     file_io_handle,
 			     mft_entry,
 			     flags,
@@ -437,6 +439,21 @@ int libfsntfs_file_entry_is_empty(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_mft_entry_is_empty(
 	          internal_file_entry->mft_entry,
 	          error );
@@ -450,8 +467,23 @@ int libfsntfs_file_entry_is_empty(
 		 "%s: unable to determine if MFT entry is empty.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -479,6 +511,21 @@ int libfsntfs_file_entry_is_allocated(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_mft_entry_is_allocated(
 	          internal_file_entry->mft_entry,
 	          error );
@@ -492,8 +539,23 @@ int libfsntfs_file_entry_is_allocated(
 		 "%s: unable to determine if MFT entry is allocated.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( result );
 }
 
@@ -884,6 +946,7 @@ int libfsntfs_file_entry_get_file_reference(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_file_reference";
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -898,6 +961,21 @@ int libfsntfs_file_entry_get_file_reference(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_entry_get_file_reference(
 	     internal_file_entry->mft_entry,
 	     file_reference,
@@ -910,9 +988,24 @@ int libfsntfs_file_entry_get_file_reference(
 		 "%s: unable to retrieve file reference from MFT entry.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the base record file reference
@@ -925,6 +1018,7 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_base_record_file_reference";
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -939,6 +1033,21 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_entry_get_base_record_file_reference(
 	     internal_file_entry->mft_entry,
 	     file_reference,
@@ -951,9 +1060,24 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 		 "%s: unable to retrieve base record file reference from MFT entry.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the parent file reference
@@ -962,11 +1086,12 @@ int libfsntfs_file_entry_get_base_record_file_reference(
  */
 int libfsntfs_file_entry_get_parent_file_reference(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *file_reference,
+     uint64_t *parent_file_reference,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_parent_file_reference";
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -981,25 +1106,51 @@ int libfsntfs_file_entry_get_parent_file_reference(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->directory_entry == NULL )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
 	{
-		return( 0 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_parent_file_reference(
-	     internal_file_entry->directory_entry->file_name_values,
-	     file_reference,
+#endif
+	if( libfsntfs_directory_entry_get_parent_file_reference(
+	     internal_file_entry->directory_entry,
+	     parent_file_reference,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from directory entry file name value.",
+		 "%s: unable to retrieve parent reference from directory entry.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the parent file reference for a specific $FILE_NAME attribute
@@ -1008,12 +1159,13 @@ int libfsntfs_file_entry_get_parent_file_reference(
 int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint64_t *file_reference,
+     uint64_t *parent_file_reference,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_parent_file_reference_by_attribute_index";
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -1028,6 +1180,21 @@ int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
 	     attribute_index,
@@ -1042,12 +1209,12 @@ int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 		 function,
 		 attribute_index );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	     attribute,
-	     file_reference,
-	     error ) != 1 )
+	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	          attribute,
+	          parent_file_reference,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1056,9 +1223,24 @@ int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 		 "%s: unable to retrieve parent reference from file name attribute.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the journal sequence number
@@ -1071,6 +1253,7 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_journal_sequence_number";
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -1085,6 +1268,21 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_entry_get_journal_sequence_number(
 	     internal_file_entry->mft_entry,
 	     journal_sequence_number,
@@ -1097,9 +1295,24 @@ int libfsntfs_file_entry_get_journal_sequence_number(
 		 "%s: unable to retrieve journal sequence number from MFT entry.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the creation date and time
@@ -3666,6 +3879,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	}
 	if( libfsntfs_directory_get_entry_by_index(
 	     internal_file_entry->directory,
+	     internal_file_entry->file_io_handle,
 	     sub_file_entry_index,
 	     &directory_entry,
 	     error ) != 1 )
@@ -3821,6 +4035,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	}
 	result = libfsntfs_directory_get_entry_by_utf8_name(
 	          internal_file_entry->directory,
+	          internal_file_entry->file_io_handle,
 	          utf8_string,
 	          utf8_string_length,
 	          &directory_entry,
@@ -3981,6 +4196,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	}
 	result = libfsntfs_directory_get_entry_by_utf16_name(
 	          internal_file_entry->directory,
+	          internal_file_entry->file_io_handle,
 	          utf16_string,
 	          utf16_string_length,
 	          &directory_entry,

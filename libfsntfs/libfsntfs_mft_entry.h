@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "libfsntfs_directory_entry.h"
-#include "libfsntfs_index.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
@@ -123,18 +122,6 @@ struct libfsntfs_mft_entry
 	 */
 	int volume_name_attribute_index;
 
-	/* The index array
-	 */
-	libcdata_array_t *index_array;
-
-	/* The $I30 (directory entry) index
-	 */
-	libfsntfs_index_t *i30_index;
-
-	/* The $SII (security ID) index
-	 */
-	libfsntfs_index_t *sii_index;
-
 	/* Value to indicate the MFT entry is empty
 	 */
 	uint8_t is_empty;
@@ -142,6 +129,10 @@ struct libfsntfs_mft_entry
 	/* Value to indicate the MFT entry is corrupted
 	 */
 	uint8_t is_corrupted;
+
+	/* Value to indicate the MFT entry has an $I30 index
+	 */
+	uint8_t has_i30_index;
 };
 
 int libfsntfs_mft_entry_check_for_empty_block(
@@ -263,21 +254,6 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
      libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_append_index(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     const uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libfsntfs_index_t **index,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_get_index_by_utf8_name(
-     libfsntfs_mft_entry_t *mft_entry,
-     const uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libfsntfs_index_t **index,
-     libcerror_error_t **error );
-
 int libfsntfs_mft_entry_append_attribute(
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_io_handle_t *io_handle,
@@ -297,18 +273,6 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
      size_t utf8_string_length,
      int *attribute_index,
      libfsntfs_mft_attribute_t **attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_append_index_allocation_attribute(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_entry_append_index_root_attribute(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_has_directory_entries_index(

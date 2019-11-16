@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_mft_entry.h"
 
@@ -40,7 +40,7 @@ struct libfsntfs_directory
 {
 	/* The directory entries tree
 	 */
-	libcdata_btree_t *directory_entries_tree;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree;
 };
 
 int libfsntfs_directory_initialize(
@@ -53,6 +53,7 @@ int libfsntfs_directory_free(
 
 int libfsntfs_directory_read_file_io_handle(
      libfsntfs_directory_t *directory,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
      uint8_t flags,
@@ -65,12 +66,14 @@ int libfsntfs_directory_get_number_of_entries(
 
 int libfsntfs_directory_get_entry_by_index(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      int entry_index,
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error );
 
 int libfsntfs_directory_get_entry_by_utf8_name(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libfsntfs_directory_entry_t **directory_entry,
@@ -78,6 +81,7 @@ int libfsntfs_directory_get_entry_by_utf8_name(
 
 int libfsntfs_directory_get_entry_by_utf16_name(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libfsntfs_directory_entry_t **directory_entry,

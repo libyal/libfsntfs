@@ -36,7 +36,6 @@
 #include "libfsntfs_directory.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_io_handle.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
@@ -399,7 +398,7 @@ int libfsntfs_volume_open(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -416,7 +415,7 @@ int libfsntfs_volume_open(
 #endif
 	internal_volume->file_io_handle_created_in_library = 1;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -568,7 +567,7 @@ int libfsntfs_volume_open_wide(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -585,7 +584,7 @@ int libfsntfs_volume_open_wide(
 #endif
 	internal_volume->file_io_handle_created_in_library = 1;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -740,7 +739,7 @@ int libfsntfs_volume_open_file_io_handle(
 
 		goto on_error;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -758,7 +757,7 @@ int libfsntfs_volume_open_file_io_handle(
 	internal_volume->file_io_handle                   = file_io_handle;
 	internal_volume->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -823,7 +822,7 @@ int libfsntfs_volume_close(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -1004,7 +1003,7 @@ int libfsntfs_volume_close(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -1845,6 +1844,7 @@ int libfsntfs_internal_volume_read_security_descriptors(
 		}
 		if( libfsntfs_security_descriptor_index_read_sii_index(
 		     internal_volume->security_descriptor_index,
+		     internal_volume->io_handle,
 		     file_io_handle,
 		     mft_entry,
 		     error ) != 1 )
@@ -1895,7 +1895,7 @@ int libfsntfs_volume_has_bitlocker_drive_encryption(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -1912,7 +1912,7 @@ int libfsntfs_volume_has_bitlocker_drive_encryption(
 #endif
 /* TODO implement */
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -1954,7 +1954,7 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -1971,7 +1971,7 @@ int libfsntfs_volume_has_volume_shadow_snapshots(
 #endif
 /* TODO implement */
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2268,7 +2268,7 @@ int libfsntfs_volume_get_bytes_per_sector(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2297,7 +2297,7 @@ int libfsntfs_volume_get_bytes_per_sector(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2340,7 +2340,7 @@ int libfsntfs_volume_get_cluster_block_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2369,7 +2369,7 @@ int libfsntfs_volume_get_cluster_block_size(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2412,7 +2412,7 @@ int libfsntfs_volume_get_mft_entry_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2441,7 +2441,7 @@ int libfsntfs_volume_get_mft_entry_size(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2484,7 +2484,7 @@ int libfsntfs_volume_get_index_entry_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2513,7 +2513,7 @@ int libfsntfs_volume_get_index_entry_size(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2559,7 +2559,7 @@ int libfsntfs_volume_get_utf8_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2607,7 +2607,7 @@ int libfsntfs_volume_get_utf8_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2654,7 +2654,7 @@ int libfsntfs_volume_get_utf8_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2703,7 +2703,7 @@ int libfsntfs_volume_get_utf8_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2749,7 +2749,7 @@ int libfsntfs_volume_get_utf16_name_size(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2797,7 +2797,7 @@ int libfsntfs_volume_get_utf16_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2844,7 +2844,7 @@ int libfsntfs_volume_get_utf16_name(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2893,7 +2893,7 @@ int libfsntfs_volume_get_utf16_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2938,7 +2938,7 @@ int libfsntfs_volume_get_version(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -2987,7 +2987,7 @@ int libfsntfs_volume_get_version(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -3030,7 +3030,7 @@ int libfsntfs_volume_get_serial_number(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -3059,7 +3059,7 @@ int libfsntfs_volume_get_serial_number(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -3102,7 +3102,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -3131,7 +3131,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
@@ -3261,15 +3261,15 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
 {
-	libcdata_btree_t *directory_entries_tree          = NULL;
-	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
-	const uint8_t *utf8_string_segment                = NULL;
-	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path";
-	libuna_unicode_character_t unicode_character      = 0;
-	size_t utf8_string_index                          = 0;
-	size_t utf8_string_segment_length                 = 0;
-	uint64_t mft_entry_index                          = 0;
-	int result                                        = 0;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_directory_entry_t *safe_directory_entry          = NULL;
+	const uint8_t *utf8_string_segment                         = NULL;
+	static char *function                                      = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path";
+	libuna_unicode_character_t unicode_character               = 0;
+	size_t utf8_string_index                                   = 0;
+	size_t utf8_string_segment_length                          = 0;
+	uint64_t mft_entry_index                                   = 0;
+	int result                                                 = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -3360,9 +3360,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	{
 		if( directory_entries_tree != NULL )
 		{
-			if( libcdata_btree_free(
+			if( libfsntfs_directory_entries_tree_free(
 			     &directory_entries_tree,
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3375,9 +3374,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 				goto on_error;
 			}
 		}
-		if( libcdata_btree_initialize(
+		if( libfsntfs_directory_entries_tree_initialize(
 		     &directory_entries_tree,
-		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3389,10 +3387,11 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 
 			goto on_error;
 		}
-		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+		if( libfsntfs_directory_entries_tree_read_from_i30_index(
 		     directory_entries_tree,
-		     *mft_entry,
+		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     *mft_entry,
 		     0,
 		     error ) != 1 )
 		{
@@ -3443,8 +3442,9 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 		}
 		else
 		{
-			result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
+			result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 			          directory_entries_tree,
+			          internal_volume->file_io_handle,
 				  utf8_string_segment,
 				  utf8_string_segment_length,
 			          &safe_directory_entry,
@@ -3516,9 +3516,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	}
 	if( directory_entries_tree != NULL )
 	{
-		if( libcdata_btree_free(
+		if( libfsntfs_directory_entries_tree_free(
 		     &directory_entries_tree,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3536,9 +3535,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 on_error:
 	if( directory_entries_tree != NULL )
 	{
-		libcdata_btree_free(
+		libfsntfs_directory_entries_tree_free(
 		 &directory_entries_tree,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 		 NULL );
 	}
 	if( *directory_entry != NULL )
@@ -3687,15 +3685,15 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
 {
-	libcdata_btree_t *directory_entries_tree          = NULL;
-	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
-	const uint16_t *utf16_string_segment              = NULL;
-	static char *function                             = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path";
-	libuna_unicode_character_t unicode_character      = 0;
-	size_t utf16_string_index                         = 0;
-	size_t utf16_string_segment_length                = 0;
-	uint64_t mft_entry_index                          = 0;
-	int result                                        = 0;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_directory_entry_t *safe_directory_entry          = NULL;
+	const uint16_t *utf16_string_segment                       = NULL;
+	static char *function                                      = "libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path";
+	libuna_unicode_character_t unicode_character               = 0;
+	size_t utf16_string_index                                  = 0;
+	size_t utf16_string_segment_length                         = 0;
+	uint64_t mft_entry_index                                   = 0;
+	int result                                                 = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -3786,9 +3784,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	{
 		if( directory_entries_tree != NULL )
 		{
-			if( libcdata_btree_free(
+			if( libfsntfs_directory_entries_tree_free(
 			     &directory_entries_tree,
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3801,9 +3798,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 				goto on_error;
 			}
 		}
-		if( libcdata_btree_initialize(
+		if( libfsntfs_directory_entries_tree_initialize(
 		     &directory_entries_tree,
-		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3815,10 +3811,11 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 
 			goto on_error;
 		}
-		if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+		if( libfsntfs_directory_entries_tree_read_from_i30_index(
 		     directory_entries_tree,
-		     *mft_entry,
+		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
+		     *mft_entry,
 		     0,
 		     error ) != 1 )
 		{
@@ -3869,8 +3866,9 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 		}
 		else
 		{
-			result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
+			result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 			          directory_entries_tree,
+			          internal_volume->file_io_handle,
 				  utf16_string_segment,
 				  utf16_string_segment_length,
 			          &safe_directory_entry,
@@ -3942,9 +3940,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	}
 	if( directory_entries_tree != NULL )
 	{
-		if( libcdata_btree_free(
+		if( libfsntfs_directory_entries_tree_free(
 		     &directory_entries_tree,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -3962,9 +3959,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 on_error:
 	if( directory_entries_tree != NULL )
 	{
-		libcdata_btree_free(
+		libfsntfs_directory_entries_tree_free(
 		 &directory_entries_tree,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 		 NULL );
 	}
 	if( *directory_entry != NULL )

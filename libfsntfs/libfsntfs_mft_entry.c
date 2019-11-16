@@ -32,7 +32,6 @@
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_file_name_values.h"
 #include "libfsntfs_fixup_values.h"
-#include "libfsntfs_index.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
@@ -237,20 +236,6 @@ int libfsntfs_mft_entry_initialize(
 
 		goto on_error;
 	}
-	if( libcdata_array_initialize(
-	     &( ( *mft_entry )->index_array ),
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index array.",
-		 function );
-
-		goto on_error;
-	}
 	( *mft_entry )->reparse_point_attribute_index        = -1;
 	( *mft_entry )->security_descriptor_attribute_index  = -1;
 	( *mft_entry )->standard_information_attribute_index = -1;
@@ -358,20 +343,6 @@ int libfsntfs_mft_entry_free(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free alternate data attributes array.",
-			 function );
-
-			result = -1;
-		}
-		if( libcdata_array_free(
-		     &( ( *mft_entry )->index_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free index array.",
 			 function );
 
 			result = -1;
@@ -1195,14 +1166,6 @@ on_error:
 		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 		 NULL );
 	}
-	libcdata_array_empty(
-	 mft_entry->index_array,
-	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_free,
-	 NULL );
-
-	mft_entry->i30_index = NULL;
-	mft_entry->sii_index = NULL;
-
 	libcdata_array_empty(
 	 mft_entry->alternate_data_attributes_array,
 	 NULL,
@@ -2094,321 +2057,6 @@ on_error:
 	return( -1 );
 }
 
-/* Appends a new index with the specified name
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_mft_entry_append_index(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     const uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libfsntfs_index_t **index,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_mft_entry_append_index";
-	int entry_index       = 0;
-	int result            = 0;
-
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_index_initialize(
-	     index,
-	     io_handle,
-	     utf8_string,
-	     utf8_string_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index.",
-		 function );
-
-		goto on_error;
-	}
-	if( libcdata_array_append_entry(
-	     mft_entry->index_array,
-	     &entry_index,
-	     (intptr_t *) *index,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append index to array.",
-		 function );
-
-		goto on_error;
-	}
-	if( mft_entry->i30_index == NULL )
-	{
-		result = libfsntfs_index_compare_name_with_utf8_string(
-			  *index,
-			  (uint8_t *) "$I30",
-			  4,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare index name with $I30.",
-			 function );
-
-			goto on_error;
-		}
-		else if( result != 0 )
-		{
-			mft_entry->i30_index = *index;
-		}
-	}
-	if( mft_entry->sii_index == NULL )
-	{
-		result = libfsntfs_index_compare_name_with_utf8_string(
-			  *index,
-			  (uint8_t *) "$SII",
-			  4,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare index name with $SII.",
-			 function );
-
-			goto on_error;
-		}
-		else if( result != 0 )
-		{
-			mft_entry->sii_index = *index;
-		}
-	}
-	return( 1 );
-
-on_error:
-	if( *index != NULL )
-	{
-		libfsntfs_index_free(
-		 index,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Retrieves an index with the specified name
- * Returns 1 if successful, 0 if no index was found or -1 on error
- */
-int libfsntfs_mft_entry_get_index_by_utf8_name(
-     libfsntfs_mft_entry_t *mft_entry,
-     const uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libfsntfs_index_t **index,
-     libcerror_error_t **error )
-{
-	static char *function       = "libfsntfs_mft_entry_get_index_by_utf8_name";
-	int index_entry             = 0;
-	int number_of_index_entries = 0;
-	int result                  = 0;
-
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( mft_entry->i30_index != NULL )
-	{
-		result = libuna_utf8_string_compare_with_utf8_stream(
-			  utf8_string,
-			  utf8_string_size,
-			  (uint8_t *) "$I30",
-			  4,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare UTF-8 string with $I30.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
-		{
-			*index = mft_entry->i30_index;
-
-			return( 1 );
-		}
-	}
-	if( mft_entry->sii_index != NULL )
-	{
-		result = libuna_utf8_string_compare_with_utf8_stream(
-			  utf8_string,
-			  utf8_string_size,
-			  (uint8_t *) "$SII",
-			  4,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare UTF-8 string with $SII.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
-		{
-			*index = mft_entry->sii_index;
-
-			return( 1 );
-		}
-	}
-	if( libcdata_array_get_number_of_entries(
-	     mft_entry->index_array,
-	     &number_of_index_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of index entries.",
-		 function );
-
-		return( -1 );
-	}
-	for( index_entry = 0;
-	     index_entry < number_of_index_entries;
-	     index_entry++ )
-	{
-		if( libcdata_array_get_entry_by_index(
-		     mft_entry->index_array,
-		     index_entry,
-		     (intptr_t **) index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index: %d.",
-			 function,
-			 index_entry );
-
-			return( -1 );
-		}
-		if( *index == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing index: %d.",
-			 function,
-			 index_entry );
-
-			return( -1 );
-		}
-		if( ( *index )->name == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid index: %d - missing name.",
-			 function,
-			 index_entry );
-
-			return( -1 );
-		}
-		result = libfsntfs_index_compare_name_with_utf8_string(
-			  *index,
-			  utf8_string,
-			  utf8_string_size,
-			  error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to compare index name with UTF-8 string.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result != 0 )
-		{
-			return( 1 );
-		}
-	}
-	*index = NULL;
-
-	return( 0 );
-}
-
 /* Appends an attribute
  * Returns 1 if successful or -1 on error
  */
@@ -2422,7 +2070,6 @@ int libfsntfs_mft_entry_append_attribute(
 {
 	uint8_t utf8_attribute_name[ 64 ];
 
-	libfsntfs_index_t *index                 = NULL;
 	static char *function                    = "libfsntfs_mft_entry_append_attribute";
 	size_t utf8_attribute_name_size          = 0;
 	uint32_t attribute_type                  = 0;
@@ -2501,61 +2148,6 @@ int libfsntfs_mft_entry_append_attribute(
 	switch( attribute_type )
 	{
 		case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
-			if( utf8_attribute_name_size > 1 )
-			{
-				if( libfsntfs_mft_attribute_get_utf8_name(
-				     attribute,
-				     utf8_attribute_name,
-				     64,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve UTF-8 attribute name.",
-					 function );
-
-					goto on_error;
-				}
-				result = libfsntfs_mft_entry_get_index_by_utf8_name(
-					  mft_entry,
-					  utf8_attribute_name,
-					  utf8_attribute_name_size,
-					  &index,
-					  error );
-
-				if( result == -1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve index.",
-					 function );
-
-					goto on_error;
-				}
-				else if( result != 0 )
-				{
-					/* Only set the bitmap if the index exists
-					 */
-					if( libfsntfs_index_set_bitmap_attribute(
-					     index,
-					     attribute,
-					     error ) != 1 )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to set bitmap attribute in index.",
-						 function );
-
-						goto on_error;
-					}
-				}
-			}
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
@@ -2662,38 +2254,45 @@ int libfsntfs_mft_entry_append_attribute(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ALLOCATION:
-			if( libfsntfs_mft_entry_append_index_allocation_attribute(
-			     mft_entry,
-			     io_handle,
+			break;
+
+		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT:
+			if( libfsntfs_mft_attribute_get_utf8_name(
 			     attribute,
+			     utf8_attribute_name,
+			     64,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append index allocation attribute to MFT entry.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-8 attribute name.",
 				 function );
 
 				goto on_error;
 			}
-			break;
+			result = libuna_utf8_string_compare_with_utf8_stream(
+				  utf8_attribute_name,
+				  utf8_attribute_name_size,
+				  (uint8_t *) "$I30",
+				  4,
+				  error );
 
-		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT:
-			if( libfsntfs_mft_entry_append_index_root_attribute(
-			     mft_entry,
-			     io_handle,
-			     attribute,
-			     error ) != 1 )
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append index root attribute to MFT entry.",
+				 LIBCERROR_RUNTIME_ERROR_GENERIC,
+				 "%s: unable to compare UTF-8 string with $I30.",
 				 function );
 
-				goto on_error;
+				return( -1 );
+			}
+			else if( result == LIBUNA_COMPARE_EQUAL )
+			{
+				mft_entry->has_i30_index = 1;
 			}
 			break;
 
@@ -2798,28 +2397,19 @@ int libfsntfs_mft_entry_append_data_attribute(
 	}
 	if( utf8_attribute_name_size <= 1 )
 	{
-/* TODO move this into append to chain ? */
-		if( mft_entry->data_attribute == NULL )
+		if( libfsntfs_mft_attribute_append_to_chain(
+		     &( mft_entry->data_attribute ),
+		     attribute,
+		     error ) != 1 )
 		{
-			mft_entry->data_attribute = attribute;
-		}
-		else
-		{
-			if( libfsntfs_mft_attribute_append_to_chain(
-			     mft_entry->data_attribute,
-			     attribute,
-			     &( mft_entry->data_attribute ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to chain attribute.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to chain attribute.",
+			 function );
 
-				return( -1 );
-			}
+			return( -1 );
 		}
 	}
 	else
@@ -2879,9 +2469,8 @@ int libfsntfs_mft_entry_append_data_attribute(
 		else
 		{
 			if( libfsntfs_mft_attribute_append_to_chain(
-			     data_attribute,
-			     attribute,
 			     &data_attribute,
+			     attribute,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -3056,250 +2645,6 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
 	return( result );
 }
 
-/* Appends an $INDEX_ALLOCATION attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_mft_entry_append_index_allocation_attribute(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error )
-{
-	uint8_t utf8_attribute_name[ 64 ];
-
-	libfsntfs_index_t *index        = NULL;
-	static char *function           = "libfsntfs_mft_entry_append_index_allocation_attribute";
-	size_t utf8_attribute_name_size = 0;
-	int result                      = 0;
-
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_attribute_get_utf8_name_size(
-	     attribute,
-	     &utf8_attribute_name_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 attribute name size.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_attribute_name_size <= 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing attribute name.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_attribute_get_utf8_name(
-	     attribute,
-	     utf8_attribute_name,
-	     64,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 attribute name.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfsntfs_mft_entry_get_index_by_utf8_name(
-		  mft_entry,
-		  utf8_attribute_name,
-		  utf8_attribute_name_size,
-		  &index,
-		  error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index.",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == 0 )
-	{
-		if( libfsntfs_mft_entry_append_index(
-		     mft_entry,
-		     io_handle,
-		     utf8_attribute_name,
-		     utf8_attribute_name_size,
-		     &index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append index to MFT entry.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( libfsntfs_index_set_index_allocation_attribute(
-	     index,
-	     attribute,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set index allocation attribute in index.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Appends an $INDEX_ROOT attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_mft_entry_append_index_root_attribute(
-     libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error )
-{
-	uint8_t utf8_attribute_name[ 64 ];
-
-	libfsntfs_index_t *index        = NULL;
-	static char *function           = "libfsntfs_mft_entry_append_index_root_attribute";
-	size_t utf8_attribute_name_size = 0;
-	int result                      = 0;
-
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_attribute_get_utf8_name_size(
-	     attribute,
-	     &utf8_attribute_name_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 attribute name size.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_attribute_name_size <= 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing attribute name.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_mft_attribute_get_utf8_name(
-	     attribute,
-	     utf8_attribute_name,
-	     64,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 attribute name.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfsntfs_mft_entry_get_index_by_utf8_name(
-		  mft_entry,
-		  utf8_attribute_name,
-		  utf8_attribute_name_size,
-		  &index,
-		  error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index.",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == 0 )
-	{
-		if( libfsntfs_mft_entry_append_index(
-		     mft_entry,
-		     io_handle,
-		     utf8_attribute_name,
-		     utf8_attribute_name_size,
-		     &index,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append index to MFT entry.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( libfsntfs_index_set_index_root_attribute(
-	     index,
-	     attribute,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set index root attribute in index.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Determines if the file entry has the directory entries ($I30) index
  * Returns 1 if the default data stream, 0 if not or -1 on error
  */
@@ -3320,11 +2665,7 @@ int libfsntfs_mft_entry_has_directory_entries_index(
 
 		return( -1 );
 	}
-	if( mft_entry->i30_index != NULL )
-	{
-		return( 1 );
-	}
-	return( 0 );
+	return( (int) mft_entry->has_i30_index );
 }
 
 /* Reads the MFT entry

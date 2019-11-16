@@ -30,11 +30,13 @@
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_name_values.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfdatetime.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_name.h"
 
 #include "fsntfs_file_name.h"
 
@@ -1153,202 +1155,59 @@ int libfsntfs_file_name_values_get_utf16_name(
 	return( 1 );
 }
 
-/* Compares a (long-named) file name values with a short-named file name values
- * Returns 1 if (possibly) equal, 0 if not or -1 on error
+/* Compares file name values
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  */
-int libfsntfs_file_name_values_compare_short_name(
-     libfsntfs_file_name_values_t *file_name_values,
-     libfsntfs_file_name_values_t *short_file_name_values,
+int libfsntfs_file_name_values_compare(
+     libfsntfs_file_name_values_t *first_file_name_values,
+     libfsntfs_file_name_values_t *second_file_name_values,
+     uint8_t use_case_folding,
      libcerror_error_t **error )
 {
-	static char *function   = "libfsntfs_file_name_values_compare_short_name";
-	size_t name_index       = 0;
-	size_t name_iterator    = 0;
-	size_t short_name_index = 0;
-	uint8_t in_tilde_suffix = 0;
+	static char *function = "libfsntfs_file_name_values_compare";
+	int result            = 0;
 
-	if( file_name_values == NULL )
+	if( first_file_name_values == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file name values.",
+		 "%s: invalid first file name values.",
 		 function );
 
 		return( -1 );
 	}
-	if( file_name_values->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file name values - missing name.",
-		 function );
-
-		return( -1 );
-	}
-	if( short_file_name_values == NULL )
+	if( second_file_name_values == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid short file name values.",
+		 "%s: invalid second file name values.",
 		 function );
 
 		return( -1 );
 	}
-	if( short_file_name_values->name == NULL )
+	result = libfsntfs_name_compare(
+	          first_file_name_values->name,
+	          first_file_name_values->name_size,
+	          second_file_name_values->name,
+	          second_file_name_values->name_size,
+	          use_case_folding,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid short file name values - missing name.",
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare names.",
 		 function );
 
 		return( -1 );
 	}
-	for( short_name_index = 0;
-	     short_name_index < short_file_name_values->name_size;
-	     short_name_index += 2 )
-	{
-		if( in_tilde_suffix != 0 )
-		{
-			/* Check for a . in the short name
-			 */
-			if( short_file_name_values->name[ short_name_index ] == 0x2e )
-			{
-				in_tilde_suffix = 0;
-
-				/* Find the last . in the (long) name
-				 */
-				name_iterator = file_name_values->name_size - 2;
-
-				while( name_iterator >= name_index )
-				{
-					if( file_name_values->name[ name_iterator ] == 0x2e )
-					{
-						break;
-					}
-					name_iterator -= 2;
-				}
-				if( name_iterator < name_index )
-				{
-					break;
-				}
-				name_index = name_iterator;
-			}
-			else
-			{
-				/* The ~ suffix should only consist of the numeric characters 0 - 9
-				 */
-				if( ( short_file_name_values->name[ short_name_index ] < 0x30 )
-				 || ( short_file_name_values->name[ short_name_index ] > 0x39 ) )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					libcnotify_printf(
-					 "%s: detected invalid character: %c in short name ~ suffix\n",
-					 function,
-					 (char) short_file_name_values->name[ short_name_index ] );
-#endif
-					break;
-				}
-				continue;
-			}
-		}
-		/* Check for a ~ in the short name
-		 */
-		if( short_file_name_values->name[ short_name_index ] == 0x7e )
-		{
-			in_tilde_suffix = 1;
-
-			continue;
-		}
-		while( name_index < file_name_values->name_size )
-		{
-			/* Ignore any non ASCII characters in the (long) name
-			 */
-			if( file_name_values->name[ name_index + 1 ] != 0 )
-			{
-				name_index += 2;
-			}
-			/* Ignore control characters and spaces
-			 */
-			else if( file_name_values->name[ name_index ] <= 0x20 )
-			{
-				name_index += 2;
-			}
-			/* Ignore '"' '*' '+' ',' '/' ':' ';' '<' '=' '>' '?' '\'
-			 */
-			else if( ( file_name_values->name[ name_index ] == 0x22 )
-			      || ( ( file_name_values->name[ name_index ] >= 0x2a )
-				&& ( file_name_values->name[ name_index ] <= 0x2c ) )
-			      || ( file_name_values->name[ name_index ] == 0x2f )
-			      || ( ( file_name_values->name[ name_index ] >= 0x3a )
-				&& ( file_name_values->name[ name_index ] <= 0x3f ) )
-			      || ( file_name_values->name[ name_index ] == 0x5c ) )
-			{
-				name_index += 2;
-			}
-			else
-			{
-				break;
-			}
-		}
-		if( name_index >= file_name_values->name_size )
-		{
-			break;
-		}
-		/* Check for a-z in the (long) name
-		 */
-		if( ( file_name_values->name[ name_index ] >= 0x61 )
-		 && ( file_name_values->name[ name_index ] <= 0x7a ) )
-		{
-			if( ( file_name_values->name[ name_index ] - 0x20 ) != short_file_name_values->name[ short_name_index ] )
-			{
-				break;
-			}
-		}
-		else
-		{
-			if( file_name_values->name[ name_index ] != short_file_name_values->name[ short_name_index ] )
-			{
-				break;
-			}
-		}
-		name_index += 2;
-	}
-	if( short_name_index == short_file_name_values->name_size )
-	{
-		if( in_tilde_suffix != 0 )
-		{
-			/* Find the last . in the (long) name
-			 */
-			name_iterator = file_name_values->name_size - 2;
-
-			while( name_iterator >= name_index )
-			{
-				if( file_name_values->name[ name_iterator ] == 0x2e )
-				{
-					break;
-				}
-				name_iterator -= 2;
-			}
-			/* If no . was found (as far as we can tell) the name matches the short name
-			 */
-			if( name_iterator < name_index )
-			{
-				name_index = file_name_values->name_size;
-			}
-		}
-		if( name_index == file_name_values->name_size )
-		{
-			return( 1 );
-		}
-	}
-	return( 0 );
+	return( result );
 }
 

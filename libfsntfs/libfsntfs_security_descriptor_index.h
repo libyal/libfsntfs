@@ -26,6 +26,8 @@
 #include <types.h>
 
 #include "libfsntfs_data_stream.h"
+#include "libfsntfs_index.h"
+#include "libfsntfs_index_node.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
@@ -42,6 +44,10 @@ typedef struct libfsntfs_security_descriptor_index libfsntfs_security_descriptor
 
 struct libfsntfs_security_descriptor_index
 {
+	/* The $SII index
+	 */
+	libfsntfs_index_t *sii_index;
+
 	/* The security descriptor index values tree
 	 */
 	libcdata_btree_t *security_descriptors_index_values_tree;
@@ -62,8 +68,23 @@ int libfsntfs_security_descriptor_index_free(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libcerror_error_t **error );
 
+int libfsntfs_security_descriptor_index_insert_index_value(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     int index_value_entry,
+     libfsntfs_index_value_t *index_value,
+     uint32_t index_value_flags,
+     libcerror_error_t **error );
+
+int libfsntfs_security_descriptor_index_read_from_index_node(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     int recursion_depth,
+     libcerror_error_t **error );
+
 int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );

@@ -32,6 +32,21 @@
 extern "C" {
 #endif
 
+int libfsntfs_name_compare(
+     const uint8_t *name,
+     size_t name_size,
+     const uint8_t *other_name,
+     size_t other_name_size,
+     uint8_t use_case_folding,
+     libcerror_error_t **error );
+
+int libfsntfs_name_compare_short(
+     const uint8_t *name,
+     size_t name_size,
+     const uint8_t *short_name,
+     size_t short_name_size,
+     libcerror_error_t **error );
+
 int libfsntfs_name_compare_with_utf8_string(
      const uint8_t *name,
      size_t name_size,

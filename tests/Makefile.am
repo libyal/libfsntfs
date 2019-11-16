@@ -52,6 +52,7 @@ check_PROGRAMS = \
 	fsntfs_test_data_run \
 	fsntfs_test_data_stream \
 	fsntfs_test_directory \
+	fsntfs_test_directory_entries_tree \
 	fsntfs_test_directory_entry \
 	fsntfs_test_error \
 	fsntfs_test_file_entry \
@@ -231,6 +232,18 @@ fsntfs_test_directory_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_directory_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_directory_entries_tree_SOURCES = \
+	fsntfs_test_directory_entries_tree.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_directory_entries_tree_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

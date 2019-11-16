@@ -214,9 +214,8 @@ int libfsntfs_mft_attribute_get_next_attribute(
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_append_to_chain(
-     libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_mft_attribute_t *additional_attribute,
      libfsntfs_mft_attribute_t **first_attribute,
+     libfsntfs_mft_attribute_t *additional_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

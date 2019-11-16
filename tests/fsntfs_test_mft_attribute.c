@@ -2058,6 +2058,18 @@ int main(
 	 fsntfs_test_mft_attribute_compare_name_with_utf16_string,
 	 mft_attribute );
 
+	/* TODO add tests for libfsntfs_mft_attribute_get_compression_unit_size */
+
+	/* TODO add tests for libfsntfs_mft_attribute_get_data */
+
+	/* TODO add tests for libfsntfs_mft_attribute_get_number_of_data_runs */
+
+	/* TODO add tests for libfsntfs_mft_attribute_get_data_run_by_index */
+
+	/* TODO add tests for libfsntfs_mft_attribute_get_next_attribute */
+
+	/* TODO add tests for libfsntfs_mft_attribute_append_to_chain */
+
 	/* Clean up
 	 */
 	result = libfsntfs_mft_attribute_free(

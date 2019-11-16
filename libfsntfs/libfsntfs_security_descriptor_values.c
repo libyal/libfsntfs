@@ -251,18 +251,19 @@ int libfsntfs_security_descriptor_values_read_data(
 		 "\n" );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 
-on_error:
 #if defined( HAVE_DEBUG_OUTPUT )
+on_error:
 	if( security_descriptor != NULL )
 	{
 		libfwnt_security_descriptor_free(
 		 &security_descriptor,
 		 NULL );
 	}
-#endif
 	return( -1 );
+#endif
 }
 
 /* Reads the security descriptor values from the buffer

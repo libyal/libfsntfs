@@ -1,12 +1,14 @@
 TODO
+* complete thread lock support
+** attribute
+** file entry - continue with libfsntfs_file_entry_get_creation_time
+** MFT metadata file
+** volume - continue with libfsntfs_volume_get_file_entry_by_index
+
+* optimize libfsntfs_directory_entries_tree_get_entry_by_utf8_name
+* optimize libfsntfs_directory_entries_tree_get_entry_by_utf16_name
+
 * refactor $I30 index to file entry
-** remove libfsntfs_mft_entry_append_index
-** remove libfsntfs_mft_entry_get_index_by_utf8_name
-** remove libfsntfs_mft_entry_append_index_allocation_attribute
-** remove libfsntfs_mft_entry_append_index_root_attribute
-** remove index_array from MFT entry
-** remove libfsntfs_index_set_index_root_attribute, libfsntfs_index_set_index_allocation_attribute, libfsntfs_index_set_bitmap_attribute
-** remove libfsntfs_index_compare_name_with_utf8_string
 ** refactor libfsntfs_mft_entry_has_directory_entries_index
 
 * refactor index to better handle get entry by identifier
@@ -14,8 +16,6 @@ TODO
 ** use tree for get entry by filename
 ** use tree for get entry by security identifier
 ** remove the need for a local cache in libfsntfs_index_read_sub_nodes, use cache value lock instead
-
-* refactor libfsntfs_mft_attribute_append_to_chain
 
 * remove libfsntfs_attribute_get_file_reference?
 * rename libfsntfs_internal_attribute_get_data to libfsntfs_internal_attribute_get_resident_data

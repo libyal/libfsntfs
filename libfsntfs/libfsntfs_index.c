@@ -41,6 +41,7 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_entry.h"
 #include "libfsntfs_unused.h"
 
 #include "fsntfs_index.h"
@@ -219,7 +220,7 @@ int libfsntfs_index_free(
 	}
 	if( *index != NULL )
 	{
-		/* The io_handle and index_root_attribute references are freed elsewhere
+		/* The io_handle, index_root_attribute, index_allocation_attribute and bitmap_attribute references are freed elsewhere
 		 */
 		if( ( *index )->root_header != NULL )
 		{
@@ -285,38 +286,6 @@ int libfsntfs_index_free(
 				result = -1;
 			}
 		}
-		if( ( *index )->index_value_list != NULL )
-		{
-			if( libfdata_list_free(
-			     &( ( *index )->index_value_list ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free index value list.",
-				 function );
-
-				result = -1;
-			}
-		}
-		if( ( *index )->index_value_cache != NULL )
-		{
-			if( libfcache_cache_free(
-			     &( ( *index )->index_value_cache ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free index value cache.",
-				 function );
-
-				result = -1;
-			}
-		}
 		if( ( *index )->name != NULL )
 		{
 			memory_free(
@@ -330,180 +299,25 @@ int libfsntfs_index_free(
 	return( result );
 }
 
-/* Sets the $INDEX_ROOT attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_set_index_root_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_set_index_root_attribute";
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->index_root_attribute != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index - index root attribute already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	index->index_root_attribute = attribute;
-
-	return( 1 );
-}
-
-/* Sets the $INDEX_ALLOCATION attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_set_index_allocation_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_set_index_allocation_attribute";
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO move this into append to chain ? */
-	if( index->index_allocation_attribute == NULL )
-	{
-		index->index_allocation_attribute = attribute;
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_append_to_chain(
-		     index->index_allocation_attribute,
-		     attribute,
-		     &( index->index_allocation_attribute ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append attribute to index allocation attribute chain.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-/* Sets the $BITMAP attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_set_bitmap_attribute(
-     libfsntfs_index_t *index,
-     libfsntfs_mft_attribute_t *attribute,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_set_bitmap_attribute";
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO move this into append to chain ? */
-	if( index->bitmap_attribute == NULL )
-	{
-		index->bitmap_attribute = attribute;
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_append_to_chain(
-		     index->bitmap_attribute,
-		     attribute,
-		     &( index->bitmap_attribute ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append attribute to index bitmap attribute chain.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
 /* Reads the index
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_index_read(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_entry_t *mft_entry,
      uint8_t flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_index_read";
+	libfsntfs_mft_attribute_t *bitmap_attribute           = NULL;
+	libfsntfs_mft_attribute_t *index_allocation_attribute = NULL;
+	libfsntfs_mft_attribute_t *index_root_attribute       = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute              = NULL;
+	static char *function                                 = "libfsntfs_index_read";
+	uint32_t attribute_type                               = 0;
+	int attribute_index                                   = 0;
+	int number_of_attributes                              = 0;
+	int result                                            = 0;
 
 	if( index == NULL )
 	{
@@ -516,71 +330,135 @@ int libfsntfs_index_read(
 
 		return( -1 );
 	}
-	if( index->is_read != 0 )
-	{
-		return( 1 );
-	}
-	if( index->index_value_list != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index - index value list value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->index_value_cache != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index - index value cache value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->index_root_attribute == NULL )
-	{
-		return( 1 );
-	}
-	if( libfdata_list_initialize(
-	     &( index->index_value_list ),
-	     (intptr_t *) index,
-	     NULL,
-	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_index_read_index_value_element_data,
-	     NULL,
-	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
+	if( libfsntfs_mft_entry_get_number_of_attributes(
+	     mft_entry,
+	     &number_of_attributes,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index value list.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of attributes.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( libfcache_cache_initialize(
-	     &( index->index_value_cache ),
-	     1,
-	     error ) != 1 )
+	for( attribute_index = 0;
+	     attribute_index < number_of_attributes;
+	     attribute_index++ )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index value cache.",
-		 function );
+		if( libfsntfs_mft_entry_get_attribute_by_index(
+		     mft_entry,
+		     attribute_index,
+		     &mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT attribute: %d.",
+			 function,
+			 attribute_index );
 
-		goto on_error;
+			return( -1 );
+		}
+		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
+			  mft_attribute,
+			  index->name,
+			  index->name_size,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare UTF-8 string with attribute: %d name.",
+			 function,
+			 attribute_index );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			if( libfsntfs_mft_attribute_get_type(
+			     mft_attribute,
+			     &attribute_type,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute type.",
+				 function );
+
+				return( -1 );
+			}
+			switch( attribute_type )
+			{
+				case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
+					if( libfsntfs_mft_attribute_append_to_chain(
+					     &bitmap_attribute,
+					     mft_attribute,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+						 "%s: unable to append attribute to bitmap attribute chain.",
+						 function );
+
+						return( -1 );
+					}
+					break;
+
+				case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ALLOCATION:
+					if( libfsntfs_mft_attribute_append_to_chain(
+					     &index_allocation_attribute,
+					     mft_attribute,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+						 "%s: unable to append attribute to index allocation attribute chain.",
+						 function );
+
+						return( -1 );
+					}
+					break;
+
+				case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT:
+					index_root_attribute = mft_attribute;
+					break;
+
+				default:
+#if defined( HAVE_DEBUG_OUTPUT )
+					if( libcnotify_verbose != 0 )
+					{
+						libcnotify_printf(
+						 "%s: unsupported index attribute type: 0x%08" PRIx32 "\n",
+						 function,
+						 attribute_type );
+					}
+#endif
+					break;
+			}
+		}
+	}
+	if( index_root_attribute == NULL )
+	{
+		return( 0 );
 	}
 	if( libfsntfs_index_read_root(
 	     index,
+	     index_root_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -596,12 +474,12 @@ int libfsntfs_index_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 	/* The index does not necessarily have a $BITMAP attribute
 	 */
-/* TODO check bitmap attribute instead of allocation attribute */
-	if( index->index_allocation_attribute != NULL )
+	if( bitmap_attribute != NULL )
 	{
 		if( libfsntfs_index_read_bitmap(
 		     index,
 		     file_io_handle,
+		     bitmap_attribute,
 		     flags,
 		     error ) != 1 )
 		{
@@ -618,12 +496,12 @@ int libfsntfs_index_read(
 #endif
 	/* The index does not necessarily have an $INDEX_ALLOCATION attribute
 	 */
-	if( index->index_allocation_attribute != NULL )
+	if( index_allocation_attribute != NULL )
 	{
 		if( libfsntfs_index_entry_vector_initialize(
 		     &( index->index_entry_vector ),
 		     index->io_handle,
-		     index->index_allocation_attribute,
+		     index_allocation_attribute,
 		     index->index_entry_size,
 		     error ) != 1 )
 		{
@@ -651,6 +529,7 @@ int libfsntfs_index_read(
 			goto on_error;
 		}
 	}
+/* TODO remove
 	if( libfsntfs_index_read_sub_nodes(
 	     index,
 	     file_io_handle,
@@ -667,8 +546,7 @@ int libfsntfs_index_read(
 
 		goto on_error;
 	}
-	index->is_read = 1;
-
+*/
 	return( 1 );
 
 on_error:
@@ -684,18 +562,6 @@ on_error:
 		 &( index->index_entry_vector ),
 		 NULL );
 	}
-	if( index->index_value_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( index->index_value_cache ),
-		 NULL );
-	}
-	if( index->index_value_list != NULL )
-	{
-		libfdata_list_free(
-		 &( index->index_value_list ),
-		 NULL );
-	}
 	return( -1 );
 }
 
@@ -704,6 +570,7 @@ on_error:
  */
 int libfsntfs_index_read_root(
      libfsntfs_index_t *index,
+     libfsntfs_mft_attribute_t *index_root_attribute,
      libcerror_error_t **error )
 {
 	uint8_t *data         = NULL;
@@ -745,7 +612,7 @@ int libfsntfs_index_read_root(
 		return( -1 );
 	}
 	if( libfsntfs_mft_attribute_get_data(
-	     index->index_root_attribute,
+	     index_root_attribute,
 	     &data,
 	     &data_size,
 	     error ) != 1 )
@@ -909,6 +776,7 @@ on_error:
 int libfsntfs_index_read_bitmap(
      libfsntfs_index_t *index,
      libbfio_handle_t *file_io_handle,
+     libfsntfs_mft_attribute_t *bitmap_attribute,
      uint8_t flags,
      libcerror_error_t **error )
 {
@@ -941,7 +809,7 @@ int libfsntfs_index_read_bitmap(
 	}
 	if( libfsntfs_bitmap_values_read_from_mft_attribute(
 	     bitmap_values,
-	     index->bitmap_attribute,
+	     bitmap_attribute,
 	     index->io_handle,
 	     file_io_handle,
 	     flags,
@@ -1089,535 +957,5 @@ int libfsntfs_index_get_sub_node(
 #endif /* defined( HAVE_PROFILER ) */
 
 	return( 1 );
-}
-
-/* Reads the index sub nodes
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_read_sub_nodes(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     libfsntfs_index_node_t *index_node,
-     int recursion_depth,
-     libcerror_error_t **error )
-{
-	libfcache_cache_t *sub_node_cache    = NULL;
-	libfsntfs_index_node_t *sub_node     = NULL;
-	libfsntfs_index_value_t *index_value = NULL;
-	static char *function                = "libfsntfs_index_read_sub_nodes";
-	off64_t index_entry_offset           = 0;
-	uint32_t index_value_flags           = 0;
-	int element_file_index               = 0;
-	int element_index                    = 0;
-	int index_value_entry                = 0;
-	int number_of_index_values           = 0;
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid recursion depth value out of bounds.",
-		 function );
-
-		return( -1 );
-        }
-	if( libfsntfs_index_node_get_number_of_values(
-	     index_node,
-	     &number_of_index_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of values from index node.",
-		 function );
-
-		goto on_error;
-	}
-	/* Use a local cache to prevent cache invalidation of index node
-	 * when reading sub nodes.
-	 */
-	if( libfcache_cache_initialize(
-	     &sub_node_cache,
-	     1,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub node cache.",
-		 function );
-
-		goto on_error;
-	}
-	for( index_value_entry = 0;
-	     index_value_entry < number_of_index_values;
-	     index_value_entry++ )
-	{
-		if( libfsntfs_index_node_get_value_by_index(
-		     index_node,
-		     index_value_entry,
-		     &index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value: %d from index node.",
-			 function,
-			 index_value_entry );
-
-			goto on_error;
-		}
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
-		{
-			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: node index value: %d sub node VCN value out of bounds.",
-				 function,
-				 index_value_entry );
-
-				goto on_error;
-			}
-			index_entry_offset = (off64_t) ( index_value->sub_node_vcn * index->io_handle->cluster_block_size );
-
-			if( libfsntfs_index_get_sub_node(
-			     index,
-			     file_io_handle,
-			     sub_node_cache,
-			     index_entry_offset,
-			     (int) index_value->sub_node_vcn,
-			     &sub_node,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
-				 function,
-				 (int) index_value->sub_node_vcn,
-				 index_entry_offset );
-
-				goto on_error;
-			}
-			if( libfsntfs_index_read_sub_nodes(
-			     index,
-			     file_io_handle,
-			     sub_node,
-			     recursion_depth + 1,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read sub nodes of index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
-				 function,
-				 (int) index_value->sub_node_vcn,
-				 index_entry_offset );
-
-				goto on_error;
-			}
-		}
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
-		{
-			break;
-		}
-		/* The element file index value contains the index value entry + 1
-		 */
-		element_file_index = index_value_entry + 1;
-		index_value_flags  = 0;
-
-		if( index_node == index->root_node )
-		{
-			index_value_flags = LIBFSNTFS_INDEX_VALUE_LIST_FLAG_STORED_IN_ROOT;
-		}
-		/* Add the index values containing data in a depth first manner
-		 * This will create a sorted 'list' of the index values
-		 */
-		if( libfdata_list_append_element(
-		     index->index_value_list,
-		     &element_index,
-		     element_file_index,
-		     index_value->offset,
-		     (size64_t) index_value->size,
-		     index_value_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append index value to list.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	if( libfcache_cache_free(
-	     &sub_node_cache,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free sub node cache.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( sub_node_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &sub_node_cache,
-		 NULL );
-	}
-	return( -1 );
-}
-
-/* Reads an index value
- * Callback function for the index value list
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_read_index_value_element_data(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *element,
-     libfdata_cache_t *cache,
-     int element_file_index,
-     off64_t index_value_offset,
-     size64_t element_size LIBFSNTFS_ATTRIBUTE_UNUSED,
-     uint32_t index_value_flags,
-     uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
-     libcerror_error_t **error )
-{
-	libfsntfs_index_node_t *sub_node     = NULL;
-	libfsntfs_index_value_t *index_value = NULL;
-	static char *function                = "libfsntfs_index_read_index_value_element_data";
-	off64_t index_entry_offset           = 0;
-	off64_t sub_node_vcn                 = 0;
-	int index_value_entry                = 0;
-
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_size )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_element_get_element_index(
-	     element,
-	     &index_value_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve element index.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading index value: %03d at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
-		 function,
-		 index_value_entry,
-		 index_value_offset,
-		 index_value_offset );
-	}
-#endif
-	/* The element file index value contains the index value entry + 1
-	 */
-	element_file_index -= 1;
-
-	if( ( index_value_flags & LIBFSNTFS_INDEX_VALUE_LIST_FLAG_STORED_IN_ROOT ) != 0 )
-	{
-		if( libfsntfs_index_node_get_value_by_index(
-		     index->root_node,
-		     element_file_index,
-		     &index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index value: %d from root node.",
-			 function,
-			 element_file_index );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		sub_node_vcn       = index_value_offset / index->index_entry_size;
-		index_entry_offset = (off64_t) ( sub_node_vcn * index->io_handle->cluster_block_size );
-
-		if( libfsntfs_index_get_sub_node(
-		     index,
-		     file_io_handle,
-		     index->index_node_cache,
-		     index_entry_offset,
-		     (int) sub_node_vcn,
-		     &sub_node,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
-			 function,
-			 (int) sub_node_vcn,
-			 index_entry_offset );
-
-			return( -1 );
-		}
-		if( libfsntfs_index_node_get_value_by_index(
-		     sub_node,
-		     element_file_index,
-		     &index_value,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index value: %d from sub node.",
-			 function,
-			 element_file_index );
-
-			return( -1 );
-		}
-	}
-/* TODO remove free function after pinning to libfcache >= 20191115 */
-	if( libfdata_list_element_set_element_value(
-	     element,
-	     (intptr_t *) file_io_handle,
-	     cache,
-	     (intptr_t *) index_value,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_value_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_NON_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set index value as element value.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves the number of index values
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_get_number_of_index_values(
-     libfsntfs_index_t *index,
-     int *number_of_index_values,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_get_number_of_index_values";
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( index->index_value_list == NULL )
-	{
-		if( number_of_index_values == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid number of index values.",
-			 function );
-
-			return( -1 );
-		}
-		*number_of_index_values = 0;
-	}
-	else
-	{
-		if( libfdata_list_get_number_of_elements(
-		     index->index_value_list,
-		     number_of_index_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of index values.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-/* Retrieves a specific index value
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_get_index_value_by_index(
-     libfsntfs_index_t *index,
-     libbfio_handle_t *file_io_handle,
-     int index_value_entry,
-     libfsntfs_index_value_t **index_value,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_get_index_value_by_index";
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_get_element_value_by_index(
-	     index->index_value_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) index->index_value_cache,
-	     index_value_entry,
-	     (intptr_t **) index_value,
-	     LIBFDATA_READ_FLAG_IGNORE_CACHE,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index value: %d.",
-		 function,
-		 index_value_entry );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Compares the name with an UTF-8 encoded string
- * Returns 1 if the strings are equal, 0 if not or -1 on error
- */
-int libfsntfs_index_compare_name_with_utf8_string(
-     libfsntfs_index_t *index,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_index_compare_name_with_utf8_string";
-	int result            = 0;
-
-	if( index == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index.",
-		 function );
-
-		return( -1 );
-	}
-	result = libuna_utf8_string_compare_with_utf8_stream(
-		  utf8_string,
-		  utf8_string_length,
-		  index->name,
-		  index->name_size,
-		  error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare index name with UTF-8 string.",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == LIBUNA_COMPARE_EQUAL )
-	{
-		return( 1 );
-	}
-	return( 0 );
 }
 

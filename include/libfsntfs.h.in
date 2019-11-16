@@ -521,7 +521,7 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_parent_file_reference(
      libfsntfs_file_entry_t *file_entry,
-     uint64_t *file_reference,
+     uint64_t *parent_file_reference,
      libfsntfs_error_t **error );
 
 /* Retrieves the parent file reference for a specific $FILE_NAME attribute
@@ -531,7 +531,7 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
      libfsntfs_file_entry_t *file_entry,
      int attribute_index,
-     uint64_t *file_reference,
+     uint64_t *parent_file_reference,
      libfsntfs_error_t **error );
 
 /* Retrieves the journal sequence number

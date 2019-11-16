@@ -29,7 +29,6 @@
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_mft_entry.h"
 
@@ -98,9 +97,8 @@ int libfsntfs_directory_initialize(
 
 		return( -1 );
 	}
-	if( libcdata_btree_initialize(
+	if( libfsntfs_directory_entries_tree_initialize(
 	     &( ( *directory )->directory_entries_tree ),
-	     LIBFSNTFS_DIRECTORY_ENTRIES_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -119,9 +117,8 @@ on_error:
 	{
 		if( ( *directory )->directory_entries_tree != NULL )
 		{
-			libcdata_btree_free(
+			libfsntfs_directory_entries_tree_free(
 			 &( ( *directory )->directory_entries_tree ),
-			 NULL,
 			 NULL );
 		}
 		memory_free(
@@ -157,9 +154,8 @@ int libfsntfs_directory_free(
 	{
 		if( ( *directory )->directory_entries_tree != NULL )
 		{
-			if( libcdata_btree_free(
+			if( libfsntfs_directory_entries_tree_free(
 			     &( ( *directory )->directory_entries_tree ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -185,6 +181,7 @@ int libfsntfs_directory_free(
  */
 int libfsntfs_directory_read_file_io_handle(
      libfsntfs_directory_t *directory,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_entry_t *mft_entry,
      uint8_t flags,
@@ -203,10 +200,11 @@ int libfsntfs_directory_read_file_io_handle(
 
 		return( -1 );
 	}
-	if( libfsntfs_directory_entries_tree_read_from_mft_entry(
+	if( libfsntfs_directory_entries_tree_read_from_i30_index(
 	     directory->directory_entries_tree,
-	     mft_entry,
+	     io_handle,
 	     file_io_handle,
+	     mft_entry,
 	     flags,
 	     error ) != 1 )
 	{
@@ -244,7 +242,7 @@ int libfsntfs_directory_get_number_of_entries(
 
 		return( -1 );
 	}
-	if( libcdata_btree_get_number_of_values(
+	if( libfsntfs_directory_entries_tree_get_number_of_entries(
 	     directory->directory_entries_tree,
 	     number_of_entries,
 	     error ) != 1 )
@@ -253,7 +251,7 @@ int libfsntfs_directory_get_number_of_entries(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of values from directory entries tree.",
+		 "%s: unable to retrieve number of entries from directory entries tree.",
 		 function );
 
 		return( -1 );
@@ -266,6 +264,7 @@ int libfsntfs_directory_get_number_of_entries(
  */
 int libfsntfs_directory_get_entry_by_index(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      int entry_index,
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
@@ -283,10 +282,11 @@ int libfsntfs_directory_get_entry_by_index(
 
 		return( -1 );
 	}
-	if( libcdata_btree_get_value_by_index(
+	if( libfsntfs_directory_entries_get_entry_by_index(
 	     directory->directory_entries_tree,
+	     file_io_handle,
 	     entry_index,
-	     (intptr_t **) directory_entry,
+	     directory_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -307,6 +307,7 @@ int libfsntfs_directory_get_entry_by_index(
  */
 int libfsntfs_directory_get_entry_by_utf8_name(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libfsntfs_directory_entry_t **directory_entry,
@@ -326,8 +327,9 @@ int libfsntfs_directory_get_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf8_name(
+	result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 	          directory->directory_entries_tree,
+	          file_io_handle,
 	          utf8_string,
 	          utf8_string_length,
 	          directory_entry,
@@ -352,6 +354,7 @@ int libfsntfs_directory_get_entry_by_utf8_name(
  */
 int libfsntfs_directory_get_entry_by_utf16_name(
      libfsntfs_directory_t *directory,
+     libbfio_handle_t *file_io_handle,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libfsntfs_directory_entry_t **directory_entry,
@@ -371,8 +374,9 @@ int libfsntfs_directory_get_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_directory_entries_tree_get_directory_entry_by_utf16_name(
+	result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 	          directory->directory_entries_tree,
+	          file_io_handle,
 	          utf16_string,
 	          utf16_string_length,
 	          directory_entry,

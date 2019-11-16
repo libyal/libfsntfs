@@ -819,7 +819,7 @@ int libfsntfs_attribute_get_type(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -848,7 +848,7 @@ int libfsntfs_attribute_get_type(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -947,7 +947,7 @@ int libfsntfs_attribute_get_data_flags(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -976,7 +976,7 @@ int libfsntfs_attribute_get_data_flags(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1026,7 +1026,7 @@ int libfsntfs_internal_attribute_get_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1043,7 +1043,7 @@ int libfsntfs_internal_attribute_get_value(
 #endif
 	*value = internal_attribute->value;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1087,7 +1087,7 @@ int libfsntfs_attribute_get_utf8_name_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1136,7 +1136,7 @@ int libfsntfs_attribute_get_utf8_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1181,7 +1181,7 @@ int libfsntfs_attribute_get_utf8_name(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1232,7 +1232,7 @@ int libfsntfs_attribute_get_utf8_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1276,7 +1276,7 @@ int libfsntfs_attribute_get_utf16_name_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1325,7 +1325,7 @@ int libfsntfs_attribute_get_utf16_name_size(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1370,7 +1370,7 @@ int libfsntfs_attribute_get_utf16_name(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1421,7 +1421,7 @@ int libfsntfs_attribute_get_utf16_name(
 			result = -1;
 		}
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1487,7 +1487,7 @@ int libfsntfs_attribute_get_data_vcn_range(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1524,7 +1524,7 @@ int libfsntfs_attribute_get_data_vcn_range(
 	}
 /* TODO add support for attribute list entry ? */
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1690,7 +1690,7 @@ int libfsntfs_attribute_get_data_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
@@ -1719,7 +1719,7 @@ int libfsntfs_attribute_get_data_size(
 
 		result = -1;
 	}
-#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,
 	     error ) != 1 )
