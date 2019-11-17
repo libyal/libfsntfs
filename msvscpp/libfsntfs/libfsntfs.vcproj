@@ -222,10 +222,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_directory.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_directory_entries_tree.c"
 				>
 			</File>
@@ -509,10 +505,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_definitions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_directory.h"
 				>
 			</File>
 			<File

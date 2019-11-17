@@ -652,6 +652,79 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_directory_entry_get_file_reference function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entry_get_file_reference(
+     libfsntfs_directory_entry_t *directory_entry )
+{
+	libcerror_error_t *error = NULL;
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_directory_entry_get_file_reference(
+	          directory_entry,
+	          &file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entry_get_file_reference(
+	          NULL,
+	          &file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_file_reference(
+	          directory_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_directory_entry_get_parent_file_reference function
  * Returns 1 if successful or 0 if not
  */
@@ -799,9 +872,22 @@ int main(
 	 directory_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entry_get_file_reference",
+	 fsntfs_test_directory_entry_get_file_reference,
+	 directory_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_directory_entry_get_parent_file_reference",
 	 fsntfs_test_directory_entry_get_parent_file_reference,
 	 directory_entry );
+
+	/* TODO add tests for libfsntfs_directory_entry_get_utf8_name_size */
+
+	/* TODO add tests for libfsntfs_directory_entry_get_utf8_name */
+
+	/* TODO add tests for libfsntfs_directory_entry_get_utf16_name_size */
+
+	/* TODO add tests for libfsntfs_directory_entry_get_utf16_name */
 
 	/* Clean up
 	 */

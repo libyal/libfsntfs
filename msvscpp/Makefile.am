@@ -8,7 +8,6 @@ MSVSCPP_FILES = \
 	fsntfs_test_compressed_block_descriptor/fsntfs_test_compressed_block_descriptor.vcproj \
 	fsntfs_test_data_run/fsntfs_test_data_run.vcproj \
 	fsntfs_test_data_stream/fsntfs_test_data_stream.vcproj \
-	fsntfs_test_directory/fsntfs_test_directory.vcproj \
 	fsntfs_test_directory_entries_tree/fsntfs_test_directory_entries_tree.vcproj \
 	fsntfs_test_directory_entry/fsntfs_test_directory_entry.vcproj \
 	fsntfs_test_error/fsntfs_test_error.vcproj \

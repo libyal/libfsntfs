@@ -62,6 +62,10 @@ struct libfsntfs_mft_entry
 	 */
 	uint32_t index;
 
+	/* The file reference
+	 */
+	uint64_t file_reference;
+
 	/* The sequence
 	 */
 	uint16_t sequence;
@@ -98,7 +102,7 @@ struct libfsntfs_mft_entry
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
 
-	/* The index of the (first) file name attribute
+	/* The index of the (first) file name attribute or -1 if not set
 	 */
 	int file_name_attribute_index;
 

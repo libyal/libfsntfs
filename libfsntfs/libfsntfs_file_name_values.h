@@ -155,12 +155,6 @@ int libfsntfs_file_name_values_get_utf16_name(
      size_t utf16_string_size,
      libcerror_error_t **error );
 
-int libfsntfs_file_name_values_compare(
-     libfsntfs_file_name_values_t *first_file_name_values,
-     libfsntfs_file_name_values_t *second_file_name_values,
-     uint8_t use_case_folding,
-     libcerror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

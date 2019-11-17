@@ -593,6 +593,20 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 
 			goto on_error;
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 function,
+			 index_value_entry,
+			 index_value->file_reference & 0xffffffffffffUL,
+			 index_value->file_reference >> 48 );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -652,21 +666,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 		{
 			break;
 		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-			 function,
-			 index_value_entry,
-			 index_value->file_reference & 0xffffffffffffUL,
-			 index_value->file_reference >> 48 );
-
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-		index_value_flags  = 0;
+		index_value_flags = 0;
 
 		if( index_node == directory_entries_tree->i30_index->root_node )
 		{
@@ -947,16 +947,18 @@ int libfsntfs_directory_entries_tree_get_number_of_entries(
 }
 
 /* Retrieves a specific entry
+ * This function creates a new directory entry
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_directory_entries_get_entry_by_index(
+int libfsntfs_directory_entries_tree_get_entry_by_index(
      libfsntfs_directory_entries_tree_t *directory_entries_tree,
      libbfio_handle_t *file_io_handle,
      int entry_index,
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_directory_entries_get_entry_by_index";
+	libfsntfs_directory_entry_t *safe_directory_entry = NULL;
+	static char *function                             = "libfsntfs_directory_entries_tree_get_entry_by_index";
 
 	if( directory_entries_tree == NULL )
 	{
@@ -974,7 +976,7 @@ int libfsntfs_directory_entries_get_entry_by_index(
 	     (intptr_t *) file_io_handle,
 	     (libfdata_cache_t *) directory_entries_tree->entries_cache,
 	     entry_index,
-	     (intptr_t **) directory_entry,
+	     (intptr_t **) &safe_directory_entry,
 	     LIBFDATA_READ_FLAG_IGNORE_CACHE,
 	     error ) != 1 )
 	{
@@ -988,10 +990,391 @@ int libfsntfs_directory_entries_get_entry_by_index(
 
 		return( -1 );
 	}
+	if( libfsntfs_directory_entry_clone(
+	     directory_entry,
+	     safe_directory_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create directory entry.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
+/* Retrieves the directory entry from an index node for an UTF-8 encoded name
+ * This function creates a new directory entry
+ * Returns 1 if successful, 0 if no such directory entry or -1 on error
+ */
+int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
+     libfsntfs_directory_entries_tree_t *directory_entries_tree,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_directory_entry_t **directory_entry,
+     int recursion_depth,
+     libcerror_error_t **error )
+{
+	libcdata_tree_node_t *upper_node                      = NULL;
+	libfsntfs_directory_entry_t *existing_directory_entry = NULL;
+	libfsntfs_directory_entry_t *safe_directory_entry     = NULL;
+	libfsntfs_file_name_values_t *file_name_values        = NULL;
+	libfsntfs_index_node_t *sub_node                      = NULL;
+	libfsntfs_index_value_t *index_value                  = NULL;
+	static char *function                                 = "libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name";
+	off64_t index_entry_offset                            = 0;
+	int index_value_entry                                 = 0;
+	int number_of_index_values                            = 0;
+	int result                                            = 0;
+
+	if( directory_entries_tree == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->i30_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - missing $I30 index.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->i30_index->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - invalid $I30 index - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
+		 function );
+
+		return( -1 );
+        }
+	if( libfsntfs_index_node_get_number_of_values(
+	     index_node,
+	     &number_of_index_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of values from index node.",
+		 function );
+
+		goto on_error;
+	}
+	for( index_value_entry = 0;
+	     index_value_entry < number_of_index_values;
+	     index_value_entry++ )
+	{
+		if( libfsntfs_index_node_get_value_by_index(
+		     index_node,
+		     index_value_entry,
+		     &index_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value: %d from index node.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 function,
+			 index_value_entry,
+			 index_value->file_reference & 0xffffffffffffUL,
+			 index_value->file_reference >> 48 );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
+		}
+		if( libfsntfs_file_name_values_initialize(
+		     &file_name_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create file name values.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_name_values_read_data(
+		     file_name_values,
+		     index_value->key_data,
+		     (size_t) index_value->key_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read file name values.",
+			 function );
+
+			goto on_error;
+		}
+		result = libfsntfs_name_compare_with_utf8_string(
+		          file_name_values->name,
+		          file_name_values->name_size,
+		          utf8_string,
+		          utf8_string_length,
+		          1,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare file name values with UTF-8 string.",
+			 function );
+
+			goto on_error;
+		}
+		if( result != LIBUNA_COMPARE_EQUAL )
+		{
+			if( libfsntfs_file_name_values_free(
+			     &file_name_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free file name values.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( result == LIBUNA_COMPARE_LESS )
+		{
+			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+			{
+				break;
+			}
+		}
+		else if( result == LIBUNA_COMPARE_EQUAL )
+		{
+			break;
+		}
+	}
+	if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		if( libfsntfs_directory_entry_initialize(
+		     &safe_directory_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create directory entry.",
+			 function );
+
+			goto on_error;
+		}
+		safe_directory_entry->file_reference   = index_value->file_reference;
+		safe_directory_entry->file_name_values = file_name_values;
+
+		file_name_values = NULL;
+
+		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+		{
+			result = libcdata_btree_get_value_by_value(
+				  directory_entries_tree->short_names_tree,
+				  (intptr_t *) directory_entry,
+				  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+				  &upper_node,
+				  (intptr_t **) &existing_directory_entry,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve directory entry from tree.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result != 0 )
+			{
+/* TODO add debug compare of long and short names */
+				if( existing_directory_entry == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing existing directory entry.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfsntfs_file_name_values_clone(
+				     &( safe_directory_entry->short_file_name_values ),
+				     existing_directory_entry->short_file_name_values,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to clone short file name values.",
+					 function );
+
+					goto on_error;
+				}
+			}
+		}
+		*directory_entry = safe_directory_entry;
+
+		result = 1;
+	}
+	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	{
+		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: node index value: %d sub node VCN value out of bounds.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
+		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+
+		if( libfsntfs_index_get_sub_node(
+		     directory_entries_tree->i30_index,
+		     file_io_handle,
+		     directory_entries_tree->i30_index->index_node_cache,
+		     index_entry_offset,
+		     (int) index_value->sub_node_vcn,
+		     &sub_node,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 function,
+			 (int) index_value->sub_node_vcn,
+			 index_entry_offset );
+
+			goto on_error;
+		}
+		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
+			  directory_entries_tree,
+			  file_io_handle,
+			  sub_node,
+			  utf8_string,
+			  utf8_string_length,
+			  directory_entry,
+			  recursion_depth + 1,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to retrieve directory entry by UTF-8 string from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 function,
+			 (int) index_value->sub_node_vcn,
+			 index_entry_offset );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		result = 0;
+	}
+	return( result );
+
+on_error:
+	if( safe_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &safe_directory_entry,
+		 NULL );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Retrieves the directory entry for an UTF-8 encoded name
+ * This function creates a new directory entry
  * Returns 1 if successful, 0 if no such directory entry or -1 on error
  */
 int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
@@ -1002,10 +1385,8 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
 {
-	static char *function           = "libfsntfs_directory_entries_tree_get_entry_by_utf8_name";
-	int directory_entry_index       = 0;
-	int number_of_directory_entries = 0;
-	int result                      = 0;
+	static char *function = "libfsntfs_directory_entries_tree_get_entry_by_utf8_name";
+	int result            = 0;
 
 	if( directory_entries_tree == NULL )
 	{
@@ -1014,6 +1395,89 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid directory entries tree.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
+	          directory_entries_tree,
+	          file_io_handle,
+	          directory_entries_tree->i30_index->root_node,
+	          utf8_string,
+	          utf8_string_length,
+	          directory_entry,
+	          0,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve directory entry by UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Retrieves the directory entry from an index node for an UTF-16 encoded name
+ * This function creates a new directory entry
+ * Returns 1 if successful, 0 if no such directory entry or -1 on error
+ */
+int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
+     libfsntfs_directory_entries_tree_t *directory_entries_tree,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_directory_entry_t **directory_entry,
+     int recursion_depth,
+     libcerror_error_t **error )
+{
+	libcdata_tree_node_t *upper_node                      = NULL;
+	libfsntfs_directory_entry_t *existing_directory_entry = NULL;
+	libfsntfs_directory_entry_t *safe_directory_entry     = NULL;
+	libfsntfs_file_name_values_t *file_name_values        = NULL;
+	libfsntfs_index_node_t *sub_node                      = NULL;
+	libfsntfs_index_value_t *index_value                  = NULL;
+	static char *function                                 = "libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name";
+	off64_t index_entry_offset                            = 0;
+	int index_value_entry                                 = 0;
+	int number_of_index_values                            = 0;
+	int result                                            = 0;
+
+	if( directory_entries_tree == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->i30_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - missing $I30 index.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->i30_index->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - invalid $I30 index - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -1029,138 +1493,304 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	if( libfsntfs_directory_entries_tree_get_number_of_entries(
-	     directory_entries_tree,
-	     &number_of_directory_entries,
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
+		 function );
+
+		return( -1 );
+        }
+	if( libfsntfs_index_node_get_number_of_values(
+	     index_node,
+	     &number_of_index_values,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of directory entries from tree.",
+		 "%s: unable to retrieve number of values from index node.",
 		 function );
 
 		goto on_error;
 	}
-	for( directory_entry_index = 0;
-	     directory_entry_index < number_of_directory_entries;
-	     directory_entry_index++ )
+	for( index_value_entry = 0;
+	     index_value_entry < number_of_index_values;
+	     index_value_entry++ )
 	{
-		if( libfsntfs_directory_entries_get_entry_by_index(
-		     directory_entries_tree,
-		     file_io_handle,
-		     directory_entry_index,
-		     directory_entry,
+		if( libfsntfs_index_node_get_value_by_index(
+		     index_node,
+		     index_value_entry,
+		     &index_value,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve directory entry: %d from tree.",
+			 "%s: unable to retrieve value: %d from index node.",
 			 function,
-			 directory_entry_index );
+			 index_value_entry );
 
 			goto on_error;
 		}
-		if( *directory_entry == NULL )
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 function,
+			 index_value_entry,
+			 index_value->file_reference & 0xffffffffffffUL,
+			 index_value->file_reference >> 48 );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
+		}
+		if( libfsntfs_file_name_values_initialize(
+		     &file_name_values,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing directory entry.",
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create file name values.",
 			 function );
 
 			goto on_error;
 		}
-		if( ( *directory_entry )->file_name_values != NULL )
+		if( libfsntfs_file_name_values_read_data(
+		     file_name_values,
+		     index_value->key_data,
+		     (size_t) index_value->key_data_size,
+		     error ) != 1 )
 		{
-			if( ( *directory_entry )->file_name_values->name == NULL )
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read file name values.",
+			 function );
+
+			goto on_error;
+		}
+		result = libfsntfs_name_compare_with_utf16_string(
+		          file_name_values->name,
+		          file_name_values->name_size,
+		          utf16_string,
+		          utf16_string_length,
+		          1,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare file name values with UTF-16 string.",
+			 function );
+
+			goto on_error;
+		}
+		if( result != LIBUNA_COMPARE_EQUAL )
+		{
+			if( libfsntfs_file_name_values_free(
+			     &file_name_values,
+			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid directory entry - invalid file name values - missing name.",
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free file name values.",
 				 function );
 
 				goto on_error;
-			}
-			result = libfsntfs_name_compare_with_utf8_string(
-				  ( *directory_entry )->file_name_values->name,
-				  ( *directory_entry )->file_name_values->name_size,
-				  utf8_string,
-				  utf8_string_length,
-				  1,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare UTF-8 string with file name values.",
-				 function );
-
-				goto on_error;
-			}
-			else if( result == LIBUNA_COMPARE_EQUAL )
-			{
-				return( 1 );
 			}
 		}
-		if( ( *directory_entry )->short_file_name_values != NULL )
+		if( result == LIBUNA_COMPARE_LESS )
 		{
-			if( ( *directory_entry )->short_file_name_values->name == NULL )
+			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid directory entry - invalid short file name values - missing name.",
-				 function );
-
-				goto on_error;
+				break;
 			}
-			result = libfsntfs_name_compare_with_utf8_string(
-				  ( *directory_entry )->short_file_name_values->name,
-				  ( *directory_entry )->short_file_name_values->name_size,
-				  utf8_string,
-				  utf8_string_length,
-				  1,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare UTF-8 string with short file name values.",
-				 function );
-
-				goto on_error;
-			}
-			else if( result == LIBUNA_COMPARE_EQUAL )
-			{
-				return( 1 );
-			}
+		}
+		else if( result == LIBUNA_COMPARE_EQUAL )
+		{
+			break;
 		}
 	}
-	*directory_entry = NULL;
+	if( result == LIBUNA_COMPARE_EQUAL )
+	{
+		if( libfsntfs_directory_entry_initialize(
+		     &safe_directory_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create directory entry.",
+			 function );
 
-	return( 0 );
+			goto on_error;
+		}
+		safe_directory_entry->file_reference   = index_value->file_reference;
+		safe_directory_entry->file_name_values = file_name_values;
+
+		file_name_values = NULL;
+
+		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+		{
+			result = libcdata_btree_get_value_by_value(
+				  directory_entries_tree->short_names_tree,
+				  (intptr_t *) directory_entry,
+				  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+				  &upper_node,
+				  (intptr_t **) &existing_directory_entry,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve directory entry from tree.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result != 0 )
+			{
+/* TODO add debug compare of long and short names */
+				if( existing_directory_entry == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing existing directory entry.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfsntfs_file_name_values_clone(
+				     &( safe_directory_entry->short_file_name_values ),
+				     existing_directory_entry->short_file_name_values,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to clone short file name values.",
+					 function );
+
+					goto on_error;
+				}
+			}
+		}
+		*directory_entry = safe_directory_entry;
+
+		result = 1;
+	}
+	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	{
+		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: node index value: %d sub node VCN value out of bounds.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
+		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+
+		if( libfsntfs_index_get_sub_node(
+		     directory_entries_tree->i30_index,
+		     file_io_handle,
+		     directory_entries_tree->i30_index->index_node_cache,
+		     index_entry_offset,
+		     (int) index_value->sub_node_vcn,
+		     &sub_node,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 function,
+			 (int) index_value->sub_node_vcn,
+			 index_entry_offset );
+
+			goto on_error;
+		}
+		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
+			  directory_entries_tree,
+			  file_io_handle,
+			  sub_node,
+			  utf16_string,
+			  utf16_string_length,
+			  directory_entry,
+			  recursion_depth + 1,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to retrieve directory entry by UTF-16 string from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 function,
+			 (int) index_value->sub_node_vcn,
+			 index_entry_offset );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		result = 0;
+	}
+	return( result );
 
 on_error:
-	*directory_entry = NULL;
-
+	if( safe_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &safe_directory_entry,
+		 NULL );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
+		 NULL );
+	}
 	return( -1 );
 }
 
 /* Retrieves the directory entry for an UTF-16 encoded name
+ * This function creates a new directory entry
  * Returns 1 if successful, 0 if no such directory entry or -1 on error
  */
 int libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
@@ -1171,10 +1801,8 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
      libfsntfs_directory_entry_t **directory_entry,
      libcerror_error_t **error )
 {
-	static char *function           = "libfsntfs_directory_entries_tree_get_entry_by_utf16_name";
-	int directory_entry_index       = 0;
-	int number_of_directory_entries = 0;
-	int result                      = 0;
+	static char *function = "libfsntfs_directory_entries_tree_get_entry_by_utf16_name";
+	int result            = 0;
 
 	if( directory_entries_tree == NULL )
 	{
@@ -1187,146 +1815,28 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	if( directory_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid directory entry.",
-		 function );
+	result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
+	          directory_entries_tree,
+	          file_io_handle,
+	          directory_entries_tree->i30_index->root_node,
+	          utf16_string,
+	          utf16_string_length,
+	          directory_entry,
+	          0,
+	          error );
 
-		return( -1 );
-	}
-	if( libfsntfs_directory_entries_tree_get_number_of_entries(
-	     directory_entries_tree,
-	     &number_of_directory_entries,
-	     error ) != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of directory entries from tree.",
+		 "%s: unable to retrieve directory entry by UTF-16 string.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	for( directory_entry_index = 0;
-	     directory_entry_index < number_of_directory_entries;
-	     directory_entry_index++ )
-	{
-		if( libfsntfs_directory_entries_get_entry_by_index(
-		     directory_entries_tree,
-		     file_io_handle,
-		     directory_entry_index,
-		     directory_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve directory entry: %d from tree.",
-			 function,
-			 directory_entry_index );
-
-			goto on_error;
-		}
-		if( *directory_entry == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing directory entry.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( *directory_entry )->file_name_values != NULL )
-		{
-			if( ( *directory_entry )->file_name_values->name == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid directory entry - invalid file name values - missing name.",
-				 function );
-
-				goto on_error;
-			}
-			result = libfsntfs_name_compare_with_utf16_string(
-				  ( *directory_entry )->file_name_values->name,
-				  ( *directory_entry )->file_name_values->name_size,
-				  utf16_string,
-				  utf16_string_length,
-				  1,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare UTF-16 string with file name values.",
-				 function );
-
-				goto on_error;
-			}
-			else if( result == LIBUNA_COMPARE_EQUAL )
-			{
-				return( 1 );
-			}
-		}
-		if( ( *directory_entry )->short_file_name_values != NULL )
-		{
-			if( ( *directory_entry )->short_file_name_values->name == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid directory entry - invalid short file name values - missing name.",
-				 function );
-
-				goto on_error;
-			}
-			result = libfsntfs_name_compare_with_utf16_string(
-				  ( *directory_entry )->short_file_name_values->name,
-				  ( *directory_entry )->short_file_name_values->name_size,
-				  utf16_string,
-				  utf16_string_length,
-				  1,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare UTF-16 string with short file name values.",
-				 function );
-
-				goto on_error;
-			}
-			else if( result == LIBUNA_COMPARE_EQUAL )
-			{
-				return( 1 );
-			}
-		}
-	}
-	*directory_entry = NULL;
-
-	return( 0 );
-
-on_error:
-	*directory_entry = NULL;
-
-	return( -1 );
+	return( result );
 }
 
 /* Reads a directory entry
@@ -1353,7 +1863,6 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	static char *function                                 = "libfsntfs_directory_entries_tree_read_element_data";
 	off64_t index_entry_offset                            = 0;
 	off64_t sub_node_vcn                                  = 0;
-	uint8_t file_name_namespace                           = 0;
 	int index_value_entry                                 = 0;
 	int result                                            = 0;
 
@@ -1526,7 +2035,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 		goto on_error;
 	}
-	if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+	if( directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 	{
 		result = libcdata_btree_get_value_by_value(
 			  directory_entries_tree->short_names_tree,
@@ -1549,6 +2058,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 		}
 		else if( result != 0 )
 		{
+/* TODO add debug compare of long and short names */
 			if( existing_directory_entry == NULL )
 			{
 				libcerror_error_set(

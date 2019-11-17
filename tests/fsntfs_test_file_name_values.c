@@ -2199,8 +2199,6 @@ int main(
 	 fsntfs_test_file_name_values_get_utf16_name,
 	 file_name_values );
 
-	/* TODO: add tests for libfsntfs_file_name_values_compare_short_name */
-
 	/* Clean up
 	 */
 	result = libfsntfs_file_name_values_free(

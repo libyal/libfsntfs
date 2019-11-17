@@ -25,7 +25,7 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_directory.h"
+#include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
@@ -70,9 +70,9 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_directory_entry_t *directory_entry;
 
-	/* The directory
+	/* The directory entries tree
 	 */
-	libfsntfs_directory_t *directory;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree;
 
 	/* The security descriptor index
 	 */

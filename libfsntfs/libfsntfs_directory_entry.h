@@ -72,9 +72,36 @@ int libfsntfs_directory_entry_get_mft_entry_index(
      uint64_t *mft_entry_index,
      libcerror_error_t **error );
 
+int libfsntfs_directory_entry_get_file_reference(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error );
+
 int libfsntfs_directory_entry_get_parent_file_reference(
      libfsntfs_directory_entry_t *directory_entry,
      uint64_t *parent_file_reference,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_utf8_name_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_utf8_name(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_utf16_name_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_utf16_name(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

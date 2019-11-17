@@ -27,7 +27,7 @@
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
-#include "libfsntfs_directory.h"
+#include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_file_name_attribute.h"
@@ -152,21 +152,21 @@ int libfsntfs_file_entry_initialize(
 	{
 		if( mft_entry->has_i30_index != 0 )
 		{
-			if( libfsntfs_directory_initialize(
-			     &( internal_file_entry->directory ),
+			if( libfsntfs_directory_entries_tree_initialize(
+			     &( internal_file_entry->directory_entries_tree ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create directory.",
+				 "%s: unable to create directory entries tree.",
 				 function );
 
 				goto on_error;
 			}
-			if( libfsntfs_directory_read_file_io_handle(
-			     internal_file_entry->directory,
+			if( libfsntfs_directory_entries_tree_read_from_i30_index(
+			     internal_file_entry->directory_entries_tree,
 			     io_handle,
 			     file_io_handle,
 			     mft_entry,
@@ -254,10 +254,10 @@ on_error:
 			 &( internal_file_entry->data_cluster_block_stream ),
 			 NULL );
 		}
-		if( internal_file_entry->directory != NULL )
+		if( internal_file_entry->directory_entries_tree != NULL )
 		{
-			libfsntfs_directory_free(
-			 &( internal_file_entry->directory ),
+			libfsntfs_directory_entries_tree_free(
+			 &( internal_file_entry->directory_entries_tree ),
 			 NULL );
 		}
 		memory_free(
@@ -361,17 +361,17 @@ int libfsntfs_file_entry_free(
 				result = -1;
 			}
 		}
-		if( internal_file_entry->directory != NULL )
+		if( internal_file_entry->directory_entries_tree != NULL )
 		{
-			if( libfsntfs_directory_free(
-			     &( internal_file_entry->directory ),
+			if( libfsntfs_directory_entries_tree_free(
+			     &( internal_file_entry->directory_entries_tree ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free directory.",
+				 "%s: unable to free directory entries tree.",
 				 function );
 
 				result = -1;
@@ -1343,6 +1343,21 @@ int libfsntfs_file_entry_get_creation_time(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_file_entry_get_standard_information_attribute(
 	          internal_file_entry,
 	          &standard_information_attribute,
@@ -1357,7 +1372,7 @@ int libfsntfs_file_entry_get_creation_time(
 		 "%s: unable to retrieve standard information attribute.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -1373,12 +1388,12 @@ int libfsntfs_file_entry_get_creation_time(
 			 "%s: unable to retrieve value from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
-		if( libfsntfs_standard_information_values_get_creation_time(
-		     standard_information_values,
-		     filetime,
-		     error ) != 1 )
+		else if( libfsntfs_standard_information_values_get_creation_time(
+		          standard_information_values,
+		          filetime,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1387,9 +1402,24 @@ int libfsntfs_file_entry_get_creation_time(
 			 "%s: unable to retrieve creation time from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1421,6 +1451,21 @@ int libfsntfs_file_entry_get_modification_time(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_file_entry_get_standard_information_attribute(
 	          internal_file_entry,
 	          &standard_information_attribute,
@@ -1435,7 +1480,7 @@ int libfsntfs_file_entry_get_modification_time(
 		 "%s: unable to retrieve standard information attribute.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -1451,12 +1496,12 @@ int libfsntfs_file_entry_get_modification_time(
 			 "%s: unable to retrieve standard information attribute value.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
-		if( libfsntfs_standard_information_values_get_modification_time(
-		     standard_information_values,
-		     filetime,
-		     error ) != 1 )
+		else if( libfsntfs_standard_information_values_get_modification_time(
+		          standard_information_values,
+		          filetime,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1465,9 +1510,24 @@ int libfsntfs_file_entry_get_modification_time(
 			 "%s: unable to retrieve modification time from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1499,6 +1559,21 @@ int libfsntfs_file_entry_get_access_time(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_file_entry_get_standard_information_attribute(
 	          internal_file_entry,
 	          &standard_information_attribute,
@@ -1513,7 +1588,7 @@ int libfsntfs_file_entry_get_access_time(
 		 "%s: unable to retrieve standard information attribute.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -1529,12 +1604,12 @@ int libfsntfs_file_entry_get_access_time(
 			 "%s: unable to retrieve standard information attribute value.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
-		if( libfsntfs_standard_information_values_get_access_time(
-		     standard_information_values,
-		     filetime,
-		     error ) != 1 )
+		else if( libfsntfs_standard_information_values_get_access_time(
+		          standard_information_values,
+		          filetime,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1543,9 +1618,24 @@ int libfsntfs_file_entry_get_access_time(
 			 "%s: unable to retrieve access time from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1577,6 +1667,21 @@ int libfsntfs_file_entry_get_entry_modification_time(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_file_entry_get_standard_information_attribute(
 	          internal_file_entry,
 	          &standard_information_attribute,
@@ -1591,7 +1696,7 @@ int libfsntfs_file_entry_get_entry_modification_time(
 		 "%s: unable to retrieve standard information attribute.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -1607,12 +1712,12 @@ int libfsntfs_file_entry_get_entry_modification_time(
 			 "%s: unable to retrieve standard information attribute value.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
-		if( libfsntfs_standard_information_values_get_entry_modification_time(
-		     standard_information_values,
-		     filetime,
-		     error ) != 1 )
+		else if( libfsntfs_standard_information_values_get_entry_modification_time(
+		          standard_information_values,
+		          filetime,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1621,9 +1726,24 @@ int libfsntfs_file_entry_get_entry_modification_time(
 			 "%s: unable to retrieve entry modification time from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1655,6 +1775,21 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_file_entry_get_standard_information_attribute(
 	          internal_file_entry,
 	          &standard_information_attribute,
@@ -1669,7 +1804,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 		 "%s: unable to retrieve standard information attribute.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -1685,12 +1820,12 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 			 "%s: unable to retrieve standard information attribute value.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
-		if( libfsntfs_standard_information_values_get_file_attribute_flags(
-		     standard_information_values,
-		     file_attribute_flags,
-		     error ) != 1 )
+		else if( libfsntfs_standard_information_values_get_file_attribute_flags(
+		          standard_information_values,
+		          file_attribute_flags,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1699,9 +1834,24 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 			 "%s: unable to retrieve file attribute flags from standard information attribute.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1717,6 +1867,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_name_size";
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1731,36 +1882,56 @@ int libfsntfs_file_entry_get_utf8_name_size(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->directory_entry == NULL )
-	{
-		return( 0 );
-	}
-	if( libfsntfs_file_name_values_get_utf8_name_size(
-	     internal_file_entry->directory_entry->file_name_values,
-	     utf8_string_size,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-8 name from directory entry file name value.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_utf8_name_size(
+		          internal_file_entry->directory_entry,
+		          utf8_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size of UTF-8 name from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded name
@@ -1776,6 +1947,7 @@ int libfsntfs_file_entry_get_utf8_name(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_name";
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1790,37 +1962,57 @@ int libfsntfs_file_entry_get_utf8_name(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->directory_entry == NULL )
-	{
-		return( 0 );
-	}
-	if( libfsntfs_file_name_values_get_utf8_name(
-	     internal_file_entry->directory_entry->file_name_values,
-	     utf8_string,
-	     utf8_string_size,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name from directory entry file name value.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_utf8_name(
+		          internal_file_entry->directory_entry,
+		          utf8_string,
+		          utf8_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 name from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -1835,6 +2027,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_name_size";
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1849,36 +2042,56 @@ int libfsntfs_file_entry_get_utf16_name_size(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->directory_entry == NULL )
-	{
-		return( 0 );
-	}
-	if( libfsntfs_file_name_values_get_utf16_name_size(
-	     internal_file_entry->directory_entry->file_name_values,
-	     utf16_string_size,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-16 name from directory entry file name value.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_utf16_name_size(
+		          internal_file_entry->directory_entry,
+		          utf16_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size of UTF-16 name from directory.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded name
@@ -1894,6 +2107,7 @@ int libfsntfs_file_entry_get_utf16_name(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_name";
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1908,37 +2122,57 @@ int libfsntfs_file_entry_get_utf16_name(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file_entry->directory_entry == NULL )
-	{
-		return( 0 );
-	}
-	if( libfsntfs_file_name_values_get_utf16_name(
-	     internal_file_entry->directory_entry->file_name_values,
-	     utf16_string,
-	     utf16_string_size,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 name from directory entry file name value.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_utf16_name(
+		          internal_file_entry->directory_entry,
+		          utf16_string,
+		          utf16_string_size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 name from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the name attribute index
@@ -1955,6 +2189,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 	static char *function                                = "libfsntfs_file_entry_get_name_attribute_index";
 	uint32_t attribute_type                              = 0;
 	int number_of_attributes                             = 0;
+	int safe_attribute_index                             = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1969,17 +2204,6 @@ int libfsntfs_file_entry_get_name_attribute_index(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
-		 function );
-
-		return( -1 );
-	}
 	if( attribute_index == NULL )
 	{
 		libcerror_error_set(
@@ -2009,13 +2233,13 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 		return( -1 );
 	}
-	for( *attribute_index = 0;
-	     *attribute_index < number_of_attributes;
-	     *attribute_index += 1 )
+	for( safe_attribute_index = 0;
+	     safe_attribute_index < number_of_attributes;
+	     safe_attribute_index++ )
 	{
 		if( libfsntfs_internal_file_entry_get_attribute_by_index(
 		     internal_file_entry,
-		     *attribute_index,
+		     safe_attribute_index,
 		     &attribute,
 		     error ) != 1 )
 		{
@@ -2025,7 +2249,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve attribute: %d.",
 			 function,
-			 *attribute_index );
+			 safe_attribute_index );
 
 			return( -1 );
 		}
@@ -2040,7 +2264,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve attribute: %d type.",
 			 function,
-			 *attribute_index );
+			 safe_attribute_index );
 
 			return( -1 );
 		}
@@ -2059,7 +2283,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve attribute: %d value.",
 			 function,
-			 *attribute_index );
+			 safe_attribute_index );
 
 			return( -1 );
 		}
@@ -2070,6 +2294,8 @@ int libfsntfs_file_entry_get_name_attribute_index(
 		       file_name_values->name,
 		       file_name_values->name_size ) == 0 ) )
 		{
+			*attribute_index = safe_attribute_index;
+
 			return( 1 );
 		}
 	}
@@ -3791,7 +4017,7 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
-	if( internal_file_entry->directory == NULL )
+	if( internal_file_entry->directory_entries_tree == NULL )
 	{
 		if( number_of_sub_file_entries == NULL )
 		{
@@ -3808,8 +4034,8 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 	}
 	else
 	{
-		if( libfsntfs_directory_get_number_of_entries(
-		     internal_file_entry->directory,
+		if( libfsntfs_directory_entries_tree_get_number_of_entries(
+		     internal_file_entry->directory_entries_tree,
 		     number_of_sub_file_entries,
 		     error ) != 1 )
 		{
@@ -3817,7 +4043,7 @@ int libfsntfs_file_entry_get_number_of_sub_file_entries(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of entries from directory.",
+			 "%s: unable to retrieve number of entries from directory entries tree.",
 			 function );
 
 			return( -1 );
@@ -3835,8 +4061,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
      libfsntfs_file_entry_t **sub_file_entry,
      libcerror_error_t **error )
 {
-	libfsntfs_directory_entry_t *directory_entry         = NULL;
-	libfsntfs_directory_entry_t *safe_directory_entry    = NULL;
+	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_index";
@@ -3877,25 +4102,25 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-	if( libfsntfs_directory_get_entry_by_index(
-	     internal_file_entry->directory,
+	if( libfsntfs_directory_entries_tree_get_entry_by_index(
+	     internal_file_entry->directory_entries_tree,
 	     internal_file_entry->file_io_handle,
 	     sub_file_entry_index,
-	     &directory_entry,
+	     &sub_directory_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry: %d from directory.",
+		 "%s: unable to retrieve entry: %d from directory entries tree.",
 		 function,
 		 sub_file_entry_index );
 
 		goto on_error;
 	}
 	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     directory_entry,
+	     sub_directory_entry,
 	     &mft_entry_index,
 	     error ) != 1 )
 	{
@@ -3925,21 +4150,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		goto on_error;
 	}
-	if( libfsntfs_directory_entry_clone(
-	     &safe_directory_entry,
-	     directory_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create directory entry.",
-		 function );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and safe_directory_entry
+	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
@@ -3948,7 +4159,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	     internal_file_entry->mft,
 	     internal_file_entry->security_descriptor_index,
 	     mft_entry,
-	     safe_directory_entry,
+	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
 	{
@@ -3965,10 +4176,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	return( 1 );
 
 on_error:
-	if( safe_directory_entry != NULL )
+	if( sub_directory_entry != NULL )
 	{
 		libfsntfs_directory_entry_free(
-		 &safe_directory_entry,
+		 &sub_directory_entry,
 		 NULL );
 	}
 	if( mft_entry != NULL )
@@ -3990,7 +4201,6 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
      libfsntfs_file_entry_t **sub_file_entry,
      libcerror_error_t **error )
 {
-	libfsntfs_directory_entry_t *directory_entry         = NULL;
 	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
@@ -4033,12 +4243,12 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_directory_get_entry_by_utf8_name(
-	          internal_file_entry->directory,
+	result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
+	          internal_file_entry->directory_entries_tree,
 	          internal_file_entry->file_io_handle,
 	          utf8_string,
 	          utf8_string_length,
-	          &directory_entry,
+	          &sub_directory_entry,
 	          error );
 
 	if( result == -1 )
@@ -4057,7 +4267,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		return( 0 );
 	}
 	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     directory_entry,
+	     sub_directory_entry,
 	     &mft_entry_index,
 	     error ) != 1 )
 	{
@@ -4087,21 +4297,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_directory_entry_clone(
-	     &sub_directory_entry,
-	     directory_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub directory entry.",
-		 function );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and safe_directory_entry
+	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
@@ -4151,7 +4347,6 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
      libfsntfs_file_entry_t **sub_file_entry,
      libcerror_error_t **error )
 {
-	libfsntfs_directory_entry_t *directory_entry         = NULL;
 	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_mft_entry_t *mft_entry                     = NULL;
@@ -4194,12 +4389,12 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
-	result = libfsntfs_directory_get_entry_by_utf16_name(
-	          internal_file_entry->directory,
+	result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
+	          internal_file_entry->directory_entries_tree,
 	          internal_file_entry->file_io_handle,
 	          utf16_string,
 	          utf16_string_length,
-	          &directory_entry,
+	          &sub_directory_entry,
 	          error );
 
 	if( result == -1 )
@@ -4218,7 +4413,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		return( 0 );
 	}
 	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     directory_entry,
+	     sub_directory_entry,
 	     &mft_entry_index,
 	     error ) != 1 )
 	{
@@ -4248,21 +4443,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_directory_entry_clone(
-	     &sub_directory_entry,
-	     directory_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub directory entry.",
-		 function );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and safe_directory_entry
+	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,

@@ -135,7 +135,6 @@ stamp-h[1-9]
 /tests/fsntfs_test_compressed_block_descriptor
 /tests/fsntfs_test_data_run
 /tests/fsntfs_test_data_stream
-/tests/fsntfs_test_directory
 /tests/fsntfs_test_directory_entries_tree
 /tests/fsntfs_test_directory_entry
 /tests/fsntfs_test_error

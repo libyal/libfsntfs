@@ -59,6 +59,10 @@ struct info_handle
 	 */
 	libfsntfs_mft_metadata_file_t *input_mft_metadata_file;
 
+	/* The bodyfile output stream
+	 */
+	FILE *bodyfile_stream;
+
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
@@ -84,6 +88,11 @@ int info_handle_free(
 
 int info_handle_signal_abort(
      info_handle_t *info_handle,
+     libcerror_error_t **error );
+
+int info_handle_set_bodyfile(
+     info_handle_t *info_handle,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int info_handle_set_volume_offset(
@@ -158,10 +167,16 @@ int info_handle_volume_name_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libcerror_error_t **error );
 
+int info_handle_file_entry_value_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     const system_character_t *path,
+     libcerror_error_t **error );
+
 int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
-     int indentation_level,
+     const system_character_t *path,
      libcerror_error_t **error );
 
 int info_handle_mft_entry_fprint(
@@ -173,7 +188,7 @@ int info_handle_mft_entries_fprint(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
-int info_handle_file_entry_fprint(
+int info_handle_file_entry_fprint_by_path(
      info_handle_t *info_handle,
      const system_character_t *path,
      libcerror_error_t **error );

@@ -33,8 +33,8 @@
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
-#include "libfsntfs_directory.h"
 #include "libfsntfs_file_entry.h"
+#include "libfsntfs_file_name_values.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
@@ -42,6 +42,7 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_name.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_usn_change_journal.h"
 #include "libfsntfs_volume.h"
@@ -1728,11 +1729,12 @@ int libfsntfs_internal_volume_read_security_descriptors(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_attribute_t *data_attribute = NULL;
-	libfsntfs_mft_attribute_t *mft_attribute  = NULL;
-	libfsntfs_mft_entry_t *mft_entry          = NULL;
-	static char *function                     = "libfsntfs_internal_volume_read_security_descriptors";
-	int result                                = 0;
+	libfsntfs_file_name_values_t *file_name_values = NULL;
+	libfsntfs_mft_attribute_t *data_attribute      = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute       = NULL;
+	libfsntfs_mft_entry_t *mft_entry               = NULL;
+	static char *function                          = "libfsntfs_internal_volume_read_security_descriptors";
+	int result                                     = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -1791,10 +1793,41 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
-	          mft_attribute,
+	if( libfsntfs_file_name_values_initialize(
+	     &file_name_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file name values.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_name_values_read_from_mft_attribute(
+	     file_name_values,
+	     mft_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read file name values from attribute: %d from MFT entry: %d.",
+		 function,
+		 mft_entry->file_name_attribute_index,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_SECURE );
+
+		goto on_error;
+	}
+	result = libfsntfs_name_compare_with_utf8_string(
+	          file_name_values->name,
+	          file_name_values->name_size,
 	          (uint8_t *) "$Secure",
 	          7,
+	          1,
 	          error );
 
 	if( result == -1 )
@@ -1808,7 +1841,7 @@ int libfsntfs_internal_volume_read_security_descriptors(
 
 		goto on_error;
 	}
-	else if( result != 0 )
+	else if( result == LIBUNA_COMPARE_EQUAL )
 	{
 		if( libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
 		     mft_entry,
@@ -1859,6 +1892,19 @@ int libfsntfs_internal_volume_read_security_descriptors(
 			goto on_error;
 		}
 	}
+	if( libfsntfs_file_name_values_free(
+	     &file_name_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free file name values.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
@@ -1866,6 +1912,12 @@ on_error:
 	{
 		libfsntfs_security_descriptor_index_free(
 		 &( internal_volume->security_descriptor_index ),
+		 NULL );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
 		 NULL );
 	}
 	return( -1 );
@@ -3442,6 +3494,22 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 		}
 		else
 		{
+			if( safe_directory_entry != NULL )
+			{
+				if( libfsntfs_directory_entry_free(
+				     &safe_directory_entry,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free directory entry.",
+					 function );
+
+					goto on_error;
+				}
+			}
 			result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 			          directory_entries_tree,
 			          internal_volume->file_io_handle,
@@ -3456,7 +3524,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve directory entry by name.",
+			 "%s: unable to retrieve directory entry by UTF-8 name.",
 			 function );
 
 			goto on_error;
@@ -3499,16 +3567,19 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	}
 	if( result != 0 )
 	{
-		if( libfsntfs_directory_entry_clone(
-		     directory_entry,
-		     safe_directory_entry,
+		*directory_entry = safe_directory_entry;
+	}
+	else if( safe_directory_entry != NULL )
+	{
+		if( libfsntfs_directory_entry_free(
+		     &safe_directory_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create directory entry.",
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entry.",
 			 function );
 
 			goto on_error;
@@ -3533,18 +3604,20 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	return( result );
 
 on_error:
+	if( safe_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &safe_directory_entry,
+		 NULL );
+	}
 	if( directory_entries_tree != NULL )
 	{
 		libfsntfs_directory_entries_tree_free(
 		 &directory_entries_tree,
 		 NULL );
 	}
-	if( *directory_entry != NULL )
-	{
-		libfsntfs_directory_entry_free(
-		 directory_entry,
-		 NULL );
-	}
+	*directory_entry = NULL;
+
 	return( -1 );
 }
 
@@ -3866,6 +3939,22 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 		}
 		else
 		{
+			if( safe_directory_entry != NULL )
+			{
+				if( libfsntfs_directory_entry_free(
+				     &safe_directory_entry,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free directory entry.",
+					 function );
+
+					goto on_error;
+				}
+			}
 			result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 			          directory_entries_tree,
 			          internal_volume->file_io_handle,
@@ -3880,7 +3969,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve directory entry by name.",
+			 "%s: unable to retrieve directory entry by UTF-16 name.",
 			 function );
 
 			goto on_error;
@@ -3923,16 +4012,19 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	}
 	if( result != 0 )
 	{
-		if( libfsntfs_directory_entry_clone(
-		     directory_entry,
-		     safe_directory_entry,
+		*directory_entry = safe_directory_entry;
+	}
+	else if( safe_directory_entry != NULL )
+	{
+		if( libfsntfs_directory_entry_free(
+		     &safe_directory_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create directory entry.",
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free directory entry.",
 			 function );
 
 			goto on_error;
@@ -3957,18 +4049,20 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	return( result );
 
 on_error:
+	if( safe_directory_entry != NULL )
+	{
+		libfsntfs_directory_entry_free(
+		 &safe_directory_entry,
+		 NULL );
+	}
 	if( directory_entries_tree != NULL )
 	{
 		libfsntfs_directory_entries_tree_free(
 		 &directory_entries_tree,
 		 NULL );
 	}
-	if( *directory_entry != NULL )
-	{
-		libfsntfs_directory_entry_free(
-		 directory_entry,
-		 NULL );
-	}
+	*directory_entry = NULL;
+
 	return( -1 );
 }
 

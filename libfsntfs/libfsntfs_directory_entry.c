@@ -374,6 +374,43 @@ int libfsntfs_directory_entry_get_mft_entry_index(
 	return( 1 );
 }
 
+/* Retrieves the file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_file_reference(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_file_reference";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+	*file_reference = directory_entry->file_reference;
+
+	return( 1 );
+}
+
 /* Retrieves the parent file reference
  * Returns 1 if successful or -1 on error
  */
@@ -405,6 +442,166 @@ int libfsntfs_directory_entry_get_parent_file_reference(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve parent reference from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_utf8_name_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_utf8_name_size";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_utf8_name_size(
+	     directory_entry->file_name_values,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-8 name from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_utf8_name(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_utf8_name";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_utf8_name(
+	     directory_entry->file_name_values,
+	     utf8_string,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_utf16_name_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_utf16_name_size";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_utf16_name_size(
+	     directory_entry->file_name_values,
+	     utf16_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size of UTF-16 name from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_utf16_name(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_utf16_name";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_utf16_name(
+	     directory_entry->file_name_values,
+	     utf16_string,
+	     utf16_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name from file name values.",
 		 function );
 
 		return( -1 );

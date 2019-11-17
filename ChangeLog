@@ -1,12 +1,15 @@
 TODO
 * complete thread lock support
 ** attribute
-** file entry - continue with libfsntfs_file_entry_get_creation_time
+** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
 ** MFT metadata file
 ** volume - continue with libfsntfs_volume_get_file_entry_by_index
 
-* optimize libfsntfs_directory_entries_tree_get_entry_by_utf8_name
-* optimize libfsntfs_directory_entries_tree_get_entry_by_utf16_name
+* fsntfsinfo complete bodyfile support
+
+* optimize security descriptor index
+
+* add debug compare of long and short names
 
 * refactor $I30 index to file entry
 ** refactor libfsntfs_mft_entry_has_directory_entries_index

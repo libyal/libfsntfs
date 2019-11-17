@@ -49,7 +49,6 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_debug.c libfsntfs_debug.h \
 	libfsntfs_definitions.h \
-	libfsntfs_directory.c libfsntfs_directory.h \
 	libfsntfs_directory_entries_tree.c libfsntfs_directory_entries_tree.h \
 	libfsntfs_directory_entry.c libfsntfs_directory_entry.h \
 	libfsntfs_error.c libfsntfs_error.h \

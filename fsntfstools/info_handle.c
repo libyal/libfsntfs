@@ -443,7 +443,12 @@ int info_handle_initialize(
 		 "%s: unable to clear info handle.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 *info_handle );
+
+		*info_handle = NULL;
+
+		return( -1 );
 	}
 	if( libbfio_file_range_initialize(
 	     &( ( *info_handle )->input_file_io_handle ),
@@ -502,6 +507,22 @@ int info_handle_free(
 	}
 	if( *info_handle != NULL )
 	{
+		if( ( *info_handle )->bodyfile_stream != NULL )
+		{
+			if( file_stream_close(
+			     ( *info_handle )->bodyfile_stream ) != 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_CLOSE_FAILED,
+				 "%s: unable to close bodyfile stream.",
+				 function );
+
+				result = -1;
+			}
+			( *info_handle )->bodyfile_stream = NULL;
+		}
 		if( ( *info_handle )->input_volume != NULL )
 		{
 			if( libfsntfs_volume_free(
@@ -592,6 +613,67 @@ int info_handle_signal_abort(
 
 			return( -1 );
 		}
+	}
+	return( 1 );
+}
+
+/* Sets the bodyfile
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_set_bodyfile(
+     info_handle_t *info_handle,
+     const system_character_t *filename,
+     libcerror_error_t **error )
+{
+	static char *function = "info_handle_set_bodyfile";
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( info_handle->bodyfile_stream != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid info handle - bodyfile stream value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.",
+		 function );
+
+		return( -1 );
+	}
+	info_handle->bodyfile_stream = file_stream_open(
+	                                filename,
+	                                "wb" );
+
+	if( info_handle->bodyfile_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open bodyfile stream.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -2186,7 +2268,7 @@ int info_handle_file_name_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry modifiation time.",
+		 "%s: unable to retrieve entry modification time.",
 		 function );
 
 		goto on_error;
@@ -2988,7 +3070,7 @@ int info_handle_standard_information_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry modifiation time.",
+		 "%s: unable to retrieve entry modification time.",
 		 function );
 
 		return( -1 );
@@ -3276,26 +3358,501 @@ on_error:
 	return( -1 );
 }
 
+/* Prints a file entry value
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int info_handle_file_entry_value_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     const system_character_t *path,
+     libcerror_error_t **error )
+{
+	char file_mode_string[ 11 ]          = { '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 0 };
+
+	system_character_t *file_entry_name  = NULL;
+	uint8_t *security_descriptor_data    = NULL;
+	static char *function                = "info_handle_file_entry_value_fprint";
+	size64_t size                        = 0;
+	size_t file_entry_name_size          = 0;
+	size_t security_descriptor_data_size = 0;
+	uint64_t access_time                 = 0;
+	uint64_t creation_time               = 0;
+	uint64_t entry_modification_time     = 0;
+	uint64_t file_reference              = 0;
+	uint64_t modification_time           = 0;
+	uint64_t parent_file_reference       = 0;
+	uint32_t file_attribute_flags        = 0;
+	uint32_t group_identifier            = 0;
+	uint32_t owner_identifier            = 0;
+	int result                           = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_file_reference(
+	     file_entry,
+	     &file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_file_entry_get_utf16_name_size(
+	          file_entry,
+	          &file_entry_name_size,
+	          error );
+#else
+	result = libfsntfs_file_entry_get_utf8_name_size(
+	          file_entry,
+	          &file_entry_name_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file entry name string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result == 1 )
+	 && ( file_entry_name_size > 0 ) )
+	{
+		file_entry_name = system_string_allocate(
+		                   file_entry_name_size );
+
+		if( file_entry_name == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create file entry name string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_file_entry_get_utf16_name(
+		          file_entry,
+		          (uint16_t *) file_entry_name,
+		          file_entry_name_size,
+		          error );
+#else
+		result = libfsntfs_file_entry_get_utf8_name(
+		          file_entry,
+		          (uint8_t *) file_entry_name,
+		          file_entry_name_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file entry name string.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfsntfs_file_entry_get_parent_file_reference(
+	     file_entry,
+	     &parent_file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent file reference.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_creation_time(
+	     file_entry,
+	     &creation_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_modification_time(
+	     file_entry,
+	     &modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_access_time(
+	     file_entry,
+	     &access_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_entry_modification_time(
+	     file_entry,
+	     &entry_modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_file_entry_get_file_attribute_flags(
+	     file_entry,
+	     &file_attribute_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		goto on_error;
+	}
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          &security_descriptor_data_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve security descriptor size.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		security_descriptor_data = (uint8_t *) memory_allocate(
+		                                        sizeof( uint8_t ) * security_descriptor_data_size );
+
+		if( security_descriptor_data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create security descriptor data.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_entry_get_security_descriptor(
+		     file_entry,
+		     security_descriptor_data,
+		     security_descriptor_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfsntfs_file_entry_get_size(
+	     file_entry,
+	     &size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		goto on_error;
+	}
+	if( info_handle->bodyfile_stream != NULL )
+	{
+		/* Colums in a Sleuthkit 3.x and later bodyfile
+		 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
+		 */
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 "0|" );
+
+		if( path != NULL )
+		{
+			fprintf(
+			 info_handle->bodyfile_stream,
+			 "%" PRIs_SYSTEM "",
+			 path );
+		}
+		if( file_entry_name != NULL )
+		{
+			fprintf(
+			 info_handle->bodyfile_stream,
+			 "%" PRIs_SYSTEM "",
+			 file_entry_name );
+		}
+/* TODO print data stream name */
+/* TODO determine mode as string */
+/* TODO determine owner and group */
+
+		/* Note that Sleuthkit adds a decimal representaion of the $DATA attribute type
+		 * to the inode value and that technically this should be the $STANDARD_INFORMATION attribute type
+		 */
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 "|%" PRIu64 "-128-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+		 file_reference & 0xffffffffffffUL,
+		 file_reference >> 48,
+		 file_mode_string,
+		 owner_identifier,
+		 group_identifier,
+		 size,
+		 (double) ( access_time - 116444736000000000L ) / 10000000,
+		 (double) ( modification_time - 116444736000000000L ) / 10000000,
+		 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
+		 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+
+/* TODO determine $FILE_NAME values */
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tFile reference\t\t\t: %" PRIu64 "-%" PRIu64 "\n",
+		 file_reference & 0xffffffffffffUL,
+		 file_reference >> 48 );
+
+		if( file_entry_name != NULL )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tName\t\t\t\t: " );
+
+			if( path != NULL )
+			{
+				fprintf(
+				 info_handle->notify_stream,
+				 "%" PRIs_SYSTEM "",
+				 path );
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIs_SYSTEM "\n",
+			 file_entry_name );
+		}
+/* TODO print data stream name */
+		if( parent_file_reference == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tParent file reference\t\t: Not set (0)\n" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tParent file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tSize\t\t\t\t: %" PRIu64 "\n",
+		 size );
+
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tCreation time\t\t\t",
+		     creation_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tModification time\t\t",
+		     modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tAccess time\t\t\t",
+		     access_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tEntry modification time\t\t",
+		     entry_modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tFile attribute flags\t\t: 0x%08" PRIx32 "\n",
+		 file_attribute_flags );
+		info_handle_file_attribute_flags_fprint(
+		 file_attribute_flags,
+		 info_handle->notify_stream );
+
+		if( security_descriptor_data != NULL )
+		{
+			if( info_handle_security_descriptor_fprint(
+			     info_handle,
+			     security_descriptor_data,
+			     security_descriptor_data_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print security descriptor.",
+				 function );
+
+				goto on_error;
+			}
+		}
+/* TODO print attributes + ADS ? */
+	}
+	if( security_descriptor_data != NULL )
+	{
+		memory_free(
+		 security_descriptor_data );
+
+		security_descriptor_data = NULL;
+	}
+	if( file_entry_name != NULL )
+	{
+		memory_free(
+		 file_entry_name );
+
+		file_entry_name = NULL;
+	}
+	return( 1 );
+
+on_error:
+	if( security_descriptor_data != NULL )
+	{
+		memory_free(
+		 security_descriptor_data );
+	}
+	if( file_entry_name != NULL )
+	{
+		memory_free(
+		 file_entry_name );
+	}
+	return( -1 );
+}
+
 /* Prints file entry information as part of the file system hierarchy
  * Returns 1 if successful or -1 on error
  */
 int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
-     int indentation_level,
+     const system_character_t *path,
      libcerror_error_t **error )
 {
 	libfsntfs_data_stream_t *alternate_data_stream = NULL;
 	libfsntfs_file_entry_t *sub_file_entry         = NULL;
 	system_character_t *data_stream_name           = NULL;
 	system_character_t *file_entry_name            = NULL;
+	system_character_t *sub_path                   = NULL;
 	static char *function                          = "info_handle_file_system_hierarchy_fprint_file_entry";
 	size_t data_stream_name_size                   = 0;
 	size_t file_entry_name_size                    = 0;
+	size_t path_length                             = 0;
+	size_t sub_path_size                           = 0;
 	int alternate_data_stream_index                = 0;
 	int has_default_data_stream                    = 0;
 	int has_directory_entries_index                = 0;
-	int indentation_level_iterator                 = 0;
 	int number_of_alternate_data_streams           = 0;
 	int number_of_sub_file_entries                 = 0;
 	int result                                     = 0;
@@ -3308,6 +3865,17 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
 		 function );
 
 		return( -1 );
@@ -3374,6 +3942,9 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 		goto on_error;
 	}
+	path_length = system_string_length(
+	               path );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_file_entry_get_utf16_name_size(
 	          file_entry,
@@ -3443,18 +4014,44 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 		 || ( has_directory_entries_index != 0 )
 		 || ( number_of_alternate_data_streams == 0 ) )
 		{
-			for( indentation_level_iterator = 0;
-			     indentation_level_iterator < indentation_level;
-			     indentation_level_iterator++ )
+			if( info_handle->bodyfile_stream != NULL )
 			{
+				if( info_handle_file_entry_value_fprint(
+				     info_handle,
+				     file_entry,
+				     path,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print file entry.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			else
+			{
+/* TODO move into info_handle_file_entry_value_fprint with print name only mode ? */
+
 				fprintf(
 				 info_handle->notify_stream,
-				 " " );
+				 "%" PRIs_SYSTEM "",
+				 path );
+
+				if( file_entry_name != NULL )
+				{
+					fprintf(
+					 info_handle->notify_stream,
+					 "%" PRIs_SYSTEM "",
+					 file_entry_name );
+				}
+				fprintf(
+				 info_handle->notify_stream,
+				 "\n" );
 			}
-			fprintf(
-			 info_handle->notify_stream,
-			 "%" PRIs_SYSTEM "\n",
-			 file_entry_name );
 		}
 		for( alternate_data_stream_index = 0;
 		     alternate_data_stream_index < number_of_alternate_data_streams;
@@ -3541,24 +4138,52 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 					goto on_error;
 				}
-				for( indentation_level_iterator = 0;
-				     indentation_level_iterator < indentation_level;
-				     indentation_level_iterator++ )
+				if( info_handle->bodyfile_stream != NULL )
 				{
+/* TODO pass data stream name
+					if( info_handle_file_entry_value_fprint(
+					     info_handle,
+					     file_entry,
+					     path,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+						 "%s: unable to print file entry.",
+						 function );
+
+						goto on_error;
+					}
+*/
+				}
+				else
+				{
+/* TODO move into info_handle_file_entry_value_fprint with print name only mode ? */
+
 					fprintf(
 					 info_handle->notify_stream,
-					 " " );
+					 "%" PRIs_SYSTEM "",
+					 path );
+
+					if( file_entry_name != NULL )
+					{
+						fprintf(
+						 info_handle->notify_stream,
+						 "%" PRIs_SYSTEM ":%" PRIs_SYSTEM "\n",
+						 file_entry_name,
+						 data_stream_name );
+					}
+					fprintf(
+					 info_handle->notify_stream,
+					 "\n" );
+
+					memory_free(
+					 data_stream_name );
+
+					data_stream_name = NULL;
 				}
-				fprintf(
-				 info_handle->notify_stream,
-				 "%" PRIs_SYSTEM ":%" PRIs_SYSTEM "\n",
-				 file_entry_name,
-				 data_stream_name );
-
-				memory_free(
-				 data_stream_name );
-
-				data_stream_name = NULL;
 			}
 			if( libfsntfs_data_stream_free(
 			     &alternate_data_stream,
@@ -3575,61 +4200,128 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				goto on_error;
 			}
 		}
+	}
+	if( number_of_sub_file_entries > 0 )
+	{
+		sub_path_size = path_length + 1;
+
+		if( file_entry_name != NULL )
+		{
+			sub_path_size += file_entry_name_size;
+		}
+		sub_path = system_string_allocate(
+		            sub_path_size );
+
+		if( sub_path == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create sub path.",
+			 function );
+
+			goto on_error;
+		}
+		if( system_string_copy(
+		     sub_path,
+		     path,
+		     path_length ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy path to sub path.",
+			 function );
+
+			goto on_error;
+		}
+		if( file_entry_name != NULL )
+		{
+			if( system_string_copy(
+			     &( sub_path[ path_length ] ),
+			     file_entry_name,
+			     file_entry_name_size - 1 ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy file entry name to sub path.",
+				 function );
+
+				goto on_error;
+			}
+			sub_path[ sub_path_size - 2 ] = (system_character_t) LIBFSNTFS_SEPARATOR;
+		}
+		sub_path[ sub_path_size - 1 ] = (system_character_t) 0;
+
+		for( sub_file_entry_index = 0;
+		     sub_file_entry_index < number_of_sub_file_entries;
+		     sub_file_entry_index++ )
+		{
+			if( libfsntfs_file_entry_get_sub_file_entry_by_index(
+			     file_entry,
+			     sub_file_entry_index,
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+			if( info_handle_file_system_hierarchy_fprint_file_entry(
+			     info_handle,
+			     sub_file_entry,
+			     sub_path,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print file entry: %d information.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+			if( libfsntfs_file_entry_free(
+			     &sub_file_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free sub file entry: %d.",
+				 function,
+				 sub_file_entry_index );
+
+				goto on_error;
+			}
+		}
+	}
+	if( sub_path != NULL )
+	{
+		memory_free(
+		 sub_path );
+
+		sub_path = NULL;
+	}
+	if( file_entry_name != NULL )
+	{
 		memory_free(
 		 file_entry_name );
 
 		file_entry_name = NULL;
-	}
-	for( sub_file_entry_index = 0;
-	     sub_file_entry_index < number_of_sub_file_entries;
-	     sub_file_entry_index++ )
-	{
-		if( libfsntfs_file_entry_get_sub_file_entry_by_index(
-		     file_entry,
-		     sub_file_entry_index,
-		     &sub_file_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
-
-			goto on_error;
-		}
-		if( info_handle_file_system_hierarchy_fprint_file_entry(
-		     info_handle,
-		     sub_file_entry,
-		     indentation_level + 1,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print file entry: %d information.",
-			 function,
-			 sub_file_entry_index );
-
-			goto on_error;
-		}
-		if( libfsntfs_file_entry_free(
-		     &sub_file_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free sub file entry: %d.",
-			 function,
-			 sub_file_entry_index );
-
-			goto on_error;
-		}
 	}
 	return( 1 );
 
@@ -3639,6 +4331,11 @@ on_error:
 		libfsntfs_file_entry_free(
 		 &sub_file_entry,
 		 NULL );
+	}
+	if( sub_path != NULL )
+	{
+		memory_free(
+		 sub_path );
 	}
 	if( data_stream_name != NULL )
 	{
@@ -4026,21 +4723,17 @@ int info_handle_mft_entries_fprint(
 	return( 1 );
 }
 
-/* Prints the file entry information
+/* Prints the file entry information for a specific path
  * Returns 1 if successful or -1 on error
  */
-int info_handle_file_entry_fprint(
+int info_handle_file_entry_fprint_by_path(
      info_handle_t *info_handle,
      const system_character_t *path,
      libcerror_error_t **error )
 {
 	libfsntfs_file_entry_t *file_entry = NULL;
-	static char *function              = "info_handle_file_entry_fprint";
-	uint8_t *data                      = NULL;
-	size_t data_size                   = 0;
+	static char *function              = "info_handle_file_entry_fprint_by_path";
 	size_t path_length                 = 0;
-	uint64_t value_64bit               = 0;
-	uint32_t value_32bit               = 0;
 	int result                         = 0;
 
 	if( info_handle == NULL )
@@ -4094,275 +4787,36 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "Windows NT File System information:\n\n" );
-
-	fprintf(
-	 info_handle->notify_stream,
-	 "File entry:\n" );
-
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tPath\t\t\t\t: %" PRIs_SYSTEM "\n",
-	 path );
-
-	if( libfsntfs_file_entry_get_file_reference(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file reference.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-	 value_64bit & 0xffffffffffffUL,
-	 value_64bit >> 48 );
-
-	if( libfsntfs_file_entry_get_parent_file_reference(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent file reference.",
-		 function );
-
-		goto on_error;
-	}
-	if( value_64bit == 0 )
+	if( info_handle->bodyfile_stream == NULL )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t: %" PRIu64 "\n",
-		 value_64bit );
-	}
-	else
-	{
+		 "Windows NT File System information:\n\n" );
+
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-		 value_64bit & 0xffffffffffffUL,
-		 value_64bit >> 48 );
-	}
-	if( libfsntfs_file_entry_get_creation_time(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve creation time.",
-		 function );
+		 "File entry:\n" );
 
-		goto on_error;
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tPath\t\t\t\t: %" PRIs_SYSTEM "\n",
+		 path );
 	}
-	if( info_handle_filetime_value_fprint(
+	if( info_handle_file_entry_value_fprint(
 	     info_handle,
-	     "\tCreation time\t\t\t",
-	     value_64bit,
+	     file_entry,
+	     NULL,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
+		 "%s: unable to print file entry.",
 		 function );
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_modification_time(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve modification time.",
-		 function );
-
-		goto on_error;
-	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tModification time\t\t",
-	     value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_entry_get_access_time(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve access time.",
-		 function );
-
-		goto on_error;
-	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tAccess time\t\t\t",
-	     value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_entry_get_entry_modification_time(
-	     file_entry,
-	     &value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve entry modifiation time.",
-		 function );
-
-		goto on_error;
-	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tEntry modification time\t\t",
-	     value_64bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_entry_get_file_attribute_flags(
-	     file_entry,
-	     &value_32bit,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file attribute flags.",
-		 function );
-
-		goto on_error;
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tFile attribute flags\t\t: 0x%08" PRIx32 "\n",
-	 value_32bit );
-	info_handle_file_attribute_flags_fprint(
-	 value_32bit,
-	 info_handle->notify_stream );
-
-	result = libfsntfs_file_entry_get_security_descriptor_size(
-	          file_entry,
-	          &data_size,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve security descriptor size.",
-		 function );
-
-		goto on_error;
-	}
-	else if( result != 0 )
-	{
-		data = (uint8_t *) memory_allocate(
-		                    sizeof( uint8_t ) * data_size );
-
-		if( data == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create data.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_file_entry_get_security_descriptor(
-		     file_entry,
-		     data,
-		     data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve security descriptor.",
-			 function );
-
-			goto on_error;
-		}
-		if( info_handle_security_descriptor_fprint(
-		     info_handle,
-		     data,
-		     data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print security descriptor.",
-			 function );
-
-			goto on_error;
-		}
-		memory_free(
-		 data );
-
-		data = NULL;
-	}
-/* TODO print attributes + ADS ? */
-
 	if( libfsntfs_file_entry_free(
 	     &file_entry,
 	     error ) != 1 )
@@ -4376,18 +4830,15 @@ int info_handle_file_entry_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
-
+	if( info_handle->bodyfile_stream == NULL )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+	}
 	return( 1 );
 
 on_error:
-	if( data != NULL )
-	{
-		memory_free(
-		 data );
-	}
 	if( file_entry != NULL )
 	{
 		libfsntfs_file_entry_free(
@@ -4418,14 +4869,16 @@ int info_handle_file_system_hierarchy_fprint(
 
 		return( -1 );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "Windows NT File System information:\n\n" );
+	if( info_handle->bodyfile_stream == NULL )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Windows NT File System information:\n\n" );
 
-	fprintf(
-	 info_handle->notify_stream,
-	 "File system hierarchy:\n" );
-
+		fprintf(
+		 info_handle->notify_stream,
+		 "File system hierarchy:\n" );
+	}
 	if( libfsntfs_volume_get_root_directory(
 	     info_handle->input_volume,
 	     &file_entry,
@@ -4443,7 +4896,7 @@ int info_handle_file_system_hierarchy_fprint(
 	if( info_handle_file_system_hierarchy_fprint_file_entry(
 	     info_handle,
 	     file_entry,
-	     0,
+	     _SYSTEM_STRING( "" ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -4468,10 +4921,12 @@ int info_handle_file_system_hierarchy_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
-
+	if( info_handle->bodyfile_stream == NULL )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+	}
 	return( 1 );
 
 on_error:

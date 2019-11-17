@@ -236,6 +236,7 @@ int libfsntfs_mft_entry_initialize(
 
 		goto on_error;
 	}
+	( *mft_entry )->file_name_attribute_index            = -1;
 	( *mft_entry )->reparse_point_attribute_index        = -1;
 	( *mft_entry )->security_descriptor_attribute_index  = -1;
 	( *mft_entry )->standard_information_attribute_index = -1;
@@ -642,12 +643,15 @@ int libfsntfs_mft_entry_read_data(
 	}
 #endif
 	mft_entry->is_empty = 0;
-	mft_entry->index    = mft_entry->header->index;
+
+	mft_entry->index = mft_entry->header->index;
 
 	if( mft_entry->index != mft_entry_index )
 	{
 		mft_entry->index = mft_entry_index;
 	}
+	mft_entry->file_reference = ( (uint64_t) mft_entry->header->sequence << 48 ) | mft_entry->index;
+
 	return( 1 );
 
 on_error:
@@ -1613,8 +1617,7 @@ int libfsntfs_mft_entry_get_file_reference(
 
 		return( -1 );
 	}
-	*file_reference  = (uint64_t) mft_entry->sequence << 48;
-	*file_reference |= mft_entry->index;
+	*file_reference = mft_entry->file_reference;
 
 	return( 1 );
 }

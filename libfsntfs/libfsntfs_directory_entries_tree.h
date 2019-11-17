@@ -96,11 +96,21 @@ int libfsntfs_directory_entries_tree_get_number_of_entries(
      int *number_of_entries,
      libcerror_error_t **error );
 
-int libfsntfs_directory_entries_get_entry_by_index(
+int libfsntfs_directory_entries_tree_get_entry_by_index(
      libfsntfs_directory_entries_tree_t *directory_entries_tree,
      libbfio_handle_t *file_io_handle,
      int entry_index,
      libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
+     libfsntfs_directory_entries_tree_t *directory_entries_tree,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libfsntfs_directory_entry_t **directory_entry,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
@@ -109,6 +119,16 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libfsntfs_directory_entry_t **directory_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
+     libfsntfs_directory_entries_tree_t *directory_entries_tree,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libfsntfs_directory_entry_t **directory_entry,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
