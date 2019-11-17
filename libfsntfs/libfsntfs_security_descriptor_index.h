@@ -30,7 +30,6 @@
 #include "libfsntfs_index_node.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
@@ -48,10 +47,6 @@ struct libfsntfs_security_descriptor_index
 	 */
 	libfsntfs_index_t *sii_index;
 
-	/* The security descriptor index values tree
-	 */
-	libcdata_btree_t *security_descriptors_index_values_tree;
-
 	/* The $SDS data stream
 	 */
 	libfsntfs_data_stream_t *data_stream;
@@ -68,20 +63,6 @@ int libfsntfs_security_descriptor_index_free(
      libfsntfs_security_descriptor_index_t **security_descriptor_index,
      libcerror_error_t **error );
 
-int libfsntfs_security_descriptor_index_insert_index_value(
-     libfsntfs_security_descriptor_index_t *security_descriptor_index,
-     int index_value_entry,
-     libfsntfs_index_value_t *index_value,
-     uint32_t index_value_flags,
-     libcerror_error_t **error );
-
-int libfsntfs_security_descriptor_index_read_from_index_node(
-     libfsntfs_security_descriptor_index_t *security_descriptor_index,
-     libbfio_handle_t *file_io_handle,
-     libfsntfs_index_node_t *index_node,
-     int recursion_depth,
-     libcerror_error_t **error );
-
 int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
      libfsntfs_io_handle_t *io_handle,
@@ -89,8 +70,18 @@ int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
-int libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libbfio_handle_t *file_io_handle,
+     libfsntfs_index_node_t *index_node,
+     uint32_t security_descriptor_indentifier,
+     libfsntfs_security_descriptor_values_t **security_descriptor_values,
+     int recursion_depth,
+     libcerror_error_t **error );
+
+int libfsntfs_security_descriptor_index_get_entry_by_identifier(
+     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libbfio_handle_t *file_io_handle,
      uint32_t security_descriptor_indentifier,
      libfsntfs_security_descriptor_values_t **security_descriptor_values,
      libcerror_error_t **error );

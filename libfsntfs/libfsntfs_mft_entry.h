@@ -98,6 +98,10 @@ struct libfsntfs_mft_entry
 	 */
 	libfsntfs_mft_attribute_t *data_attribute;
 
+	/* The WofCompressedData $DATA attribute
+	 */
+	libfsntfs_mft_attribute_t *wof_compressed_data_attribute;
+
 	/* The alternate data attributes array
 	 */
 	libcdata_array_t *alternate_data_attributes_array;
@@ -169,11 +173,9 @@ int libfsntfs_mft_entry_read_file_io_handle(
 
 int libfsntfs_mft_entry_read_attributes_data(
      libfsntfs_mft_entry_t *mft_entry,
-     libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
-     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_attributes(
@@ -186,11 +188,9 @@ int libfsntfs_mft_entry_read_attributes(
 
 int libfsntfs_mft_entry_read_attributes_from_attribute_list(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
      libcdata_array_t *attribute_list,
-     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_is_empty(
@@ -258,17 +258,15 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
      libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_append_attribute(
+int libfsntfs_mft_entry_set_attribute_helper_values(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
+     int attribute_index,
      libfsntfs_mft_attribute_t *attribute,
-     uint8_t flags,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_append_data_attribute(
+int libfsntfs_mft_entry_set_data_attribute_helper_values(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_mft_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(

@@ -3185,8 +3185,9 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 
 				goto on_error;
 			}
-			if( libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+			if( libfsntfs_security_descriptor_index_get_entry_by_identifier(
 			     internal_file_entry->security_descriptor_index,
+			     internal_file_entry->file_io_handle,
 			     security_descriptor_identifier,
 			     &( internal_file_entry->security_descriptor_values ),
 			     error ) != 1 )
@@ -3201,7 +3202,7 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 
 				goto on_error;
 			}
-			/* The file entry takes over management of security_descriptor_values
+			/* file_entry takes over management of security_descriptor_values
 			 */
 		}
 		security_descriptor_values = internal_file_entry->security_descriptor_values;
@@ -3352,8 +3353,9 @@ int libfsntfs_file_entry_get_security_descriptor(
 
 				goto on_error;
 			}
-			if( libfsntfs_security_descriptor_index_get_security_descriptor_by_identifier(
+			if( libfsntfs_security_descriptor_index_get_entry_by_identifier(
 			     internal_file_entry->security_descriptor_index,
+			     internal_file_entry->file_io_handle,
 			     security_descriptor_identifier,
 			     &( internal_file_entry->security_descriptor_values ),
 			     error ) != 1 )
@@ -3368,7 +3370,7 @@ int libfsntfs_file_entry_get_security_descriptor(
 
 				goto on_error;
 			}
-			/* The file entry takes over management of security_descriptor_values
+			/* file_entry takes over management of security_descriptor_values
 			 */
 		}
 		security_descriptor_values = internal_file_entry->security_descriptor_values;

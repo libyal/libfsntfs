@@ -3155,7 +3155,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
 	{
@@ -3163,7 +3163,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -3184,7 +3184,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_volume->read_write_lock,
 	     error ) != 1 )
 	{
@@ -3192,7 +3192,7 @@ int libfsntfs_volume_get_number_of_file_entries(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -3249,7 +3249,21 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		return( -1 );
 	}
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -3289,6 +3303,21 @@ int libfsntfs_volume_get_file_entry_by_index(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -3298,6 +3327,11 @@ on_error:
 		 &mft_entry,
 		 NULL );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_volume->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -3672,7 +3706,21 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 
 		return( -1 );
 	}
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          utf8_string,
@@ -3734,6 +3782,21 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 
 on_error:
@@ -3743,6 +3806,11 @@ on_error:
 		 &directory_entry,
 		 NULL );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_volume->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -4117,7 +4185,21 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 
 		return( -1 );
 	}
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 	          internal_volume,
 	          utf16_string,
@@ -4179,6 +4261,21 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			goto on_error;
 		}
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 
 on_error:
@@ -4188,6 +4285,11 @@ on_error:
 		 &directory_entry,
 		 NULL );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_volume->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -4238,7 +4340,21 @@ int libfsntfs_volume_get_root_directory(
 
 		return( -1 );
 	}
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
 	     internal_volume->mft,
 	     internal_volume->file_io_handle,
@@ -4277,6 +4393,21 @@ int libfsntfs_volume_get_root_directory(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -4286,6 +4417,11 @@ on_error:
 		 &mft_entry,
 		 NULL );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_volume->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 
@@ -4317,7 +4453,21 @@ int libfsntfs_volume_get_usn_change_journal(
 	}
 	internal_volume = (libfsntfs_internal_volume_t *) volume;
 
-/* TODO implement read/write lock support */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 	          internal_volume,
 	          (uint8_t *) "\\$Extend\\$UsnJrnl",
@@ -4337,65 +4487,81 @@ int libfsntfs_volume_get_usn_change_journal(
 
 		goto on_error;
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
-	}
-	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
-	          mft_entry,
-	          (uint8_t *) "$J",
-	          2,
-	          &data_attribute,
-	          error );
+		result = libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
+		          mft_entry,
+		          (uint8_t *) "$J",
+		          2,
+		          &data_attribute,
+		          error );
 
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve $J data attribute.",
-		 function );
-
-		goto on_error;
-	}
-	else if( result == 0 )
-	{
-		if( libfsntfs_directory_entry_free(
-		     &directory_entry,
-		     error ) != 1 )
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free directory entry.",
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve $J data attribute.",
 			 function );
 
 			goto on_error;
 		}
-		return( 0 );
+		else if( result != 0 )
+		{
+			/* libfsntfs_usn_change_journal_initialize takes over management of directory_entry
+			 */
+			if( libfsntfs_usn_change_journal_initialize(
+			     usn_change_journal,
+			     internal_volume->io_handle,
+			     internal_volume->file_io_handle,
+			     directory_entry,
+			     data_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create USN change journal.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		else
+		{
+			if( libfsntfs_directory_entry_free(
+			     &directory_entry,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free directory entry.",
+				 function );
+
+				goto on_error;
+			}
+		}
 	}
-	/* libfsntfs_usn_change_journal_initialize takes over management of directory_entry
-	 */
-	if( libfsntfs_usn_change_journal_initialize(
-	     usn_change_journal,
-	     internal_volume->io_handle,
-	     internal_volume->file_io_handle,
-	     directory_entry,
-	     data_attribute,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create USN change journal.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 
 on_error:
 	if( directory_entry != NULL )
@@ -4404,6 +4570,11 @@ on_error:
 		 &directory_entry,
 		 NULL );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	libcthreads_read_write_lock_release_for_write(
+	 internal_volume->read_write_lock,
+	 NULL );
+#endif
 	return( -1 );
 }
 

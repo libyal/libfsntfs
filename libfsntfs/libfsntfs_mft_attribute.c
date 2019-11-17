@@ -631,7 +631,7 @@ int libfsntfs_mft_attribute_read_data(
 				 ( (fsntfs_mft_attribute_non_resident_compressed_t *) non_resident_data )->total_data_size,
 				 value_64bit );
 				libcnotify_printf(
-				 "%s: total data size\t: %" PRIu64 "\n",
+				 "%s: total data size\t\t\t: %" PRIu64 "\n",
 				 function,
 				 value_64bit );
 			}
@@ -774,7 +774,18 @@ int libfsntfs_mft_attribute_read_data(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: data offset value out of bounds.",
+				 "%s: resident data offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			if( mft_attribute->data_size > ( mft_attribute->size - mft_attribute->data_offset ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: resident data size value out of bounds.",
 				 function );
 
 				goto on_error;
@@ -783,7 +794,7 @@ int libfsntfs_mft_attribute_read_data(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: data:\n",
+				 "%s: resident data:\n",
 				 function );
 				libcnotify_print_data(
 				 &( data[ mft_attribute->data_offset ] ),
@@ -800,7 +811,7 @@ int libfsntfs_mft_attribute_read_data(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create data.",
+				 "%s: unable to create resident data.",
 				 function );
 
 				goto on_error;
@@ -814,7 +825,7 @@ int libfsntfs_mft_attribute_read_data(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_MEMORY,
 				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy data.",
+				 "%s: unable to copy resident data.",
 				 function );
 
 				goto on_error;

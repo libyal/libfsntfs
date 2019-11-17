@@ -1539,11 +1539,9 @@ int fsntfs_test_mft_entry_read_attributes_data(
 	 */
 	result = libfsntfs_mft_entry_read_attributes_data(
 	          mft_entry,
-	          NULL,
 	          io_handle,
 	          mft_entry_data,
 	          1024,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1559,11 +1557,9 @@ int fsntfs_test_mft_entry_read_attributes_data(
 	 */
 	result = libfsntfs_mft_entry_read_attributes_data(
 	          NULL,
-	          NULL,
 	          io_handle,
 	          mft_entry_data,
 	          1024,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1580,11 +1576,9 @@ int fsntfs_test_mft_entry_read_attributes_data(
 
 	result = libfsntfs_mft_entry_read_attributes_data(
 	          mft_entry,
-	          NULL,
 	          io_handle,
 	          NULL,
 	          1024,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1601,11 +1595,9 @@ int fsntfs_test_mft_entry_read_attributes_data(
 
 	result = libfsntfs_mft_entry_read_attributes_data(
 	          mft_entry,
-	          NULL,
 	          io_handle,
 	          mft_entry_data,
 	          (size_t) SSIZE_MAX + 1,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1622,11 +1614,9 @@ int fsntfs_test_mft_entry_read_attributes_data(
 
 	result = libfsntfs_mft_entry_read_attributes_data(
 	          mft_entry,
-	          NULL,
 	          io_handle,
 	          mft_entry_data,
 	          0,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -2306,9 +2296,9 @@ on_error:
 
 /* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name */
 
-/* TODO: add tests for libfsntfs_mft_entry_append_attribute */
+/* TODO: add tests for libfsntfs_mft_entry_set_attribute_helper_values */
 
-/* TODO: add tests for libfsntfs_mft_entry_append_data_attribute */
+/* TODO: add tests for libfsntfs_mft_entry_set_data_attribute_helper_values */
 
 /* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_name */
 

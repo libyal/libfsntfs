@@ -529,24 +529,6 @@ int libfsntfs_index_read(
 			goto on_error;
 		}
 	}
-/* TODO remove
-	if( libfsntfs_index_read_sub_nodes(
-	     index,
-	     file_io_handle,
-	     index->root_node,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read sub nodes.",
-		 function );
-
-		goto on_error;
-	}
-*/
 	return( 1 );
 
 on_error:

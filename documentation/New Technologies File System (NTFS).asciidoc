@@ -1690,6 +1690,24 @@ See: https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20m
 * default data stream is sparse
 * WofCompressedData data stream is contains LZXPRESS Huffman or LZX compressed data
 
+==== LZXPRESS Huffman compressed data
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _Chunk offset table_
+| 0 | ... | | Array of 32-bit compressed data block offsets +
+The offset is relative from the start of the compressed data +
+Note that the offset of the first compressed data block is not stored
+4+| _Compressed data_
+| ... | ... | | One or more compressed data blocks +
+The compressed data is stored in blocks that can contain a maximum of 8196 bytes of uncompressed data per block
+|===
+
+[yellow-background]*TODO: add more detail*
+
+==== LZX compressed data
+
 [yellow-background]*TODO: add more detail*
 
 == [[reparse_point]]The reparse point

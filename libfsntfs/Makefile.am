@@ -91,6 +91,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_profiler.c libfsntfs_profiler.h \
 	libfsntfs_reparse_point_attribute.c libfsntfs_reparse_point_attribute.h \
 	libfsntfs_reparse_point_values.c libfsntfs_reparse_point_values.h \
+	libfsntfs_sds_index_value.c libfsntfs_sds_index_value.h \
 	libfsntfs_security_descriptor_attribute.c libfsntfs_security_descriptor_attribute.h \
 	libfsntfs_security_descriptor_index.c libfsntfs_security_descriptor_index.h \
 	libfsntfs_security_descriptor_index_value.c libfsntfs_security_descriptor_index_value.h \

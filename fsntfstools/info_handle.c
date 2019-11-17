@@ -4171,7 +4171,7 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 					{
 						fprintf(
 						 info_handle->notify_stream,
-						 "%" PRIs_SYSTEM ":%" PRIs_SYSTEM "\n",
+						 "%" PRIs_SYSTEM ":%" PRIs_SYSTEM "",
 						 file_entry_name,
 						 data_stream_name );
 					}

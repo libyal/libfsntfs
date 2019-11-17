@@ -166,7 +166,6 @@ int libfsntfs_security_descriptor_index_value_compare(
 
 		return( -1 );
 	}
-
 	if( first_security_descriptor_index_value->identifier < second_security_descriptor_index_value->identifier )
 	{
 		return( LIBCDATA_COMPARE_LESS );
