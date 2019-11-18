@@ -1,15 +1,13 @@
 TODO
 * complete thread lock support
-** attribute
 ** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
 ** MFT metadata file
 
 * add WofCompressedData support to cluster block data stream
 ** clean up cluster block data stream
 
-* add tests for sds_index_value
-
 * fsntfsinfo complete bodyfile support
+** fix libfsntfs_file_entry_get_security_descriptor_size: unable to retrieve security descriptor from index for identifier: 0.
 * fsntfsinfo -F add support for ADS notation
 
 * change libfsntfs_mft_attribute_get_utf[8,16]_name[_size] to return 0 if not set

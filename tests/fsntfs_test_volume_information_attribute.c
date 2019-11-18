@@ -410,8 +410,8 @@ int main(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_read_value(
-	          attribute,
+	result = libfsntfs_internal_attribute_read_value(
+	          (libfsntfs_internal_attribute_t *) attribute,
 	          io_handle,
 	          NULL,
 	          0,

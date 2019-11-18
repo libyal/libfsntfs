@@ -213,7 +213,7 @@ int libfsntfs_sds_index_value_read_data(
 		 ( (fsntfs_secure_index_value_t *) data )->hash,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: hash\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: hash\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
@@ -221,7 +221,7 @@ int libfsntfs_sds_index_value_read_data(
 		 ( (fsntfs_secure_index_value_t *) data )->identifier,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: identifier\t\t: %" PRIu32 "\n",
+		 "%s: identifier\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 
@@ -229,7 +229,7 @@ int libfsntfs_sds_index_value_read_data(
 		 ( (fsntfs_secure_index_value_t *) data )->data_offset,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: data offset\t\t: 0x%08" PRIx64 "\n",
+		 "%s: data offset\t\t\t: 0x%08" PRIx64 "\n",
 		 function,
 		 value_64bit );
 
@@ -237,7 +237,7 @@ int libfsntfs_sds_index_value_read_data(
 		 ( (fsntfs_secure_index_value_t *) data )->data_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: data size\t\t: %" PRIu32 "\n",
+		 "%s: data size\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
 

@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	fsntfs_test_object_identifier_values \
 	fsntfs_test_reparse_point_attribute \
 	fsntfs_test_reparse_point_values \
+	fsntfs_test_sds_index_value \
 	fsntfs_test_security_descriptor_index \
 	fsntfs_test_security_descriptor_index_value \
 	fsntfs_test_security_descriptor_values \
@@ -97,11 +98,13 @@ fsntfs_test_attribute_SOURCES = \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
 	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_rwlock.c fsntfs_test_rwlock.h \
 	fsntfs_test_unused.h
 
 fsntfs_test_attribute_LDADD = \
 	../libfsntfs/libfsntfs.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 fsntfs_test_attribute_list_SOURCES = \
 	fsntfs_test_attribute_list.c \
@@ -553,6 +556,18 @@ fsntfs_test_reparse_point_values_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_reparse_point_values_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_sds_index_value_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_sds_index_value.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_sds_index_value_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

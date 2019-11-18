@@ -2168,7 +2168,7 @@ int info_handle_file_name_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "\tParent file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 value_64bit & 0xffffffffffffUL,
 		 value_64bit >> 48 );
 	}
@@ -3369,6 +3369,7 @@ int info_handle_file_entry_value_fprint(
 {
 	char file_mode_string[ 11 ]          = { '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 0 };
 
+	libfsntfs_attribute_t *attribute     = NULL;
 	system_character_t *file_entry_name  = NULL;
 	uint8_t *security_descriptor_data    = NULL;
 	static char *function                = "info_handle_file_entry_value_fprint";
@@ -3384,6 +3385,7 @@ int info_handle_file_entry_value_fprint(
 	uint32_t file_attribute_flags        = 0;
 	uint32_t group_identifier            = 0;
 	uint32_t owner_identifier            = 0;
+	int name_attribute_index             = 0;
 	int result                           = 0;
 
 	if( info_handle == NULL )
@@ -3559,6 +3561,7 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
+#ifdef TODO
 	result = libfsntfs_file_entry_get_security_descriptor_size(
 	          file_entry,
 	          &security_descriptor_data_size,
@@ -3607,6 +3610,7 @@ int info_handle_file_entry_value_fprint(
 			goto on_error;
 		}
 	}
+#endif
 	if( libfsntfs_file_entry_get_size(
 	     file_entry,
 	     &size,
@@ -3647,15 +3651,12 @@ int info_handle_file_entry_value_fprint(
 /* TODO print data stream name */
 /* TODO determine mode as string */
 /* TODO determine owner and group */
+/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 
-		/* Note that Sleuthkit adds a decimal representaion of the $DATA attribute type
-		 * to the inode value and that technically this should be the $STANDARD_INFORMATION attribute type
-		 */
 		fprintf(
 		 info_handle->bodyfile_stream,
-		 "|%" PRIu64 "-128-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+		 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
 		 file_reference & 0xffffffffffffUL,
-		 file_reference >> 48,
 		 file_mode_string,
 		 owner_identifier,
 		 group_identifier,
@@ -3664,8 +3665,6 @@ int info_handle_file_entry_value_fprint(
 		 (double) ( modification_time - 116444736000000000L ) / 10000000,
 		 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
 		 (double) ( creation_time - 116444736000000000L ) / 10000000 );
-
-/* TODO determine $FILE_NAME values */
 	}
 	else
 	{
@@ -3801,6 +3800,151 @@ int info_handle_file_entry_value_fprint(
 		}
 /* TODO print attributes + ADS ? */
 	}
+	result = libfsntfs_file_entry_get_name_attribute_index(
+	          file_entry,
+	          &name_attribute_index,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name attribute index.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_file_entry_get_attribute_by_index(
+		     file_entry,
+		     name_attribute_index,
+		     &attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d.",
+			 function,
+			 name_attribute_index );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_name_attribute_get_creation_time(
+		     attribute,
+		     &creation_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve creation time.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_name_attribute_get_modification_time(
+		     attribute,
+		     &modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve modification time.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_name_attribute_get_access_time(
+		     attribute,
+		     &access_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve access time.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_file_name_attribute_get_entry_modification_time(
+		     attribute,
+		     &entry_modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry modification time.",
+			 function );
+
+			goto on_error;
+		}
+		if( info_handle->bodyfile_stream != NULL )
+		{
+			/* Colums in a Sleuthkit 3.x and later bodyfile
+			 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
+			 */
+			fprintf(
+			 info_handle->bodyfile_stream,
+			 "0|" );
+
+			if( path != NULL )
+			{
+				fprintf(
+				 info_handle->bodyfile_stream,
+				 "%" PRIs_SYSTEM "",
+				 path );
+			}
+			if( file_entry_name != NULL )
+			{
+				fprintf(
+				 info_handle->bodyfile_stream,
+				 "%" PRIs_SYSTEM "",
+				 file_entry_name );
+			}
+/* TODO determine mode as string */
+/* TODO determine owner and group */
+/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
+
+			fprintf(
+			 info_handle->bodyfile_stream,
+			 " ($FILE_NAME)|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+			 file_reference & 0xffffffffffffUL,
+			 file_mode_string,
+			 owner_identifier,
+			 group_identifier,
+			 size,
+			 (double) ( access_time - 116444736000000000L ) / 10000000,
+			 (double) ( modification_time - 116444736000000000L ) / 10000000,
+			 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
+			 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+		}
+		if( libfsntfs_attribute_free(
+		     &attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free attribute: %d.",
+			 function,
+			 name_attribute_index );
+
+			goto on_error;
+		}
+	}
 	if( security_descriptor_data != NULL )
 	{
 		memory_free(
@@ -3818,6 +3962,12 @@ int info_handle_file_entry_value_fprint(
 	return( 1 );
 
 on_error:
+	if( attribute != NULL )
+	{
+		libfsntfs_attribute_free(
+		 &attribute,
+		 NULL );
+	}
 	if( security_descriptor_data != NULL )
 	{
 		memory_free(
@@ -4503,7 +4653,7 @@ int info_handle_mft_entry_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "\tFile reference\t\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 value_64bit & 0xffffffffffffUL,
 		 value_64bit >> 48 );
 
@@ -4521,12 +4671,20 @@ int info_handle_mft_entry_fprint(
 
 			goto on_error;
 		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tBase record file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
-		 base_record_file_reference & 0xffffffffffffUL,
-		 base_record_file_reference >> 48 );
-
+		if( base_record_file_reference == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tBase record file reference\t: Not set (0)\n" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tBase record file reference\t: %" PRIu64 "-%" PRIu64 "\n",
+			 base_record_file_reference & 0xffffffffffffUL,
+			 base_record_file_reference >> 48 );
+		}
 		if( libfsntfs_file_entry_get_journal_sequence_number(
 		     file_entry,
 		     &value_64bit,
@@ -5343,7 +5501,7 @@ int info_handle_usn_record_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tFile reference\t\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "\tFile reference\t\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 value_64bit & 0xffffffffffffUL,
 		 value_64bit >> 48 );
 	}
@@ -5372,7 +5530,7 @@ int info_handle_usn_record_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "\tParent file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 value_64bit & 0xffffffffffffUL,
 		 value_64bit >> 48 );
 	}

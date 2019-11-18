@@ -408,6 +408,17 @@ int libfsntfs_file_name_values_read_data(
 
 		return( -1 );
 	}
+	if( data_size < sizeof( fsntfs_file_name_t ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: unsupported data size value too small.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{

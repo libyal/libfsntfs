@@ -332,7 +332,7 @@ int libfsntfs_file_entry_free(
 		{
 			if( libcdata_array_free(
 			     &( internal_file_entry->attributes_array ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_internal_attribute_free_new,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_internal_attribute_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -676,8 +676,8 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_read_value(
-		     safe_attribute,
+		if( libfsntfs_internal_attribute_read_value(
+		     (libfsntfs_internal_attribute_t *) safe_attribute,
 		     internal_file_entry->io_handle,
 		     internal_file_entry->file_io_handle,
 		     internal_file_entry->flags,
@@ -716,7 +716,7 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 on_error:
 	if( safe_attribute != NULL )
 	{
-		libfsntfs_internal_attribute_free_new(
+		libfsntfs_internal_attribute_free(
 		 (libfsntfs_internal_attribute_t **) &safe_attribute,
 		 NULL );
 	}

@@ -958,7 +958,7 @@ int libfsntfs_volume_close(
 	}
 	if( internal_volume->volume_information_attribute != NULL )
 	{
-		if( libfsntfs_internal_attribute_free_new(
+		if( libfsntfs_internal_attribute_free(
 		     (libfsntfs_internal_attribute_t **) &( internal_volume->volume_information_attribute ),
 		     error ) != 1 )
 		{
@@ -974,7 +974,7 @@ int libfsntfs_volume_close(
 	}
 	if( internal_volume->volume_name_attribute != NULL )
 	{
-		if( libfsntfs_internal_attribute_free_new(
+		if( libfsntfs_internal_attribute_free(
 		     (libfsntfs_internal_attribute_t **) &( internal_volume->volume_name_attribute ),
 		     error ) != 1 )
 		{
@@ -2145,8 +2145,8 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 
 			return( -1 );
 		}
-		if( libfsntfs_attribute_read_value(
-		     internal_volume->volume_information_attribute,
+		if( libfsntfs_internal_attribute_read_value(
+		     (libfsntfs_internal_attribute_t *) internal_volume->volume_information_attribute,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     0,
@@ -2272,8 +2272,8 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 
 			return( -1 );
 		}
-		if( libfsntfs_attribute_read_value(
-		     internal_volume->volume_name_attribute,
+		if( libfsntfs_internal_attribute_read_value(
+		     (libfsntfs_internal_attribute_t *) internal_volume->volume_name_attribute,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     0,

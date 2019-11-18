@@ -258,6 +258,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_reparse_point_v
 		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_sds_index_value", "fsntfs_test_sds_index_value\fsntfs_test_sds_index_value.vcproj", "{0C5B426F-5F01-4A7F-8FE3-A372CE67F02A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_security_descriptor_index", "fsntfs_test_security_descriptor_index\fsntfs_test_security_descriptor_index.vcproj", "{AF956C6B-4E27-487E-B795-7F8503A4B5AB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
@@ -681,6 +687,10 @@ Global
 		{D47D7B9A-C9B6-4F52-8B13-14E7FE90200E}.Release|Win32.Build.0 = Release|Win32
 		{D47D7B9A-C9B6-4F52-8B13-14E7FE90200E}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{D47D7B9A-C9B6-4F52-8B13-14E7FE90200E}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{0C5B426F-5F01-4A7F-8FE3-A372CE67F02A}.Release|Win32.ActiveCfg = Release|Win32
+		{0C5B426F-5F01-4A7F-8FE3-A372CE67F02A}.Release|Win32.Build.0 = Release|Win32
+		{0C5B426F-5F01-4A7F-8FE3-A372CE67F02A}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{0C5B426F-5F01-4A7F-8FE3-A372CE67F02A}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{AF956C6B-4E27-487E-B795-7F8503A4B5AB}.Release|Win32.ActiveCfg = Release|Win32
 		{AF956C6B-4E27-487E-B795-7F8503A4B5AB}.Release|Win32.Build.0 = Release|Win32
 		{AF956C6B-4E27-487E-B795-7F8503A4B5AB}.VSDebug|Win32.ActiveCfg = VSDebug|Win32

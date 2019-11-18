@@ -83,12 +83,8 @@ int libfsntfs_internal_attribute_free(
      libfsntfs_internal_attribute_t **internal_attribute,
      libcerror_error_t **error );
 
-int libfsntfs_internal_attribute_free_new(
-     libfsntfs_internal_attribute_t **internal_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_attribute_read_value(
-     libfsntfs_attribute_t *attribute,
+int libfsntfs_internal_attribute_read_value(
+     libfsntfs_internal_attribute_t *internal_attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
@@ -103,11 +99,6 @@ LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_type(
      libfsntfs_attribute_t *attribute,
      uint32_t *type,
-     libcerror_error_t **error );
-
-int libfsntfs_internal_attribute_get_data_flags(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     uint16_t *data_flags,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

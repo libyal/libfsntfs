@@ -971,6 +971,24 @@ int fsntfs_test_file_name_values_read_data(
 	libcerror_error_free(
 	 &error );
 
+	result = libfsntfs_file_name_values_read_data(
+	          file_name_values,
+	          &( fsntfs_test_file_name_values_data1[ 24 ] ),
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
 	/* Test libfsntfs_file_name_values_read_data with malloc failing in libfsntfs_file_name_values_set_name

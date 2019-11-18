@@ -212,73 +212,6 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
-		/* The mft_attribute and attribute_list_entry reference are freed elsewhere
-		 */
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-		if( libcthreads_read_write_lock_free(
-		     &( ( *internal_attribute )->read_write_lock ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free read/write lock.",
-			 function );
-
-			result = -1;
-		}
-#endif
-		if( ( *internal_attribute )->value != NULL )
-		{
-			if( ( *internal_attribute )->free_value != NULL )
-			{
-				if( ( *internal_attribute )->free_value(
-				     &( ( *internal_attribute )->value ),
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-					 "%s: unable to free attribute value.",
-					 function );
-
-					result = -1;
-				}
-			}
-		}
-		memory_free(
-		 *internal_attribute );
-
-		*internal_attribute = NULL;
-	}
-	return( result );
-}
-
-/* Frees an attribute
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_internal_attribute_free_new(
-     libfsntfs_internal_attribute_t **internal_attribute,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_internal_attribute_free_new";
-	int result            = 1;
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( *internal_attribute != NULL )
-	{
 		/* The mft_attribute and attribute_list_entry references are freed elsewhere
 		 */
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -326,19 +259,18 @@ int libfsntfs_internal_attribute_free_new(
 /* Reads the attribute value
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_attribute_read_value(
-     libfsntfs_attribute_t *attribute,
+int libfsntfs_internal_attribute_read_value(
+     libfsntfs_internal_attribute_t *internal_attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_read_value";
-	uint32_t attribute_type                            = 0;
-	int result                                         = 0;
+	static char *function   = "libfsntfs_internal_attribute_read_value";
+	uint32_t attribute_type = 0;
+	int result              = 0;
 
-	if( attribute == NULL )
+	if( internal_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -349,9 +281,8 @@ int libfsntfs_attribute_read_value(
 
 		return( -1 );
 	}
-	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
-
-	/* Value already set ignore */
+	/* Value already set ignore
+	 */
 	if( internal_attribute->value != NULL )
 	{
 		return( 1 );
@@ -869,62 +800,6 @@ int libfsntfs_attribute_get_type(
 /* Retrieves the data flags
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_internal_attribute_get_data_flags(
-     libfsntfs_internal_attribute_t *internal_attribute,
-     uint16_t *data_flags,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_internal_attribute_get_data_flags";
-
-	if( internal_attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_attribute->mft_attribute != NULL )
-	{
-		if( libfsntfs_mft_attribute_get_data_flags(
-		     internal_attribute->mft_attribute,
-		     data_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data flags from MFT attribute.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		if( data_flags == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid data flags.",
-			 function );
-
-			return( -1 );
-		}
-		*data_flags = 0;
-	}
-	return( 1 );
-}
-
-/* Retrieves the data flags
- * Returns 1 if successful or -1 on error
- */
 int libfsntfs_attribute_get_data_flags(
      libfsntfs_attribute_t *attribute,
      uint16_t *data_flags,
@@ -932,6 +807,7 @@ int libfsntfs_attribute_get_data_flags(
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_attribute_get_data_flags";
+	uint16_t safe_data_flags                           = 0;
 	int result                                         = 1;
 
 	if( attribute == NULL )
@@ -947,6 +823,17 @@ int libfsntfs_attribute_get_data_flags(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
+	if( data_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data flags.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_attribute->read_write_lock,
@@ -962,19 +849,22 @@ int libfsntfs_attribute_get_data_flags(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_internal_attribute_get_data_flags(
-	     internal_attribute,
-	     data_flags,
-	     error ) != 1 )
+	if( internal_attribute->mft_attribute != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data flags.",
-		 function );
+		if( libfsntfs_mft_attribute_get_data_flags(
+		     internal_attribute->mft_attribute,
+		     &safe_data_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data flags from MFT attribute.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -991,6 +881,10 @@ int libfsntfs_attribute_get_data_flags(
 		return( -1 );
 	}
 #endif
+	if( result == 1 )
+	{
+		*data_flags = safe_data_flags;
+	}
 	return( result );
 }
 
@@ -1026,38 +920,8 @@ int libfsntfs_internal_attribute_get_value(
 
 		return( -1 );
 	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_attribute->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	*value = internal_attribute->value;
 
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_attribute->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	return( 1 );
 }
 
@@ -1554,7 +1418,9 @@ int libfsntfs_attribute_get_file_reference(
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_attribute_get_file_reference";
+	uint64_t safe_mft_entry_index                      = 0;
 	uint16_t safe_sequence_number                      = 0;
+	int result                                         = 1;
 
 	if( attribute == NULL )
 	{
@@ -1569,26 +1435,37 @@ int libfsntfs_attribute_get_file_reference(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( internal_attribute->mft_attribute != NULL )
+	if( mft_entry_index == NULL )
 	{
-		if( mft_entry_index == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid MFT entry index.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry index.",
+		 function );
 
-			return( -1 );
-		}
-		*mft_entry_index = 0;
+		return( -1 );
 	}
-	else
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_attribute->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_attribute->mft_attribute == NULL )
 	{
 		if( libfsntfs_attribute_list_entry_get_file_reference(
 		     internal_attribute->attribute_list_entry,
-		     mft_entry_index,
+		     &safe_mft_entry_index,
 		     &safe_sequence_number,
 		     error ) != 1 )
 		{
@@ -1599,14 +1476,34 @@ int libfsntfs_attribute_get_file_reference(
 			 "%s: unable to retrieve file reference.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
-	if( sequence_number != NULL )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_attribute->read_write_lock,
+	     error ) != 1 )
 	{
-		*sequence_number = safe_sequence_number;
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( result == 1 )
+	{
+		*mft_entry_index = safe_mft_entry_index;
+
+		if( sequence_number != NULL )
+		{
+			*sequence_number = safe_sequence_number;
+		}
+	}
+	return( result );
 }
 
 /* Retrieves the data size
@@ -1747,6 +1644,8 @@ int libfsntfs_attribute_get_valid_data_size(
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_attribute_get_valid_data_size";
+	uint64_t safe_valid_data_size                      = 0;
+	int result                                         = 1;
 
 	if( attribute == NULL )
 	{
@@ -1761,11 +1660,37 @@ int libfsntfs_attribute_get_valid_data_size(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
+	if( valid_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid valid data size.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_attribute->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( internal_attribute->mft_attribute != NULL )
 	{
 		if( libfsntfs_mft_attribute_get_valid_data_size(
 		     internal_attribute->mft_attribute,
-		     (uint64_t *) valid_data_size,
+		     &safe_valid_data_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1775,24 +1700,28 @@ int libfsntfs_attribute_get_valid_data_size(
 			 "%s: unable to retrieve valid data size.",
 			 function );
 
-			return( -1 );
+			result = -1;
 		}
 	}
-	else
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_attribute->read_write_lock,
+	     error ) != 1 )
 	{
-		if( valid_data_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid valid data size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
 
-			return( -1 );
-		}
-		*valid_data_size = 0;
+		return( -1 );
 	}
-	return( 1 );
+#endif
+	if( result == 1 )
+	{
+		*valid_data_size = safe_valid_data_size;
+	}
+	return( result );
 }
 

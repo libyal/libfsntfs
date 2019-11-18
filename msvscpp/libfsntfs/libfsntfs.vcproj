@@ -338,6 +338,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_sds_index_value.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_security_descriptor_attribute.c"
 				>
 			</File>
@@ -673,6 +677,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_reparse_point_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_sds_index_value.h"
 				>
 			</File>
 			<File
