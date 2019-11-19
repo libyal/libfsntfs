@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_attribute"
-	ProjectGUID="{14362056-DE51-456D-A0BA-1D4C346D8DF5}"
-	RootNamespace="fsntfs_test_attribute"
+	Name="fsntfs_test_cluster_block_data_handle"
+	ProjectGUID="{8A19E7A9-D25E-45EB-870B-9643818970D9}"
+	RootNamespace="fsntfs_test_cluster_block_data_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,15 +176,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_attribute.c"
+				RelativePath="..\..\tests\fsntfs_test_cluster_block_data_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_functions.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_rwlock.c"
 				>
 			</File>
 		</Filter>
@@ -193,6 +193,14 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_functions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
@@ -207,10 +215,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_rwlock.h"
 				>
 			</File>
 			<File

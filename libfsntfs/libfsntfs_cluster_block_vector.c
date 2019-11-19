@@ -42,13 +42,14 @@ int libfsntfs_cluster_block_vector_initialize(
      libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error )
 {
-	libfsntfs_data_run_t *data_run = NULL;
-	static char *function          = "libfsntfs_cluster_block_vector_initialize";
-	int attribute_index            = 0;
-	int data_run_index             = 0;
-	int number_of_data_runs        = 0;
-	int segment_index              = 0;
-	uint16_t attribute_data_flags  = 0;
+	libfdata_vector_t *safe_cluster_block_vector = NULL;
+	libfsntfs_data_run_t *data_run               = NULL;
+	static char *function                        = "libfsntfs_cluster_block_vector_initialize";
+	uint16_t attribute_data_flags                = 0;
+	int attribute_index                          = 0;
+	int data_run_index                           = 0;
+	int number_of_data_runs                      = 0;
+	int segment_index                            = 0;
 
 	if( cluster_block_vector == NULL )
 	{
@@ -57,6 +58,17 @@ int libfsntfs_cluster_block_vector_initialize(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid cluster block vector.",
+		 function );
+
+		return( -1 );
+	}
+	if( *cluster_block_vector != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid cluster block vector value already set.",
 		 function );
 
 		return( -1 );
@@ -98,7 +110,7 @@ int libfsntfs_cluster_block_vector_initialize(
 		goto on_error;
 	}
 	if( libfdata_vector_initialize(
-	     cluster_block_vector,
+	     &safe_cluster_block_vector,
 	     (size64_t) io_handle->cluster_block_size,
 	     (intptr_t *) io_handle,
 	     NULL,
@@ -170,7 +182,7 @@ int libfsntfs_cluster_block_vector_initialize(
 				goto on_error;
 			}
 			if( libfdata_vector_append_segment(
-			     *cluster_block_vector,
+			     safe_cluster_block_vector,
 			     &segment_index,
 			     0,
 			     data_run->start_offset,
@@ -208,13 +220,15 @@ int libfsntfs_cluster_block_vector_initialize(
 			goto on_error;
 		}
 	}
+	*cluster_block_vector = safe_cluster_block_vector;
+
 	return( 1 );
 
 on_error:
-	if( *cluster_block_vector != NULL )
+	if( safe_cluster_block_vector != NULL )
 	{
 		libfdata_vector_free(
-		 cluster_block_vector,
+		 &safe_cluster_block_vector,
 		 NULL );
 	}
 	return( -1 );

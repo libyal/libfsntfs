@@ -46,7 +46,11 @@ check_PROGRAMS = \
 	fsntfs_test_attribute_list \
 	fsntfs_test_attribute_list_entry \
 	fsntfs_test_bitmap_values \
+	fsntfs_test_buffer_data_handle \
 	fsntfs_test_cluster_block \
+	fsntfs_test_cluster_block_data_handle \
+	fsntfs_test_cluster_block_stream \
+	fsntfs_test_cluster_block_vector \
 	fsntfs_test_compressed_block \
 	fsntfs_test_compressed_block_descriptor \
 	fsntfs_test_data_run \
@@ -112,6 +116,7 @@ fsntfs_test_attribute_list_SOURCES = \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
 	fsntfs_test_unused.h
 
 fsntfs_test_attribute_list_LDADD = \
@@ -145,6 +150,18 @@ fsntfs_test_bitmap_values_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
+fsntfs_test_buffer_data_handle_SOURCES = \
+	fsntfs_test_buffer_data_handle.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_buffer_data_handle_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
 fsntfs_test_cluster_block_SOURCES = \
 	fsntfs_test_cluster_block.c \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
@@ -164,6 +181,55 @@ fsntfs_test_cluster_block_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_cluster_block_data_handle_SOURCES = \
+	fsntfs_test_cluster_block_data_handle.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_cluster_block_data_handle_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_cluster_block_stream_SOURCES = \
+	fsntfs_test_cluster_block_stream.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfdata.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_cluster_block_stream_LDADD = \
+	@LIBFDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_cluster_block_vector_SOURCES = \
+	fsntfs_test_cluster_block_vector.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfdata.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_cluster_block_vector_LDADD = \
+	@LIBFDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

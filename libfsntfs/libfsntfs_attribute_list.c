@@ -208,17 +208,6 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 		return( -1 );
 	}
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
 	if( libfsntfs_mft_attribute_get_number_of_data_runs(
 	     attribute,
 	     &number_of_data_runs,

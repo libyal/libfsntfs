@@ -31,6 +31,7 @@
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
+#include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_attribute_list.h"

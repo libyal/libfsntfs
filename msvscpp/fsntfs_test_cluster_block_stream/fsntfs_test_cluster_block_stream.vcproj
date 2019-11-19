@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_attribute"
-	ProjectGUID="{14362056-DE51-456D-A0BA-1D4C346D8DF5}"
-	RootNamespace="fsntfs_test_attribute"
+	Name="fsntfs_test_cluster_block_stream"
+	ProjectGUID="{7075C461-7EE0-4BBB-BE45-4CA4D58CE945}"
+	RootNamespace="fsntfs_test_cluster_block_stream"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,15 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_attribute.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_rwlock.c"
+				RelativePath="..\..\tests\fsntfs_test_cluster_block_stream.c"
 				>
 			</File>
 		</Filter>
@@ -198,19 +190,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\fsntfs_test_libfdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_libfsntfs.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_rwlock.h"
 				>
 			</File>
 			<File

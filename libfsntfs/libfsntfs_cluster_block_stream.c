@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_buffer_data_handle.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_compressed_block.h"
 #include "libfsntfs_compressed_block_descriptor.h"
@@ -45,7 +46,6 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
      libfsntfs_cluster_block_stream_data_handle_t **data_handle,
      libfsntfs_io_handle_t *io_handle,
      size64_t data_size,
-     const uint8_t *resident_data,
      size_t compression_unit_size,
      uint16_t data_flags,
      libcerror_error_t **error )
@@ -118,8 +118,7 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
 
 		return( -1 );
 	}
-	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-	 && ( resident_data == NULL ) )
+	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	{
 		if( libcdata_array_initialize(
 		     &( ( *data_handle )->compressed_block_descriptors_array ),
@@ -158,7 +157,6 @@ int libfsntfs_cluster_block_stream_data_handle_initialize(
 	}
 	( *data_handle )->io_handle             = io_handle;
 	( *data_handle )->data_size             = data_size;
-	( *data_handle )->resident_data         = resident_data;
 	( *data_handle )->compression_unit_size = compression_unit_size;
 	( *data_handle )->data_flags            = data_flags;
 
@@ -306,7 +304,6 @@ int libfsntfs_cluster_block_stream_data_handle_clone(
 	     destination_data_handle,
 	     source_data_handle->io_handle,
 	     source_data_handle->data_size,
-	     source_data_handle->resident_data,
 	     source_data_handle->compression_unit_size,
 	     source_data_handle->data_flags,
 	     error ) != 1 )
@@ -427,52 +424,7 @@ ssize_t libfsntfs_cluster_block_stream_data_handle_read_segment_data(
 	{
 		return( 0 );
 	}
-	if( data_handle->resident_data != NULL )
-	{
-		if( data_handle->data_size > (size64_t) SSIZE_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid data handle - data size value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		if( (size64_t) data_handle->current_segment_offset >= data_handle->data_size )
-		{
-			return( 0 );
-		}
-		segment_size = data_handle->data_size - data_handle->current_segment_offset;
-
-		if( segment_data_size > segment_size )
-		{
-			read_count = segment_size;
-		}
-		else
-		{
-			read_count = segment_data_size;
-		}
-		if( read_count > 0 )
-		{
-			if( memory_copy(
-			     segment_data,
-			     &( ( data_handle->resident_data )[ data_handle->current_segment_offset ] ),
-			     (size_t) read_count ) == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-				 "%s: unable to copy resident data.",
-				 function );
-
-				return( -1 );
-			}
-		}
-	}
-	else if( data_handle->compressed_block_vector != NULL )
+	if( data_handle->compressed_block_vector != NULL )
 	{
 		if( libfdata_vector_get_segment_by_index(
 		     data_handle->compressed_block_vector,
@@ -826,11 +778,29 @@ int libfsntfs_cluster_block_stream_initialize(
 			goto on_error;
 		}
 	}
+	if( resident_data != NULL )
+	{
+		if( libfsntfs_cluster_block_stream_initialize_from_data(
+		     cluster_block_stream,
+		     resident_data,
+		     data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create cluster block stream.",
+			 function );
+
+			goto on_error;
+		}
+		return( 1 );
+	}
 	if( libfsntfs_cluster_block_stream_data_handle_initialize(
 	     &data_handle,
 	     io_handle,
 	     data_size,
-	     resident_data,
 	     compression_unit_size,
 	     data_flags,
 	     error ) != 1 )
@@ -878,20 +848,6 @@ int libfsntfs_cluster_block_stream_initialize(
 	}
 	while( mft_attribute != NULL )
 	{
-		if( ( attribute_index > 0 )
-		 && ( data_handle->resident_data != NULL ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-			 "%s: invalid data handle - resident data already set.",
-			 function );
-
-			data_handle = NULL;
-
-			goto on_error;
-		}
 		if( (size64_t) data_offset > valid_data_size )
 		{
 			libcerror_error_set(
@@ -1401,8 +1357,7 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 		attribute_index++;
 	}
-	if( ( number_of_data_runs != 0 )
-	 || ( resident_data != NULL ) )
+	if( number_of_data_runs != 0 )
 	{
 		if( libfdata_stream_set_mapped_size(
 		     *cluster_block_stream,
@@ -1428,8 +1383,7 @@ int libfsntfs_cluster_block_stream_initialize(
 		 "\n" );
 	}
 #endif
-	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-	 && ( resident_data == NULL ) )
+	if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	{
 		if( libfcache_cache_initialize(
 		     &( data_handle->cache ),
@@ -1460,6 +1414,108 @@ on_error:
 	if( data_handle != NULL )
 	{
 		libfsntfs_cluster_block_stream_data_handle_free(
+		 &data_handle,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Creates cluster block stream from a buffer of data
+ * Make sure the value cluster_block_stream is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_cluster_block_stream_initialize_from_data(
+     libfdata_stream_t **cluster_block_stream,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error )
+{
+	libfdata_stream_t *safe_data_stream         = NULL;
+	libfsntfs_buffer_data_handle_t *data_handle = NULL;
+	static char *function                       = "libfsntfs_cluster_block_stream_initialize_from_data";
+	int segment_index                           = 0;
+
+	if( cluster_block_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid cluster block stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_buffer_data_handle_initialize(
+	     &data_handle,
+	     data,
+	     data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create buffer data handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_stream_initialize(
+	     &safe_data_stream,
+	     (intptr_t *) data_handle,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_buffer_data_handle_free,
+	     NULL,
+	     NULL,
+	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_buffer_data_handle_read_segment_data,
+	     NULL,
+	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_buffer_data_handle_seek_segment_offset,
+	     LIBFDATA_DATA_HANDLE_FLAG_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create data stream.",
+		 function );
+
+		goto on_error;
+	}
+	data_handle = NULL;
+
+	if( libfdata_stream_append_segment(
+	     safe_data_stream,
+	     &segment_index,
+	     0,
+	     0,
+	     (size64_t) data_size,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append data stream segment.",
+		 function );
+
+		goto on_error;
+	}
+	*cluster_block_stream = safe_data_stream;
+
+	return( 1 );
+
+on_error:
+	if( safe_data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &safe_data_stream,
+		 NULL );
+	}
+	if( data_handle != NULL )
+	{
+		libfsntfs_buffer_data_handle_free(
 		 &data_handle,
 		 NULL );
 	}

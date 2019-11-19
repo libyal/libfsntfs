@@ -190,7 +190,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_buffer_data_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data_handle.c"
 				>
 			</File>
 			<File
@@ -476,7 +484,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_buffer_data_handle.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data_handle.h"
 				>
 			</File>
 			<File
