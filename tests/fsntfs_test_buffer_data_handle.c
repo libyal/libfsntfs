@@ -95,6 +95,42 @@ int fsntfs_test_buffer_data_handle_initialize(
 	 "error",
 	 error );
 
+	result = libfsntfs_buffer_data_handle_initialize(
+	          &buffer_data_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "buffer_data_handle",
+	 buffer_data_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_buffer_data_handle_free(
+	          &buffer_data_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "buffer_data_handle",
+	 buffer_data_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libfsntfs_buffer_data_handle_initialize(
@@ -159,24 +195,6 @@ int fsntfs_test_buffer_data_handle_initialize(
 	          &buffer_data_handle,
 	          fsntfs_test_buffer_data_handle_data1,
 	          (size_t) SSIZE_MAX + 1,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_buffer_data_handle_initialize(
-	          &buffer_data_handle,
-	          fsntfs_test_buffer_data_handle_data1,
-	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

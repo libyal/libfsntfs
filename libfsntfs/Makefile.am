@@ -47,6 +47,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_cluster_block_vector.c libfsntfs_cluster_block_vector.h \
 	libfsntfs_compressed_block.c libfsntfs_compressed_block.h \
 	libfsntfs_compressed_block_descriptor.c libfsntfs_compressed_block_descriptor.h \
+	libfsntfs_compression.c libfsntfs_compression.h \
 	libfsntfs_data_run.c libfsntfs_data_run.h \
 	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_debug.c libfsntfs_debug.h \

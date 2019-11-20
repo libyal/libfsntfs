@@ -749,7 +749,8 @@ int libfsntfs_cluster_block_stream_initialize(
 		}
 	}
 	if( ( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-	 && ( resident_data == NULL ) )
+	 && ( resident_data == NULL )
+	 && ( data_size > 0 ) )
 	{
 		if( libfsntfs_mft_attribute_get_compression_unit_size(
 		     mft_attribute,
@@ -778,7 +779,8 @@ int libfsntfs_cluster_block_stream_initialize(
 			goto on_error;
 		}
 	}
-	if( resident_data != NULL )
+	if( ( resident_data != NULL )
+	 || ( data_size == 0 ) )
 	{
 		if( libfsntfs_cluster_block_stream_initialize_from_data(
 		     cluster_block_stream,
@@ -845,6 +847,10 @@ int libfsntfs_cluster_block_stream_initialize(
 		 function );
 
 		goto on_error;
+	}
+	if( data_size == 0 )
+	{
+		return( 1 );
 	}
 	while( mft_attribute != NULL )
 	{

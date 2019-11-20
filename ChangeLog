@@ -1,13 +1,23 @@
 TODO
+* clean up and improve cluster block data stream
+** complete compressed data handle
+** complete compressed data handle test
+** complete compression test
+** create small LZNT1 test data
+** create small LZXPRESS Huffman test data
+** add WofCompressedData support to cluster block data stream
+** add support for 0 size data stream
+
 * complete thread lock support
 ** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
 ** MFT metadata file
 
-* add WofCompressedData support to cluster block data stream
-** clean up cluster block data stream
+* MFT entry
+** preserve attribute list data MFT entries?
 
 * fsntfsinfo complete bodyfile support
 ** fix libfsntfs_file_entry_get_security_descriptor_size: unable to retrieve security descriptor from index for identifier: 0.
+** add support for tsk metadata address calculation? inside MFT attribute?
 * fsntfsinfo -F add support for ADS notation
 
 * change libfsntfs_mft_attribute_get_utf[8,16]_name[_size] to return 0 if not set

@@ -25,13 +25,12 @@
 
 #include "libfsntfs_compressed_block.h"
 #include "libfsntfs_compressed_block_descriptor.h"
+#include "libfsntfs_compression.h"
+#include "libfsntfs_definitions.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfdata.h"
-#include "libfsntfs_libfwnt.h"
-#include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 
 /* Creates a compressed block
@@ -314,9 +313,10 @@ int libfsntfs_compressed_block_read_element_data(
 	}
 	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
-		result = libfwnt_lznt1_decompress(
+		result = libfsntfs_decompress_data(
 			  compressed_data,
 			  (size_t) compressed_block_size,
+			  LIBFSNTFS_COMPRESSION_METHOD_LZNT1,
 			  compressed_block->data,
 			  &( compressed_block->data_size ),
 			  error );

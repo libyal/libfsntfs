@@ -53,6 +53,7 @@ check_PROGRAMS = \
 	fsntfs_test_cluster_block_vector \
 	fsntfs_test_compressed_block \
 	fsntfs_test_compressed_block_descriptor \
+	fsntfs_test_compression \
 	fsntfs_test_data_run \
 	fsntfs_test_data_stream \
 	fsntfs_test_directory_entries_tree \
@@ -264,6 +265,17 @@ fsntfs_test_compressed_block_descriptor_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_compressed_block_descriptor_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_compression_SOURCES = \
+	fsntfs_test_compression.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_compression_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

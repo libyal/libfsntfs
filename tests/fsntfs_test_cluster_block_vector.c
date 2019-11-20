@@ -128,8 +128,6 @@ int fsntfs_test_cluster_block_vector_initialize(
 	          mft_attribute,
 	          &error );
 
-FSNTFS_TEST_FPRINT_ERROR( error );
-
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
