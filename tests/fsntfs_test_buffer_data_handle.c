@@ -501,6 +501,33 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 	libcerror_error_free(
 	 &error );
 
+	buffer_data_handle->current_offset = -1;
+
+	read_count = libfsntfs_buffer_data_handle_read_segment_data(
+	              buffer_data_handle,
+	              NULL,
+	              0,
+	              0,
+	              segment_data,
+	              16,
+	              0,
+	              0,
+	              &error );
+
+	buffer_data_handle->current_offset = 0;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	read_count = libfsntfs_buffer_data_handle_read_segment_data(
 	              buffer_data_handle,
 	              NULL,
@@ -588,6 +615,44 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+#if defined( OPTIMIZATION_DISABLED )
+	/* Test libfsntfs_buffer_data_handle_read_segment_data with memcpy failing
+	 */
+	fsntfs_test_memcpy_attempts_before_fail = 0;
+
+	read_count = libfsntfs_buffer_data_handle_read_segment_data(
+	              buffer_data_handle,
+	              NULL,
+	              0,
+	              0,
+	              segment_data,
+	              12,
+	              0,
+	              0,
+	              &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	return( 1 );
 

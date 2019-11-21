@@ -281,11 +281,16 @@ int libfsntfs_internal_attribute_read_value(
 
 		return( -1 );
 	}
-	/* Value already set ignore
-	 */
 	if( internal_attribute->value != NULL )
 	{
-		return( 1 );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid attribute - value already set.",
+		 function );
+
+		return( -1 );
 	}
 	if( libfsntfs_internal_attribute_get_type(
 	     internal_attribute,

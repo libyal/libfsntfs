@@ -168,12 +168,16 @@ fsntfs_test_cluster_block_SOURCES = \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
+	fsntfs_test_libfcache.h \
+	fsntfs_test_libfdata.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
 	fsntfs_test_memory.c fsntfs_test_memory.h \
 	fsntfs_test_unused.h
 
 fsntfs_test_cluster_block_LDADD = \
+	@LIBFDATA_LIBADD@ \
+	@LIBFCACHE_LIBADD@ \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

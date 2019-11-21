@@ -62,7 +62,7 @@ int fsntfs_test_cluster_block_data_handle_initialize(
 	int result                                                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests                                  = 1;
+	int number_of_malloc_fail_tests                                  = 5;
 	int number_of_memset_fail_tests                                  = 1;
 	int test_number                                                  = 0;
 #endif
@@ -740,6 +740,60 @@ int fsntfs_test_cluster_block_data_handle_read_segment_data(
 	libcerror_error_free(
 	 &error );
 
+	cluster_block_data_handle->io_handle = NULL;
+
+	read_count = libfsntfs_cluster_block_data_handle_read_segment_data(
+	              cluster_block_data_handle,
+	              file_io_handle,
+	              0,
+	              0,
+	              segment_data,
+	              16,
+	              0,
+	              0,
+	              &error );
+
+	cluster_block_data_handle->io_handle = io_handle;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	cluster_block_data_handle->current_offset = -1;
+
+	read_count = libfsntfs_cluster_block_data_handle_read_segment_data(
+	              cluster_block_data_handle,
+	              file_io_handle,
+	              0,
+	              0,
+	              segment_data,
+	              16,
+	              0,
+	              0,
+	              &error );
+
+	cluster_block_data_handle->current_offset = 0;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	read_count = libfsntfs_cluster_block_data_handle_read_segment_data(
 	              cluster_block_data_handle,
 	              NULL,
@@ -831,6 +885,44 @@ int fsntfs_test_cluster_block_data_handle_read_segment_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+#if defined( OPTIMIZATION_DISABLED )
+	/* Test libfsntfs_cluster_block_data_handle_read_segment_data with memcpy failing
+	 */
+	fsntfs_test_memcpy_attempts_before_fail = 0;
+
+	read_count = libfsntfs_cluster_block_data_handle_read_segment_data(
+	              cluster_block_data_handle,
+	              file_io_handle,
+	              0,
+	              0,
+	              segment_data,
+	              12,
+	              0,
+	              0,
+	              &error );
+
+	if( fsntfs_test_memcpy_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up file IO handle
 	 */

@@ -34,8 +34,12 @@
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_bitmap_values.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 
-uint8_t fsntfs_test_bitmap_values_data1[ 8 ] = {
+uint8_t fsntfs_test_bitmap_values_data1[ 40 ] = {
+	0xb0, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x04, 0x18, 0x00, 0x00, 0x00, 0x04, 0x00,
+	0x08, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x24, 0x00, 0x49, 0x00, 0x33, 0x00, 0x30, 0x00,
 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
@@ -306,7 +310,7 @@ int fsntfs_test_bitmap_values_read_data(
 	 */
 	result = libfsntfs_bitmap_values_read_data(
 	          bitmap_values,
-	          fsntfs_test_bitmap_values_data1,
+	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
 	          &error );
 
@@ -323,7 +327,7 @@ int fsntfs_test_bitmap_values_read_data(
 	 */
 	result = libfsntfs_bitmap_values_read_data(
 	          NULL,
-	          fsntfs_test_bitmap_values_data1,
+	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
 	          &error );
 
@@ -359,7 +363,7 @@ int fsntfs_test_bitmap_values_read_data(
 
 	result = libfsntfs_bitmap_values_read_data(
 	          bitmap_values,
-	          fsntfs_test_bitmap_values_data1,
+	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -411,6 +415,230 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_bitmap_values_read_from_mft_attribute function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_bitmap_values_read_from_mft_attribute(
+     void )
+{
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_bitmap_values_t *bitmap_values = NULL;
+	libfsntfs_io_handle_t *io_handle         = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	int result                               = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_bitmap_values_data1,
+	          40,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_bitmap_values_initialize(
+	          &bitmap_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "bitmap_values",
+	 bitmap_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_bitmap_values_read_from_mft_attribute(
+	          bitmap_values,
+	          mft_attribute,
+	          io_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_bitmap_values_read_from_mft_attribute(
+	          NULL,
+	          mft_attribute,
+	          io_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_bitmap_values_read_from_mft_attribute(
+	          bitmap_values,
+	          NULL,
+	          io_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_bitmap_values_free(
+	          &bitmap_values,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "bitmap_values",
+	 bitmap_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( bitmap_values != NULL )
+	{
+		libfsntfs_bitmap_values_free(
+		 &bitmap_values,
+		 NULL );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -441,6 +669,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_bitmap_values_read_data",
 	 fsntfs_test_bitmap_values_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_bitmap_values_read_from_mft_attribute",
+	 fsntfs_test_bitmap_values_read_from_mft_attribute );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

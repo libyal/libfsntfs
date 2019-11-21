@@ -1559,6 +1559,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 	uint8_t utf8_name1[ 5 ]  = { '$', 'S', 'D', 'S', 0 };
 	uint8_t utf8_name2[ 6 ]  = { 'b', 'o', 'g', 'u', 's', 0 };
 	libcerror_error_t *error = NULL;
+	uint8_t *name            = NULL;
 	int result               = 0;
 
 	/* Test regular cases
@@ -1583,6 +1584,27 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 	          utf8_name2,
 	          5,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	name = attribute_list_entry->name;
+
+	attribute_list_entry->name = NULL;
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	          attribute_list_entry,
+	          utf8_name1,
+	          4,
+	          &error );
+
+	attribute_list_entry->name = name;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1669,6 +1691,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 	uint16_t utf16_name1[ 5 ] = { '$', 'S', 'D', 'S', 0 };
 	uint16_t utf16_name2[ 6 ] = { 'b', 'o', 'g', 'u', 's', 0 };
 	libcerror_error_t *error  = NULL;
+	uint8_t *name             = NULL;
 	int result                = 0;
 
 	/* Test regular cases
@@ -1693,6 +1716,27 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 	          utf16_name2,
 	          5,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	name = attribute_list_entry->name;
+
+	attribute_list_entry->name = NULL;
+
+	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	          attribute_list_entry,
+	          utf16_name1,
+	          4,
+	          &error );
+
+	attribute_list_entry->name = name;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
