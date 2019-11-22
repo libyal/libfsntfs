@@ -214,11 +214,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_descriptor.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_data_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_vector.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_data_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.c"
 				>
 			</File>
 			<File
@@ -512,11 +524,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_descriptor.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_data_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_block_vector.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_data_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.h"
 				>
 			</File>
 			<File

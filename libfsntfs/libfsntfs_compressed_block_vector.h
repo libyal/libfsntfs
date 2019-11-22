@@ -1,5 +1,5 @@
 /*
- * Cluster block stream functions
+ * Compressed block vector functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,16 +19,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_CLUSTER_BLOCK_STREAM_H )
-#define _LIBFSNTFS_CLUSTER_BLOCK_STREAM_H
+#if !defined( _LIBFSNTFS_COMPRESSED_BLOCK_VECTOR_H )
+#define _LIBFSNTFS_COMPRESSED_BLOCK_VECTOR_H
 
 #include <common.h>
 #include <types.h>
 
 #include "libfsntfs_io_handle.h"
-#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 
@@ -36,26 +34,8 @@
 extern "C" {
 #endif
 
-int libfsntfs_cluster_block_stream_initialize_from_data(
-     libfdata_stream_t **cluster_block_stream,
-     const uint8_t *data,
-     size_t data_size,
-     libcerror_error_t **error );
-
-int libfsntfs_cluster_block_stream_initialize_from_data_runs(
-     libfdata_stream_t **cluster_block_stream,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
-     libfdata_stream_t **cluster_block_stream,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_cluster_block_stream_initialize(
-     libfdata_stream_t **cluster_block_stream,
+int libfsntfs_compressed_block_vector_initialize(
+     libfdata_vector_t **compressed_block_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error );
@@ -64,5 +44,5 @@ int libfsntfs_cluster_block_stream_initialize(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_STREAM_H ) */
+#endif /* !defined( _LIBFSNTFS_COMPRESSED_BLOCK_VECTOR_H ) */
 

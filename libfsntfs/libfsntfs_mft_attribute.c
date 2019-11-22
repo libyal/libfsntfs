@@ -931,6 +931,8 @@ int libfsntfs_mft_attribute_read_data(
 				 data_run_value2_size );
 			}
 #endif
+			data_offset++;
+
 			/* An empty number of cluster blocks value size indicates the end of the data runs.
 			 */
 			if( data_run_value1_size == 0 )
@@ -951,8 +953,6 @@ int libfsntfs_mft_attribute_read_data(
 #endif
 				break;
 			}
-			data_offset++;
-
 			/* Determine the number of cluster blocks value
 			 */
 			data_run_number_of_cluster_blocks = 0;

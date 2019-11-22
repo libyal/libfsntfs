@@ -367,6 +367,7 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 	libcerror_error_t *error                           = NULL;
 	libfsntfs_buffer_data_handle_t *buffer_data_handle = NULL;
 	ssize_t read_count                                 = 0;
+	off64_t offset                                     = 0;
 	int result                                         = 0;
 
 	/* Initialize test
@@ -471,6 +472,25 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 	 "read_count",
 	 read_count,
 	 (ssize_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	offset = libfsntfs_buffer_data_handle_seek_segment_offset(
+	          buffer_data_handle,
+	          NULL,
+	          0,
+	          0,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

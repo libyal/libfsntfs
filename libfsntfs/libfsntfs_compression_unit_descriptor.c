@@ -23,87 +23,87 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_compressed_block_descriptor.h"
+#include "libfsntfs_compression_unit_descriptor.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_unused.h"
 
-/* Creates a compressed block descriptor
- * Make sure the value compressed_block_descriptor is referencing, is set to NULL
+/* Creates a compression unit descriptor
+ * Make sure the value compression_unit_descriptor is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compressed_block_descriptor_initialize(
-     libfsntfs_compressed_block_descriptor_t **compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_initialize(
+     libfsntfs_compression_unit_descriptor_t **compression_unit_descriptor,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compressed_block_descriptor_initialize";
+	static char *function = "libfsntfs_compression_unit_descriptor_initialize";
 
-	if( compressed_block_descriptor == NULL )
+	if( compression_unit_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed block descriptor.",
+		 "%s: invalid compression unit descriptor.",
 		 function );
 
 		return( -1 );
 	}
-	if( *compressed_block_descriptor != NULL )
+	if( *compression_unit_descriptor != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid compressed block descriptor value already set.",
+		 "%s: invalid compression unit descriptor value already set.",
 		 function );
 
 		return( -1 );
 	}
-	*compressed_block_descriptor = memory_allocate_structure(
-	                                libfsntfs_compressed_block_descriptor_t );
+	*compression_unit_descriptor = memory_allocate_structure(
+	                                libfsntfs_compression_unit_descriptor_t );
 
-	if( *compressed_block_descriptor == NULL )
+	if( *compression_unit_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create compressed block descriptor.",
+		 "%s: unable to create compression unit descriptor.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     *compressed_block_descriptor,
+	     *compression_unit_descriptor,
 	     0,
-	     sizeof( libfsntfs_compressed_block_descriptor_t ) ) == NULL )
+	     sizeof( libfsntfs_compression_unit_descriptor_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear compressed block descriptor.",
+		 "%s: unable to clear compression unit descriptor.",
 		 function );
 
 		memory_free(
-		 *compressed_block_descriptor );
+		 *compression_unit_descriptor );
 
-		*compressed_block_descriptor = NULL;
+		*compression_unit_descriptor = NULL;
 
 		return( -1 );
 	}
 	if( libfdata_stream_initialize(
-	     &( ( *compressed_block_descriptor )->data_stream ),
+	     &( ( *compression_unit_descriptor )->data_stream ),
 	     NULL,
 	     NULL,
 	     NULL,
 	     NULL,
-	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compressed_block_descriptor_read_segment_data,
+	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compression_unit_descriptor_read_segment_data,
 	     NULL,
-	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_compressed_block_descriptor_seek_segment_offset,
+	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_compression_unit_descriptor_seek_segment_offset,
 	     0,
 	     error ) != 1 )
 	{
@@ -119,41 +119,41 @@ int libfsntfs_compressed_block_descriptor_initialize(
 	return( 1 );
 
 on_error:
-	if( *compressed_block_descriptor != NULL )
+	if( *compression_unit_descriptor != NULL )
 	{
 		memory_free(
-		 *compressed_block_descriptor );
+		 *compression_unit_descriptor );
 
-		*compressed_block_descriptor = NULL;
+		*compression_unit_descriptor = NULL;
 	}
 	return( -1 );
 }
 
-/* Frees a compressed block descriptor
+/* Frees a compression unit descriptor
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compressed_block_descriptor_free(
-     libfsntfs_compressed_block_descriptor_t **compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_free(
+     libfsntfs_compression_unit_descriptor_t **compression_unit_descriptor,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compressed_block_descriptor_free";
+	static char *function = "libfsntfs_compression_unit_descriptor_free";
 	int result            = 1;
 
-	if( compressed_block_descriptor == NULL )
+	if( compression_unit_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed block descriptor.",
+		 "%s: invalid compression unit descriptor.",
 		 function );
 
 		return( -1 );
 	}
-	if( *compressed_block_descriptor != NULL )
+	if( *compression_unit_descriptor != NULL )
 	{
 		if( libfdata_stream_free(
-		     &( ( *compressed_block_descriptor )->data_stream ),
+		     &( ( *compression_unit_descriptor )->data_stream ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -166,9 +166,9 @@ int libfsntfs_compressed_block_descriptor_free(
 			result = -1;
 		}
 		memory_free(
-		 *compressed_block_descriptor );
+		 *compression_unit_descriptor );
 
-		*compressed_block_descriptor = NULL;
+		*compression_unit_descriptor = NULL;
 	}
 	return( result );
 }
@@ -176,29 +176,29 @@ int libfsntfs_compressed_block_descriptor_free(
 /* Appends a data segment
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compressed_block_descriptor_append_data_segment(
-     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_append_data_segment(
+     libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      off64_t segment_offset,
      size64_t segment_size,
      uint32_t segment_flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compressed_block_descriptor_append_data_segment";
+	static char *function = "libfsntfs_compression_unit_descriptor_append_data_segment";
 	int segment_index     = 0;
 
-	if( compressed_block_descriptor == NULL )
+	if( compression_unit_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed block descriptor.",
+		 "%s: invalid compression unit descriptor.",
 		 function );
 
 		return( -1 );
 	}
 	if( libfdata_stream_append_segment(
-	     compressed_block_descriptor->data_stream,
+	     compression_unit_descriptor->data_stream,
 	     &segment_index,
 	     0,
 	     segment_offset,
@@ -215,16 +215,16 @@ int libfsntfs_compressed_block_descriptor_append_data_segment(
 
 		return( -1 );
 	}
-	compressed_block_descriptor->data_size += segment_size;
+	compression_unit_descriptor->data_size += segment_size;
 
 	return( 1 );
 }
 
 /* Reads data from the current offset into a buffer
- * Callback for the compressed block descriptor data stream
+ * Callback for the compression unit descriptor data stream
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
+ssize_t libfsntfs_compression_unit_descriptor_read_segment_data(
          intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
          libbfio_handle_t *file_io_handle,
          int segment_index LIBFSNTFS_ATTRIBUTE_UNUSED,
@@ -235,7 +235,7 @@ ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
          uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
          libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compressed_block_descriptor_read_segment_data";
+	static char *function = "libfsntfs_compression_unit_descriptor_read_segment_data";
 	ssize_t read_count    = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
@@ -310,7 +310,7 @@ ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
  * Callback for the cluster block stream
  * Returns the offset if seek is successful or -1 on error
  */
-off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
+off64_t libfsntfs_compression_unit_descriptor_seek_segment_offset(
          intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
          libbfio_handle_t *file_io_handle,
          int segment_index LIBFSNTFS_ATTRIBUTE_UNUSED,
@@ -318,7 +318,7 @@ off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
          off64_t segment_offset,
          libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_compressed_block_descriptor_seek_segment_offset";
+	static char *function = "libfsntfs_compression_unit_descriptor_seek_segment_offset";
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_index )
@@ -356,17 +356,17 @@ off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 
-/* Debug prints the compressed block descriptor
+/* Debug prints the compression unit descriptor
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_compressed_block_descriptor_print(
-     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_print(
+     libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      libfsntfs_io_handle_t *io_handle,
-     int compressed_block_descriptor_index,
+     int compression_unit_descriptor_index,
      libcerror_error_t **error )
 {
 	char *compression_unit_data_type = NULL;
-	static char *function            = "libfsntfs_compressed_block_descriptor_print";
+	static char *function            = "libfsntfs_compression_unit_descriptor_print";
 	off64_t segment_offset           = 0;
 	size64_t segment_size            = 0;
 	uint32_t segment_flags           = 0;
@@ -374,13 +374,13 @@ int libfsntfs_compressed_block_descriptor_print(
 	int segment_file_index           = 0;
 	int segment_index                = 0;
 
-	if( compressed_block_descriptor == NULL )
+	if( compression_unit_descriptor == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed block descriptor.",
+		 "%s: invalid compression unit descriptor.",
 		 function );
 
 		return( -1 );
@@ -396,11 +396,11 @@ int libfsntfs_compressed_block_descriptor_print(
 
 		return( -1 );
 	}
-	if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
 		compression_unit_data_type = "compressed";
 	}
-	else if( ( compressed_block_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	else if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
 		compression_unit_data_type = "sparse";
 	}
@@ -409,14 +409,16 @@ int libfsntfs_compressed_block_descriptor_print(
 		compression_unit_data_type = "uncompressed";
 	}
 	libcnotify_printf(
-	 "%s: %" PRIzd " blocks %s compression unit: %d.\n",
+	 "%s: %" PRIzd " blocks %s compression unit: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 	 function,
-	 compressed_block_descriptor->data_size / io_handle->cluster_block_size,
+	 compression_unit_descriptor->data_size / io_handle->cluster_block_size,
 	 compression_unit_data_type,
-	 compressed_block_descriptor_index );
+	 compression_unit_descriptor_index,
+	 compression_unit_descriptor->data_offset,
+	 compression_unit_descriptor->data_offset );
 
 	if( libfdata_stream_get_number_of_segments(
-	     compressed_block_descriptor->data_stream,
+	     compression_unit_descriptor->data_stream,
 	     &number_of_segments,
 	     error ) != 1 )
 	{
@@ -434,7 +436,7 @@ int libfsntfs_compressed_block_descriptor_print(
 	     segment_index++ )
 	{
 		if( libfdata_stream_get_segment_by_index(
-		     compressed_block_descriptor->data_stream,
+		     compression_unit_descriptor->data_stream,
 		     segment_index,
 		     &segment_file_index,
 		     &segment_offset,

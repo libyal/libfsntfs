@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_COMPRESSED_BLOCK_DESCRIPTOR_H )
-#define _LIBFSNTFS_COMPRESSED_BLOCK_DESCRIPTOR_H
+#if !defined( _LIBFSNTFS_COMPRESSION_UNIT_DESCRIPTOR_H )
+#define _LIBFSNTFS_COMPRESSION_UNIT_DESCRIPTOR_H
 
 #include <common.h>
 #include <types.h>
@@ -34,39 +34,43 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_compressed_block_descriptor libfsntfs_compressed_block_descriptor_t;
+typedef struct libfsntfs_compression_unit_descriptor libfsntfs_compression_unit_descriptor_t;
 
-struct libfsntfs_compressed_block_descriptor
+struct libfsntfs_compression_unit_descriptor
 {
-	/* The data stream
+	/* The data offset
 	 */
-	libfdata_stream_t *data_stream;
+	off64_t data_offset;
+
+	/* The data size
+	 */
+	size_t data_size;
 
 	/* The data range flags
 	 */
 	uint32_t data_range_flags;
 
-	/* The data size
+	/* The data stream
 	 */
-	size_t data_size;
+	libfdata_stream_t *data_stream;
 };
 
-int libfsntfs_compressed_block_descriptor_initialize(
-     libfsntfs_compressed_block_descriptor_t **compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_initialize(
+     libfsntfs_compression_unit_descriptor_t **compression_unit_descriptor,
      libcerror_error_t **error );
 
-int libfsntfs_compressed_block_descriptor_free(
-     libfsntfs_compressed_block_descriptor_t **compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_free(
+     libfsntfs_compression_unit_descriptor_t **compression_unit_descriptor,
      libcerror_error_t **error );
 
-int libfsntfs_compressed_block_descriptor_append_data_segment(
-     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_append_data_segment(
+     libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      off64_t segment_offset,
      size64_t segment_size,
      uint32_t segment_flags,
      libcerror_error_t **error );
 
-ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
+ssize_t libfsntfs_compression_unit_descriptor_read_segment_data(
          intptr_t *data_handle,
          libbfio_handle_t *file_io_handle,
          int segment_index,
@@ -77,7 +81,7 @@ ssize_t libfsntfs_compressed_block_descriptor_read_segment_data(
          uint8_t read_flags,
          libcerror_error_t **error );
 
-off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
+off64_t libfsntfs_compression_unit_descriptor_seek_segment_offset(
          intptr_t *data_handle,
          libbfio_handle_t *file_io_handle,
          int segment_index,
@@ -87,10 +91,10 @@ off64_t libfsntfs_compressed_block_descriptor_seek_segment_offset(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 
-int libfsntfs_compressed_block_descriptor_print(
-     libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor,
+int libfsntfs_compression_unit_descriptor_print(
+     libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor,
      libfsntfs_io_handle_t *io_handle,
-     int compressed_block_descriptor_index,
+     int compression_unit_descriptor_index,
      libcerror_error_t **error );
 
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
@@ -99,5 +103,5 @@ int libfsntfs_compressed_block_descriptor_print(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_COMPRESSED_BLOCK_DESCRIPTOR_H ) */
+#endif /* !defined( _LIBFSNTFS_COMPRESSION_UNIT_DESCRIPTOR_H ) */
 

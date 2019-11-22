@@ -1,16 +1,14 @@
 TODO
-* clean up and improve cluster block data stream
+* improve cluster block data stream
 ** complete compressed data handle
 ** complete compressed data handle test
-** complete compression test
-** create small LZNT1 test data
-** create small LZXPRESS Huffman test data
 ** add WofCompressedData support to cluster block data stream
-** add support for 0 size data stream
 
 * complete thread lock support
 ** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
 ** MFT metadata file
+
+* create data_run_read_data function?
 
 * MFT entry
 ** preserve attribute list data MFT entries?

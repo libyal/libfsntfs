@@ -1,5 +1,5 @@
 /*
- * The cluster block cluster block data handle functions
+ * The compressed block data handle functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -23,27 +23,29 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_cluster_block.h"
-#include "libfsntfs_cluster_block_data_handle.h"
-#include "libfsntfs_cluster_block_vector.h"
+#include "libfsntfs_compressed_block.h"
+#include "libfsntfs_compressed_block_data_handle.h"
+#include "libfsntfs_compressed_block_vector.h"
+#include "libfsntfs_compression.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
-#include "libfsntfs_libfdata.h"
+#include "libfsntfs_libcnotify.h"
+#include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_unused.h"
 
-/* Creates a cluster block data handle
+/* Creates compressed block data handle
  * Make sure the value data_handle is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_cluster_block_data_handle_initialize(
-     libfsntfs_cluster_block_data_handle_t **data_handle,
+int libfsntfs_compressed_block_data_handle_initialize(
+     libfsntfs_compressed_block_data_handle_t **data_handle,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *mft_attribute,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_cluster_block_data_handle_initialize";
+	static char *function = "libfsntfs_compressed_block_data_handle_initialize";
 
 	if( data_handle == NULL )
 	{
@@ -79,7 +81,7 @@ int libfsntfs_cluster_block_data_handle_initialize(
 		return( -1 );
 	}
 	*data_handle = memory_allocate_structure(
-	                libfsntfs_cluster_block_data_handle_t );
+	                libfsntfs_compressed_block_data_handle_t );
 
 	if( *data_handle == NULL )
 	{
@@ -95,7 +97,7 @@ int libfsntfs_cluster_block_data_handle_initialize(
 	if( memory_set(
 	     *data_handle,
 	     0,
-	     sizeof( libfsntfs_cluster_block_data_handle_t ) ) == NULL )
+	     sizeof( libfsntfs_compressed_block_data_handle_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -111,8 +113,8 @@ int libfsntfs_cluster_block_data_handle_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_cluster_block_vector_initialize(
-	     &( ( *data_handle )->cluster_block_vector ),
+	if( libfsntfs_compressed_block_vector_initialize(
+	     &( ( *data_handle )->compressed_block_vector ),
 	     io_handle,
 	     mft_attribute,
 	     error ) != 1 )
@@ -121,13 +123,13 @@ int libfsntfs_cluster_block_data_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create cluster block vector.",
+		 "%s: unable to create compressed block vector.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfdata_vector_get_size(
-	     ( *data_handle )->cluster_block_vector,
+	     ( *data_handle )->compressed_block_vector,
 	     &( ( *data_handle )->data_size ),
 	     error ) != 1 )
 	{
@@ -135,21 +137,21 @@ int libfsntfs_cluster_block_data_handle_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of cluster block vector.",
+		 "%s: unable to retrieve size of compressed block vector.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfcache_cache_initialize(
-	     &( ( *data_handle )->cluster_block_cache ),
-	     LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_CLUSTER_BLOCKS,
+	     &( ( *data_handle )->compressed_block_cache ),
+	     LIBFSNTFS_MAXIMUM_CACHE_ENTRIES_COMPRESSED_BLOCKS,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create cluster block cache.",
+		 "%s: unable to create compressed block cache.",
 		 function );
 
 		goto on_error;
@@ -159,10 +161,10 @@ int libfsntfs_cluster_block_data_handle_initialize(
 on_error:
 	if( *data_handle != NULL )
 	{
-		if( ( *data_handle )->cluster_block_vector != NULL )
+		if( ( *data_handle )->compressed_block_vector != NULL )
 		{
 			libfdata_vector_free(
-			 &( ( *data_handle )->cluster_block_vector ),
+			 &( ( *data_handle )->compressed_block_vector ),
 			 NULL );
 		}
 		memory_free(
@@ -173,14 +175,14 @@ on_error:
 	return( -1 );
 }
 
-/* Frees a cluster block data handle
+/* Frees a data handle
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_cluster_block_data_handle_free(
-     libfsntfs_cluster_block_data_handle_t **data_handle,
+int libfsntfs_compressed_block_data_handle_free(
+     libfsntfs_compressed_block_data_handle_t **data_handle,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_cluster_block_data_handle_free";
+	static char *function = "libfsntfs_compressed_block_data_handle_free";
 	int result            = 1;
 
 	if( data_handle == NULL )
@@ -196,30 +198,28 @@ int libfsntfs_cluster_block_data_handle_free(
 	}
 	if( *data_handle != NULL )
 	{
-		/* IO handle is freed elsewhere
-		 */
 		if( libfcache_cache_free(
-		     &( ( *data_handle )->cluster_block_cache ),
+		     &( ( *data_handle )->compressed_block_cache ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free cluster block cache.",
+			 "%s: unable to free compressed_block cache.",
 			 function );
 
 			result = -1;
 		}
 		if( libfdata_vector_free(
-		     &( ( *data_handle )->cluster_block_vector ),
+		     &( ( *data_handle )->compressed_block_vector ),
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free cluster block vector.",
+			 "%s: unable to free compressed block vector.",
 			 function );
 
 			result = -1;
@@ -232,12 +232,12 @@ int libfsntfs_cluster_block_data_handle_free(
 	return( result );
 }
 
-/* Reads data from the current offset into a buffer
+/* Reads data from the current offset into a compressed
  * Callback for the data stream
  * Returns the number of bytes read or -1 on error
  */
-ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
-         libfsntfs_cluster_block_data_handle_t *data_handle,
+ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
+         libfsntfs_compressed_block_data_handle_t *data_handle,
          libbfio_handle_t *file_io_handle,
          int segment_index,
          int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
@@ -247,11 +247,11 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
          uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
          libcerror_error_t **error )
 {
-	libfsntfs_cluster_block_t *cluster_block = NULL;
-	static char *function                    = "libfsntfs_cluster_block_data_handle_read_segment_data";
-	size_t read_size                         = 0;
-	size_t segment_data_offset               = 0;
-	off64_t cluster_block_offset             = 0;
+	libfsntfs_compressed_block_t *compressed_block = NULL;
+	static char *function                          = "libfsntfs_compressed_block_data_handle_read_segment_data";
+	size_t segment_data_offset                     = 0;
+	size_t read_size                               = 0;
+	off64_t compressed_block_offset                = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_flags )
@@ -319,12 +319,12 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
 	while( segment_data_size > 0 )
 	{
 		if( libfdata_vector_get_element_value_at_offset(
-		     data_handle->cluster_block_vector,
+		     data_handle->compressed_block_vector,
 		     (intptr_t *) file_io_handle,
-		     (libfdata_cache_t *) data_handle->cluster_block_cache,
+		     (libfdata_cache_t *) data_handle->compressed_block_cache,
 		     data_handle->current_offset,
-		     &cluster_block_offset,
-		     (intptr_t **) &cluster_block,
+		     &compressed_block_offset,
+		     (intptr_t **) &compressed_block,
 		     0,
 		     error ) != 1 )
 		{
@@ -332,48 +332,48 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve cluster block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: unable to retrieve compressed block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 data_handle->current_offset,
 			 data_handle->current_offset );
 
 			return( -1 );
 		}
-		if( cluster_block == NULL )
+		if( compressed_block == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid cluster block.",
+			 "%s: invalid compressed block.",
 			 function );
 
 			return( -1 );
 		}
-		if( cluster_block->data == NULL )
+		if( compressed_block->data == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid cluster block - missing data.",
+			 "%s: invalid compressed block - missing data.",
 			 function );
 
 			return( -1 );
 		}
-		if( ( cluster_block_offset < 0 )
-		 || ( (size64_t) cluster_block_offset >= cluster_block->data_size ) )
+		if( ( compressed_block_offset < 0 )
+		 || ( (size64_t) compressed_block_offset >= compressed_block->data_size ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid cluster block offset value out of bounds.",
+			 "%s: invalid compressed block offset value out of bounds.",
 			 function );
 
 			return( -1 );
 		}
-		read_size = cluster_block->data_size - cluster_block_offset;
+		read_size = compressed_block->data_size - compressed_block_offset;
 
 		if( read_size > segment_data_size )
 		{
@@ -381,14 +381,14 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
 		}
 		if( memory_copy(
 		     &( segment_data[ segment_data_offset ] ),
-		     &( cluster_block->data[ cluster_block_offset ] ),
+		     &( ( compressed_block->data )[ compressed_block_offset ] ),
 		     read_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy cluster block data.",
+			 "%s: unable to copy compressed block data.",
 			 function );
 
 			return( -1 );
@@ -410,15 +410,15 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
  * Callback for the data stream
  * Returns the offset if seek is successful or -1 on error
  */
-off64_t libfsntfs_cluster_block_data_handle_seek_segment_offset(
-         libfsntfs_cluster_block_data_handle_t *data_handle,
+off64_t libfsntfs_compressed_block_data_handle_seek_segment_offset(
+         libfsntfs_compressed_block_data_handle_t *data_handle,
          intptr_t *file_io_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
          int segment_index,
          int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          off64_t segment_offset,
          libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_cluster_block_data_handle_seek_segment_offset";
+	static char *function = "libfsntfs_compressed_block_data_handle_seek_segment_offset";
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( file_io_handle )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
@@ -434,7 +434,7 @@ off64_t libfsntfs_cluster_block_data_handle_seek_segment_offset(
 
 		return( -1 );
 	}
-	if( segment_index < 0 )
+	if( segment_index != 0 )
 	{
 		libcerror_error_set(
 		 error,

@@ -1,5 +1,5 @@
 /*
- * Library compressed_block_descriptor type test program
+ * Library compression_unit_descriptor type test program
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,18 +33,18 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_compressed_block_descriptor.h"
+#include "../libfsntfs/libfsntfs_compression_unit_descriptor.h"
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-/* Tests the libfsntfs_compressed_block_descriptor_initialize function
+/* Tests the libfsntfs_compression_unit_descriptor_initialize function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_compressed_block_descriptor_initialize(
+int fsntfs_test_compression_unit_descriptor_initialize(
      void )
 {
 	libcerror_error_t *error                                             = NULL;
-	libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor = NULL;
+	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
 	int result                                                           = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
@@ -55,8 +55,8 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_compressed_block_descriptor_initialize(
-	          &compressed_block_descriptor,
+	result = libfsntfs_compression_unit_descriptor_initialize(
+	          &compression_unit_descriptor,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -65,15 +65,15 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "compressed_block_descriptor",
-	 compressed_block_descriptor );
+	 "compression_unit_descriptor",
+	 compression_unit_descriptor );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libfsntfs_compressed_block_descriptor_free(
-	          &compressed_block_descriptor,
+	result = libfsntfs_compression_unit_descriptor_free(
+	          &compression_unit_descriptor,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -82,8 +82,8 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "compressed_block_descriptor",
-	 compressed_block_descriptor );
+	 "compression_unit_descriptor",
+	 compression_unit_descriptor );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -91,7 +91,7 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_compressed_block_descriptor_initialize(
+	result = libfsntfs_compression_unit_descriptor_initialize(
 	          NULL,
 	          &error );
 
@@ -107,13 +107,13 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	libcerror_error_free(
 	 &error );
 
-	compressed_block_descriptor = (libfsntfs_compressed_block_descriptor_t *) 0x12345678UL;
+	compression_unit_descriptor = (libfsntfs_compression_unit_descriptor_t *) 0x12345678UL;
 
-	result = libfsntfs_compressed_block_descriptor_initialize(
-	          &compressed_block_descriptor,
+	result = libfsntfs_compression_unit_descriptor_initialize(
+	          &compression_unit_descriptor,
 	          &error );
 
-	compressed_block_descriptor = NULL;
+	compression_unit_descriptor = NULL;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -133,22 +133,22 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_compressed_block_descriptor_initialize with malloc failing
+		/* Test libfsntfs_compression_unit_descriptor_initialize with malloc failing
 		 */
 		fsntfs_test_malloc_attempts_before_fail = test_number;
 
-		result = libfsntfs_compressed_block_descriptor_initialize(
-		          &compressed_block_descriptor,
+		result = libfsntfs_compression_unit_descriptor_initialize(
+		          &compression_unit_descriptor,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
 		{
 			fsntfs_test_malloc_attempts_before_fail = -1;
 
-			if( compressed_block_descriptor != NULL )
+			if( compression_unit_descriptor != NULL )
 			{
-				libfsntfs_compressed_block_descriptor_free(
-				 &compressed_block_descriptor,
+				libfsntfs_compression_unit_descriptor_free(
+				 &compression_unit_descriptor,
 				 NULL );
 			}
 		}
@@ -160,8 +160,8 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "compressed_block_descriptor",
-			 compressed_block_descriptor );
+			 "compression_unit_descriptor",
+			 compression_unit_descriptor );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -175,22 +175,22 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_compressed_block_descriptor_initialize with memset failing
+		/* Test libfsntfs_compression_unit_descriptor_initialize with memset failing
 		 */
 		fsntfs_test_memset_attempts_before_fail = test_number;
 
-		result = libfsntfs_compressed_block_descriptor_initialize(
-		          &compressed_block_descriptor,
+		result = libfsntfs_compression_unit_descriptor_initialize(
+		          &compression_unit_descriptor,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
 		{
 			fsntfs_test_memset_attempts_before_fail = -1;
 
-			if( compressed_block_descriptor != NULL )
+			if( compression_unit_descriptor != NULL )
 			{
-				libfsntfs_compressed_block_descriptor_free(
-				 &compressed_block_descriptor,
+				libfsntfs_compression_unit_descriptor_free(
+				 &compression_unit_descriptor,
 				 NULL );
 			}
 		}
@@ -202,8 +202,8 @@ int fsntfs_test_compressed_block_descriptor_initialize(
 			 -1 );
 
 			FSNTFS_TEST_ASSERT_IS_NULL(
-			 "compressed_block_descriptor",
-			 compressed_block_descriptor );
+			 "compression_unit_descriptor",
+			 compression_unit_descriptor );
 
 			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -223,19 +223,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( compressed_block_descriptor != NULL )
+	if( compression_unit_descriptor != NULL )
 	{
-		libfsntfs_compressed_block_descriptor_free(
-		 &compressed_block_descriptor,
+		libfsntfs_compression_unit_descriptor_free(
+		 &compression_unit_descriptor,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_compressed_block_descriptor_free function
+/* Tests the libfsntfs_compression_unit_descriptor_free function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_compressed_block_descriptor_free(
+int fsntfs_test_compression_unit_descriptor_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -243,7 +243,7 @@ int fsntfs_test_compressed_block_descriptor_free(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_compressed_block_descriptor_free(
+	result = libfsntfs_compression_unit_descriptor_free(
 	          NULL,
 	          &error );
 
@@ -290,20 +290,20 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_compressed_block_descriptor_initialize",
-	 fsntfs_test_compressed_block_descriptor_initialize );
+	 "libfsntfs_compression_unit_descriptor_initialize",
+	 fsntfs_test_compression_unit_descriptor_initialize );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_compressed_block_descriptor_free",
-	 fsntfs_test_compressed_block_descriptor_free );
+	 "libfsntfs_compression_unit_descriptor_free",
+	 fsntfs_test_compression_unit_descriptor_free );
 
-	/* TODO: add tests for libfsntfs_compressed_block_descriptor_append_data_segment */
+	/* TODO: add tests for libfsntfs_compression_unit_descriptor_append_data_segment */
 
-	/* TODO: add tests for libfsntfs_compressed_block_descriptor_read_segment_data */
+	/* TODO: add tests for libfsntfs_compression_unit_descriptor_read_segment_data */
 
-	/* TODO: add tests for libfsntfs_compressed_block_descriptor_seek_segment_offset */
+	/* TODO: add tests for libfsntfs_compression_unit_descriptor_seek_segment_offset */
 
-	/* TODO: add tests for libfsntfs_compressed_block_descriptor_print */
+	/* TODO: add tests for libfsntfs_compression_unit_descriptor_print */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_cluster_block"
-	ProjectGUID="{1A1FAFF8-A1FE-4D75-BB39-3913E5ED5834}"
-	RootNamespace="fsntfs_test_cluster_block"
+	Name="fsntfs_test_compression_unit_data_handle"
+	ProjectGUID="{5D487897-C716-451D-839D-F9822EF149F4}"
+	RootNamespace="fsntfs_test_compression_unit_data_handle"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_cluster_block.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_functions.c"
+				RelativePath="..\..\tests\fsntfs_test_compression_unit_data_handle.c"
 				>
 			</File>
 			<File
@@ -194,23 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_functions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libfcache.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libfdata.h"
 				>
 			</File>
 			<File

@@ -26,9 +26,9 @@
 #include <types.h>
 
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
+#include "libfsntfs_compression_unit_data_handle.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -57,7 +57,7 @@ int libfsntfs_compressed_block_free(
      libcerror_error_t **error );
 
 int libfsntfs_compressed_block_read_element_data(
-     libcdata_array_t *compressed_block_descriptors_array,
+     libfsntfs_compression_unit_data_handle_t *data_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,

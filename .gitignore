@@ -136,8 +136,11 @@ stamp-h[1-9]
 /tests/fsntfs_test_cluster_block_stream
 /tests/fsntfs_test_cluster_block_vector
 /tests/fsntfs_test_compressed_block
-/tests/fsntfs_test_compressed_block_descriptor
+/tests/fsntfs_test_compressed_block_vector
+/tests/fsntfs_test_compressed_block_data_handle
 /tests/fsntfs_test_compression
+/tests/fsntfs_test_compression_unit_data_handle
+/tests/fsntfs_test_compression_unit_descriptor
 /tests/fsntfs_test_data_run
 /tests/fsntfs_test_data_stream
 /tests/fsntfs_test_directory_entries_tree

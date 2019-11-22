@@ -24,11 +24,11 @@
 #include <types.h>
 
 #include "libfsntfs_compressed_block.h"
-#include "libfsntfs_compressed_block_descriptor.h"
+#include "libfsntfs_compression_unit_data_handle.h"
+#include "libfsntfs_compression_unit_descriptor.h"
 #include "libfsntfs_compression.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_unused.h"
@@ -181,7 +181,7 @@ int libfsntfs_compressed_block_free(
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_compressed_block_read_element_data(
-     libcdata_array_t *compressed_block_descriptors_array,
+     libfsntfs_compression_unit_data_handle_t *data_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,
@@ -194,7 +194,7 @@ int libfsntfs_compressed_block_read_element_data(
      libcerror_error_t **error )
 {
 	libfsntfs_compressed_block_t *compressed_block                       = NULL;
-	libfsntfs_compressed_block_descriptor_t *compressed_block_descriptor = NULL;
+	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
 	uint8_t *compressed_data                                             = NULL;
 	uint8_t *compressed_block_data                                       = NULL;
 	static char *function                                                = "libfsntfs_compressed_block_read_element_data";
@@ -205,17 +205,6 @@ int libfsntfs_compressed_block_read_element_data(
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_offset )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
-	if( compressed_block_descriptors_array == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed block descriptors array.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( compressed_block_size == 0 )
 	 || ( compressed_block_size > (size64_t) SSIZE_MAX ) )
 	{
@@ -228,10 +217,10 @@ int libfsntfs_compressed_block_read_element_data(
 
 		return( -1 );
 	}
-	if( libcdata_array_get_entry_by_index(
-	     compressed_block_descriptors_array,
+	if( libfsntfs_compression_unit_data_handle_get_descriptor_by_index(
+	     data_handle,
 	     element_index,
-	     (intptr_t **) &compressed_block_descriptor,
+	     &compression_unit_descriptor,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -244,7 +233,7 @@ int libfsntfs_compressed_block_read_element_data(
 
 		goto on_error;
 	}
-/* TODO check compressed_block_descriptor == NULL */
+/* TODO check compression_unit_descriptor == NULL */
 	if( libfsntfs_compressed_block_initialize(
 	     &compressed_block,
 	     compressed_block_size,
@@ -293,7 +282,7 @@ int libfsntfs_compressed_block_read_element_data(
 		compressed_block_data = compressed_block->data;
 	}
 	read_count = libfdata_stream_read_buffer(
-	              compressed_block_descriptor->data_stream,
+	              compression_unit_descriptor->data_stream,
 		      (intptr_t *) file_io_handle,
 		      compressed_block_data,
 		      compressed_block_size,
