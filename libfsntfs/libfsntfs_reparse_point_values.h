@@ -40,6 +40,10 @@ struct libfsntfs_reparse_point_values
 	 */
 	uint32_t tag;
 
+	/* The compression method
+	 */
+	uint32_t compression_method;
+
 	/* The substitute name offset
 	 */
 	uint16_t substitute_name_offset;
@@ -87,6 +91,11 @@ int libfsntfs_reparse_point_values_read_from_mft_attribute(
 int libfsntfs_reparse_point_values_get_tag(
      libfsntfs_reparse_point_values_t *reparse_point_values,
      uint32_t *tag,
+     libcerror_error_t **error );
+
+int libfsntfs_reparse_point_values_get_compression_method(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint32_t *compression_method,
      libcerror_error_t **error );
 
 int libfsntfs_reparse_point_values_get_utf8_substitute_name_size(

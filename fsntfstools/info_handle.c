@@ -4891,6 +4891,9 @@ int info_handle_file_entry_fprint_by_path(
 {
 	libfsntfs_file_entry_t *file_entry = NULL;
 	static char *function              = "info_handle_file_entry_fprint_by_path";
+	size_t data_stream_name_index      = 0;
+	size_t data_stream_name_length     = 0;
+	size_t path_index                  = 0;
 	size_t path_length                 = 0;
 	int result                         = 0;
 
@@ -4905,9 +4908,40 @@ int info_handle_file_entry_fprint_by_path(
 
 		return( -1 );
 	}
+	if( path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path.",
+		 function );
+
+		return( -1 );
+	}
 	path_length = system_string_length(
 	               path );
 
+	for( path_index = path_length - 1;
+	     path_index > 0;
+	     path_index-- )
+	{
+		if( path[ path_index ] == (system_character_t) ':' )
+		{
+			data_stream_name_index = path_index + 1;
+
+			break;
+		}
+		else if( path[ path_index ] == (system_character_t) LIBFSNTFS_SEPARATOR )
+		{
+			break;
+		}
+		data_stream_name_length++;
+	}
+	if( data_stream_name_index > 0 )
+	{
+		path_length -= data_stream_name_length + 1;
+	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_volume_get_file_entry_by_utf16_path(
 	          info_handle->input_volume,
@@ -4955,6 +4989,7 @@ int info_handle_file_entry_fprint_by_path(
 		 info_handle->notify_stream,
 		 "File entry:\n" );
 
+/* TODO remove data stream name */
 		fprintf(
 		 info_handle->notify_stream,
 		 "\tPath\t\t\t\t: %" PRIs_SYSTEM "\n",

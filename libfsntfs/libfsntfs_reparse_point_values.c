@@ -160,6 +160,7 @@ int libfsntfs_reparse_point_values_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 	system_character_t *value_string = NULL;
 	size_t value_string_size         = 0;
+	uint32_t value_32bit             = 0;
 	int result                       = 0;
 #endif
 
@@ -280,8 +281,48 @@ int libfsntfs_reparse_point_values_read_data(
 			goto on_error;
 		}
 	}
-	if( ( reparse_point_values->tag == 0xa0000003 )
-	 || ( reparse_point_values->tag == 0xa000000c ) )
+	if( reparse_point_values->tag == 0x80000017 )
+	{
+		byte_stream_copy_to_uint32_little_endian(
+		 &( reparse_point_values->reparse_data[ 12 ] ),
+		 reparse_point_values->compression_method );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 &( reparse_point_values->reparse_data[ 0 ] ),
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: external version\t: %" PRIu32 "\n",
+			 function,
+			 value_32bit );
+
+			byte_stream_copy_to_uint32_little_endian(
+			 &( reparse_point_values->reparse_data[ 4 ] ),
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: external provider\t: %" PRIu32 "\n",
+			 function,
+			 value_32bit );
+
+			byte_stream_copy_to_uint32_little_endian(
+			 &( reparse_point_values->reparse_data[ 8 ] ),
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: internal version\t: %" PRIu32 "\n",
+			 function,
+			 value_32bit );
+
+			libcnotify_printf(
+			 "%s: compression method\t: %" PRIu32 "\n",
+			 function,
+			 reparse_point_values->compression_method );
+		}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+	}
+	else if( ( reparse_point_values->tag == 0xa0000003 )
+	      || ( reparse_point_values->tag == 0xa000000c ) )
 	{
 		byte_stream_copy_to_uint16_little_endian(
 		 ( (fsntfs_mount_point_reparse_data_t *) reparse_point_values->reparse_data )->substitute_name_offset,
@@ -322,7 +363,7 @@ int libfsntfs_reparse_point_values_read_data(
 			 function,
 			 reparse_point_values->print_name_size );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
 	if( reparse_point_values->tag == 0xa0000003 )
 	{
@@ -350,7 +391,8 @@ int libfsntfs_reparse_point_values_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( ( reparse_point_values->tag == 0xa0000003 )
+		if( ( reparse_point_values->tag == 0x80000017 )
+		 || ( reparse_point_values->tag == 0xa0000003 )
 		 || ( reparse_point_values->tag == 0xa000000c ) )
 		{
 			libcnotify_printf(
@@ -753,6 +795,47 @@ int libfsntfs_reparse_point_values_get_tag(
 	*tag = reparse_point_values->tag;
 
 	return( 1 );
+}
+
+/* Retrieves the compression method
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_values_get_compression_method(
+     libfsntfs_reparse_point_values_t *reparse_point_values,
+     uint32_t *compression_method,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_reparse_point_values_get_compression_method";
+
+	if( reparse_point_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid reparse point values.",
+		 function );
+
+		return( -1 );
+	}
+	if( compression_method == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid compression method.",
+		 function );
+
+		return( -1 );
+	}
+	if( reparse_point_values->tag == 0x80000017 )
+	{
+		*compression_method = reparse_point_values->compression_method;
+
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Retrieves the size of the UTF-8 encoded substitute name

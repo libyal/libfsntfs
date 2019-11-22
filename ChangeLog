@@ -1,12 +1,12 @@
 TODO
-* improve cluster block data stream
-** complete compressed data handle
-** complete compressed data handle test
-** add WofCompressedData support to cluster block data stream
+* WofCompressedData support
+** add libfsntfs_reparse_point_attribute_get_compression_method to API
 
 * complete thread lock support
 ** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
 ** MFT metadata file
+
+* refactor file entry / data stream extents
 
 * create data_run_read_data function?
 
@@ -38,7 +38,6 @@ TODO
 * change calls to libfsntfs_mft_entry_get_data_attribute_by_utf8_name to utf16 for optimization
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 * implement read/write lock support
-* add support for WofCompressedData NTFS alternate data streams
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 
@@ -61,7 +60,6 @@ TODO
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 * fix or remove TODO_CASE_INSENSITIVE
 * implement read/write lock support
-* add support for WofCompressedData NTFS alternate data streams
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 

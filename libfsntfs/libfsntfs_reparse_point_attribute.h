@@ -39,6 +39,12 @@ int libfsntfs_reparse_point_attribute_get_tag(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_reparse_point_attribute_get_compression_method(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *compression_method,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
      libfsntfs_attribute_t *attribute,
      size_t *utf8_string_size,

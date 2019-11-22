@@ -149,12 +149,14 @@ int libfsntfs_file_entry_is_allocated(
 
 int libfsntfs_internal_file_entry_get_attribute_by_index(
      libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 
 int libfsntfs_internal_file_entry_get_reparse_point_attribute(
      libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error );
 

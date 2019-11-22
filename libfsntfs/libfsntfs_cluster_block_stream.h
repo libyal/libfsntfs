@@ -45,19 +45,30 @@ int libfsntfs_cluster_block_stream_initialize_from_data(
 int libfsntfs_cluster_block_stream_initialize_from_data_runs(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     size64_t data_size,
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     size64_t uncompressed_data_size,
+     libcerror_error_t **error );
+
+int libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+     libfdata_stream_t **cluster_block_stream,
+     libfdata_stream_t *compressed_data_stream,
+     libfsntfs_mft_attribute_t *data_attribute,
+     uint32_t compression_method,
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_stream_initialize(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *wof_compressed_data_attribute,
+     uint32_t compression_method,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

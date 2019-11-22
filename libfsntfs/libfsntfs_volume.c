@@ -3779,6 +3779,10 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 "%s: unable to create file entry.",
 			 function );
 
+			libfsntfs_mft_entry_free(
+			 &mft_entry,
+			 NULL );
+
 			goto on_error;
 		}
 	}
@@ -4257,6 +4261,10 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create file entry.",
 			 function );
+
+			libfsntfs_mft_entry_free(
+			 &mft_entry,
+			 NULL );
 
 			goto on_error;
 		}

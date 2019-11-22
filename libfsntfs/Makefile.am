@@ -48,9 +48,11 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_compressed_block.c libfsntfs_compressed_block.h \
 	libfsntfs_compressed_block_data_handle.c libfsntfs_compressed_block_data_handle.h \
 	libfsntfs_compressed_block_vector.c libfsntfs_compressed_block_vector.h \
+	libfsntfs_compressed_data_handle.c libfsntfs_compressed_data_handle.h \
 	libfsntfs_compression.c libfsntfs_compression.h \
 	libfsntfs_compression_unit_data_handle.c libfsntfs_compression_unit_data_handle.h \
 	libfsntfs_compression_unit_descriptor.c libfsntfs_compression_unit_descriptor.h \
+	libfsntfs_data_extent.c libfsntfs_data_extent.h \
 	libfsntfs_data_run.c libfsntfs_data_run.h \
 	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_debug.c libfsntfs_debug.h \

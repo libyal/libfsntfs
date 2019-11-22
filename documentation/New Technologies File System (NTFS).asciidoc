@@ -66,7 +66,7 @@ Switched to asccidoc format.
 | 0.0.15 | J.B. Metz | June 2018 | Corrected typos.
 | 0.0.16 | J.B. Metz | January 2019 | Changes to format.
 | 0.0.17 | J.B. Metz | August 2019 | Additional information regarding volumes created by Windows 10 (1903) and mkntfs.
-| 0.0.18 | J.B. Metz | September 2019 | Additional information regarding WofCompressedData data stream.
+| 0.0.18 | J.B. Metz | September 2019 | Additional information regarding Windows Overlay Filter (WOF) compressed data.
 | 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
 |===
 
@@ -782,8 +782,9 @@ The MFT attribute data flags (0x00ff) indicate if the data stream is compressed
 or not. The currently known value for LZNT1 compression is 1.
 
 [NOTE]
-Windows 10 supports WofCompressedData, which stores the LZXPRESS or LZX
-compressed data in alternate data stream named WofCompressedData.
+Windows 10 supports Windows Overlay Filter (WOF) compressed data, which stores
+the LZXPRESS Huffman or LZX compressed data in alternate data stream named
+WofCompressedData and links it to the default data stream using a reparse point.
 
 The data is stored in compression unit blocks. A compression unit typically
 consists of 16 cluster blocks. However the actual value is stored in the
@@ -1683,14 +1684,17 @@ The upper 4 bits of the block size are used as flags.
 
 === LZNT1 compression method
 
-See: https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[[LIBFWNT\]]
+For more information about LZNT1 Huffman see:
+https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
-=== WofCompressedData alternate data stream
+=== Windows Overlay Filter (WOF) compressed data
 
-* default data stream is sparse
-* WofCompressedData data stream is contains LZXPRESS Huffman or LZX compressed data
+A MFT entry that contains Windows Overlay Filter (WOF) compressed data has the
+following attributes:
 
-==== LZXPRESS Huffman compressed data
+* reparse point attribute with tag 0x80000017, which defines the compression method
+* a nameless data attribute that is sparse and contains the uncompressed data size
+* a data attribute named WofCompressedData that contains LZXPRESS Huffman or LZX compressed data
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1698,17 +1702,13 @@ See: https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20m
 4+| _Chunk offset table_
 | 0 | ... | | Array of 32-bit compressed data block offsets +
 The offset is relative from the start of the compressed data +
-Note that the offset of the first compressed data block is not stored
+Note that the offset of the first compressed data block is not stored.
 4+| _Compressed data_
-| ... | ... | | One or more compressed data blocks +
-The compressed data is stored in blocks that can contain a maximum of 8196 bytes of uncompressed data per block
+| ... | ... | | One or more compressed data blocks
 |===
 
-[yellow-background]*TODO: add more detail*
-
-==== LZX compressed data
-
-[yellow-background]*TODO: add more detail*
+For more information about the compression methods see section
+<<wof_compression_method,Windows Overlay Filter (WOF) compression method>>
 
 == [[reparse_point]]The reparse point
 
@@ -1763,6 +1763,10 @@ Predefined reparse point tag values according to `[MSDN]`:
 | 0x8000000b | IO_REPARSE_TAG_FILTER_MANAGER | Used by filter manager test harness
 | | |
 | 0x80000012 | IO_REPARSE_TAG_DFSR | Used by the Distributed File System (DFS)
+| | |
+| 0x80000014 | IO_REPARSE_TAG_NFS | Used by the Network File System (NFS)
+| | |
+| 0x80000017 | | Used by Windows Overlay Filter (WOF) compressed data
 | | |
 | 0xa0000003 | IO_REPARSE_TAG_MOUNT_POINT | Junction or mount point
 | | |
@@ -1866,6 +1870,36 @@ Contains an UTF-16 little-endian [yellow-background]*with the end-of-string char
 | Value | Identifier | Description
 | 0x00000001 | SYMLINK_FLAG_RELATIVE | The substitute name is a path name relative to the directory containing the symbolic link.
 |===
+
+=== Windows Overlay Filter (WOF) reparse data
+
+The Windows Overlay Filter (WOF) reparse data is 16 bytes of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+4+| _External provider information_
+| 0 | 4 | 1 | [yellow-background]*Unknown (version)*
+| 4 | 4 | 2 | [yellow-background]*Unknown (provider)*
+4+| _Internal provider information_
+| 8 | 4 | 1 | [yellow-background]*Unknown (version)*
+| 12 | 4 | | Compression method +
+See section <<wof_compression_method,Windows Overlay Filter (WOF) compression method>>
+|===
+
+==== [[wof_compression_method]]Windows Overlay Filter (WOF) compression method
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0 | | LZXPRESS Huffman with 4k window (compression unit)
+| 1 | | [yellow-background]*Unknown (LZX)*
+| 2 | | LZXPRESS Huffman with 8k window (compression unit)
+| 3 | | LZXPRESS Huffman with 16k window (compression unit)
+|===
+
+For more information about LZXPRESS Huffman see:
+https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
 == The allocation bitmap
 

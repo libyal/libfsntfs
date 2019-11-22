@@ -59,8 +59,12 @@ int libfsntfs_file_entry_initialize(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_initialize";
+	libfsntfs_attribute_t *reparse_point_attribute           = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry     = NULL;
+	libfsntfs_mft_attribute_t *wof_compressed_data_attribute = NULL;
+	static char *function                                    = "libfsntfs_file_entry_initialize";
+	uint32_t compression_method                              = 0;
+	int result                                               = 0;
 
 	if( file_entry == NULL )
 	{
@@ -186,10 +190,50 @@ int libfsntfs_file_entry_initialize(
 		}
 		if( mft_entry->data_attribute != NULL )
 		{
+			if( mft_entry->wof_compressed_data_attribute != NULL )
+			{
+				result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
+				          internal_file_entry,
+				          mft_entry,
+				          &reparse_point_attribute,
+				          error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve reparse point attribute.",
+					 function );
+
+					goto on_error;
+				}
+				else if( result != 0 )
+				{
+					if( libfsntfs_reparse_point_attribute_get_compression_method(
+					     reparse_point_attribute,
+					     &compression_method,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve compression method from $REPARSE_POINT attribute.",
+						 function );
+
+						goto on_error;
+					}
+					wof_compressed_data_attribute = mft_entry->wof_compressed_data_attribute;
+				}
+			}
 			if( libfsntfs_cluster_block_stream_initialize(
 			     &( internal_file_entry->data_cluster_block_stream ),
 			     io_handle,
 			     mft_entry->data_attribute,
+			     wof_compressed_data_attribute,
+			     compression_method,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -235,8 +279,8 @@ int libfsntfs_file_entry_initialize(
 	internal_file_entry->io_handle                 = io_handle;
 	internal_file_entry->file_io_handle            = file_io_handle;
 	internal_file_entry->mft                       = mft;
-	internal_file_entry->mft_entry                 = mft_entry;
 	internal_file_entry->security_descriptor_index = security_descriptor_index;
+	internal_file_entry->mft_entry                 = mft_entry;
 	internal_file_entry->directory_entry           = directory_entry;
 	internal_file_entry->data_attribute            = mft_entry->data_attribute;
 	internal_file_entry->flags                     = flags;
@@ -564,6 +608,7 @@ int libfsntfs_file_entry_is_allocated(
  */
 int libfsntfs_internal_file_entry_get_attribute_by_index(
      libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error )
@@ -598,7 +643,7 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 	if( internal_file_entry->attributes_array == NULL )
 	{
 		if( libfsntfs_mft_entry_get_number_of_attributes(
-		     internal_file_entry->mft_entry,
+		     mft_entry,
 		     &number_of_attributes,
 		     error ) != 1 )
 		{
@@ -645,7 +690,7 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 	if( *attribute == NULL )
 	{
 		if( libfsntfs_mft_entry_get_attribute_by_index(
-		     internal_file_entry->mft_entry,
+		     mft_entry,
 		     attribute_index,
 		     &mft_attribute,
 		     error ) != 1 )
@@ -728,6 +773,7 @@ on_error:
  */
 int libfsntfs_internal_file_entry_get_reparse_point_attribute(
      libfsntfs_internal_file_entry_t *internal_file_entry,
+     libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_attribute_t **attribute,
      libcerror_error_t **error )
 {
@@ -744,13 +790,13 @@ int libfsntfs_internal_file_entry_get_reparse_point_attribute(
 
 		return( -1 );
 	}
-	if( internal_file_entry->mft_entry == NULL )
+	if( mft_entry == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file entry - missing MFT entry.",
+		 "%s: missing MFT entry.",
 		 function );
 
 		return( -1 );
@@ -766,7 +812,7 @@ int libfsntfs_internal_file_entry_get_reparse_point_attribute(
 
 		return( -1 );
 	}
-	if( internal_file_entry->mft_entry->reparse_point_attribute_index == -1 )
+	if( mft_entry->reparse_point_attribute_index == -1 )
 	{
 		return( 0 );
 	}
@@ -774,7 +820,8 @@ int libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	{
 		if( libfsntfs_internal_file_entry_get_attribute_by_index(
 		     internal_file_entry,
-		     internal_file_entry->mft_entry->reparse_point_attribute_index,
+		     mft_entry,
+		     mft_entry->reparse_point_attribute_index,
 		     &( internal_file_entry->reparse_point_attribute ),
 		     error ) != 1 )
 		{
@@ -784,7 +831,7 @@ int libfsntfs_internal_file_entry_get_reparse_point_attribute(
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve attribute: %d.",
 			 function,
-			 internal_file_entry->mft_entry->reparse_point_attribute_index );
+			 mft_entry->reparse_point_attribute_index );
 
 			return( -1 );
 		}
@@ -845,6 +892,7 @@ int libfsntfs_internal_file_entry_get_security_descriptor_attribute(
 	{
 		if( libfsntfs_internal_file_entry_get_attribute_by_index(
 		     internal_file_entry,
+		     internal_file_entry->mft_entry,
 		     internal_file_entry->mft_entry->security_descriptor_attribute_index,
 		     &( internal_file_entry->security_descriptor_attribute ),
 		     error ) != 1 )
@@ -916,6 +964,7 @@ int libfsntfs_internal_file_entry_get_standard_information_attribute(
 	{
 		if( libfsntfs_internal_file_entry_get_attribute_by_index(
 		     internal_file_entry,
+		     internal_file_entry->mft_entry,
 		     internal_file_entry->mft_entry->standard_information_attribute_index,
 		     &( internal_file_entry->standard_information_attribute ),
 		     error ) != 1 )
@@ -1197,6 +1246,7 @@ int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 #endif
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     &attribute,
 	     error ) != 1 )
@@ -2239,6 +2289,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 	{
 		if( libfsntfs_internal_file_entry_get_attribute_by_index(
 		     internal_file_entry,
+		     internal_file_entry->mft_entry,
 		     safe_attribute_index,
 		     &attribute,
 		     error ) != 1 )
@@ -2331,6 +2382,7 @@ int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
 
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     &attribute,
 	     error ) != 1 )
@@ -2392,6 +2444,7 @@ int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
 
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     &attribute,
 	     error ) != 1 )
@@ -2453,6 +2506,7 @@ int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
 
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     &attribute,
 	     error ) != 1 )
@@ -2514,6 +2568,7 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     &attribute,
 	     error ) != 1 )
@@ -2576,6 +2631,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2592,10 +2648,12 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
-		     reparse_point_attribute,
-		     utf8_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+		          reparse_point_attribute,
+		          utf8_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2641,6 +2699,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2657,11 +2716,13 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
-		     reparse_point_attribute,
-		     utf8_string,
-		     utf8_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		          reparse_point_attribute,
+		          utf8_string,
+		          utf8_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2706,6 +2767,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2722,10 +2784,12 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
-		     reparse_point_attribute,
-		     utf16_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+		          reparse_point_attribute,
+		          utf16_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2771,6 +2835,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2787,11 +2852,13 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
-		     reparse_point_attribute,
-		     utf16_string,
-		     utf16_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		          reparse_point_attribute,
+		          utf16_string,
+		          utf16_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2836,6 +2903,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2852,10 +2920,12 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
-		     reparse_point_attribute,
-		     utf8_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
+		          reparse_point_attribute,
+		          utf8_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2901,6 +2971,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2917,11 +2988,13 @@ int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf8_print_name(
-		     reparse_point_attribute,
-		     utf8_string,
-		     utf8_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
+		          reparse_point_attribute,
+		          utf8_string,
+		          utf8_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -2966,6 +3039,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -2982,10 +3056,12 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
-		     reparse_point_attribute,
-		     utf16_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
+		          reparse_point_attribute,
+		          utf16_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3031,6 +3107,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
 
 	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
 	          internal_file_entry,
+	          internal_file_entry->mft_entry,
 	          &reparse_point_attribute,
 	          error );
 
@@ -3047,11 +3124,13 @@ int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_reparse_point_attribute_get_utf16_print_name(
-		     reparse_point_attribute,
-		     utf16_string,
-		     utf16_string_size,
-		     error ) != 1 )
+		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
+		          reparse_point_attribute,
+		          utf16_string,
+		          utf16_string_size,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3492,6 +3571,7 @@ int libfsntfs_file_entry_get_attribute_by_index(
 	}
 	if( libfsntfs_internal_file_entry_get_attribute_by_index(
 	     internal_file_entry,
+	     internal_file_entry->mft_entry,
 	     attribute_index,
 	     attribute,
 	     error ) != 1 )

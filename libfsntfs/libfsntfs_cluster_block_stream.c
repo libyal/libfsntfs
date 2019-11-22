@@ -27,6 +27,7 @@
 #include "libfsntfs_cluster_block_data_handle.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_compressed_block_data_handle.h"
+#include "libfsntfs_compressed_data_handle.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
@@ -144,13 +145,13 @@ on_error:
 int libfsntfs_cluster_block_stream_initialize_from_data_runs(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     size64_t data_size,
      libcerror_error_t **error )
 {
 	libfdata_stream_t *safe_data_stream                = NULL;
 	libfsntfs_cluster_block_data_handle_t *data_handle = NULL;
 	static char *function                              = "libfsntfs_cluster_block_stream_initialize_from_data_runs";
-	size64_t valid_data_size                           = 0;
 	int segment_index                                  = 0;
 
 	if( cluster_block_stream == NULL )
@@ -164,41 +165,10 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_valid_data_size(
-	     mft_attribute,
-	     &valid_data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve valid data size",
-		 function );
-
-		goto on_error;
-	}
-	if( valid_data_size == 0 )
-	{
-		if( libfsntfs_mft_attribute_get_data_size(
-		     mft_attribute,
-		     &valid_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data size",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( libfsntfs_cluster_block_data_handle_initialize(
 	     &data_handle,
 	     io_handle,
-	     mft_attribute,
+	     data_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -238,7 +208,7 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 	     &segment_index,
 	     0,
 	     0,
-	     valid_data_size,
+	     data_size,
 	     0,
 	     error ) != 1 )
 	{
@@ -278,13 +248,13 @@ on_error:
 int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     size64_t uncompressed_data_size,
      libcerror_error_t **error )
 {
 	libfdata_stream_t *safe_data_stream                   = NULL;
 	libfsntfs_compressed_block_data_handle_t *data_handle = NULL;
 	static char *function                                 = "libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs";
-	size64_t valid_data_size                              = 0;
 	int segment_index                                     = 0;
 
 	if( cluster_block_stream == NULL )
@@ -298,41 +268,10 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_valid_data_size(
-	     mft_attribute,
-	     &valid_data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve valid data size",
-		 function );
-
-		goto on_error;
-	}
-	if( valid_data_size == 0 )
-	{
-		if( libfsntfs_mft_attribute_get_data_size(
-		     mft_attribute,
-		     &valid_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data size",
-			 function );
-
-			goto on_error;
-		}
-	}
 	if( libfsntfs_compressed_block_data_handle_initialize(
 	     &data_handle,
 	     io_handle,
-	     mft_attribute,
+	     data_attribute,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -372,7 +311,7 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
 	     &segment_index,
 	     0,
 	     0,
-	     valid_data_size,
+	     uncompressed_data_size,
 	     0,
 	     error ) != 1 )
 	{
@@ -405,6 +344,142 @@ on_error:
 	return( -1 );
 }
 
+/* Creates cluster block stream from a compressed stream
+ * Make sure the value data_stream is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+     libfdata_stream_t **cluster_block_stream,
+     libfdata_stream_t *compressed_data_stream,
+     libfsntfs_mft_attribute_t *data_attribute,
+     uint32_t compression_method,
+     libcerror_error_t **error )
+{
+	libfdata_stream_t *safe_data_stream             = NULL;
+	libfsntfs_compressed_data_handle_t *data_handle = NULL;
+	static char *function                           = "libfsntfs_cluster_block_stream_initialize_from_compressed_stream";
+	size64_t uncompressed_data_size                 = 0;
+	int segment_index                               = 0;
+
+	if( cluster_block_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data stream.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_valid_data_size(
+	     data_attribute,
+	     &uncompressed_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve valid data size",
+		 function );
+
+		goto on_error;
+	}
+	if( uncompressed_data_size == 0 )
+	{
+		if( libfsntfs_mft_attribute_get_data_size(
+		     data_attribute,
+		     &uncompressed_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data size",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( libfsntfs_compressed_data_handle_initialize(
+	     &data_handle,
+	     compressed_data_stream,
+	     compression_method,
+	     uncompressed_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create data handle.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_stream_initialize(
+	     &safe_data_stream,
+	     (intptr_t *) data_handle,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_compressed_data_handle_free,
+	     NULL,
+	     NULL,
+	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_compressed_data_handle_read_segment_data,
+	     NULL,
+	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_compressed_data_handle_seek_segment_offset,
+	     LIBFDATA_DATA_HANDLE_FLAG_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create data stream.",
+		 function );
+
+		goto on_error;
+	}
+	data_handle = NULL;
+
+	if( libfdata_stream_append_segment(
+	     safe_data_stream,
+	     &segment_index,
+	     0,
+	     0,
+	     uncompressed_data_size,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append data stream segment.",
+		 function );
+
+		goto on_error;
+	}
+	*cluster_block_stream = safe_data_stream;
+
+	return( 1 );
+
+on_error:
+	if( safe_data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &safe_data_stream,
+		 NULL );
+	}
+	if( data_handle != NULL )
+	{
+		libfsntfs_compressed_data_handle_free(
+		 &data_handle,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Creates a cluster block stream
  * Make sure the value cluster_block_stream is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -412,10 +487,13 @@ on_error:
 int libfsntfs_cluster_block_stream_initialize(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_mft_attribute_t *data_attribute,
+     libfsntfs_mft_attribute_t *wof_compressed_data_attribute,
+     uint32_t compression_method,
      libcerror_error_t **error )
 {
 	libfdata_stream_t *safe_cluster_block_stream = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute     = NULL;
 	uint8_t *resident_data                       = NULL;
 	static char *function                        = "libfsntfs_cluster_block_stream_initialize";
 	size64_t data_size                           = 0;
@@ -434,20 +512,13 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_data(
-	     mft_attribute,
-	     &resident_data,
-	     &resident_data_size,
-	     error ) != 1 )
+	if( wof_compressed_data_attribute == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve resident attribute data",
-		 function );
-
-		goto on_error;
+		mft_attribute = data_attribute;
+	}
+	else
+	{
+		mft_attribute = wof_compressed_data_attribute;
 	}
 	if( libfsntfs_mft_attribute_get_valid_data_size(
 	     mft_attribute,
@@ -480,6 +551,21 @@ int libfsntfs_cluster_block_stream_initialize(
 			goto on_error;
 		}
 	}
+	if( libfsntfs_mft_attribute_get_data(
+	     mft_attribute,
+	     &resident_data,
+	     &resident_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve resident data from attribute.",
+		 function );
+
+		goto on_error;
+	}
 	if( libfsntfs_mft_attribute_get_data_flags(
 	     mft_attribute,
 	     &data_flags,
@@ -489,7 +575,7 @@ int libfsntfs_cluster_block_stream_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute data flags.",
+		 "%s: unable to retrieve data flags from attribute.",
 		 function );
 
 		goto on_error;
@@ -514,20 +600,22 @@ int libfsntfs_cluster_block_stream_initialize(
 		          resident_data_size,
 		          error );
 	}
-	else if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) == 0 )
-	{
-		result = libfsntfs_cluster_block_stream_initialize_from_data_runs(
-		          &safe_cluster_block_stream,
-		          io_handle,
-		          mft_attribute,
-		          error );
-	}
-	else
+	else if( ( data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
 	{
 		result = libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
 		          &safe_cluster_block_stream,
 		          io_handle,
 		          mft_attribute,
+		          data_size,
+		          error );
+	}
+	else
+	{
+		result = libfsntfs_cluster_block_stream_initialize_from_data_runs(
+		          &safe_cluster_block_stream,
+		          io_handle,
+		          mft_attribute,
+		          data_size,
 		          error );
 	}
 	if( result != 1 )
@@ -541,8 +629,29 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
-	*cluster_block_stream = safe_cluster_block_stream;
+	if( wof_compressed_data_attribute == NULL )
+	{
+		*cluster_block_stream = safe_cluster_block_stream;
+	}
+	else
+	{
+		if( libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+		     cluster_block_stream,
+		     safe_cluster_block_stream,
+		     data_attribute,
+		     compression_method,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create cluster block stream.",
+			 function );
 
+			goto on_error;
+		}
+	}
 	return( 1 );
 
 on_error:

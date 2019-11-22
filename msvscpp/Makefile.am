@@ -11,9 +11,11 @@ MSVSCPP_FILES = \
 	fsntfs_test_compressed_block/fsntfs_test_compressed_block.vcproj \
 	fsntfs_test_compressed_block_data_handle/fsntfs_test_compressed_block_data_handle.vcproj \
 	fsntfs_test_compressed_block_vector/fsntfs_test_compressed_block_vector.vcproj \
+	fsntfs_test_compressed_data_handle/fsntfs_test_compressed_data_handle.vcproj \
 	fsntfs_test_compression/fsntfs_test_compression.vcproj \
 	fsntfs_test_compression_unit_data_handle/fsntfs_test_compression_unit_data_handle.vcproj \
 	fsntfs_test_compression_unit_descriptor/fsntfs_test_compression_unit_descriptor.vcproj \
+	fsntfs_test_data_extent/fsntfs_test_data_extent.vcproj \
 	fsntfs_test_data_run/fsntfs_test_data_run.vcproj \
 	fsntfs_test_data_stream/fsntfs_test_data_stream.vcproj \
 	fsntfs_test_directory_entries_tree/fsntfs_test_directory_entries_tree.vcproj \

@@ -131,6 +131,8 @@ int libfsntfs_data_stream_initialize(
 	     &( internal_data_stream->data_cluster_block_stream ),
 	     io_handle,
 	     data_attribute,
+	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

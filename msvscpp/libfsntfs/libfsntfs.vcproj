@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_data_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression.c"
 				>
 			</File>
@@ -231,6 +235,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_data_extent.c"
 				>
 			</File>
 			<File
@@ -532,6 +540,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_compressed_data_handle.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression.h"
 				>
 			</File>
@@ -541,6 +553,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_compression_unit_descriptor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_data_extent.h"
 				>
 			</File>
 			<File

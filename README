@@ -5,6 +5,23 @@ Project information:
 * Status: experimental
 * Licence: LGPLv3+
 
+Read-only supported NTFS formats:
+
+* version 3.0
+* version 3.1
+
+Supported NTFS format features:
+
+* LZNT1 compression
+* LZXPRESS-Huffman Windows Overlay Filter (WOF) compressed data
+
+Unsupported NTFS format features:
+
+* NTFS version 1.2
+* Encrypted File System (EFS)
+* Case sensitive directories
+* LZX Windows Overlay Filter (WOF) compressed data
+
 For more information see:
 
 * Project documentation: https://github.com/libyal/libfsntfs/wiki/Home

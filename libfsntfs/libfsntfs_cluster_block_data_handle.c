@@ -196,8 +196,6 @@ int libfsntfs_cluster_block_data_handle_free(
 	}
 	if( *data_handle != NULL )
 	{
-		/* IO handle is freed elsewhere
-		 */
 		if( libfcache_cache_free(
 		     &( ( *data_handle )->cluster_block_cache ),
 		     error ) != 1 )

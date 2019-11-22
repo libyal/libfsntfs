@@ -664,6 +664,8 @@ int libfsntfs_security_descriptor_values_read_from_mft_attribute(
 		     &cluster_block_stream,
 		     io_handle,
 		     mft_attribute,
+		     NULL,
+		     0,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
