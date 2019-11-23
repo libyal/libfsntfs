@@ -27,7 +27,6 @@
 
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfdata.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -63,19 +62,6 @@ int libfsntfs_cluster_block_read_file_io_handle(
      libfsntfs_cluster_block_t *cluster_block,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
-     libcerror_error_t **error );
-
-int libfsntfs_cluster_block_read_element_data(
-     intptr_t *data_handle,
-     libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *vector,
-     libfdata_cache_t *cache,
-     int element_index,
-     int element_data_file_index,
-     off64_t cluster_block_offset,
-     size64_t cluster_block_size,
-     uint32_t range_flags,
-     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

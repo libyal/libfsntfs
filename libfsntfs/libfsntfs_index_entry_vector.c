@@ -44,13 +44,16 @@ int libfsntfs_index_entry_vector_initialize(
      uint32_t index_entry_size,
      libcerror_error_t **error )
 {
-	libfsntfs_data_run_t *data_run = NULL;
-	static char *function          = "libfsntfs_index_entry_vector_initialize";
-	int attribute_index            = 0;
-	int entry_index                = 0;
-	int number_of_entries          = 0;
-	int segment_index              = 0;
-	uint16_t attribute_data_flags  = 0;
+	libfsntfs_data_run_t *data_run               = NULL;
+	static char *function                        = "libfsntfs_index_entry_vector_initialize";
+	size64_t attribute_data_vcn_size             = 0;
+	off64_t attribute_data_vcn_offset            = 0;
+	off64_t calculated_attribute_data_vcn_offset = 0;
+	uint16_t attribute_data_flags                = 0;
+	int attribute_index                          = 0;
+	int entry_index                              = 0;
+	int number_of_entries                        = 0;
+	int segment_index                            = 0;
 
 	if( index_entry_vector == NULL )
 	{
@@ -121,7 +124,63 @@ int libfsntfs_index_entry_vector_initialize(
 	}
 	while( mft_attribute != NULL )
 	{
-/* TODO check VCN of previous attribute? */
+		if( libfsntfs_mft_attribute_get_data_vcn_range(
+		     mft_attribute,
+		     (uint64_t *) &attribute_data_vcn_offset,
+		     (uint64_t *) &attribute_data_vcn_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute data VCN range.",
+			 function );
+
+			goto on_error;
+		}
+		if( attribute_data_vcn_size != 0xffffffffffffffffULL )
+		{
+			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data last VCN value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			attribute_data_vcn_size   += 1;
+			attribute_data_vcn_size   -= attribute_data_vcn_offset;
+			attribute_data_vcn_offset *= io_handle->cluster_block_size;
+			attribute_data_vcn_size   *= io_handle->cluster_block_size;
+
+			if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data VCN offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
+		}
 		if( libfsntfs_mft_attribute_get_number_of_data_runs(
 		     mft_attribute,
 		     &number_of_entries,
@@ -151,7 +210,7 @@ int libfsntfs_index_entry_vector_initialize(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute: %d data runs array entry: %d.",
+				 "%s: unable to retrieve attribute: %d data run: %d.",
 				 function,
 				 attribute_index,
 				 entry_index );

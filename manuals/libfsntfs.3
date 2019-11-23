@@ -1,4 +1,4 @@
-.Dd November 15, 2019
+.Dd November 23, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -266,6 +266,24 @@ $FILE_NAME attribute functions
 $REPARSE_POINT attribute functions
 .Ft int
 .Fn libfsntfs_reparse_point_attribute_get_tag "libfsntfs_attribute_t *attribute" "uint32_t *tag" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_compression_method "libfsntfs_attribute_t *attribute" "uint32_t *compression_method" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf8_substitute_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf16_substitute_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf8_print_name_size "libfsntfs_attribute_t *attribute" "size_t *utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf8_print_name "libfsntfs_attribute_t *attribute" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf16_print_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_reparse_point_attribute_get_utf16_print_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Pp
 $SECURITY_DESCRIPTOR attribute functions
 .Ft int

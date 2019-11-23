@@ -97,7 +97,7 @@ int libfsntfs_reparse_point_attribute_get_tag(
 	return( 1 );
 }
 
-/* Retrieves the compression_method
+/* Retrieves the Windows Overlay Filter (WOF) compression_method
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_reparse_point_attribute_get_compression_method(

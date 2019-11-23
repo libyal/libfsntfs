@@ -1,14 +1,13 @@
 TODO
-* WofCompressedData support
-** add libfsntfs_reparse_point_attribute_get_compression_method to API
-
-* complete thread lock support
-** file entry - continue with libfsntfs_file_entry_get_name_attribute_index
+* complete read/write lock support
+** file entry
+*** libfsntfs_file_entry_get_name_attribute_index
+*** libfsntfs_file_entry_get_security_descriptor_size
+*** libfsntfs_file_entry_get_security_descriptor
+*** continue with libfsntfs_file_entry_get_sub_file_entry_by_index
 ** MFT metadata file
-
-* refactor file entry / data stream extents
-
-* create data_run_read_data function?
+** specific attribute values functions
+** USN journal
 
 * MFT entry
 ** preserve attribute list data MFT entries?
@@ -16,6 +15,7 @@ TODO
 * fsntfsinfo complete bodyfile support
 ** fix libfsntfs_file_entry_get_security_descriptor_size: unable to retrieve security descriptor from index for identifier: 0.
 ** add support for tsk metadata address calculation? inside MFT attribute?
+
 * fsntfsinfo -F add support for ADS notation
 
 * change libfsntfs_mft_attribute_get_utf[8,16]_name[_size] to return 0 if not set
@@ -37,7 +37,6 @@ TODO
 * change calls to libfsntfs_mft_entry_get_index_by_utf8_name to utf16 for optimization
 * change calls to libfsntfs_mft_entry_get_data_attribute_by_utf8_name to utf16 for optimization
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
-* implement read/write lock support
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 
@@ -59,7 +58,6 @@ TODO
   - handle valid data size
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 * fix or remove TODO_CASE_INSENSITIVE
-* implement read/write lock support
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
 
@@ -97,7 +95,6 @@ TODO
   - copy directory index in file entry
 * data runs block
   - add a check to see if data run sizes add up
-  - handle compressed blocks
 * volume
   - complete libfsntfs_volume_has_bitlocker_drvie_encryption
   - complete libfsntfs_volume_has_volume_shadow_snapshots
@@ -137,9 +134,6 @@ TODO
 
 * cached approach of reading attributes ?
 
-* add support for other values of sectors_per_cluster_block, seen 8, 128
-* add support for other values of index_entry_size, seen 1, 244
-* complete libcdata integration
 * fix issue on win2k image
   - stack overflow infinite loop
   - determine MFT entry index based on offset
@@ -193,7 +187,6 @@ Format:
 * filenames
   - ignoring short filenames for now?
 * ntfs3g indicates volume is hibernated, could this be stored in the volume flags?
-* Windows 10 different compression?
 
 Tools:
 * fsntfsinfo

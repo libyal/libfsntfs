@@ -42,7 +42,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_bitmap_values.c libfsntfs_bitmap_values.h \
 	libfsntfs_buffer_data_handle.c libfsntfs_buffer_data_handle.h \
 	libfsntfs_cluster_block.c libfsntfs_cluster_block.h \
-	libfsntfs_cluster_block_data_handle.c libfsntfs_cluster_block_data_handle.h \
+	libfsntfs_cluster_block_data.c libfsntfs_cluster_block_data.h \
 	libfsntfs_cluster_block_stream.c libfsntfs_cluster_block_stream.h \
 	libfsntfs_cluster_block_vector.c libfsntfs_cluster_block_vector.h \
 	libfsntfs_compressed_block.c libfsntfs_compressed_block.h \

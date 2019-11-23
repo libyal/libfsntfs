@@ -68,7 +68,6 @@ fsntfsmount_SOURCES = \
 	fsntfstools_getopt.c fsntfstools_getopt.h \
 	fsntfstools_i18n.h \
 	fsntfstools_libbfio.h \
-	fsntfstools_libcdata.h \
 	fsntfstools_libcerror.h \
 	fsntfstools_libclocale.h \
 	fsntfstools_libcnotify.h \

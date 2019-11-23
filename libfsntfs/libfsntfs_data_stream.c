@@ -25,11 +25,14 @@
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
+#include "libfsntfs_data_extent.h"
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
@@ -47,7 +50,6 @@ int libfsntfs_data_stream_initialize(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_initialize";
-	int number_of_data_runs                                = 0;
 
 	if( data_stream == NULL )
 	{
@@ -94,7 +96,7 @@ int libfsntfs_data_stream_initialize(
 		 "%s: unable to create data stream.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( memory_set(
 	     internal_data_stream,
@@ -113,16 +115,17 @@ int libfsntfs_data_stream_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_number_of_data_runs(
+	if( libfsntfs_mft_attribute_get_data_extents_array(
 	     data_attribute,
-	     &number_of_data_runs,
+	     io_handle,
+	     &( internal_data_stream->extents_array ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of data runs.",
+		 "%s: unable to determine extents array.",
 		 function );
 
 		goto on_error;
@@ -144,20 +147,21 @@ int libfsntfs_data_stream_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_attribute_get_data_size(
-	     data_attribute,
-	     &( internal_data_stream->data_size ),
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_data_stream->read_write_lock ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data attribute data size.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
+#endif
 	internal_data_stream->file_io_handle = file_io_handle;
 	internal_data_stream->data_attribute = data_attribute;
 
@@ -168,6 +172,19 @@ int libfsntfs_data_stream_initialize(
 on_error:
 	if( internal_data_stream != NULL )
 	{
+		if( internal_data_stream->data_cluster_block_stream != NULL )
+		{
+			libfdata_stream_free(
+			 &( internal_data_stream->data_cluster_block_stream ),
+			 NULL );
+		}
+		if( internal_data_stream->extents_array != NULL )
+		{
+			libcdata_array_free(
+			 &( internal_data_stream->extents_array ),
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+			 NULL );
+		}
 		memory_free(
 		 internal_data_stream );
 	}
@@ -201,6 +218,21 @@ int libfsntfs_data_stream_free(
 		internal_data_stream = (libfsntfs_internal_data_stream_t *) *data_stream;
 		*data_stream         = NULL;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_data_stream->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		/* The file_io_handle and data_attribute references are freed elsewhere
 		 */
 		if( internal_data_stream->data_cluster_block_stream != NULL )
@@ -219,6 +251,20 @@ int libfsntfs_data_stream_free(
 				result = -1;
 			}
 		}
+		if( libcdata_array_free(
+		     &( internal_data_stream->extents_array ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free extents array.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 internal_data_stream );
 	}
@@ -236,6 +282,7 @@ int libfsntfs_data_stream_get_utf8_name_size(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_utf8_name_size";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -250,6 +297,21 @@ int libfsntfs_data_stream_get_utf8_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_attribute_get_utf8_name_size(
 	     internal_data_stream->data_attribute,
 	     utf8_string_size,
@@ -262,9 +324,24 @@ int libfsntfs_data_stream_get_utf8_name_size(
 		 "%s: unable to retrieve size of UTF-8 name from data stream.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 encoded name
@@ -279,6 +356,7 @@ int libfsntfs_data_stream_get_utf8_name(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_utf8_name";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -293,6 +371,21 @@ int libfsntfs_data_stream_get_utf8_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_attribute_get_utf8_name(
 	     internal_data_stream->data_attribute,
 	     utf8_string,
@@ -306,9 +399,24 @@ int libfsntfs_data_stream_get_utf8_name(
 		 "%s: unable to retrieve UTF-8 name from data stream.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size of the UTF-16 encoded name
@@ -322,6 +430,7 @@ int libfsntfs_data_stream_get_utf16_name_size(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_utf16_name_size";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -336,6 +445,21 @@ int libfsntfs_data_stream_get_utf16_name_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_attribute_get_utf16_name_size(
 	     internal_data_stream->data_attribute,
 	     utf16_string_size,
@@ -348,9 +472,24 @@ int libfsntfs_data_stream_get_utf16_name_size(
 		 "%s: unable to retrieve size of UTF-16 name from data stream.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 encoded name
@@ -365,6 +504,7 @@ int libfsntfs_data_stream_get_utf16_name(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_utf16_name";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -379,6 +519,21 @@ int libfsntfs_data_stream_get_utf16_name(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_mft_attribute_get_utf16_name(
 	     internal_data_stream->data_attribute,
 	     utf16_string,
@@ -392,9 +547,24 @@ int libfsntfs_data_stream_get_utf16_name(
 		 "%s: unable to retrieve UTF-16 name from data stream.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Reads data at the current offset
@@ -423,6 +593,21 @@ ssize_t libfsntfs_data_stream_read_buffer(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	read_count = libfdata_stream_read_buffer(
 	              internal_data_stream->data_cluster_block_stream,
 		      (intptr_t *) internal_data_stream->file_io_handle,
@@ -440,8 +625,23 @@ ssize_t libfsntfs_data_stream_read_buffer(
 		 "%s: unable to read from data cluster block stream.",
 		 function );
 
+		read_count = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( read_count );
 }
 
@@ -455,11 +655,40 @@ ssize_t libfsntfs_data_stream_read_buffer_at_offset(
          off64_t offset,
          libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_data_stream_read_buffer_at_offset";
-	ssize_t read_count    = 0;
+	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
+	static char *function                                  = "libfsntfs_data_stream_read_buffer_at_offset";
+	ssize_t read_count                                     = 0;
 
-	if( libfsntfs_data_stream_seek_offset(
-	     data_stream,
+	if( data_stream == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data stream.",
+		 function );
+
+		return( -1 );
+	}
+	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfdata_stream_seek_offset(
+	     internal_data_stream->data_cluster_block_stream,
 	     offset,
 	     SEEK_SET,
 	     error ) == -1 )
@@ -468,28 +697,48 @@ ssize_t libfsntfs_data_stream_read_buffer_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.",
+		 "%s: unable to seek offset in data cluster block stream.",
 		 function );
 
-		return( -1 );
+		read_count = -1;
 	}
-	read_count = libfsntfs_data_stream_read_buffer(
-	              data_stream,
-	              buffer,
-	              buffer_size,
-	              error );
+	else
+	{
+		read_count = libfdata_stream_read_buffer(
+		              internal_data_stream->data_cluster_block_stream,
+			      (intptr_t *) internal_data_stream->file_io_handle,
+			      buffer,
+			      buffer_size,
+			      0,
+			      error );
 
-	if( read_count <= -1 )
+		if( read_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read from data cluster block stream.",
+			 function );
+
+			read_count = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	return( read_count );
 }
 
@@ -518,6 +767,21 @@ off64_t libfsntfs_data_stream_seek_offset(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	offset = libfdata_stream_seek_offset(
 	          internal_data_stream->data_cluster_block_stream,
 	          offset,
@@ -533,8 +797,23 @@ off64_t libfsntfs_data_stream_seek_offset(
 		 "%s: unable to seek offset in data cluster block stream.",
 		 function );
 
+		offset = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
+#endif
 	return( offset );
 }
 
@@ -548,6 +827,7 @@ int libfsntfs_data_stream_get_offset(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_offset";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -562,6 +842,21 @@ int libfsntfs_data_stream_get_offset(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_stream_get_offset(
 	     internal_data_stream->data_cluster_block_stream,
 	     offset,
@@ -574,9 +869,24 @@ int libfsntfs_data_stream_get_offset(
 		 "%s: unable to retrieve offset from data cluster block stream.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the size
@@ -589,6 +899,7 @@ int libfsntfs_data_stream_get_size(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_size";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -614,9 +925,51 @@ int libfsntfs_data_stream_get_size(
 
 		return( -1 );
 	}
-	*size = internal_data_stream->data_size;
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
-	return( 1 );
+		return( -1 );
+	}
+#endif
+	if( libfdata_stream_get_size(
+	     internal_data_stream->data_cluster_block_stream,
+	     size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data attribute data size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the number of extents (decoded data runs)
@@ -629,6 +982,7 @@ int libfsntfs_data_stream_get_number_of_extents(
 {
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_number_of_extents";
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -643,39 +997,51 @@ int libfsntfs_data_stream_get_number_of_extents(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_cluster_block_stream == NULL )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
 	{
-		if( number_of_extents == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid number of extents.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
-			return( -1 );
-		}
-		*number_of_extents = 0;
+		return( -1 );
 	}
-	else
+#endif
+	if( libcdata_array_get_number_of_entries(
+	     internal_data_stream->extents_array,
+	     number_of_extents,
+	     error ) != 1 )
 	{
-		if( libfdata_stream_get_number_of_segments(
-		     internal_data_stream->data_cluster_block_stream,
-		     number_of_extents,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve data cluster block stream number of segments.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of extents.",
+		 function );
 
-			return( -1 );
-		}
+		result = -1;
 	}
-	return( 1 );
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves a specific extent (decoded data run)
@@ -689,11 +1055,10 @@ int libfsntfs_data_stream_get_extent_by_index(
      uint32_t *extent_flags,
      libcerror_error_t **error )
 {
+	libfsntfs_data_extent_t *data_extent                   = NULL;
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_extent_by_index";
-	size64_t data_size                                     = 0;
-	uint32_t range_flags                                   = 0;
-	int segment_file_index                                 = 0;
+	int result                                             = 1;
 
 	if( data_stream == NULL )
 	{
@@ -708,114 +1073,69 @@ int libfsntfs_data_stream_get_extent_by_index(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( internal_data_stream->data_cluster_block_stream == NULL )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid extent index value out of bounds.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	if( extent_offset == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid extent offset.",
-		 function );
-
-		return( -1 );
-	}
-	if( extent_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid extent size.",
-		 function );
-
-		return( -1 );
-	}
-	if( extent_flags == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid extent flags.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_stream_get_segment_by_index(
-	     internal_data_stream->data_cluster_block_stream,
+#endif
+	if( libcdata_array_get_entry_by_index(
+	     internal_data_stream->extents_array,
 	     extent_index,
-	     &segment_file_index,
-	     extent_offset,
-	     extent_size,
-	     &range_flags,
+	     (intptr_t **) &data_extent,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data cluster block stream segment: %d.",
+		 "%s: unable to retrieve extent: %d.",
 		 function,
 		 extent_index );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libfdata_stream_get_segment_mapped_range(
-	     internal_data_stream->data_cluster_block_stream,
-	     extent_index,
-	     extent_offset,
-	     extent_size,
-	     error ) != 1 )
+	else if( libfsntfs_data_extent_get_values(
+	          data_extent,
+	          extent_offset,
+	          extent_size,
+	          extent_flags,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data cluster block stream segment: %d mapped range.",
+		 "%s: unable to retrieve extent: %d values.",
 		 function,
 		 extent_index );
 
-		return( -1 );
+		result = -1;
 	}
-	if( ( *extent_offset < 0 )
-	 || ( (size64_t) *extent_offset >= internal_data_stream->data_size ) )
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_data_stream->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid extent offset value out of bounds.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
-	data_size = internal_data_stream->data_size - *extent_offset;
-
-	if( *extent_size > data_size )
-	{
-		*extent_size = data_size;
-	}
-	*extent_flags = 0;
-
-	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-	{
-		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_SPARSE;
-	}
-	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
-	{
-		*extent_flags |= LIBFSNTFS_EXTENT_FLAG_IS_COMPRESSED;
-	}
-	return( 1 );
+#endif
+	return( result );
 }
 

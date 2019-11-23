@@ -27,6 +27,8 @@
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
+#include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_usn_change_journal.h"

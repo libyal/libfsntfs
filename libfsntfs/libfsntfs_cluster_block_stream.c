@@ -24,7 +24,7 @@
 #include <types.h>
 
 #include "libfsntfs_buffer_data_handle.h"
-#include "libfsntfs_cluster_block_data_handle.h"
+#include "libfsntfs_cluster_block_data.h"
 #include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_compressed_block_data_handle.h"
 #include "libfsntfs_compressed_data_handle.h"
@@ -149,10 +149,17 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
      size64_t data_size,
      libcerror_error_t **error )
 {
-	libfdata_stream_t *safe_data_stream                = NULL;
-	libfsntfs_cluster_block_data_handle_t *data_handle = NULL;
-	static char *function                              = "libfsntfs_cluster_block_stream_initialize_from_data_runs";
-	int segment_index                                  = 0;
+	libfdata_stream_t *safe_data_stream          = NULL;
+	libfsntfs_data_run_t *data_run               = NULL;
+	static char *function                        = "libfsntfs_cluster_block_stream_initialize_from_data_runs";
+	size64_t attribute_data_vcn_size             = 0;
+	off64_t attribute_data_vcn_offset            = 0;
+	off64_t calculated_attribute_data_vcn_offset = 0;
+	uint16_t attribute_data_flags                = 0;
+	int attribute_index                          = 0;
+	int data_run_index                           = 0;
+	int number_of_data_runs                      = 0;
+	int segment_index                            = 0;
 
 	if( cluster_block_stream == NULL )
 	{
@@ -165,31 +172,63 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 
 		return( -1 );
 	}
-	if( libfsntfs_cluster_block_data_handle_initialize(
-	     &data_handle,
-	     io_handle,
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->cluster_block_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid IO handle - cluster block size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_data_flags(
 	     data_attribute,
+	     &attribute_data_flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data handle.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute data flags.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported compressed attribute data.",
 		 function );
 
 		goto on_error;
 	}
 	if( libfdata_stream_initialize(
 	     &safe_data_stream,
-	     (intptr_t *) data_handle,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_cluster_block_data_handle_free,
 	     NULL,
 	     NULL,
-	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_cluster_block_data_handle_read_segment_data,
 	     NULL,
-	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_cluster_block_data_handle_seek_segment_offset,
-	     LIBFDATA_DATA_HANDLE_FLAG_MANAGED,
+	     NULL,
+	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_cluster_block_data_read_segment_data,
+	     NULL,
+	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libfsntfs_cluster_block_data_seek_segment_offset,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -201,25 +240,152 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 
 		goto on_error;
 	}
-	data_handle = NULL;
-
-	if( libfdata_stream_append_segment(
-	     safe_data_stream,
-	     &segment_index,
-	     0,
-	     0,
-	     data_size,
-	     0,
-	     error ) != 1 )
+	while( data_attribute != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append data stream segment.",
-		 function );
+		if( libfsntfs_mft_attribute_get_data_vcn_range(
+		     data_attribute,
+		     (uint64_t *) &attribute_data_vcn_offset,
+		     (uint64_t *) &attribute_data_vcn_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute data VCN range.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		if( attribute_data_vcn_size != 0xffffffffffffffffULL )
+		{
+			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data last VCN value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			attribute_data_vcn_size   += 1;
+			attribute_data_vcn_size   -= attribute_data_vcn_offset;
+			attribute_data_vcn_offset *= io_handle->cluster_block_size;
+			attribute_data_vcn_size   *= io_handle->cluster_block_size;
+
+			if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data VCN offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
+		}
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     data_attribute,
+		     &number_of_data_runs,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d number of data runs.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+		for( data_run_index = 0;
+		     data_run_index < number_of_data_runs;
+		     data_run_index++ )
+		{
+			if( libfsntfs_mft_attribute_get_data_run_by_index(
+			     data_attribute,
+			     data_run_index,
+			     &data_run,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute: %d data run: %d.",
+				 function,
+				 attribute_index,
+				 data_run_index );
+
+				goto on_error;
+			}
+			if( data_run == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing attribute: %d data run: %d.",
+				 function,
+				 attribute_index,
+				 data_run_index );
+
+				goto on_error;
+			}
+			if( libfdata_stream_append_segment(
+			     safe_data_stream,
+			     &segment_index,
+			     0,
+			     data_run->start_offset,
+			     data_run->size,
+			     data_run->range_flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to append attribute: %d data run: %d data stream segment.",
+				 function,
+				 attribute_index,
+				 data_run_index );
+
+				goto on_error;
+			}
+		}
+		attribute_index++;
+
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     data_attribute,
+		     &data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next MFT attribute: %d.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
 	}
 	*cluster_block_stream = safe_data_stream;
 
@@ -230,12 +396,6 @@ on_error:
 	{
 		libfdata_stream_free(
 		 &safe_data_stream,
-		 NULL );
-	}
-	if( data_handle != NULL )
-	{
-		libfsntfs_cluster_block_data_handle_free(
-		 &data_handle,
 		 NULL );
 	}
 	return( -1 );

@@ -30,8 +30,6 @@
 #include "fsntfs_test_functions.h"
 #include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
-#include "fsntfs_test_libfcache.h"
-#include "fsntfs_test_libfdata.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
@@ -425,6 +423,36 @@ int fsntfs_test_cluster_block_clear(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
+
+	/* Test libfsntfs_cluster_block_clear with memset failing
+	 */
+	fsntfs_test_memset_attempts_before_fail = 0;
+
+	result = libfsntfs_cluster_block_clear(
+	          cluster_block,
+	          &error );
+
+	if( fsntfs_test_memset_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
+
 	/* Clean up
 	 */
 	result = libfsntfs_cluster_block_free(
@@ -695,306 +723,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_cluster_block_read_element_data function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_cluster_block_read_element_data(
-     void )
-{
-	libbfio_handle_t *file_io_handle         = NULL;
-	libcerror_error_t *error                 = NULL;
-	libfcache_cache_t *cache                 = NULL;
-	libfdata_vector_t *vector                = NULL;
-	libfsntfs_cluster_block_t *cluster_block = NULL;
-	int result                               = 0;
-
-	/* Initialize test
-	 */
-	result = libfcache_cache_initialize(
-	          &cache,
-	          1,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "cache",
-	 cache );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_cluster_block_initialize(
-	          &cluster_block,
-	          1024,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "cluster_block",
-	 cluster_block );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Initialize file IO handle
-	 */
-	result = fsntfs_test_open_file_io_handle(
-	          &file_io_handle,
-	          fsntfs_test_cluster_block_data1,
-	          1024,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "file_io_handle",
-	 file_io_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-/* TODO create vector
-	result = libfsntfs_cluster_block_read_element_data(
-	          NULL,
-	          file_io_handle,
-	          vector,
-	          (libfdata_cache_t *) cache,
-	          0,
-	          0,
-	          0,
-	          4096,
-	          0,
-	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "file_io_handle",
-	 file_io_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-*/
-
-/* TODO implement read from file IO handle */
-
-	/* Test error cases
-	 */
-	result = libfsntfs_cluster_block_read_element_data(
-	          NULL,
-	          file_io_handle,
-	          vector,
-	          (libfdata_cache_t *) cache,
-	          0,
-	          0,
-	          0,
-	          0,
-	          0,
-	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_cluster_block_read_element_data(
-	          NULL,
-	          file_io_handle,
-	          vector,
-	          (libfdata_cache_t *) cache,
-	          0,
-	          0,
-	          0,
-	          (size64_t) SSIZE_MAX + 1,
-	          0,
-	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_cluster_block_read_element_data(
-	          NULL,
-	          file_io_handle,
-	          vector,
-	          (libfdata_cache_t *) cache,
-	          0,
-	          0,
-	          0,
-	          4096,
-	          0,
-	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-#if defined( HAVE_FSNTFS_TEST_MEMORY )
-
-	/* Test libfsntfs_cluster_block_read_element_data with malloc failing in libfsntfs_cluster_block_initialize
-	 */
-	fsntfs_test_malloc_attempts_before_fail = 0;
-
-	result = libfsntfs_cluster_block_read_element_data(
-	          NULL,
-	          file_io_handle,
-	          vector,
-	          (libfdata_cache_t *) cache,
-	          0,
-	          0,
-	          0,
-	          4096,
-	          0,
-	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
-	          &error );
-
-	if( fsntfs_test_malloc_attempts_before_fail != -1 )
-	{
-		fsntfs_test_malloc_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
-
-	/* Clean up file IO handle
-	 */
-	result = fsntfs_test_close_file_io_handle(
-	          &file_io_handle,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Clean up
-	 */
-	result = libfsntfs_cluster_block_free(
-	          &cluster_block,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "cluster_block",
-	 cluster_block );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfcache_cache_free(
-	          &cache,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "cache",
-	 cache );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( file_io_handle != NULL )
-	{
-		libbfio_handle_free(
-		 &file_io_handle,
-		 NULL );
-	}
-	if( cluster_block != NULL )
-	{
-		libfsntfs_cluster_block_free(
-		 &cluster_block,
-		 NULL );
-	}
-	if( cache != NULL )
-	{
-		libfcache_cache_free(
-		 &cache,
-		 NULL );
-	}
-	return( 0 );
-}
-
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -1029,10 +757,6 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_cluster_block_read_file_io_handle",
 	 fsntfs_test_cluster_block_read_file_io_handle );
-
-	FSNTFS_TEST_RUN(
-	 "libfsntfs_cluster_block_read_element_data",
-	 fsntfs_test_cluster_block_read_element_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

@@ -2066,6 +2066,8 @@ int main(
 
 	/* TODO add tests for libfsntfs_mft_attribute_get_data_run_by_index */
 
+	/* TODO add tests for libfsntfs_mft_attribute_get_data_extents_array */
+
 	/* TODO add tests for libfsntfs_mft_attribute_get_next_attribute */
 
 	/* TODO add tests for libfsntfs_mft_attribute_append_to_chain */

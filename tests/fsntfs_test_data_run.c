@@ -28,12 +28,17 @@
 #endif
 
 #include "fsntfs_test_libcerror.h"
+#include "fsntfs_test_libfdata.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_data_run.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+
+uint8_t fsntfs_test_data_run_data1[ 6 ] = {
+	0x11, 0x03, 0x37, 0x01, 0x0d, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -270,6 +275,330 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_data_run_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_data_run_read_data(
+     void )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_data_run_t *data_run   = NULL;
+	libfsntfs_io_handle_t *io_handle = NULL;
+	ssize_t read_count               = 0;
+	int result                       = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->cluster_block_size = 4096;
+
+	result = libfsntfs_data_run_initialize(
+	          &data_run,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "data_run",
+	 data_run );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              fsntfs_test_data_run_data1,
+	              6,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 3 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->cluster_block_number",
+	 data_run->cluster_block_number,
+	 (uint64_t) 55 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->start_offset",
+	 (uint64_t) data_run->start_offset,
+	 (uint64_t) 55 * 4096 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->size",
+	 (uint64_t) data_run->size,
+	 (uint64_t) 12288 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "data_run->range_flags",
+	 (uint32_t) data_run->range_flags,
+	 (uint32_t) 0 );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              &( fsntfs_test_data_run_data1[ 3 ] ),
+	              6 - 3,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 2 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->cluster_block_number",
+	 data_run->cluster_block_number,
+	 (uint64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->start_offset",
+	 (uint64_t) data_run->start_offset,
+	 (uint64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->size",
+	 (uint64_t) data_run->size,
+	 (uint64_t) 53248 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "data_run->range_flags",
+	 (uint32_t) data_run->range_flags,
+	 (uint32_t) LIBFDATA_RANGE_FLAG_IS_SPARSE );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              &( fsntfs_test_data_run_data1[ 5 ] ),
+	              6 - 5,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->cluster_block_number",
+	 data_run->cluster_block_number,
+	 (uint64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->start_offset",
+	 (uint64_t) data_run->start_offset,
+	 (uint64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
+	 "data_run->size",
+	 (uint64_t) data_run->size,
+	 (uint64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
+	 "data_run->range_flags",
+	 (uint32_t) data_run->range_flags,
+	 (uint32_t) 0 );
+
+	/* Test error cases
+	 */
+	read_count = libfsntfs_data_run_read_data(
+	              NULL,
+	              io_handle,
+	              fsntfs_test_data_run_data1,
+	              6,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              NULL,
+	              fsntfs_test_data_run_data1,
+	              6,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              NULL,
+	              6,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              fsntfs_test_data_run_data1,
+	              (size_t) SSIZE_MAX + 1,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_data_run_read_data(
+	              data_run,
+	              io_handle,
+	              fsntfs_test_data_run_data1,
+	              0,
+	              data_run->cluster_block_number,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_data_run_free(
+	          &data_run,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "data_run",
+	 data_run );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( data_run != NULL )
+	{
+		libfsntfs_data_run_free(
+		 &data_run,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -296,6 +625,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_data_run_free",
 	 fsntfs_test_data_run_free );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_data_run_read_data",
+	 fsntfs_test_data_run_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

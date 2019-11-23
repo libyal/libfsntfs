@@ -31,6 +31,7 @@
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
+#include "fsntfs_test_rwlock.h"
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_data_stream.h"

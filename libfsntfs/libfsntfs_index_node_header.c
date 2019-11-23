@@ -177,17 +177,6 @@ int libfsntfs_index_node_header_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( data_size < sizeof( fsntfs_index_node_header_t ) )
 	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{

@@ -299,10 +299,6 @@ int main(
 
 	/* TODO: add tests for libfsntfs_compression_unit_descriptor_append_data_segment */
 
-	/* TODO: add tests for libfsntfs_compression_unit_descriptor_read_segment_data */
-
-	/* TODO: add tests for libfsntfs_compression_unit_descriptor_seek_segment_offset */
-
 	/* TODO: add tests for libfsntfs_compression_unit_descriptor_print */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */

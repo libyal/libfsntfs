@@ -134,3 +134,66 @@ int libfsntfs_data_extent_free(
 	return( 1 );
 }
 
+/* Retrieves the extent values
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_data_extent_get_values(
+     libfsntfs_data_extent_t *data_extent,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_data_extent_get_values";
+
+	if( data_extent == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data extent.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent size.",
+		 function );
+
+		return( -1 );
+	}
+	if( extent_flags == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extent flags.",
+		 function );
+
+		return( -1 );
+	}
+	*extent_offset = data_extent->start_offset;
+	*extent_size   = data_extent->size;
+	*extent_flags  = data_extent->range_flags;
+
+	return( 1 );
+}
+

@@ -82,13 +82,13 @@ struct libfsntfs_internal_file_entry
 	 */
 	libfsntfs_security_descriptor_values_t *security_descriptor_values;
 
-	/* The data size
-	 */
-	size64_t data_size;
-
 	/* The default (nameless) $DATA attribute
 	 */
 	libfsntfs_mft_attribute_t *data_attribute;
+
+	/* The data extents array
+	 */
+	libcdata_array_t *extents_array;
 
 	/* The attributes array
 	 */

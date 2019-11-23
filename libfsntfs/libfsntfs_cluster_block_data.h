@@ -1,5 +1,5 @@
 /*
- * The cluster block data handle functions
+ * Cluster block data functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_CLUSTER_BLOCK_DATA_HANDLE_H )
-#define _LIBFSNTFS_CLUSTER_BLOCK_DATA_HANDLE_H
+#if !defined( _LIBFSNTFS_CLUSTER_BLOCK_DATA_H )
+#define _LIBFSNTFS_CLUSTER_BLOCK_DATA_H
 
 #include <common.h>
 #include <types.h>
@@ -28,47 +28,14 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
-#include "libfsntfs_mft_attribute.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libfsntfs_cluster_block_data_handle libfsntfs_cluster_block_data_handle_t;
-
-struct libfsntfs_cluster_block_data_handle
-{
-	/* The current offset
-	 */
-	off64_t current_offset;
-
-	/* The data size
-	 */
-	size64_t data_size;
-
-	/* The cluster block vector
-	 */
-	libfdata_vector_t *cluster_block_vector;
-
-	/* The cluster block cache
-	 */
-	libfcache_cache_t *cluster_block_cache;
-};
-
-int libfsntfs_cluster_block_data_handle_initialize(
-     libfsntfs_cluster_block_data_handle_t **data_handle,
-     libfsntfs_io_handle_t *io_handle,
-     libfsntfs_mft_attribute_t *mft_attribute,
-     libcerror_error_t **error );
-
-int libfsntfs_cluster_block_data_handle_free(
-     libfsntfs_cluster_block_data_handle_t **data_handle,
-     libcerror_error_t **error );
-
-ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
-         libfsntfs_cluster_block_data_handle_t *data_handle,
+ssize_t libfsntfs_cluster_block_data_read_segment_data(
+         intptr_t *data_handle,
          libbfio_handle_t *file_io_handle,
          int segment_index,
          int segment_file_index,
@@ -78,9 +45,9 @@ ssize_t libfsntfs_cluster_block_data_handle_read_segment_data(
          uint8_t read_flags,
          libcerror_error_t **error );
 
-off64_t libfsntfs_cluster_block_data_handle_seek_segment_offset(
-         libfsntfs_cluster_block_data_handle_t *data_handle,
-         intptr_t *file_io_handle,
+off64_t libfsntfs_cluster_block_data_seek_segment_offset(
+         intptr_t *data_handle,
+         libbfio_handle_t *file_io_handle,
          int segment_index,
          int segment_file_index,
          off64_t segment_offset,
@@ -90,5 +57,5 @@ off64_t libfsntfs_cluster_block_data_handle_seek_segment_offset(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_DATA_HANDLE_H ) */
+#endif /* !defined( _LIBFSNTFS_CLUSTER_BLOCK_DATA_H ) */
 

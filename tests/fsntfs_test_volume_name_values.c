@@ -33,6 +33,7 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
 #include "../libfsntfs/libfsntfs_standard_information_values.h"
 #include "../libfsntfs/libfsntfs_volume_name_values.h"

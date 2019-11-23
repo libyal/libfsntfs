@@ -28,7 +28,9 @@
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
@@ -49,13 +51,19 @@ struct libfsntfs_internal_data_stream
 	 */
 	libfsntfs_mft_attribute_t *data_attribute;
 
+	/* The data extents array
+	 */
+	libcdata_array_t *extents_array;
+
 	/* The $DATA attribute cluster block stream
 	 */
 	libfdata_stream_t *data_cluster_block_stream;
 
-	/* The data size
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
 	 */
-	size64_t data_size;
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libfsntfs_data_stream_initialize(

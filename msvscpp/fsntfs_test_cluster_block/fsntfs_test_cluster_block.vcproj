@@ -206,14 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_libfcache.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libfdata.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_libfsntfs.h"
 				>
 			</File>

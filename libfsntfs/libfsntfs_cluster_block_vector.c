@@ -27,9 +27,11 @@
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_unused.h"
 
 /* Creates a cluster block vector
  * Make sure the value cluster_block_vector is referencing, is set to NULL
@@ -128,7 +130,7 @@ int libfsntfs_cluster_block_vector_initialize(
 	     (intptr_t *) io_handle,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_cluster_block_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_cluster_block_vector_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -230,7 +232,7 @@ int libfsntfs_cluster_block_vector_initialize(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute: %d data runs array entry: %d.",
+				 "%s: unable to retrieve attribute: %d data run: %d.",
 				 function,
 				 attribute_index,
 				 data_run_index );
@@ -298,6 +300,124 @@ on_error:
 	{
 		libfdata_vector_free(
 		 &safe_cluster_block_vector,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads a cluster block
+ * Callback function for the cluster block vector
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_cluster_block_vector_read_element_data(
+     intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *vector,
+     libfdata_cache_t *cache,
+     int element_index LIBFSNTFS_ATTRIBUTE_UNUSED,
+     int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
+     off64_t cluster_block_offset,
+     size64_t cluster_block_size,
+     uint32_t range_flags,
+     uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+     libcerror_error_t **error )
+{
+	libfsntfs_cluster_block_t *cluster_block = NULL;
+	static char *function                    = "libfsntfs_cluster_block_vector_read_element_data";
+
+	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( element_index )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
+
+	if( ( cluster_block_size == 0 )
+	 || ( cluster_block_size > (size64_t) SSIZE_MAX ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid cluster block size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_cluster_block_initialize(
+	     &cluster_block,
+	     (size_t) cluster_block_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create cluster block.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	{
+		if( libfsntfs_cluster_block_clear(
+		     cluster_block,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to clear cluster block.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	else
+	{
+		if( libfsntfs_cluster_block_read_file_io_handle(
+		     cluster_block,
+		     file_io_handle,
+		     cluster_block_offset,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read cluster block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 function,
+			 cluster_block_offset,
+			 cluster_block_offset );
+
+			goto on_error;
+		}
+	}
+	if( libfdata_vector_set_element_value_by_index(
+	     vector,
+	     (intptr_t *) file_io_handle,
+	     cache,
+	     element_index,
+	     (intptr_t *) cluster_block,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_cluster_block_free,
+	     LIBFDATA_VECTOR_ELEMENT_VALUE_FLAG_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set cluster block as element value.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( cluster_block != NULL )
+	{
+		libfsntfs_cluster_block_free(
+		 &cluster_block,
 		 NULL );
 	}
 	return( -1 );

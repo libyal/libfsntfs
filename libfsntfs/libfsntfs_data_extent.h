@@ -56,6 +56,13 @@ int libfsntfs_data_extent_free(
      libfsntfs_data_extent_t **data_extent,
      libcerror_error_t **error );
 
+int libfsntfs_data_extent_get_values(
+     libfsntfs_data_extent_t *data_extent,
+     off64_t *extent_offset,
+     size64_t *extent_size,
+     uint32_t *extent_flags,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

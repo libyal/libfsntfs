@@ -270,6 +270,164 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_data_extent_get_values function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_data_extent_get_values(
+     void )
+{
+	libcerror_error_t *error             = NULL;
+	libfsntfs_data_extent_t *data_extent = NULL;
+	size64_t extent_size                 = 0;
+	off64_t extent_offset                = 0;
+	uint32_t extent_flags                = 0;
+	int result                           = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_data_extent_initialize(
+	          &data_extent,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "data_extent",
+	 data_extent );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_data_extent_get_values(
+	          data_extent,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_data_extent_get_values(
+	          NULL,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_data_extent_get_values(
+	          data_extent,
+	          NULL,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_data_extent_get_values(
+	          data_extent,
+	          &extent_offset,
+	          NULL,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_data_extent_get_values(
+	          data_extent,
+	          &extent_offset,
+	          &extent_size,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_data_extent_free(
+	          &data_extent,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "data_extent",
+	 data_extent );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -296,6 +454,10 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_data_extent_free",
 	 fsntfs_test_data_extent_free );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_data_extent_get_values",
+	 fsntfs_test_data_extent_get_values );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

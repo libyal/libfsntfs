@@ -203,7 +203,7 @@ int libfsntfs_txf_data_values_read_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported TxF data size: %" PRIzd "\n",
+		 "%s: unsupported TxF data values size: %" PRIzd "\n",
 		 function,
 		 data_size );
 

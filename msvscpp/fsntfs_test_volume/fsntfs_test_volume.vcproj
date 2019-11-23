@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\fsntfs_test_rwlock.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_volume.c"
 				>
 			</File>
@@ -235,6 +239,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_rwlock.h"
 				>
 			</File>
 			<File

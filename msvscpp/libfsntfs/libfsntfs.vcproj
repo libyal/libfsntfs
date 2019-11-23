@@ -198,7 +198,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data_handle.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data.c"
 				>
 			</File>
 			<File
@@ -516,7 +516,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data_handle.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_cluster_block_data.h"
 				>
 			</File>
 			<File

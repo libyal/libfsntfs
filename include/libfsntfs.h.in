@@ -1268,6 +1268,14 @@ int libfsntfs_reparse_point_attribute_get_tag(
      uint32_t *tag,
      libfsntfs_error_t **error );
 
+/* Retrieves the Windows Overlay Filter (WOF) compression_method
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_reparse_point_attribute_get_compression_method(
+     libfsntfs_attribute_t *attribute,
+     uint32_t *compression_method,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded substitute name
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if not available or -1 on error

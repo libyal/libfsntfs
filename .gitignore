@@ -132,7 +132,6 @@ stamp-h[1-9]
 /tests/fsntfs_test_bitmap_values
 /tests/fsntfs_test_buffer_data_handle
 /tests/fsntfs_test_cluster_block
-/tests/fsntfs_test_cluster_block_data_handle
 /tests/fsntfs_test_cluster_block_stream
 /tests/fsntfs_test_cluster_block_vector
 /tests/fsntfs_test_compressed_block

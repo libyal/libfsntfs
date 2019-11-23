@@ -25,7 +25,9 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_compression_unit_data_handle.h"
 #include "libfsntfs_io_handle.h"
+#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
@@ -38,6 +40,19 @@ int libfsntfs_compressed_block_vector_initialize(
      libfdata_vector_t **compressed_block_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *mft_attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_compressed_block_vector_read_element_data(
+     libfsntfs_compression_unit_data_handle_t *data_handle,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *vector,
+     libfdata_cache_t *cache,
+     int element_index,
+     int element_data_file_index,
+     off64_t element_data_offset,
+     size64_t compressed_block_size,
+     uint32_t range_flags,
+     uint8_t read_flags,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 
 #if defined( __cplusplus )
@@ -35,6 +36,10 @@ typedef struct libfsntfs_data_run libfsntfs_data_run_t;
 
 struct libfsntfs_data_run
 {
+	/* The cluster block number
+	 */
+	uint64_t cluster_block_number;
+
 	/* The start offset
 	 */
 	off64_t start_offset;
@@ -55,6 +60,14 @@ int libfsntfs_data_run_initialize(
 int libfsntfs_data_run_free(
      libfsntfs_data_run_t **data_run,
      libcerror_error_t **error );
+
+ssize_t libfsntfs_data_run_read_data(
+         libfsntfs_data_run_t *data_run,
+         libfsntfs_io_handle_t *io_handle,
+         const uint8_t *data,
+         size_t data_size,
+         uint64_t last_cluster_block_number,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

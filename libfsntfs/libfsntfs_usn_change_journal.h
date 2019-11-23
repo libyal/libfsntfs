@@ -28,6 +28,7 @@
 #include "libfsntfs_extern.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 

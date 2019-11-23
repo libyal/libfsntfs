@@ -1,5 +1,5 @@
 /*
- * Compressed block descriptor functions
+ * Compression unit descriptor functions
  *
  * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -69,25 +69,6 @@ int libfsntfs_compression_unit_descriptor_append_data_segment(
      size64_t segment_size,
      uint32_t segment_flags,
      libcerror_error_t **error );
-
-ssize_t libfsntfs_compression_unit_descriptor_read_segment_data(
-         intptr_t *data_handle,
-         libbfio_handle_t *file_io_handle,
-         int segment_index,
-         int segment_file_index,
-         uint8_t *segment_data,
-         size_t segment_data_size,
-         uint32_t segment_flags,
-         uint8_t read_flags,
-         libcerror_error_t **error );
-
-off64_t libfsntfs_compression_unit_descriptor_seek_segment_offset(
-         intptr_t *data_handle,
-         libbfio_handle_t *file_io_handle,
-         int segment_index,
-         int segment_file_index,
-         off64_t segment_offset,
-         libcerror_error_t **error );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 

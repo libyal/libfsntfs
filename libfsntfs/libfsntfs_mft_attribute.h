@@ -208,6 +208,12 @@ int libfsntfs_mft_attribute_get_data_run_by_index(
      libfsntfs_data_run_t **data_run,
      libcerror_error_t **error );
 
+int libfsntfs_mft_attribute_get_data_extents_array(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     libfsntfs_io_handle_t *io_handle,
+     libcdata_array_t **data_extents_array,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_attribute_get_next_attribute(
      libfsntfs_mft_attribute_t *mft_attribute,
      libfsntfs_mft_attribute_t **next_attribute,

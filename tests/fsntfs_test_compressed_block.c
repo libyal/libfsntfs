@@ -27,8 +27,6 @@
 #include <stdlib.h>
 #endif
 
-#include "fsntfs_test_functions.h"
-#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
@@ -320,8 +318,6 @@ int main(
 	FSNTFS_TEST_RUN(
 	 "libfsntfs_compressed_block_free",
 	 fsntfs_test_compressed_block_free );
-
-	/* TODO: add tests for libfsntfs_compressed_block_read_element_data */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
