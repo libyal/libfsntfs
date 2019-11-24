@@ -29,15 +29,14 @@
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
+#include "libfsntfs_file_system.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
-#include "libfsntfs_mft.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
-#include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
@@ -58,9 +57,9 @@ struct libfsntfs_internal_file_entry
 	 */
 	libbfio_handle_t *file_io_handle;
 
-	/* The MFT
+	/* The file system
 	 */
-	libfsntfs_mft_t *mft;
+	libfsntfs_file_system_t *file_system;
 
 	/* The MFT entry
 	 */
@@ -73,10 +72,6 @@ struct libfsntfs_internal_file_entry
 	/* The directory entries tree
 	 */
 	libfsntfs_directory_entries_tree_t *directory_entries_tree;
-
-	/* The security descriptor index
-	 */
-	libfsntfs_security_descriptor_index_t *security_descriptor_index;
 
 	/* The security descriptor values
 	 */
@@ -125,8 +120,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_t *mft,
-     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libfsntfs_file_system_t *file_system,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,

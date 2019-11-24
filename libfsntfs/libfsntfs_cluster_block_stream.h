@@ -53,7 +53,7 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
      libfdata_stream_t **cluster_block_stream,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *data_attribute,
-     size64_t uncompressed_data_size,
+     size64_t data_size,
      libcerror_error_t **error );
 
 int libfsntfs_cluster_block_stream_initialize_from_compressed_stream(

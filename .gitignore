@@ -150,6 +150,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_file_entry
 /tests/fsntfs_test_file_name_attribute
 /tests/fsntfs_test_file_name_values
+/tests/fsntfs_test_file_system
 /tests/fsntfs_test_fixup_values
 /tests/fsntfs_test_index
 /tests/fsntfs_test_index_entry

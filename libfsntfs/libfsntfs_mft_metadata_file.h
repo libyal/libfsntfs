@@ -30,7 +30,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
-#include "libfsntfs_mft.h"
+#include "libfsntfs_file_system.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -57,9 +57,9 @@ struct libfsntfs_internal_mft_metadata_file
 	 */
 	libfsntfs_io_handle_t *io_handle;
 
-	/* The MFT
+	/* The file system
 	 */
-	libfsntfs_mft_t *mft;
+	libfsntfs_file_system_t *file_system;
 
 	/* The volume MFT entry
 	 */

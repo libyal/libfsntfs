@@ -1,5 +1,6 @@
 TODO
 * complete read/write lock support
+** refactor volume and file entry to use file system
 ** file entry
 *** libfsntfs_file_entry_get_name_attribute_index
 *** libfsntfs_file_entry_get_security_descriptor_size
@@ -17,6 +18,9 @@ TODO
 ** add support for tsk metadata address calculation? inside MFT attribute?
 
 * fsntfsinfo -F add support for ADS notation
+
+* API changes
+** rename libfsntfs_volume_get_number_of_file_entries to libfsntfs_volume_get_number_of_mft_entries
 
 * change libfsntfs_mft_attribute_get_utf[8,16]_name[_size] to return 0 if not set
 

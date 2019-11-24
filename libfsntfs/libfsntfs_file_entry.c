@@ -53,8 +53,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_t *mft,
-     libfsntfs_security_descriptor_index_t *security_descriptor_index,
+     libfsntfs_file_system_t *file_system,
      libfsntfs_mft_entry_t *mft_entry,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,
@@ -101,13 +100,13 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( mft == NULL )
+	if( file_system == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT.",
+		 "%s: invalid file system.",
 		 function );
 
 		return( -1 );
@@ -287,14 +286,13 @@ int libfsntfs_file_entry_initialize(
 		goto on_error;
 	}
 #endif
-	internal_file_entry->io_handle                 = io_handle;
-	internal_file_entry->file_io_handle            = file_io_handle;
-	internal_file_entry->mft                       = mft;
-	internal_file_entry->security_descriptor_index = security_descriptor_index;
-	internal_file_entry->mft_entry                 = mft_entry;
-	internal_file_entry->directory_entry           = directory_entry;
-	internal_file_entry->data_attribute            = mft_entry->data_attribute;
-	internal_file_entry->flags                     = flags;
+	internal_file_entry->io_handle       = io_handle;
+	internal_file_entry->file_io_handle  = file_io_handle;
+	internal_file_entry->file_system     = file_system;
+	internal_file_entry->mft_entry       = mft_entry;
+	internal_file_entry->directory_entry = directory_entry;
+	internal_file_entry->data_attribute  = mft_entry->data_attribute;
+	internal_file_entry->flags           = flags;
 
 	*file_entry = (libfsntfs_file_entry_t *) internal_file_entry;
 
@@ -370,7 +368,7 @@ int libfsntfs_file_entry_free(
 			result = -1;
 		}
 #endif
-		/* The file_io_handle, io_handle, mft and security_descriptor_index references are freed elsewhere
+		/* The file_io_handle, io_handle and file_system references are freed elsewhere
 		 */
 		if( internal_file_entry->data_cluster_block_stream != NULL )
 		{
@@ -3593,10 +3591,6 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 	}
 	else if( result != 0 )
 	{
-		if( internal_file_entry->security_descriptor_index == NULL )
-		{
-			return( 0 );
-		}
 		if( libfsntfs_internal_attribute_get_value(
 		     (libfsntfs_internal_attribute_t *) security_descriptor_attribute,
 		     (intptr_t **) &security_descriptor_values,
@@ -3664,12 +3658,14 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 
 				goto on_error;
 			}
-			if( libfsntfs_security_descriptor_index_get_entry_by_identifier(
-			     internal_file_entry->security_descriptor_index,
-			     internal_file_entry->file_io_handle,
-			     security_descriptor_identifier,
-			     &( internal_file_entry->security_descriptor_values ),
-			     error ) != 1 )
+			result = libfsntfs_file_system_get_security_descriptor_values_by_identifier(
+			          internal_file_entry->file_system,
+			          internal_file_entry->file_io_handle,
+			          security_descriptor_identifier,
+			          &( internal_file_entry->security_descriptor_values ),
+			          error );
+
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3680,6 +3676,10 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 				 security_descriptor_identifier );
 
 				goto on_error;
+			}
+			else if( result == 0 )
+			{
+				return( 0 );
 			}
 			/* file_entry takes over management of security_descriptor_values
 			 */
@@ -3763,10 +3763,6 @@ int libfsntfs_file_entry_get_security_descriptor(
 	}
 	else if( result != 0 )
 	{
-		if( internal_file_entry->security_descriptor_index == NULL )
-		{
-			return( 0 );
-		}
 		if( libfsntfs_internal_attribute_get_value(
 		     (libfsntfs_internal_attribute_t *) security_descriptor_attribute,
 		     (intptr_t **) &security_descriptor_values,
@@ -3834,12 +3830,14 @@ int libfsntfs_file_entry_get_security_descriptor(
 
 				goto on_error;
 			}
-			if( libfsntfs_security_descriptor_index_get_entry_by_identifier(
-			     internal_file_entry->security_descriptor_index,
-			     internal_file_entry->file_io_handle,
-			     security_descriptor_identifier,
-			     &( internal_file_entry->security_descriptor_values ),
-			     error ) != 1 )
+			result = libfsntfs_file_system_get_security_descriptor_values_by_identifier(
+			          internal_file_entry->file_system,
+			          internal_file_entry->file_io_handle,
+			          security_descriptor_identifier,
+			          &( internal_file_entry->security_descriptor_values ),
+			          error );
+
+			if( result == -1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -3850,6 +3848,10 @@ int libfsntfs_file_entry_get_security_descriptor(
 				 security_descriptor_identifier );
 
 				goto on_error;
+			}
+			else if( result == 0 )
+			{
+				return( 0 );
 			}
 			/* file_entry takes over management of security_descriptor_values
 			 */
@@ -4954,8 +4956,8 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->mft,
+	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
+	     internal_file_entry->file_system,
 	     internal_file_entry->file_io_handle,
 	     mft_entry_index,
 	     &mft_entry,
@@ -4977,8 +4979,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
-	     internal_file_entry->mft,
-	     internal_file_entry->security_descriptor_index,
+	     internal_file_entry->file_system,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
@@ -5103,8 +5104,8 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->mft,
+	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
+	     internal_file_entry->file_system,
 	     internal_file_entry->file_io_handle,
 	     mft_entry_index,
 	     &mft_entry,
@@ -5126,8 +5127,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
-	     internal_file_entry->mft,
-	     internal_file_entry->security_descriptor_index,
+	     internal_file_entry->file_system,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
@@ -5251,8 +5251,8 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->mft,
+	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
+	     internal_file_entry->file_system,
 	     internal_file_entry->file_io_handle,
 	     mft_entry_index,
 	     &mft_entry,
@@ -5274,8 +5274,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
-	     internal_file_entry->mft,
-	     internal_file_entry->security_descriptor_index,
+	     internal_file_entry->file_system,
 	     mft_entry,
 	     sub_directory_entry,
 	     internal_file_entry->flags,

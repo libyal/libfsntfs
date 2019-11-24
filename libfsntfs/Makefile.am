@@ -64,6 +64,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_file_entry.c libfsntfs_file_entry.h \
 	libfsntfs_file_name_attribute.c libfsntfs_file_name_attribute.h \
 	libfsntfs_file_name_values.c libfsntfs_file_name_values.h \
+	libfsntfs_file_system.c libfsntfs_file_system.h \
 	libfsntfs_fixup_values.c libfsntfs_fixup_values.h \
 	libfsntfs_index.c libfsntfs_index.h \
 	libfsntfs_index_entry.c libfsntfs_index_entry.h \

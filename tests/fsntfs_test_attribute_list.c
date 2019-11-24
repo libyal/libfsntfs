@@ -270,6 +270,8 @@ int fsntfs_test_attribute_list_read_from_attribute(
 	 "error",
 	 error );
 
+	io_handle->cluster_block_size = 4096;
+
 	result = libfsntfs_mft_attribute_initialize(
 	          &mft_attribute,
 	          &error );

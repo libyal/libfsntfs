@@ -66,6 +66,7 @@ check_PROGRAMS = \
 	fsntfs_test_file_entry \
 	fsntfs_test_file_name_attribute \
 	fsntfs_test_file_name_values \
+	fsntfs_test_file_system \
 	fsntfs_test_fixup_values \
 	fsntfs_test_index \
 	fsntfs_test_index_entry \
@@ -364,6 +365,8 @@ fsntfs_test_data_run_LDADD = \
 
 fsntfs_test_data_stream_SOURCES = \
 	fsntfs_test_data_stream.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -372,6 +375,14 @@ fsntfs_test_data_stream_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_data_stream_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
@@ -448,6 +459,20 @@ fsntfs_test_file_name_values_SOURCES = \
 fsntfs_test_file_name_values_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
+
+fsntfs_test_file_system_SOURCES = \
+	fsntfs_test_file_system.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_rwlock.c fsntfs_test_rwlock.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_file_system_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 fsntfs_test_fixup_values_SOURCES = \
 	fsntfs_test_fixup_values.c \
@@ -581,6 +606,7 @@ fsntfs_test_mft_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_mft_attribute_SOURCES = \
+	fsntfs_test_libcdata.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -589,6 +615,7 @@ fsntfs_test_mft_attribute_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_mft_attribute_LDADD = \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -650,7 +677,6 @@ fsntfs_test_mft_metadata_file_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
-	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
 
@@ -862,7 +888,6 @@ fsntfs_test_volume_LDADD = \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
-	@LIBCTHREADS_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
 

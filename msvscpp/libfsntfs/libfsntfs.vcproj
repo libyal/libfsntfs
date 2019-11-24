@@ -278,6 +278,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_file_system.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_fixup_values.c"
 				>
 			</File>
@@ -601,6 +605,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_file_name_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_file_system.h"
 				>
 			</File>
 			<File

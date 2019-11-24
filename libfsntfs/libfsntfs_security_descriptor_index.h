@@ -74,7 +74,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
      libbfio_handle_t *file_io_handle,
      libfsntfs_index_node_t *index_node,
-     uint32_t security_descriptor_indentifier,
+     uint32_t security_descriptor_identifier,
      libfsntfs_security_descriptor_values_t **security_descriptor_values,
      int recursion_depth,
      libcerror_error_t **error );
@@ -82,7 +82,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 int libfsntfs_security_descriptor_index_get_entry_by_identifier(
      libfsntfs_security_descriptor_index_t *security_descriptor_index,
      libbfio_handle_t *file_io_handle,
-     uint32_t security_descriptor_indentifier,
+     uint32_t security_descriptor_identifier,
      libfsntfs_security_descriptor_values_t **security_descriptor_values,
      libcerror_error_t **error );
 

@@ -1502,6 +1502,8 @@ int fsntfs_test_mft_entry_read_attributes_data(
 	 "error",
 	 error );
 
+	io_handle->cluster_block_size = 4096;
+
 	result = libfsntfs_mft_entry_initialize(
 	          &mft_entry,
 	          &error );

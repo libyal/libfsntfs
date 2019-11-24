@@ -23,6 +23,7 @@ MSVSCPP_FILES = \
 	fsntfs_test_file_entry/fsntfs_test_file_entry.vcproj \
 	fsntfs_test_file_name_attribute/fsntfs_test_file_name_attribute.vcproj \
 	fsntfs_test_file_name_values/fsntfs_test_file_name_values.vcproj \
+	fsntfs_test_file_system/fsntfs_test_file_system.vcproj \
 	fsntfs_test_fixup_values/fsntfs_test_fixup_values.vcproj \
 	fsntfs_test_index/fsntfs_test_index.vcproj \
 	fsntfs_test_index_entry/fsntfs_test_index_entry.vcproj \

@@ -448,6 +448,8 @@ int fsntfs_test_internal_attribute_read_value(
 	 "error",
 	 error );
 
+	io_handle->cluster_block_size = 4096;
+
 	result = libfsntfs_mft_attribute_initialize(
 	          &mft_attribute,
 	          &error );
@@ -2413,6 +2415,8 @@ int main(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	io_handle->cluster_block_size = 4096;
 
 	result = libfsntfs_mft_attribute_initialize(
 	          &mft_attribute,

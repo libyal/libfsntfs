@@ -27,13 +27,13 @@
 
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
+#include "libfsntfs_file_system.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
-#include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume_header.h"
 
@@ -85,9 +85,9 @@ struct libfsntfs_internal_volume
 	 */
 	libfsntfs_attribute_t *volume_name_attribute;
 
-	/* The security descriptor index
+	/* The file system
 	 */
-	libfsntfs_security_descriptor_index_t *security_descriptor_index;
+	libfsntfs_file_system_t *file_system;
 
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
@@ -147,11 +147,6 @@ int libfsntfs_internal_volume_open_read(
      libcerror_error_t **error );
 
 int libfsntfs_internal_volume_read_bitmap(
-     libfsntfs_internal_volume_t *internal_volume,
-     libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error );
-
-int libfsntfs_internal_volume_read_security_descriptors(
      libfsntfs_internal_volume_t *internal_volume,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

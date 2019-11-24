@@ -83,6 +83,8 @@ int fsntfs_test_index_initialize(
 	 "error",
 	 error );
 
+	io_handle->cluster_block_size = 4096;
+
 	/* Test regular cases
 	 */
 	result = libfsntfs_index_initialize(

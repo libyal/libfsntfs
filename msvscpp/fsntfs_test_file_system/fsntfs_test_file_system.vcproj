@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_mft_attribute"
-	ProjectGUID="{33B72873-D87D-480A-8371-3334AEE49B6C}"
-	RootNamespace="fsntfs_test_mft_attribute"
+	Name="fsntfs_test_file_system"
+	ProjectGUID="{F09A00EE-2E4A-4E6A-90F4-9501DAAC5262}"
+	RootNamespace="fsntfs_test_file_system"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\tests\fsntfs_test_file_system.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_mft_attribute.c"
+				RelativePath="..\..\tests\fsntfs_test_rwlock.c"
 				>
 			</File>
 		</Filter>
@@ -189,10 +193,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libcdata.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
@@ -207,6 +207,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_rwlock.h"
 				>
 			</File>
 			<File
