@@ -41,7 +41,7 @@
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
 
 /* Define to make fsntfs_test_file generate verbose output
-#define FSNTFS_TEST_DATA_HANDLE_VERBOSE
+#define FSNTFS_TEST_DATA_STREAM_VERBOSE
  */
 
 #define FSNTFS_TEST_DATA_STREAM_READ_BUFFER_SIZE	4096
@@ -2007,7 +2007,7 @@ int fsntfs_test_data_stream_read_buffer(
 
 		read_size = (size_t) random_number % FSNTFS_TEST_DATA_STREAM_READ_BUFFER_SIZE;
 
-#if defined( FSNTFS_TEST_DATA_HANDLE_VERBOSE )
+#if defined( FSNTFS_TEST_DATA_STREAM_VERBOSE )
 		fprintf(
 		 stdout,
 		 "libfsntfs_data_stream_read_buffer: at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIzd "\n",
@@ -2347,7 +2347,7 @@ int fsntfs_test_data_stream_read_buffer_at_offset(
 		}
 		read_size = (size_t) random_number % FSNTFS_TEST_DATA_STREAM_READ_BUFFER_SIZE;
 
-#if defined( FSNTFS_TEST_DATA_HANDLE_VERBOSE )
+#if defined( FSNTFS_TEST_DATA_STREAM_VERBOSE )
 		fprintf(
 		 stdout,
 		 "libfsntfs_data_stream_read_buffer_at_offset: at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIzd "\n",

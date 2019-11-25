@@ -54,7 +54,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_file_system_t *file_system,
-     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t mft_entry_index,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,
      libcerror_error_t **error )
@@ -63,6 +63,7 @@ int libfsntfs_file_entry_initialize(
 	libfsntfs_internal_file_entry_t *internal_file_entry     = NULL;
 	libfsntfs_mft_attribute_t *data_extents_attribute        = NULL;
 	libfsntfs_mft_attribute_t *wof_compressed_data_attribute = NULL;
+	libfsntfs_mft_entry_t *mft_entry                         = NULL;
 	static char *function                                    = "libfsntfs_file_entry_initialize";
 	uint32_t compression_method                              = 0;
 	int result                                               = 0;
@@ -111,17 +112,6 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry.",
-		 function );
-
-		return( -1 );
-	}
 	internal_file_entry = memory_allocate_structure(
 	                       libfsntfs_internal_file_entry_t );
 
@@ -150,6 +140,35 @@ int libfsntfs_file_entry_initialize(
 
 		memory_free(
 		 internal_file_entry );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
+	     file_system,
+	     file_io_handle,
+	     mft_entry_index,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
+
+		goto on_error;
+	}
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
 
 		return( -1 );
 	}
@@ -299,6 +318,12 @@ int libfsntfs_file_entry_initialize(
 	return( 1 );
 
 on_error:
+	if( mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 &mft_entry,
+		 NULL );
+	}
 	if( internal_file_entry != NULL )
 	{
 		if( internal_file_entry->data_cluster_block_stream != NULL )
@@ -4884,7 +4909,6 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 {
 	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_index";
 	uint64_t mft_entry_index                             = 0;
 
@@ -4956,31 +4980,14 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->file_system,
-	     internal_file_entry->file_io_handle,
-	     mft_entry_index,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
+	/* sub_file_entry takes over management of sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->file_system,
-	     mft_entry,
+	     mft_entry_index,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
@@ -4989,9 +4996,10 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry: %d.",
+		 "%s: unable to create sub file entry: %d with MFT entry: %" PRIu64 ".",
 		 function,
-		 sub_file_entry_index );
+		 sub_file_entry_index,
+		 mft_entry_index );
 
 		goto on_error;
 	}
@@ -5002,12 +5010,6 @@ on_error:
 	{
 		libfsntfs_directory_entry_free(
 		 &sub_directory_entry,
-		 NULL );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
 		 NULL );
 	}
 	return( -1 );
@@ -5025,7 +5027,6 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 {
 	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf8_name";
 	uint64_t mft_entry_index                             = 0;
 	int result                                           = 0;
@@ -5104,31 +5105,14 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->file_system,
-	     internal_file_entry->file_io_handle,
-	     mft_entry_index,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
+	/* sub_file_entry takes over management of sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->file_system,
-	     mft_entry,
+	     mft_entry_index,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
@@ -5137,8 +5121,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry.",
-		 function );
+		 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
 
 		goto on_error;
 	}
@@ -5149,12 +5134,6 @@ on_error:
 	{
 		libfsntfs_directory_entry_free(
 		 &sub_directory_entry,
-		 NULL );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
 		 NULL );
 	}
 	return( -1 );
@@ -5172,7 +5151,6 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 {
 	libfsntfs_directory_entry_t *sub_directory_entry     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	libfsntfs_mft_entry_t *mft_entry                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_utf16_name";
 	uint64_t mft_entry_index                             = 0;
 	int result                                           = 0;
@@ -5251,31 +5229,14 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-	     internal_file_entry->file_system,
-	     internal_file_entry->file_io_handle,
-	     mft_entry_index,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
-	}
-	/* sub_file_entry takes over management of mft_entry and sub_directory_entry
+	/* sub_file_entry takes over management of sub_directory_entry
 	 */
 	if( libfsntfs_file_entry_initialize(
 	     sub_file_entry,
 	     internal_file_entry->io_handle,
 	     internal_file_entry->file_io_handle,
 	     internal_file_entry->file_system,
-	     mft_entry,
+	     mft_entry_index,
 	     sub_directory_entry,
 	     internal_file_entry->flags,
 	     error ) != 1 )
@@ -5284,8 +5245,9 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry.",
-		 function );
+		 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
 
 		goto on_error;
 	}
@@ -5296,12 +5258,6 @@ on_error:
 	{
 		libfsntfs_directory_entry_free(
 		 &sub_directory_entry,
-		 NULL );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
 		 NULL );
 	}
 	return( -1 );

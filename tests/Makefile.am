@@ -424,6 +424,8 @@ fsntfs_test_error_LDADD = \
 
 fsntfs_test_file_entry_SOURCES = \
 	fsntfs_test_file_entry.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -432,6 +434,14 @@ fsntfs_test_file_entry_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_file_entry_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
@@ -462,6 +472,8 @@ fsntfs_test_file_name_values_LDADD = \
 
 fsntfs_test_file_system_SOURCES = \
 	fsntfs_test_file_system.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -470,6 +482,14 @@ fsntfs_test_file_system_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_file_system_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@

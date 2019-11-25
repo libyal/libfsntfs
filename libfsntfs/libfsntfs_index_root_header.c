@@ -282,3 +282,77 @@ int libfsntfs_index_root_header_get_index_entry_size(
 	return( 1 );
 }
 
+/* Retrieves the attribute type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_root_header_get_attribute_type(
+     libfsntfs_index_root_header_t *index_root_header,
+     uint32_t *attribute_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_root_header_get_attribute_type";
+
+	if( index_root_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index root header.",
+		 function );
+
+		return( -1 );
+	}
+	if( attribute_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute type.",
+		 function );
+
+		return( -1 );
+	}
+	*attribute_type = index_root_header->attribute_type;
+
+	return( 1 );
+}
+
+/* Retrieves the collation type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_root_header_get_collation_type(
+     libfsntfs_index_root_header_t *index_root_header,
+     uint32_t *collation_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_root_header_get_collation_type";
+
+	if( index_root_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index root header.",
+		 function );
+
+		return( -1 );
+	}
+	if( collation_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid collation type.",
+		 function );
+
+		return( -1 );
+	}
+	*collation_type = index_root_header->collation_type;
+
+	return( 1 );
+}
+

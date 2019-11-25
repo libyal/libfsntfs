@@ -319,7 +319,7 @@ int libfsntfs_file_system_read_mft(
 	     io_handle,
 	     file_io_handle,
 	     mft_offset,
-	     0,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_MFT,
 	     mft_entry,
 	     flags,
 	     error ) != 1 )
@@ -328,8 +328,9 @@ int libfsntfs_file_system_read_mft(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT entry: 0.",
-		 function );
+		 "%s: unable to read MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_MFT );
 
 		goto on_error;
 	}

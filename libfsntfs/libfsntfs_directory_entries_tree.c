@@ -730,8 +730,10 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_directory_entries_tree_read_from_i30_index";
-	int result            = 0;
+	static char *function   = "libfsntfs_directory_entries_tree_read_from_i30_index";
+	int result              = 0;
+	uint32_t attribute_type = 0;
+	uint32_t collation_type = 0;
 
 	if( directory_entries_tree == NULL )
 	{
@@ -795,6 +797,56 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
 	}
 	else if( result != 0 )
 	{
+		if( libfsntfs_index_get_attribute_type(
+		     directory_entries_tree->i30_index,
+		     &attribute_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute type from index.",
+			 function );
+
+			goto on_error;
+		}
+		if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported index attribute type.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_index_get_collation_type(
+		     directory_entries_tree->i30_index,
+		     &collation_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve collation type from index.",
+			 function );
+
+			goto on_error;
+		}
+		if( collation_type != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported index collation type.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfdata_list_initialize(
 		     &( directory_entries_tree->entries_list ),
 		     (intptr_t *) directory_entries_tree,
@@ -1863,6 +1915,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	static char *function                                 = "libfsntfs_directory_entries_tree_read_element_data";
 	off64_t index_entry_offset                            = 0;
 	off64_t sub_node_vcn                                  = 0;
+	uint32_t index_entry_size                             = 0;
 	int index_value_entry                                 = 0;
 	int result                                            = 0;
 
@@ -1952,7 +2005,21 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	}
 	else
 	{
-		sub_node_vcn       = index_value_offset / directory_entries_tree->i30_index->index_entry_size;
+		if( libfsntfs_index_get_index_entry_size(
+		     directory_entries_tree->i30_index,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
+
+			goto on_error;
+		}
+		sub_node_vcn       = index_value_offset / index_entry_size;
 		index_entry_offset = (off64_t) ( sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
 		if( libfsntfs_index_get_sub_node(

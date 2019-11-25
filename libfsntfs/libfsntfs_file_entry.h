@@ -121,7 +121,7 @@ int libfsntfs_file_entry_initialize(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_file_system_t *file_system,
-     libfsntfs_mft_entry_t *mft_entry,
+     uint64_t mft_entry_index,
      libfsntfs_directory_entry_t *directory_entry,
      uint8_t flags,
      libcerror_error_t **error );

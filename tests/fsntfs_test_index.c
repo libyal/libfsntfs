@@ -468,6 +468,14 @@ int main(
 
 	/* TODO: add tests for libfsntfs_index_read_bitmap */
 
+	/* TODO: add tests for libfsntfs_index_get_index_entry_size */
+
+	/* TODO: add tests for libfsntfs_index_get_attribute_type */
+
+	/* TODO: add tests for libfsntfs_index_get_collation_type */
+
+	/* TODO: add tests for libfsntfs_index_get_sub_node */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );

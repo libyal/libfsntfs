@@ -54,10 +54,6 @@ struct libfsntfs_mft_entry
 	 */
 	size_t data_size;
 
-	/* The flags
-	 */
-	uint16_t flags;
-
 	/* The index
 	 */
 	uint32_t index;

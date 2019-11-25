@@ -68,6 +68,16 @@ int libfsntfs_index_root_header_get_index_entry_size(
      uint32_t *index_entry_size,
      libcerror_error_t **error );
 
+int libfsntfs_index_root_header_get_attribute_type(
+     libfsntfs_index_root_header_t *index_root_header,
+     uint32_t *attribute_type,
+     libcerror_error_t **error );
+
+int libfsntfs_index_root_header_get_collation_type(
+     libfsntfs_index_root_header_t *index_root_header,
+     uint32_t *collation_type,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

@@ -2579,8 +2579,8 @@ int libfsntfs_volume_get_file_entry_by_index(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_file_entry_by_index";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -2632,31 +2632,12 @@ int libfsntfs_volume_get_file_entry_by_index(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-	     internal_volume->file_system,
-	     internal_volume->file_io_handle,
-	     mft_entry_index,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: %" PRIi64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
-	}
-	/* file_entry takes over management of mft_entry
-	 */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
 	     internal_volume->file_system,
-	     mft_entry,
+	     mft_entry_index,
 	     NULL,
 	     0,
 	     error ) != 1 )
@@ -2665,10 +2646,11 @@ int libfsntfs_volume_get_file_entry_by_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file entry.",
-		 function );
+		 "%s: unable to create file entry with MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -2685,21 +2667,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_volume->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the MFT entry for an UTF-8 encoded path
@@ -3109,31 +3077,14 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-		     internal_volume->file_system,
-		     internal_volume->file_io_handle,
-		     (uint64_t) mft_entry->index,
-		     &mft_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: %" PRIu32 ".",
-			 function,
-			 mft_entry->index );
-
-			goto on_error;
-		}
-		/* file_entry takes over management of mft_entry and directory_entry
+		/* file_entry takes over management of directory_entry
 		 */
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     internal_volume->file_system,
-		     mft_entry,
+		     (uint64_t) mft_entry->index,
 		     directory_entry,
 		     0,
 		     error ) != 1 )
@@ -3142,12 +3093,9 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create file entry.",
-			 function );
-
-			libfsntfs_mft_entry_free(
-			 &mft_entry,
-			 NULL );
+			 "%s: unable to create file entry with MFT entry: %" PRIu32 ".",
+			 function,
+			 mft_entry->index );
 
 			goto on_error;
 		}
@@ -3591,31 +3539,14 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-		     internal_volume->file_system,
-		     internal_volume->file_io_handle,
-		     (uint64_t) mft_entry->index,
-		     &mft_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: %" PRIu32 ".",
-			 function,
-			 mft_entry->index );
-
-			goto on_error;
-		}
-		/* file_entry takes over management of mft_entry and directory_entry
+		/* file_entry takes over management of directory_entry
 		 */
 		if( libfsntfs_file_entry_initialize(
 		     file_entry,
 		     internal_volume->io_handle,
 		     internal_volume->file_io_handle,
 		     internal_volume->file_system,
-		     mft_entry,
+		     (uint64_t) mft_entry->index,
 		     directory_entry,
 		     0,
 		     error ) != 1 )
@@ -3624,12 +3555,9 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create file entry.",
-			 function );
-
-			libfsntfs_mft_entry_free(
-			 &mft_entry,
-			 NULL );
+			 "%s: unable to create file entry with MFT entry: %" PRIu32 ".",
+			 function,
+			 mft_entry->index );
 
 			goto on_error;
 		}
@@ -3675,8 +3603,8 @@ int libfsntfs_volume_get_root_directory(
      libcerror_error_t **error )
 {
 	libfsntfs_internal_volume_t *internal_volume = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
 	static char *function                        = "libfsntfs_volume_get_root_directory";
+	int result                                   = 1;
 
 	if( volume == NULL )
 	{
@@ -3728,30 +3656,12 @@ int libfsntfs_volume_get_root_directory(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_file_system_get_mft_entry_by_index_no_cache(
-	     internal_volume->file_system,
-	     internal_volume->file_io_handle,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     &mft_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry: 5.",
-		 function );
-
-		goto on_error;
-	}
-	/* file_entry takes over management of mft_entry
-	 */
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_volume->io_handle,
 	     internal_volume->file_io_handle,
 	     internal_volume->file_system,
-	     mft_entry,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
 	     NULL,
 	     0,
 	     error ) != 1 )
@@ -3760,10 +3670,11 @@ int libfsntfs_volume_get_root_directory(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file entry.",
-		 function );
+		 "%s: unable to create file entry from MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY );
 
-		goto on_error;
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -3780,21 +3691,7 @@ int libfsntfs_volume_get_root_directory(
 		return( -1 );
 	}
 #endif
-	return( 1 );
-
-on_error:
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_volume->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the USN change journal

@@ -222,8 +222,10 @@ int libfsntfs_security_descriptor_index_read_sii_index(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_security_descriptor_index_read_sii_index";
-	int result            = 0;
+	static char *function   = "libfsntfs_security_descriptor_index_read_sii_index";
+	uint32_t attribute_type = 0;
+	uint32_t collation_type = 0;
+	int result              = 0;
 
 	if( security_descriptor_index == NULL )
 	{
@@ -280,6 +282,59 @@ int libfsntfs_security_descriptor_index_read_sii_index(
 		 function );
 
 		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_index_get_attribute_type(
+		     security_descriptor_index->sii_index,
+		     &attribute_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute type from index.",
+			 function );
+
+			goto on_error;
+		}
+		if( attribute_type != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported index attribute type.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_index_get_collation_type(
+		     security_descriptor_index->sii_index,
+		     &collation_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve collation type from index.",
+			 function );
+
+			goto on_error;
+		}
+		if( collation_type != 16 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported index collation type.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 

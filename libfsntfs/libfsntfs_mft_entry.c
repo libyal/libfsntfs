@@ -1606,7 +1606,18 @@ int libfsntfs_mft_entry_is_allocated(
 
 		return( -1 );
 	}
-	if( ( mft_entry->flags & LIBFSNTFS_MFT_ENTRY_FLAG_IN_USE ) != 0 )
+	if( mft_entry->header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT entry - missing header.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_entry->header->flags & LIBFSNTFS_MFT_ENTRY_FLAG_IN_USE ) != 0 )
 	{
 		return( 1 );
 	}

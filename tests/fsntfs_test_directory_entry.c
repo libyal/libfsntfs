@@ -35,6 +35,14 @@
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_directory_entry.h"
+#include "../libfsntfs/libfsntfs_file_name_values.h"
+
+uint8_t fsntfs_test_directory_entry_data1[ 74 ] = {
+	0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x73, 0xbc, 0x83, 0x5d, 0xeb, 0xa4, 0xd4, 0x01,
+	0x73, 0xbc, 0x83, 0x5d, 0xeb, 0xa4, 0xd4, 0x01, 0x73, 0xbc, 0x83, 0x5d, 0xeb, 0xa4, 0xd4, 0x01,
+	0x73, 0xbc, 0x83, 0x5d, 0xeb, 0xa4, 0xd4, 0x01, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x04, 0x03, 0x24, 0x00, 0x4d, 0x00, 0x46, 0x00, 0x54, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -301,6 +309,8 @@ int fsntfs_test_directory_entry_clone(
 	 "error",
 	 error );
 
+/* TODO add file name values */
+
 	/* Test regular cases
 	 */
 	result = libfsntfs_directory_entry_clone(
@@ -447,8 +457,6 @@ int fsntfs_test_directory_entry_compare_by_file_reference(
 	 "error",
 	 error );
 
-/* TODO add file name values */
-
 	result = libfsntfs_directory_entry_initialize(
 	          &second_directory_entry,
 	          &error );
@@ -465,8 +473,6 @@ int fsntfs_test_directory_entry_compare_by_file_reference(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-/* TODO add file name values */
 
 	/* Test regular cases
 	 */
@@ -800,6 +806,378 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_directory_entry_get_utf8_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entry_get_utf8_name_size(
+     libfsntfs_directory_entry_t *directory_entry )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_name_size    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_directory_entry_get_utf8_name_size(
+	          directory_entry,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entry_get_utf8_name_size(
+	          NULL,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf8_name_size(
+	          directory_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_directory_entry_get_utf8_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entry_get_utf8_name(
+     libfsntfs_directory_entry_t *directory_entry )
+{
+	uint8_t utf8_name[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_directory_entry_get_utf8_name(
+	          directory_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entry_get_utf8_name(
+	          NULL,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf8_name(
+	          directory_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf8_name(
+	          directory_entry,
+	          utf8_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf8_name(
+	          directory_entry,
+	          utf8_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_directory_entry_get_utf16_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entry_get_utf16_name_size(
+     libfsntfs_directory_entry_t *directory_entry )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_name_size   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_directory_entry_get_utf16_name_size(
+	          directory_entry,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entry_get_utf16_name_size(
+	          NULL,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf16_name_size(
+	          directory_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_directory_entry_get_utf16_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entry_get_utf16_name(
+     libfsntfs_directory_entry_t *directory_entry )
+{
+	uint16_t utf16_name[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_directory_entry_get_utf16_name(
+	          directory_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entry_get_utf16_name(
+	          NULL,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf16_name(
+	          directory_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf16_name(
+	          directory_entry,
+	          utf16_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entry_get_utf16_name(
+	          directory_entry,
+	          utf16_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -864,6 +1242,38 @@ int main(
 	 "error",
 	 error );
 
+	result = libfsntfs_file_name_values_initialize(
+	          &( directory_entry->file_name_values ),
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entry->file_name_values",
+	 directory_entry->file_name_values );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_file_name_values_read_data(
+	          directory_entry->file_name_values,
+	          fsntfs_test_directory_entry_data1,
+	          74,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Run tests
 	 */
 	FSNTFS_TEST_RUN_WITH_ARGS(
@@ -881,13 +1291,25 @@ int main(
 	 fsntfs_test_directory_entry_get_parent_file_reference,
 	 directory_entry );
 
-	/* TODO add tests for libfsntfs_directory_entry_get_utf8_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entry_get_utf8_name_size",
+	 fsntfs_test_directory_entry_get_utf8_name_size,
+	 directory_entry );
 
-	/* TODO add tests for libfsntfs_directory_entry_get_utf8_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entry_get_utf8_name",
+	 fsntfs_test_directory_entry_get_utf8_name,
+	 directory_entry );
 
-	/* TODO add tests for libfsntfs_directory_entry_get_utf16_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entry_get_utf16_name_size",
+	 fsntfs_test_directory_entry_get_utf16_name_size,
+	 directory_entry );
 
-	/* TODO add tests for libfsntfs_directory_entry_get_utf16_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entry_get_utf16_name",
+	 fsntfs_test_directory_entry_get_utf16_name,
+	 directory_entry );
 
 	/* Clean up
 	 */
@@ -914,9 +1336,8 @@ int main(
 
 	return( EXIT_SUCCESS );
 
-on_error:
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
-
+on_error:
 	if( error != NULL )
 	{
 		libcerror_error_free(
@@ -928,8 +1349,8 @@ on_error:
 		 &directory_entry,
 		 NULL );
 	}
-#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
-
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 

@@ -315,6 +315,7 @@ int libfsntfs_index_read(
 	libfsntfs_mft_attribute_t *mft_attribute              = NULL;
 	static char *function                                 = "libfsntfs_index_read";
 	uint32_t attribute_type                               = 0;
+	uint32_t index_entry_size                             = 0;
 	int attribute_index                                   = 0;
 	int number_of_attributes                              = 0;
 	int result                                            = 0;
@@ -498,11 +499,25 @@ int libfsntfs_index_read(
 	 */
 	if( index_allocation_attribute != NULL )
 	{
+		if( libfsntfs_index_root_header_get_index_entry_size(
+		     index->root_header,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_index_entry_vector_initialize(
 		     &( index->index_entry_vector ),
 		     index->io_handle,
 		     index_allocation_attribute,
-		     index->index_entry_size,
+		     index_entry_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -555,10 +570,14 @@ int libfsntfs_index_read_root(
      libfsntfs_mft_attribute_t *index_root_attribute,
      libcerror_error_t **error )
 {
-	uint8_t *data         = NULL;
-	static char *function = "libfsntfs_index_read_root";
-	size_t data_offset    = 0;
-	size_t data_size      = 0;
+	uint8_t *data             = NULL;
+	static char *function     = "libfsntfs_index_read_root";
+	size_t data_offset        = 0;
+	size_t data_size          = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint32_t index_entry_size = 0;
+#endif
 
 	if( index == NULL )
 	{
@@ -638,31 +657,31 @@ int libfsntfs_index_read_root(
 	}
 	data_offset = sizeof( fsntfs_index_root_header_t );
 
-	if( libfsntfs_index_root_header_get_index_entry_size(
-	     index->root_header,
-	     &( index->index_entry_size ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index entry size.",
-		 function );
-
-		goto on_error;
-	}
 /* TODO for directory entries index check if collation type is COLLATION_FILENAME */
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( index->index_entry_size != index->io_handle->index_entry_size )
+		if( libfsntfs_index_root_header_get_index_entry_size(
+		     index->root_header,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
+
+			goto on_error;
+		}
+		if( index_entry_size != index->io_handle->index_entry_size )
 		{
 			libcnotify_printf(
 			 "%s: mismatch in index entry size (in index root header: %" PRIu32 ", in volume header: %" PRIu32 ").\n",
 			 function,
-			 index->index_entry_size,
+			 index_entry_size,
 			 index->io_handle->index_entry_size );
 		}
 	}
@@ -833,6 +852,120 @@ on_error:
 	return( -1 );
 }
 
+/* Retrieves the index entry size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_get_index_entry_size(
+     libfsntfs_index_t *index,
+     uint32_t *index_entry_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_get_index_entry_size";
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_index_root_header_get_index_entry_size(
+	     index->root_header,
+	     index_entry_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size from root header.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the attribute type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_get_attribute_type(
+     libfsntfs_index_t *index,
+     uint32_t *attribute_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_get_attribute_type";
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_index_root_header_get_attribute_type(
+	     index->root_header,
+	     attribute_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute type from root header.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the collation type
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_get_collation_type(
+     libfsntfs_index_t *index,
+     uint32_t *collation_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_index_get_collation_type";
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_index_root_header_get_collation_type(
+	     index->root_header,
+	     collation_type,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve collation type from root header.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves an index node
  * Returns 1 if successful or -1 on error
  */
@@ -849,6 +982,7 @@ int libfsntfs_index_get_sub_node(
 	off64_t element_data_offset      = 0;
 
 #if defined( HAVE_PROFILER )
+	uint32_t index_entry_size        = 0;
 	int64_t profiler_start_timestamp = 0;
 #endif
 
@@ -877,6 +1011,20 @@ int libfsntfs_index_get_sub_node(
 #if defined( HAVE_PROFILER )
 	if( index->io_handle->profiler != NULL )
 	{
+		if( libfsntfs_index_root_header_get_index_entry_size(
+		     index->root_header,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_profiler_start_timing(
 		     index->io_handle->profiler,
 		     &profiler_start_timestamp,
@@ -923,7 +1071,7 @@ int libfsntfs_index_get_sub_node(
 		     profiler_start_timestamp,
 		     function,
 		     index_entry_offset,
-		     index->index_entry_size,
+		     index_entry_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

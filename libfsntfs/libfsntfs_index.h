@@ -56,10 +56,6 @@ struct libfsntfs_index
 	 */
 	uint16_t name_size;
 
-	/* The index entry size
-	 */
-	uint32_t index_entry_size;
-
 	/* The flags
 	 */
 	uint32_t flags;
@@ -109,6 +105,21 @@ int libfsntfs_index_read_bitmap(
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_attribute_t *bitmap_attribute,
      uint8_t flags,
+     libcerror_error_t **error );
+
+int libfsntfs_index_get_index_entry_size(
+     libfsntfs_index_t *index,
+     uint32_t *index_entry_size,
+     libcerror_error_t **error );
+
+int libfsntfs_index_get_attribute_type(
+     libfsntfs_index_t *index,
+     uint32_t *attribute_type,
+     libcerror_error_t **error );
+
+int libfsntfs_index_get_collation_type(
+     libfsntfs_index_t *index,
+     uint32_t *collation_type,
      libcerror_error_t **error );
 
 int libfsntfs_index_get_sub_node(
