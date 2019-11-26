@@ -1,6 +1,4 @@
 TODO
-* create file entry tests (WIP)
-
 * add raw (no valid size) data stream support
 * check data size of WOF reparse point
 * add has WOF compressed data stream function (for dfVFS)

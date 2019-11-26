@@ -48,6 +48,7 @@ check_PROGRAMS = \
 	fsntfs_test_bitmap_values \
 	fsntfs_test_buffer_data_handle \
 	fsntfs_test_cluster_block \
+	fsntfs_test_cluster_block_data \
 	fsntfs_test_cluster_block_stream \
 	fsntfs_test_cluster_block_vector \
 	fsntfs_test_compressed_block \
@@ -179,6 +180,27 @@ fsntfs_test_cluster_block_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_cluster_block_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_cluster_block_data_SOURCES = \
+	fsntfs_test_cluster_block_data.c \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_libbfio.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_cluster_block_data_LDADD = \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \

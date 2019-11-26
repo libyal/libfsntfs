@@ -38,8 +38,14 @@
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_definitions.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_attribute.h"
 #include "../libfsntfs/libfsntfs_mft_entry.h"
 #include "../libfsntfs/libfsntfs_mft_entry_header.h"
+
+/* Define to make fsntfs_test_file generate verbose output
+#define FSNTFS_TEST_MFT_ENTRY_VERBOSE
+ */
 
 uint8_t fsntfs_test_mft_entry_data1[ 1024 ] = {
 	0x46, 0x49, 0x4c, 0x45, 0x30, 0x00, 0x03, 0x00, 0x52, 0x51, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1696,25 +1702,72 @@ on_error:
 
 /* TODO: add tests for libfsntfs_mft_entry_read_attributes_from_attribute_list */
 
-/* TODO: add tests for libfsntfs_mft_entry_is_empty */
-
-/* TODO: add tests for libfsntfs_mft_entry_is_allocated */
-
-/* Tests the libfsntfs_mft_entry_get_file_reference function
+/* Tests the libfsntfs_mft_entry_is_empty function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_mft_entry_get_file_reference(
-     void )
+int fsntfs_test_mft_entry_is_empty(
+     libfsntfs_mft_entry_t *mft_entry )
 {
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	uint64_t file_reference          = 0;
-	int result                       = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
-	/* Initialize test
+	/* Test regular cases
 	 */
-	result = libfsntfs_mft_entry_initialize(
-	          &mft_entry,
+	result = libfsntfs_mft_entry_is_empty(
+	          mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_is_empty(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_entry_is_allocated function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_is_allocated(
+     libfsntfs_mft_entry_t *mft_entry )
+{
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_mft_entry_is_allocated(
+	          mft_entry,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1722,13 +1775,48 @@ int fsntfs_test_mft_entry_get_file_reference(
 	 result,
 	 1 );
 
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_entry",
-	 mft_entry );
-
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_is_allocated(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_entry_get_file_reference function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_get_file_reference(
+     libfsntfs_mft_entry_t *mft_entry )
+{
+	libcerror_error_t *error = NULL;
+	uint64_t file_reference  = 0;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -1782,25 +1870,6 @@ int fsntfs_test_mft_entry_get_file_reference(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libfsntfs_mft_entry_free(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -1808,12 +1877,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1822,31 +1885,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_entry_get_base_record_file_reference(
-     void )
+     libfsntfs_mft_entry_t *mft_entry )
 {
 	libcerror_error_t *error            = NULL;
-	libfsntfs_mft_entry_t *mft_entry    = NULL;
 	uint64_t base_record_file_reference = 0;
 	int result                          = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_mft_entry_initialize(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
 
 	/* Test regular cases
 	 */
@@ -1900,25 +1943,6 @@ int fsntfs_test_mft_entry_get_base_record_file_reference(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libfsntfs_mft_entry_free(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -1926,12 +1950,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -1940,31 +1958,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_entry_get_journal_sequence_number(
-     void )
+     libfsntfs_mft_entry_t *mft_entry )
 {
 	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
 	uint64_t journal_sequence_number = 0;
 	int result                       = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_mft_entry_initialize(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
 
 	/* Test regular cases
 	 */
@@ -2018,25 +2016,6 @@ int fsntfs_test_mft_entry_get_journal_sequence_number(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libfsntfs_mft_entry_free(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -2044,12 +2023,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -2058,31 +2031,11 @@ on_error:
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_entry_get_number_of_attributes(
-     void )
+     libfsntfs_mft_entry_t *mft_entry )
 {
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	int number_of_attributes         = 0;
-	int result                       = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_mft_entry_initialize(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error = NULL;
+	int number_of_attributes = 0;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
@@ -2095,6 +2048,11 @@ int fsntfs_test_mft_entry_get_number_of_attributes(
 	 "result",
 	 result,
 	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_attributes",
+	 number_of_attributes,
+	 4 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2136,10 +2094,28 @@ int fsntfs_test_mft_entry_get_number_of_attributes(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
+
+/* Tests the libfsntfs_mft_entry_get_attribute_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_get_attribute_by_index(
+     libfsntfs_mft_entry_t *mft_entry )
+{
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	int result                               = 0;
+
+	/* Test regular cases
 	 */
-	result = libfsntfs_mft_entry_free(
-	          &mft_entry,
+	result = libfsntfs_mft_entry_get_attribute_by_index(
+	          mft_entry,
+	          0,
+	          &mft_attribute,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -2147,74 +2123,102 @@ int fsntfs_test_mft_entry_get_number_of_attributes(
 	 result,
 	 1 );
 
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft_entry",
-	 mft_entry );
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_get_attribute_by_index(
+	          NULL,
+	          0,
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_get_attribute_by_index(
+	          mft_entry,
+	          -1,
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_get_attribute_by_index(
+	          mft_entry,
+	          0,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
-	}
 	return( 0 );
 }
-
-/* TODO: add tests for libfsntfs_mft_entry_get_attribute_by_index */
 
 /* Tests the libfsntfs_mft_entry_get_number_of_alternate_data_attributes function
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_mft_entry_get_number_of_alternate_data_attributes(
-     void )
+     libfsntfs_mft_entry_t *mft_entry )
 {
-	libcerror_error_t *error                = NULL;
-	libfsntfs_mft_entry_t *mft_entry        = NULL;
-	int number_of_alternate_data_attributes = 0;
-	int result                              = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_mft_entry_initialize(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
+	libcerror_error_t *error = NULL;
+	int number_of_attributes = 0;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
 	result = libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
 	          mft_entry,
-	          &number_of_alternate_data_attributes,
+	          &number_of_attributes,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
 	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_attributes",
+	 number_of_attributes,
+	 0 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2224,7 +2228,7 @@ int fsntfs_test_mft_entry_get_number_of_alternate_data_attributes(
 	 */
 	result = libfsntfs_mft_entry_get_number_of_alternate_data_attributes(
 	          NULL,
-	          &number_of_alternate_data_attributes,
+	          &number_of_attributes,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -2256,25 +2260,6 @@ int fsntfs_test_mft_entry_get_number_of_alternate_data_attributes(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libfsntfs_mft_entry_free(
-	          &mft_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft_entry",
-	 mft_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -2283,16 +2268,103 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( mft_entry != NULL )
-	{
-		libfsntfs_mft_entry_free(
-		 &mft_entry,
-		 NULL );
-	}
 	return( 0 );
 }
 
-/* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_index */
+/* Tests the libfsntfs_mft_entry_get_alternate_data_attribute_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_mft_entry_get_alternate_data_attribute_by_index(
+     libfsntfs_mft_entry_t *mft_entry )
+{
+	libcerror_error_t *error                 = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute = NULL;
+	int result                               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO change test data and enable test
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
+	          mft_entry,
+	          0,
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+*/
+
+	/* Test error cases
+	 */
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
+	          NULL,
+	          0,
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
+	          mft_entry,
+	          -1,
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
+	          mft_entry,
+	          0,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	return( 0 );
+}
 
 /* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name */
 
@@ -2302,9 +2374,7 @@ on_error:
 
 /* TODO: add tests for libfsntfs_mft_entry_set_data_attribute_helper_values */
 
-/* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_name */
-
-/* TODO: add tests for libfsntfs_mft_entry_set_reparse_point_attribute */
+/* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_utf8_name */
 
 /* TODO: add tests for libfsntfs_mft_entry_has_directory_entries_index */
 
@@ -2324,8 +2394,28 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+	uint8_t mft_entry_data[ 1024 ];
+
+	libcerror_error_t *error         = NULL;
+	libfsntfs_io_handle_t *io_handle = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	void *memcpy_result              = NULL;
+	int result                       = 0;
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( FSNTFS_TEST_MFT_ENTRY_VERBOSE )
+	libfsntfs_notify_set_verbose(
+	 1 );
+	libfsntfs_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -2357,65 +2447,211 @@ int main(
 
 	/* TODO: add tests for libfsntfs_mft_entry_read_attributes_from_attribute_list */
 
-/* TODO use FSNTFS_TEST_RUN_WITH_ARGS */
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
-	/* TODO: add tests for libfsntfs_mft_entry_is_empty */
+	/* Initialize test
+	 */
+	memcpy_result = memory_copy(
+	                 mft_entry_data,
+	                 fsntfs_test_mft_entry_data1,
+	                 sizeof( uint8_t ) * 1024 );
 
-	/* TODO: add tests for libfsntfs_mft_entry_is_allocated */
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "memcpy_result",
+	 memcpy_result );
 
-	FSNTFS_TEST_RUN(
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->cluster_block_size = 4096;
+
+	result = libfsntfs_mft_entry_initialize(
+	          &mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_entry_read_data(
+	          mft_entry,
+	          mft_entry_data,
+	          1024,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_entry_read_attributes_data(
+	          mft_entry,
+	          io_handle,
+	          mft_entry_data,
+	          1024,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_entry_is_empty",
+	 fsntfs_test_mft_entry_is_empty,
+	 mft_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_entry_is_allocated",
+	 fsntfs_test_mft_entry_is_allocated,
+	 mft_entry );
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_get_file_reference",
-	 fsntfs_test_mft_entry_get_file_reference );
+	 fsntfs_test_mft_entry_get_file_reference,
+	 mft_entry );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_get_base_record_file_reference",
-	 fsntfs_test_mft_entry_get_base_record_file_reference );
+	 fsntfs_test_mft_entry_get_base_record_file_reference,
+	 mft_entry );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_get_journal_sequence_number",
-	 fsntfs_test_mft_entry_get_journal_sequence_number );
+	 fsntfs_test_mft_entry_get_journal_sequence_number,
+	 mft_entry );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_get_number_of_attributes",
-	 fsntfs_test_mft_entry_get_number_of_attributes );
+	 fsntfs_test_mft_entry_get_number_of_attributes,
+	 mft_entry );
 
-	/* TODO: add tests for libfsntfs_mft_entry_get_attribute_by_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_entry_get_attribute_by_index",
+	 fsntfs_test_mft_entry_get_attribute_by_index,
+	 mft_entry );
 
-	FSNTFS_TEST_RUN(
+	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_mft_entry_get_number_of_alternate_data_attributes",
-	 fsntfs_test_mft_entry_get_number_of_alternate_data_attributes );
+	 fsntfs_test_mft_entry_get_number_of_alternate_data_attributes,
+	 mft_entry );
 
-	/* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_mft_entry_get_alternate_data_attribute_by_index",
+	 fsntfs_test_mft_entry_get_alternate_data_attribute_by_index,
+	 mft_entry );
 
 	/* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name */
 
 	/* TODO: add tests for libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name */
 
-	/* TODO: add tests for libfsntfs_mft_entry_append_index */
+	/* TODO: add tests for libfsntfs_mft_entry_set_attribute_helper_values */
 
-	/* TODO: add tests for libfsntfs_mft_entry_get_index_by_name */
+	/* TODO: add tests for libfsntfs_mft_entry_set_data_attribute_helper_values */
 
-	/* TODO: add tests for libfsntfs_mft_entry_append_attribute */
-
-	/* TODO: add tests for libfsntfs_mft_entry_append_data_attribute */
-
-	/* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_name */
-
-	/* TODO: add tests for libfsntfs_mft_entry_append_index_allocation_attribute */
-
-	/* TODO: add tests for libfsntfs_mft_entry_append_index_root_attribute */
-
-	/* TODO: add tests for libfsntfs_mft_entry_set_reparse_point_attribute */
+	/* TODO: add tests for libfsntfs_mft_entry_get_data_attribute_by_utf8_name */
 
 	/* TODO: add tests for libfsntfs_mft_entry_has_directory_entries_index */
 
 	/* TODO: add tests for libfsntfs_mft_entry_read_element_data */
 
+	/* Clean up
+	 */
+	result = libfsntfs_mft_entry_free(
+	          &mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( mft_entry != NULL )
+	{
+		libfsntfs_mft_entry_free(
+		 &mft_entry,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 

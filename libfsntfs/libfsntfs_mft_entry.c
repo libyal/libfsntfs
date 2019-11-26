@@ -1894,7 +1894,7 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_index(
 }
 
 /* Retrieves a specific alternate data attribute for an UTF-8 encoded name
- * Returns 1 if successful, 0 if no such directory entry or -1 on error
+ * Returns 1 if successful, 0 if no such alternate data attribute or -1 on error
  */
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
      libfsntfs_mft_entry_t *mft_entry,
@@ -1997,7 +1997,7 @@ on_error:
 }
 
 /* Retrieves a specific alternate data attribute for an UTF-16 encoded name
- * Returns 1 if successful, 0 if no such directory entry or -1 on error
+ * Returns 1 if successful, 0 if no such alternate data attribute or -1 on error
  */
 int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
      libfsntfs_mft_entry_t *mft_entry,

@@ -35,6 +35,7 @@
 #include "fsntfs_test_rwlock.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_attribute.h"
 #include "../libfsntfs/libfsntfs_definitions.h"
 #include "../libfsntfs/libfsntfs_directory_entry.h"
 #include "../libfsntfs/libfsntfs_file_entry.h"
@@ -67,9 +68,9 @@ uint8_t fsntfs_test_file_entry_data1[ 16384 ] = {
 	0x04, 0x03, 0x24, 0x00, 0x4d, 0x00, 0x46, 0x00, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x80, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0x01, 0x00, 0x40, 0x00, 0x00, 0x00, 0x06, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x21, 0x04, 0xfa, 0x00, 0x21, 0x3c, 0x85, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x11, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0xb0, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0x01, 0x00, 0x40, 0x00, 0x00, 0x00, 0x05, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1560,16 +1561,15 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
-
 /* Tests the libfsntfs_file_entry_is_empty function
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_file_entry_is_empty(
      libfsntfs_file_entry_t *file_entry )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
 
 	/* Test regular cases
 	 */
@@ -1591,6 +1591,28 @@ int fsntfs_test_file_entry_is_empty(
 	result = libfsntfs_file_entry_is_empty(
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_is_empty(
+	          file_entry,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1677,8 +1699,9 @@ on_error:
 int fsntfs_test_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry )
 {
-	libcerror_error_t *error = NULL;
-	int result               = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
 
 	/* Test regular cases
 	 */
@@ -1700,6 +1723,28 @@ int fsntfs_test_file_entry_is_allocated(
 	result = libfsntfs_file_entry_is_allocated(
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_is_allocated(
+	          file_entry,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1780,6 +1825,276 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+/* Tests the libfsntfs_internal_file_entry_get_attribute_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_internal_file_entry_get_attribute_by_index(
+     libfsntfs_internal_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_attribute_t *attribute = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_internal_file_entry_get_attribute_by_index(
+	          (libfsntfs_internal_file_entry_t *) file_entry,
+	          ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "attribute",
+	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_free(
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "attribute",
+	 attribute );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_internal_file_entry_get_attribute_by_index(
+	          NULL,
+	          ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_file_entry_get_attribute_by_index(
+	          (libfsntfs_internal_file_entry_t *) file_entry,
+	          NULL,
+	          0,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_file_entry_get_attribute_by_index(
+	          (libfsntfs_internal_file_entry_t *) file_entry,
+	          ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry,
+	          -1,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_internal_file_entry_get_attribute_by_index(
+	          (libfsntfs_internal_file_entry_t *) file_entry,
+	          ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry,
+	          0,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* TODO: add tests for libfsntfs_internal_file_entry_get_reparse_point_attribute */
+
+/* TODO: add tests for libfsntfs_internal_file_entry_get_security_descriptor_attribute */
+
+/* TODO: add tests for libfsntfs_internal_file_entry_get_standard_information_attribute */
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
+/* Tests the libfsntfs_file_entry_get_file_reference function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_file_reference(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_file_reference(
+	          file_entry,
+	          &file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_file_reference(
+	          NULL,
+	          &file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_file_reference(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_file_reference with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_file_reference(
+	          file_entry,
+	          &file_reference,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_file_reference with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_file_reference(
+	          file_entry,
+	          &file_reference,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_file_entry_get_base_record_file_reference function
  * Returns 1 if successful or 0 if not
  */
@@ -1797,10 +2112,10 @@ int fsntfs_test_file_entry_get_base_record_file_reference(
 	          &base_record_file_reference,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2042,6 +2357,178 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_file_entry_get_parent_file_reference_by_attribute_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_parent_file_reference_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error       = NULL;
+	uint64_t parent_file_reference = 0;
+	int result                     = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          1,
+	          &parent_file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          NULL,
+	          1,
+	          &parent_file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          -1,
+	          &parent_file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          1,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          0,
+	          &parent_file_reference,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_parent_file_reference_by_attribute_index with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          1,
+	          &parent_file_reference,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_parent_file_reference_by_attribute_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
+	          file_entry,
+	          1,
+	          &parent_file_reference,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libfsntfs_file_entry_get_journal_sequence_number function
  * Returns 1 if successful or 0 if not
  */
@@ -2059,10 +2546,10 @@ int fsntfs_test_file_entry_get_journal_sequence_number(
 	          &journal_sequence_number,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2845,10 +3332,10 @@ int fsntfs_test_file_entry_get_utf8_name_size(
 	          &utf8_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
 	 "utf8_name_size",
@@ -2983,10 +3470,10 @@ int fsntfs_test_file_entry_get_utf8_name(
 	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3154,10 +3641,10 @@ int fsntfs_test_file_entry_get_utf16_name_size(
 	          &utf16_name_size,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
 	 "utf16_name_size",
@@ -3292,10 +3779,10 @@ int fsntfs_test_file_entry_get_utf16_name(
 	          16,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 -1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3452,9 +3939,11 @@ on_error:
 int fsntfs_test_file_entry_get_name_attribute_index(
      libfsntfs_file_entry_t *file_entry )
 {
-	libcerror_error_t *error = NULL;
-	int attribute_index      = 0;
-	int result               = 0;
+	libcerror_error_t *error                     = NULL;
+	libfsntfs_directory_entry_t *directory_entry = NULL;
+	libfsntfs_mft_entry_t *mft_entry             = NULL;
+	int attribute_index                          = 0;
+	int result                                   = 0;
 
 	/* Test regular cases
 	 */
@@ -3463,10 +3952,35 @@ int fsntfs_test_file_entry_get_name_attribute_index(
 	          &attribute_index,
 	          &error );
 
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "attribute_index",
+	 attribute_index,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	directory_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry = NULL;
+
+	result = libfsntfs_file_entry_get_name_attribute_index(
+	          file_entry,
+	          &attribute_index,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry = directory_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -3495,6 +4009,29 @@ int fsntfs_test_file_entry_get_name_attribute_index(
 	          file_entry,
 	          NULL,
 	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_name_attribute_index(
+	          file_entry,
+	          &attribute_index,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -3579,7 +4116,4965 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+/* Tests the libfsntfs_file_entry_get_utf8_name_size_by_attribute_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_name_size_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf8_name_size    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf8_name_size",
+	 utf8_name_size,
+	 (size_t) 5 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          NULL,
+	          1,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          -1,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          0,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_name_size_by_attribute_index with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_name_size_by_attribute_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf8_name_by_attribute_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_name_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t utf8_name[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          NULL,
+	          1,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          -1,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf8_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf8_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          0,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_name_by_attribute_index with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_name_by_attribute_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_name_size_by_attribute_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_name_size_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	size_t utf16_name_size   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "utf16_name_size",
+	 utf16_name_size,
+	 (size_t) 5 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          NULL,
+	          1,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          -1,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          0,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_name_size_by_attribute_index with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_name_size_by_attribute_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
+	          file_entry,
+	          1,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_name_by_attribute_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_name_by_attribute_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint16_t utf16_name[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          NULL,
+	          1,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          -1,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf16_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf16_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          0,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_name_by_attribute_index with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_name_by_attribute_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_name_by_attribute_index(
+	          file_entry,
+	          1,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	size_t utf8_name_size            = 0;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          NULL,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_substitute_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t utf8_name[ 16 ];
+
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          NULL,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	size_t utf16_name_size           = 0;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          NULL,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_substitute_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint16_t utf16_name[ 16 ];
+
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          NULL,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_print_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	size_t utf8_name_size            = 0;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          NULL,
+	          &utf8_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a print name
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	          file_entry,
+	          &utf8_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_print_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t utf8_name[ 16 ];
+
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          NULL,
+	          utf8_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a print name
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	          file_entry,
+	          utf8_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_print_name_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_reparse_point_print_name_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	size_t utf16_name_size           = 0;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          NULL,
+	          &utf16_name_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a print name
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
+	          file_entry,
+	          &utf16_name_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_print_name function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_utf16_reparse_point_print_name(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint16_t utf16_name[ 16 ];
+
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          NULL,
+	          utf16_name,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a reparse point with a print name
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+	          file_entry,
+	          utf16_name,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_security_descriptor_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_security_descriptor_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error        = NULL;
+	size_t security_descriptor_size = 0;
+	int result                      = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          &security_descriptor_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SIZE(
+	 "security_descriptor_size",
+	 security_descriptor_size,
+	 (size_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          NULL,
+	          &security_descriptor_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a security descriptor
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+/* TODO implement RW lock support */
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK ) && defined( TODO )
+
+	/* Test libfsntfs_file_entry_get_security_descriptor_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          &security_descriptor_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_security_descriptor_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_security_descriptor_size(
+	          file_entry,
+	          &security_descriptor_size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_security_descriptor function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_security_descriptor(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t security_descriptor[ 16 ];
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          security_descriptor,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          NULL,
+	          security_descriptor,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+/* TODO test with file entry that has a security descriptor
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          NULL,
+	          16,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          security_descriptor,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          security_descriptor,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+*/
+
+/* TODO implement RW lock support */
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK ) && defined( TODO )
+
+	/* Test libfsntfs_file_entry_get_security_descriptor with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          security_descriptor,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_security_descriptor with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_security_descriptor(
+	          file_entry,
+	          security_descriptor,
+	          16,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_number_of_attributes function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_number_of_attributes(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	int number_of_attributes = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          file_entry,
+	          &number_of_attributes,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_attributes",
+	 number_of_attributes,
+	 4 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          NULL,
+	          &number_of_attributes,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_number_of_attributes with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          file_entry,
+	          &number_of_attributes,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_number_of_attributes with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_attributes(
+	          file_entry,
+	          &number_of_attributes,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_attribute_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_attribute_by_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_attribute_t *attribute = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "attribute",
+	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_attribute_free(
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "attribute",
+	 attribute );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          NULL,
+	          0,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          -1,
+	          &attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          0,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	attribute = (libfsntfs_attribute_t *) 0x12345678UL;
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	attribute = NULL;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_attribute_by_index with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_attribute_by_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_attribute_by_index(
+	          file_entry,
+	          0,
+	          &attribute,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_has_directory_entries_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_has_directory_entries_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_has_directory_entries_index(
+	          file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_has_directory_entries_index(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_has_directory_entries_index(
+	          file_entry,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_has_directory_entries_index with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_has_directory_entries_index(
+	          file_entry,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_has_directory_entries_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_has_directory_entries_index(
+	          file_entry,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_has_default_data_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int result                       = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          file_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
+
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          file_entry,
+	          &error );
+
+	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_has_default_data_stream with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          file_entry,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_has_default_data_stream with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_has_default_data_stream(
+	          file_entry,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_number_of_alternate_data_streams function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_number_of_alternate_data_streams(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error   = NULL;
+	int number_of_data_streams = 0;
+	int result                 = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          file_entry,
+	          &number_of_data_streams,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_data_streams",
+	 number_of_data_streams,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          NULL,
+	          &number_of_data_streams,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_number_of_alternate_data_streams with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          file_entry,
+	          &number_of_data_streams,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_number_of_alternate_data_streams with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_alternate_data_streams(
+	          file_entry,
+	          &number_of_data_streams,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_index */
+
+/* TODO: add tests for libfsntfs_file_entry_has_alternate_data_stream_by_utf8_name */
+
+/* TODO: add tests for libfsntfs_file_entry_has_alternate_data_stream_by_utf16_name */
+
+/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name */
+
+/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name */
+
+/* Tests the libfsntfs_file_entry_get_number_of_sub_file_entries function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_number_of_sub_file_entries(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error   = NULL;
+	int number_of_file_entries = 0;
+	int result                 = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_sub_file_entries(
+	          file_entry,
+	          &number_of_file_entries,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_file_entries",
+	 number_of_file_entries,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_sub_file_entries(
+	          NULL,
+	          &number_of_file_entries,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_number_of_sub_file_entries(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_number_of_sub_file_entries with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_sub_file_entries(
+	          file_entry,
+	          &number_of_file_entries,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_number_of_sub_file_entries with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_sub_file_entries(
+	          file_entry,
+	          &number_of_file_entries,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_index */
+
+/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_utf8_name */
+
+/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_utf16_name */
+
+/* Tests the libfsntfs_data_stream_read_buffer function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_read_buffer(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t buffer[ FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE ];
+
+	libcerror_error_t *error     = NULL;
+	time_t timestamp             = 0;
+	size64_t data_size           = 0;
+	size64_t remaining_data_size = 0;
+	size_t read_size             = 0;
+	ssize_t read_count           = 0;
+	off64_t offset               = 0;
+	off64_t read_offset          = 0;
+	int number_of_tests          = 1024;
+	int random_number            = 0;
+	int result                   = 0;
+	int test_number              = 0;
+
+	/* Determine size
+	 */
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          &data_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Reset offset to 0
+	 */
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_size = FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE;
+
+	if( data_size < FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE )
+	{
+		read_size = (size_t) data_size;
+	}
+	read_count = libfsntfs_file_entry_read_buffer(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) read_size );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( data_size > 8 )
+	{
+		/* Set offset to data_size - 8
+		 */
+		offset = libfsntfs_file_entry_seek_offset(
+		          file_entry,
+		          -8,
+		          SEEK_END,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "offset",
+		 offset,
+		 (int64_t) data_size - 8 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		/* Read buffer on data_size boundary
+		 */
+		read_count = libfsntfs_file_entry_read_buffer(
+		              file_entry,
+		              buffer,
+		              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+		              &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) 8 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		/* Read buffer beyond data_size boundary
+		 */
+		read_count = libfsntfs_file_entry_read_buffer(
+		              file_entry,
+		              buffer,
+		              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+		              &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) 0 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Stress test read buffer
+	 */
+	timestamp = time(
+	             NULL );
+
+	srand(
+	 (unsigned int) timestamp );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	remaining_data_size = data_size;
+
+	for( test_number = 0;
+	     test_number < number_of_tests;
+	     test_number++ )
+	{
+		random_number = rand();
+
+		FSNTFS_TEST_ASSERT_GREATER_THAN_INT(
+		 "random_number",
+		 random_number,
+		 -1 );
+
+		read_size = (size_t) random_number % FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE;
+
+#if defined( FSNTFS_TEST_FILE_ENTRY_VERBOSE )
+		fprintf(
+		 stdout,
+		 "libfsntfs_file_entry_read_buffer: at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIzd "\n",
+		 read_offset,
+		 read_offset,
+		 read_size );
+#endif
+		read_count = libfsntfs_file_entry_read_buffer(
+		              file_entry,
+		              buffer,
+		              read_size,
+		              &error );
+
+		if( read_size > remaining_data_size )
+		{
+			read_size = (size_t) remaining_data_size;
+		}
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) read_size );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		read_offset += read_count;
+
+		result = libfsntfs_file_entry_get_offset(
+		          file_entry,
+		          &offset,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "offset",
+		 offset,
+		 read_offset );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		remaining_data_size -= read_count;
+
+		if( remaining_data_size == 0 )
+		{
+			offset = libfsntfs_file_entry_seek_offset(
+			          file_entry,
+			          0,
+			          SEEK_SET,
+			          &error );
+
+			FSNTFS_TEST_ASSERT_EQUAL_INT64(
+			 "offset",
+			 offset,
+			 (int64_t) 0 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "error",
+			 error );
+
+			read_offset = 0;
+
+			remaining_data_size = data_size;
+		}
+	}
+	/* Reset offset to 0
+	 */
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	read_count = libfsntfs_file_entry_read_buffer(
+	              NULL,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_file_entry_read_buffer(
+	              file_entry,
+	              NULL,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_file_entry_read_buffer(
+	              file_entry,
+	              buffer,
+	              (size_t) SSIZE_MAX + 1,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_read_buffer with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	read_count = libfsntfs_file_entry_read_buffer(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_read_buffer with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	read_count = libfsntfs_file_entry_read_buffer(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_read_buffer_at_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_read_buffer_at_offset(
+     libfsntfs_file_entry_t *file_entry )
+{
+	uint8_t buffer[ FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE ];
+
+	libcerror_error_t *error     = NULL;
+	time_t timestamp             = 0;
+	size64_t data_size           = 0;
+	size64_t remaining_data_size = 0;
+	size_t read_size             = 0;
+	ssize_t read_count           = 0;
+	off64_t offset               = 0;
+	off64_t read_offset          = 0;
+	int number_of_tests          = 1024;
+	int random_number            = 0;
+	int result                   = 0;
+	int test_number              = 0;
+
+	/* Determine size
+	 */
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          &data_size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_size = FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE;
+
+	if( data_size < FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE )
+	{
+		read_size = (size_t) data_size;
+	}
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) read_size );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( data_size > 8 )
+	{
+		/* Read buffer on data_size boundary
+		 */
+		read_count = libfsntfs_file_entry_read_buffer_at_offset(
+		              file_entry,
+		              buffer,
+		              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+		              data_size - 8,
+		              &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) 8 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		/* Read buffer beyond data_size boundary
+		 */
+		read_count = libfsntfs_file_entry_read_buffer_at_offset(
+		              file_entry,
+		              buffer,
+		              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+		              data_size + 8,
+		              &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) 0 );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Stress test read buffer
+	 */
+	timestamp = time(
+	             NULL );
+
+	srand(
+	 (unsigned int) timestamp );
+
+	for( test_number = 0;
+	     test_number < number_of_tests;
+	     test_number++ )
+	{
+		random_number = rand();
+
+		FSNTFS_TEST_ASSERT_GREATER_THAN_INT(
+		 "random_number",
+		 random_number,
+		 -1 );
+
+		if( data_size > 0 )
+		{
+			read_offset = (off64_t) random_number % data_size;
+		}
+		read_size = (size_t) random_number % FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE;
+
+#if defined( FSNTFS_TEST_FILE_ENTRY_VERBOSE )
+		fprintf(
+		 stdout,
+		 "libfsntfs_file_entry_read_buffer_at_offset: at offset: %" PRIi64 " (0x%08" PRIx64 ") of size: %" PRIzd "\n",
+		 read_offset,
+		 read_offset,
+		 read_size );
+#endif
+		read_count = libfsntfs_file_entry_read_buffer_at_offset(
+		              file_entry,
+		              buffer,
+		              read_size,
+		              read_offset,
+		              &error );
+
+		remaining_data_size = data_size - read_offset;
+
+		if( read_size > remaining_data_size )
+		{
+			read_size = (size_t) remaining_data_size;
+		}
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) read_size );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+
+		read_offset += read_count;
+
+		result = libfsntfs_file_entry_get_offset(
+		          file_entry,
+		          &offset,
+		          &error );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "offset",
+		 offset,
+		 read_offset );
+
+		FSNTFS_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Test error cases
+	 */
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              NULL,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              NULL,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              buffer,
+	              (size_t) SSIZE_MAX + 1,
+	              0,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              -1,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+	 "read_count",
+	 read_count,
+	 (ssize_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_read_buffer_at_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              0,
+	              &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_read_buffer_at_offset with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	read_count = libfsntfs_file_entry_read_buffer_at_offset(
+	              file_entry,
+	              buffer,
+	              FSNTFS_TEST_FILE_ENTRY_READ_BUFFER_SIZE,
+	              0,
+	              &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_SSIZE(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_seek_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_seek_offset(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	size64_t size            = 0;
+	off64_t offset           = 0;
+
+	/* Test regular cases
+	 */
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_END,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	size = (size64_t) offset;
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          1024,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 1024 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          -512,
+	          SEEK_CUR,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 512 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          (off64_t) ( size + 512 ),
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) ( size + 512 ) );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Reset offset to 0
+	 */
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	offset = libfsntfs_file_entry_seek_offset(
+	          NULL,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          -1,
+	          SEEK_SET,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          -1,
+	          SEEK_CUR,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          (off64_t) ( -1 * ( size + 1 ) ),
+	          SEEK_END,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_seek_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	 */
+	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "offset",
+		 (int64_t) offset,
+		 (int64_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_seek_offset with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	offset = libfsntfs_file_entry_seek_offset(
+	          file_entry,
+	          0,
+	          SEEK_SET,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "offset",
+		 (int64_t) offset,
+		 (int64_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_offset function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_offset(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	off64_t offset           = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_offset(
+	          file_entry,
+	          &offset,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_offset(
+	          NULL,
+	          &offset,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_offset(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_offset with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_offset(
+	          file_entry,
+	          &offset,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_offset with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_offset(
+	          file_entry,
+	          &offset,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_size function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_size(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	size64_t size            = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          &size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_size(
+	          NULL,
+	          &size,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          &size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_size(
+	          file_entry,
+	          &size,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_number_of_extents function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_number_of_extents(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	int number_of_extents    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          file_entry,
+	          &number_of_extents,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "number_of_extents",
+	 number_of_extents,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          NULL,
+	          &number_of_extents,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          file_entry,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_number_of_extents with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          file_entry,
+	          &number_of_extents,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_number_of_extents with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_number_of_extents(
+	          file_entry,
+	          &number_of_extents,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_file_entry_get_extent_by_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_file_entry_get_extent_by_index(
+     libfsntfs_file_entry_t *file_entry )
+{
+	libcerror_error_t *error = NULL;
+	size64_t extent_size     = 0;
+	off64_t extent_offset    = 0;
+	uint32_t extent_flags    = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          NULL,
+	          0,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          -1,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          NULL,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          &extent_offset,
+	          NULL,
+	          &extent_flags,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          &extent_offset,
+	          &extent_size,
+	          NULL,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+
+	/* Test libfsntfs_file_entry_get_extent_by_index with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
+	 */
+	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+	/* Test libfsntfs_file_entry_get_extent_by_index with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
+	 */
+	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
+
+	result = libfsntfs_file_entry_get_extent_by_index(
+	          file_entry,
+	          0,
+	          &extent_offset,
+	          &extent_size,
+	          &extent_flags,
+	          &error );
+
+	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
+	{
+		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
 
 /* The main program
  */
@@ -3605,6 +9100,14 @@ int main(
 
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( FSNTFS_TEST_FILE_ENTRY_VERBOSE )
+	libfsntfs_notify_set_verbose(
+	 1 );
+	libfsntfs_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -3782,6 +9285,19 @@ int main(
 	 fsntfs_test_file_entry_is_allocated,
 	 file_entry );
 
+	/* TODO: add tests for libfsntfs_internal_file_entry_get_attribute_by_index */
+
+	/* TODO: add tests for libfsntfs_internal_file_entry_get_reparse_point_attribute */
+
+	/* TODO: add tests for libfsntfs_internal_file_entry_get_security_descriptor_attribute */
+
+	/* TODO: add tests for libfsntfs_internal_file_entry_get_standard_information_attribute */
+
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_file_reference",
+	 fsntfs_test_file_entry_get_file_reference,
+	 file_entry );
+
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_file_entry_get_base_record_file_reference",
 	 fsntfs_test_file_entry_get_base_record_file_reference,
@@ -3792,7 +9308,10 @@ int main(
 	 fsntfs_test_file_entry_get_parent_file_reference,
 	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_parent_file_reference_by_attribute_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_parent_file_reference_by_attribute_index",
+	 fsntfs_test_file_entry_get_parent_file_reference_by_attribute_index,
+	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_file_entry_get_journal_sequence_number",
@@ -3849,43 +9368,100 @@ int main(
 	 fsntfs_test_file_entry_get_name_attribute_index,
 	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name_size_by_attribute_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_name_size_by_attribute_index",
+	 fsntfs_test_file_entry_get_utf8_name_size_by_attribute_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_name_by_attribute_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_name_by_attribute_index",
+	 fsntfs_test_file_entry_get_utf8_name_by_attribute_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name_size_by_attribute_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_name_size_by_attribute_index",
+	 fsntfs_test_file_entry_get_utf16_name_size_by_attribute_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_name_by_attribute_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_name_by_attribute_index",
+	 fsntfs_test_file_entry_get_utf16_name_by_attribute_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size",
+	 fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_substitute_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name",
+	 fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size",
+	 fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_substitute_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name",
+	 fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_print_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_reparse_point_print_name_size",
+	 fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf8_reparse_point_print_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf8_reparse_point_print_name",
+	 fsntfs_test_file_entry_get_utf8_reparse_point_print_name,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_print_name_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_reparse_point_print_name_size",
+	 fsntfs_test_file_entry_get_utf16_reparse_point_print_name_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_utf16_reparse_point_print_name */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_utf16_reparse_point_print_name",
+	 fsntfs_test_file_entry_get_utf16_reparse_point_print_name,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_security_descriptor_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_security_descriptor_size",
+	 fsntfs_test_file_entry_get_security_descriptor_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_security_descriptor */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_security_descriptor",
+	 fsntfs_test_file_entry_get_security_descriptor,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_number_of_attributes */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_number_of_attributes",
+	 fsntfs_test_file_entry_get_number_of_attributes,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_attribute_by_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_attribute_by_index",
+	 fsntfs_test_file_entry_get_attribute_by_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_has_directory_entries_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_has_directory_entries_index",
+	 fsntfs_test_file_entry_has_directory_entries_index,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_has_default_data_stream */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_has_default_data_stream",
+	 fsntfs_test_file_entry_has_default_data_stream,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_number_of_alternate_data_streams */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_number_of_alternate_data_streams",
+	 fsntfs_test_file_entry_get_number_of_alternate_data_streams,
+	 file_entry );
 
 	/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_index */
 
@@ -3897,7 +9473,10 @@ int main(
 
 	/* TODO: add tests for libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name */
 
-	/* TODO: add tests for libfsntfs_file_entry_get_number_of_sub_file_entries */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_number_of_sub_file_entries",
+	 fsntfs_test_file_entry_get_number_of_sub_file_entries,
+	 file_entry );
 
 	/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_index */
 
@@ -3905,19 +9484,40 @@ int main(
 
 	/* TODO: add tests for libfsntfs_file_entry_get_sub_file_entry_by_utf16_name */
 
-	/* TODO: add tests for libfsntfs_file_entry_read_buffer */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_read_buffer",
+	 fsntfs_test_file_entry_read_buffer,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_read_buffer_at_offset */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_read_buffer_at_offset",
+	 fsntfs_test_file_entry_read_buffer_at_offset,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_seek_offset */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_seek_offset",
+	 fsntfs_test_file_entry_seek_offset,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_offset */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_offset",
+	 fsntfs_test_file_entry_get_offset,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_size */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_size",
+	 fsntfs_test_file_entry_get_size,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_number_of_extents */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_number_of_extents",
+	 fsntfs_test_file_entry_get_number_of_extents,
+	 file_entry );
 
-	/* TODO: add tests for libfsntfs_file_entry_get_extent_by_index */
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_file_entry_get_extent_by_index",
+	 fsntfs_test_file_entry_get_extent_by_index,
+	 file_entry );
 
 	/* Clean up
 	 */

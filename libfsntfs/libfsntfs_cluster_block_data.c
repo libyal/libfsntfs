@@ -90,6 +90,7 @@ ssize_t libfsntfs_cluster_block_data_read_segment_data(
 
 			return( -1 );
 		}
+		read_count = (ssize_t) segment_data_size;
 	}
 	else
 	{
@@ -99,7 +100,7 @@ ssize_t libfsntfs_cluster_block_data_read_segment_data(
 		              segment_data_size,
 		              error );
 
-		if( read_count != (ssize_t) segment_data_size )
+		if( read_count < 0 )
 		{
 			libcerror_error_set(
 			 error,
@@ -111,7 +112,7 @@ ssize_t libfsntfs_cluster_block_data_read_segment_data(
 			return( -1 );
 		}
 	}
-	return( (ssize_t) segment_data_size );
+	return( read_count );
 }
 
 /* Seeks a certain offset of the data

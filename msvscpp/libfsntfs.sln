@@ -163,6 +163,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_cluster_block",
 		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_cluster_block_data", "fsntfs_test_cluster_block_data\fsntfs_test_cluster_block_data.vcproj", "{DB4FE956-0D15-47B3-89B4-2049D90A9FAC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_cluster_block_stream", "fsntfs_test_cluster_block_stream\fsntfs_test_cluster_block_stream.vcproj", "{7075C461-7EE0-4BBB-BE45-4CA4D58CE945}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D9725AED-6124-4225-AC2B-306A97F90607} = {D9725AED-6124-4225-AC2B-306A97F90607}
@@ -728,6 +734,10 @@ Global
 		{1A1FAFF8-A1FE-4D75-BB39-3913E5ED5834}.Release|Win32.Build.0 = Release|Win32
 		{1A1FAFF8-A1FE-4D75-BB39-3913E5ED5834}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{1A1FAFF8-A1FE-4D75-BB39-3913E5ED5834}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{DB4FE956-0D15-47B3-89B4-2049D90A9FAC}.Release|Win32.ActiveCfg = Release|Win32
+		{DB4FE956-0D15-47B3-89B4-2049D90A9FAC}.Release|Win32.Build.0 = Release|Win32
+		{DB4FE956-0D15-47B3-89B4-2049D90A9FAC}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{DB4FE956-0D15-47B3-89B4-2049D90A9FAC}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{7075C461-7EE0-4BBB-BE45-4CA4D58CE945}.Release|Win32.ActiveCfg = Release|Win32
 		{7075C461-7EE0-4BBB-BE45-4CA4D58CE945}.Release|Win32.Build.0 = Release|Win32
 		{7075C461-7EE0-4BBB-BE45-4CA4D58CE945}.VSDebug|Win32.ActiveCfg = VSDebug|Win32

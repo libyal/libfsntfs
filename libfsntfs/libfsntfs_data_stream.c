@@ -914,17 +914,6 @@ int libfsntfs_data_stream_get_size(
 	}
 	internal_data_stream = (libfsntfs_internal_data_stream_t *) data_stream;
 
-	if( size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid size.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_data_stream->read_write_lock,

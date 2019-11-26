@@ -1606,8 +1606,7 @@ int fsntfs_test_compressed_block_data_handle_read_segment_data(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_MEMORY )
-#if defined( OPTIMIZATION_DISABLED )
+#if defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
 	/* Test libfsntfs_compressed_block_data_handle_read_segment_data with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
@@ -1641,8 +1640,7 @@ int fsntfs_test_compressed_block_data_handle_read_segment_data(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( OPTIMIZATION_DISABLED ) */
-#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
 
 	/* Clean up file IO handle
 	 */
