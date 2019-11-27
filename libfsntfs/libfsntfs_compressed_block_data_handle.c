@@ -249,8 +249,8 @@ ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
 {
 	libfsntfs_compressed_block_t *compressed_block = NULL;
 	static char *function                          = "libfsntfs_compressed_block_data_handle_read_segment_data";
-	size_t segment_data_offset                     = 0;
 	size_t read_size                               = 0;
+	size_t segment_data_offset                     = 0;
 	off64_t compressed_block_offset                = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )

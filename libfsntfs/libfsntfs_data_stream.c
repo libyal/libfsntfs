@@ -610,11 +610,11 @@ ssize_t libfsntfs_data_stream_read_buffer(
 #endif
 	read_count = libfdata_stream_read_buffer(
 	              internal_data_stream->data_cluster_block_stream,
-		      (intptr_t *) internal_data_stream->file_io_handle,
-		      buffer,
-		      buffer_size,
-		      0,
-		      error );
+	              (intptr_t *) internal_data_stream->file_io_handle,
+	              buffer,
+	              buffer_size,
+	              0,
+	              error );
 
 	if( read_count < 0 )
 	{
@@ -706,11 +706,11 @@ ssize_t libfsntfs_data_stream_read_buffer_at_offset(
 	{
 		read_count = libfdata_stream_read_buffer(
 		              internal_data_stream->data_cluster_block_stream,
-			      (intptr_t *) internal_data_stream->file_io_handle,
-			      buffer,
-			      buffer_size,
-			      0,
-			      error );
+		              (intptr_t *) internal_data_stream->file_io_handle,
+		              buffer,
+		              buffer_size,
+		              0,
+		              error );
 
 		if( read_count < 0 )
 		{

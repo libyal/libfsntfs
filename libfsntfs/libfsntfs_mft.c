@@ -51,8 +51,8 @@ int libfsntfs_mft_initialize(
      libcerror_error_t **error )
 {
 	static char *function  = "libfsntfs_mft_initialize";
-	int segment_index      = 0;
 	uint32_t segment_flags = 0;
+	int segment_index      = 0;
 
 	if( mft == NULL )
 	{

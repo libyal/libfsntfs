@@ -179,6 +179,14 @@
 				RelativePath="..\..\tests\fsntfs_test_cluster_block_data.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_functions.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_memory.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -186,7 +194,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\fsntfs_test_functions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_libfdata.h"
 				>
 			</File>
 			<File
@@ -195,6 +215,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_memory.h"
 				>
 			</File>
 			<File

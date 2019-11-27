@@ -50,8 +50,8 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	size64_t data_segment_size                          = 0;
 	size_t compression_unit_size                        = 0;
 	size_t remaining_compression_unit_size              = 0;
-	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t attribute_data_vcn_offset                   = 0;
+	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
 	off64_t data_run_offset                             = 0;
 	uint16_t attribute_data_flags                       = 0;

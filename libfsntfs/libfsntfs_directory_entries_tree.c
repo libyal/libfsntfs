@@ -97,12 +97,7 @@ int libfsntfs_directory_entries_tree_initialize(
 		 "%s: unable to clear directory entries tree.",
 		 function );
 
-		memory_free(
-		 *directory_entries_tree );
-
-		*directory_entries_tree = NULL;
-
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 
@@ -339,13 +334,13 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 		file_name_values = NULL;
 
 		result = libcdata_btree_insert_value(
-			  directory_entries_tree->short_names_tree,
-			  &value_index,
-			  (intptr_t *) directory_entry,
-			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
-			  &upper_node,
-			  (intptr_t **) &existing_directory_entry,
-			  error ) ;
+		          directory_entries_tree->short_names_tree,
+		          &value_index,
+		          (intptr_t *) directory_entry,
+		          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+		          &upper_node,
+		          (intptr_t **) &existing_directory_entry,
+		          error ) ;
 
 		if( result == -1 )
 		{
@@ -541,7 +536,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 		 function );
 
 		return( -1 );
-        }
+	}
 	if( libfsntfs_index_node_get_number_of_values(
 	     index_node,
 	     &number_of_index_values,
@@ -731,9 +726,9 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
      libcerror_error_t **error )
 {
 	static char *function   = "libfsntfs_directory_entries_tree_read_from_i30_index";
-	int result              = 0;
 	uint32_t attribute_type = 0;
 	uint32_t collation_type = 0;
+	int result              = 0;
 
 	if( directory_entries_tree == NULL )
 	{
@@ -1140,7 +1135,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		 function );
 
 		return( -1 );
-        }
+	}
 	if( libfsntfs_index_node_get_number_of_values(
 	     index_node,
 	     &number_of_index_values,
@@ -1291,12 +1286,12 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 		{
 			result = libcdata_btree_get_value_by_value(
-				  directory_entries_tree->short_names_tree,
-				  (intptr_t *) directory_entry,
-				  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
-				  &upper_node,
-				  (intptr_t **) &existing_directory_entry,
-				  error );
+			          directory_entries_tree->short_names_tree,
+			          (intptr_t *) directory_entry,
+			          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+			          &upper_node,
+			          (intptr_t **) &existing_directory_entry,
+			          error );
 
 			if( result == -1 )
 			{
@@ -1380,14 +1375,14 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			goto on_error;
 		}
 		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
-			  directory_entries_tree,
-			  file_io_handle,
-			  sub_node,
-			  utf8_string,
-			  utf8_string_length,
-			  directory_entry,
-			  recursion_depth + 1,
-			  error );
+		          directory_entries_tree,
+		          file_io_handle,
+		          sub_node,
+		          utf8_string,
+		          utf8_string_length,
+		          directory_entry,
+		          recursion_depth + 1,
+		          error );
 
 		if( result == -1 )
 		{
@@ -1556,7 +1551,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		 function );
 
 		return( -1 );
-        }
+	}
 	if( libfsntfs_index_node_get_number_of_values(
 	     index_node,
 	     &number_of_index_values,
@@ -1707,12 +1702,12 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 		{
 			result = libcdata_btree_get_value_by_value(
-				  directory_entries_tree->short_names_tree,
-				  (intptr_t *) directory_entry,
-				  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
-				  &upper_node,
-				  (intptr_t **) &existing_directory_entry,
-				  error );
+			          directory_entries_tree->short_names_tree,
+			          (intptr_t *) directory_entry,
+			          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+			          &upper_node,
+			          (intptr_t **) &existing_directory_entry,
+			          error );
 
 			if( result == -1 )
 			{
@@ -1796,14 +1791,14 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			goto on_error;
 		}
 		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
-			  directory_entries_tree,
-			  file_io_handle,
-			  sub_node,
-			  utf16_string,
-			  utf16_string_length,
-			  directory_entry,
-			  recursion_depth + 1,
-			  error );
+		          directory_entries_tree,
+		          file_io_handle,
+		          sub_node,
+		          utf16_string,
+		          utf16_string_length,
+		          directory_entry,
+		          recursion_depth + 1,
+		          error );
 
 		if( result == -1 )
 		{
@@ -2105,12 +2100,12 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	if( directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 	{
 		result = libcdata_btree_get_value_by_value(
-			  directory_entries_tree->short_names_tree,
-			  (intptr_t *) directory_entry,
-			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
-			  &upper_node,
-			  (intptr_t **) &existing_directory_entry,
-			  error ) ;
+		          directory_entries_tree->short_names_tree,
+		          (intptr_t *) directory_entry,
+		          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_directory_entry_compare_by_file_reference,
+		          &upper_node,
+		          (intptr_t **) &existing_directory_entry,
+		          error ) ;
 
 		if( result == -1 )
 		{

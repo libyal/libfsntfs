@@ -366,10 +366,10 @@ int libfsntfs_index_read(
 			return( -1 );
 		}
 		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
-			  mft_attribute,
-			  index->name,
-			  index->name_size,
-			  error );
+		          mft_attribute,
+		          index->name,
+		          index->name_size,
+		          error );
 
 		if( result == -1 )
 		{
@@ -982,8 +982,8 @@ int libfsntfs_index_get_sub_node(
 	off64_t element_data_offset      = 0;
 
 #if defined( HAVE_PROFILER )
-	uint32_t index_entry_size        = 0;
 	int64_t profiler_start_timestamp = 0;
+	uint32_t index_entry_size        = 0;
 #endif
 
 	if( index == NULL )

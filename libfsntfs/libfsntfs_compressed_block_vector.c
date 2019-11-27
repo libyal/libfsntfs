@@ -46,8 +46,8 @@ int libfsntfs_compressed_block_vector_initialize(
      libcerror_error_t **error )
 {
 	libfdata_vector_t *safe_compressed_block_vector       = NULL;
-	libfsntfs_compression_unit_descriptor_t *descriptor   = NULL;
 	libfsntfs_compression_unit_data_handle_t *data_handle = NULL;
+	libfsntfs_compression_unit_descriptor_t *descriptor   = NULL;
 	static char *function                                 = "libfsntfs_compressed_block_vector_initialize";
 	int descriptor_index                                  = 0;
 	int number_of_descriptors                             = 0;
@@ -234,8 +234,8 @@ int libfsntfs_compressed_block_vector_read_element_data(
 {
 	libfsntfs_compressed_block_t *compressed_block                       = NULL;
 	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
-	uint8_t *compressed_data                                             = NULL;
 	uint8_t *compressed_block_data                                       = NULL;
+	uint8_t *compressed_data                                             = NULL;
 	static char *function                                                = "libfsntfs_compressed_block_vector_read_element_data";
 	ssize_t read_count                                                   = 0;
 	int result                                                           = 0;
@@ -322,11 +322,11 @@ int libfsntfs_compressed_block_vector_read_element_data(
 	}
 	read_count = libfdata_stream_read_buffer(
 	              compression_unit_descriptor->data_stream,
-		      (intptr_t *) file_io_handle,
-		      compressed_block_data,
-		      compressed_block_size,
-		      0,
-		      error );
+	              (intptr_t *) file_io_handle,
+	              compressed_block_data,
+	              compressed_block_size,
+	              0,
+	              error );
 
 	if( read_count != (ssize_t) compressed_block_size )
 	{
@@ -342,12 +342,12 @@ int libfsntfs_compressed_block_vector_read_element_data(
 	if( ( range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		result = libfsntfs_decompress_data(
-			  compressed_data,
-			  (size_t) compressed_block_size,
-			  LIBFSNTFS_COMPRESSION_METHOD_LZNT1,
-			  compressed_block->data,
-			  &( compressed_block->data_size ),
-			  error );
+		          compressed_data,
+		          (size_t) compressed_block_size,
+		          LIBFSNTFS_COMPRESSION_METHOD_LZNT1,
+		          compressed_block->data,
+		          &( compressed_block->data_size ),
+		          error );
 
 		if( result != 1 )
 		{

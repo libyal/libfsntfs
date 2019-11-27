@@ -431,7 +431,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		 function );
 
 		return( -1 );
-        }
+	}
 	if( libfsntfs_index_node_get_number_of_values(
 	     index_node,
 	     &number_of_index_values,
@@ -553,11 +553,11 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 			return( -1 );
 		}
 		read_count = libfsntfs_data_stream_read_buffer_at_offset(
-			      security_descriptor_index->data_stream,
-			      secure_index_value_data,
-			      sizeof( fsntfs_secure_index_value_t ),
-			      (off64_t) security_descriptor_index_value->data_offset,
-			      error );
+		              security_descriptor_index->data_stream,
+		              secure_index_value_data,
+		              sizeof( fsntfs_secure_index_value_t ),
+		              (off64_t) security_descriptor_index_value->data_offset,
+		              error );
 
 		if( read_count < 0 )
 		{
@@ -647,10 +647,10 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 			goto on_error;
 		}
 		read_count = libfsntfs_data_stream_read_buffer(
-			      security_descriptor_index->data_stream,
-			      safe_security_descriptor_values->data,
-			      safe_security_descriptor_values->data_size,
-			      error );
+		              security_descriptor_index->data_stream,
+		              safe_security_descriptor_values->data,
+		              safe_security_descriptor_values->data_size,
+		              error );
 
 		if( read_count < 0 )
 		{
@@ -725,8 +725,8 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		          security_descriptor_index->sii_index->root_node,
 		          security_descriptor_identifier,
 		          security_descriptor_values,
-			  recursion_depth + 1,
-			  error );
+		          recursion_depth + 1,
+		          error );
 
 		if( result == -1 )
 		{

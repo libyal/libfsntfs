@@ -97,7 +97,7 @@ int libfsntfs_decompress_data(
 		          compressed_data_size,
 		          uncompressed_data,
 		          uncompressed_data_size,
-			  error );
+		          error );
 
 		if( result != 1 )
 		{
@@ -118,7 +118,7 @@ int libfsntfs_decompress_data(
 		          compressed_data_size,
 		          uncompressed_data,
 		          uncompressed_data_size,
-			  error );
+		          error );
 
 		if( result != 1 )
 		{

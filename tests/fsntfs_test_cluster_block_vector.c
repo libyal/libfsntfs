@@ -973,6 +973,28 @@ int fsntfs_test_cluster_block_vector_initialize(
 	libcerror_error_free(
 	 &error );
 
+	io_handle->cluster_block_size = 0;
+
+	result = libfsntfs_cluster_block_vector_initialize(
+	          &cluster_block_vector,
+	          io_handle,
+	          mft_attribute,
+	          &error );
+
+	io_handle->cluster_block_size = 4096;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	result = libfsntfs_cluster_block_vector_initialize(
 	          &cluster_block_vector,
 	          NULL,
@@ -1008,6 +1030,8 @@ int fsntfs_test_cluster_block_vector_initialize(
 
 	libcerror_error_free(
 	 &error );
+
+/* TODO test with LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK set */
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
@@ -1462,6 +1486,44 @@ int fsntfs_test_cluster_block_vector_read_element_data(
 		libcerror_error_free(
 		 &error );
 	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libfsntfs_cluster_block_vector_read_element_data with memset failing in libfsntfs_cluster_block_clear
+	 */
+	fsntfs_test_memset_attempts_before_fail = 0;
+
+	result = libfsntfs_cluster_block_vector_read_element_data(
+	          NULL,
+	          file_io_handle,
+	          cluster_block_vector,
+	          (libfdata_cache_t *) cache,
+	          0,
+	          0,
+	          0,
+	          4096,
+	          LIBFDATA_RANGE_FLAG_IS_SPARSE,
+	          0,
+	          &error );
+
+	if( fsntfs_test_memset_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up file IO handle

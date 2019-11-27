@@ -31,9 +31,11 @@
 #include "fsntfs_test_libfdata.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
+#include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_cluster_block_stream.h"
+#include "../libfsntfs/libfsntfs_definitions.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
 
@@ -73,6 +75,11 @@ int fsntfs_test_cluster_block_stream_initialize_from_data(
 	libcerror_error_t *error                = NULL;
 	libfdata_stream_t *cluster_block_stream = NULL;
 	int result                              = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests         = 2;
+	int test_number                         = 0;
+#endif
 
 	/* Test regular cases
 	 */
@@ -166,6 +173,54 @@ int fsntfs_test_cluster_block_stream_initialize_from_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_cluster_block_stream_initialize_from_data with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_cluster_block_stream_initialize_from_data(
+		          &cluster_block_stream,
+		          buffer,
+		          64,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( cluster_block_stream != NULL )
+			{
+				libfdata_stream_free(
+				 &cluster_block_stream,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "cluster_block_stream",
+			 cluster_block_stream );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
 	return( 1 );
 
 on_error:
@@ -194,6 +249,11 @@ int fsntfs_test_cluster_block_stream_initialize_from_data_runs(
 	libfsntfs_io_handle_t *io_handle         = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	int result                               = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests          = 1;
+	int test_number                          = 0;
+#endif
 
 	/* Initialize test
 	 */
@@ -326,6 +386,29 @@ int fsntfs_test_cluster_block_stream_initialize_from_data_runs(
 	libcerror_error_free(
 	 &error );
 
+	io_handle->cluster_block_size = 0;
+
+	result = libfsntfs_cluster_block_stream_initialize_from_data_runs(
+	          &cluster_block_stream,
+	          io_handle,
+	          mft_attribute,
+	          4096,
+	          &error );
+
+	io_handle->cluster_block_size = 4096;
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	result = libfsntfs_cluster_block_stream_initialize_from_data_runs(
 	          &cluster_block_stream,
 	          io_handle,
@@ -344,6 +427,55 @@ int fsntfs_test_cluster_block_stream_initialize_from_data_runs(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_cluster_block_stream_initialize_from_data_runs with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_cluster_block_stream_initialize_from_data_runs(
+		          &cluster_block_stream,
+		          io_handle,
+		          mft_attribute,
+		          4096,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( cluster_block_stream != NULL )
+			{
+				libfdata_stream_free(
+				 &cluster_block_stream,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "cluster_block_stream",
+			 cluster_block_stream );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up
 	 */
@@ -421,6 +553,11 @@ int fsntfs_test_cluster_block_stream_initialize_from_compressed_data_runs(
 	libfsntfs_io_handle_t *io_handle         = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	int result                               = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests          = 2;
+	int test_number                          = 0;
+#endif
 
 	/* Initialize test
 	 */
@@ -572,6 +709,663 @@ int fsntfs_test_cluster_block_stream_initialize_from_compressed_data_runs(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
+		          &cluster_block_stream,
+		          io_handle,
+		          mft_attribute,
+		          4096,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( cluster_block_stream != NULL )
+			{
+				libfdata_stream_free(
+				 &cluster_block_stream,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "cluster_block_stream",
+			 cluster_block_stream );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( cluster_block_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &cluster_block_stream,
+		 NULL );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_cluster_block_stream_initialize_from_compressed_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_cluster_block_stream_initialize_from_compressed_stream(
+     void )
+{
+	uint8_t buffer[ 64 ];
+
+	libcerror_error_t *error                  = NULL;
+	libfdata_stream_t *cluster_block_stream   = NULL;
+	libfdata_stream_t *compressed_data_stream = NULL;
+	libfsntfs_io_handle_t *io_handle          = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute  = NULL;
+	int result                                = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests           = 2;
+	int test_number                           = 0;
+#endif
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->cluster_block_size = 4096;
+
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_cluster_block_stream_data2,
+	          80,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_cluster_block_stream_initialize_from_data(
+	          &compressed_data_stream,
+	          buffer,
+	          64,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+	          &cluster_block_stream,
+	          compressed_data_stream,
+	          mft_attribute,
+	          LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libfdata_stream_free(
+	          &cluster_block_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "cluster_block_stream",
+	 cluster_block_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+	          NULL,
+	          compressed_data_stream,
+	          mft_attribute,
+	          LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+	          &cluster_block_stream,
+	          NULL,
+	          mft_attribute,
+	          LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+	          &cluster_block_stream,
+	          compressed_data_stream,
+	          NULL,
+	          LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_cluster_block_stream_initialize_from_compressed_stream with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
+		          &cluster_block_stream,
+		          compressed_data_stream,
+		          mft_attribute,
+		          LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( cluster_block_stream != NULL )
+			{
+				libfdata_stream_free(
+				 &cluster_block_stream,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "cluster_block_stream",
+			 cluster_block_stream );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libfdata_stream_free(
+	          &compressed_data_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "compressed_data_stream",
+	 compressed_data_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_free(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( cluster_block_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &cluster_block_stream,
+		 NULL );
+	}
+	if( compressed_data_stream != NULL )
+	{
+		libfdata_stream_free(
+		 &compressed_data_stream,
+		 NULL );
+	}
+	if( mft_attribute != NULL )
+	{
+		libfsntfs_mft_attribute_free(
+		 &mft_attribute,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libfsntfs_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_cluster_block_stream_initialize function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_cluster_block_stream_initialize(
+     void )
+{
+	libcerror_error_t *error                  = NULL;
+	libfdata_stream_t *cluster_block_stream   = NULL;
+	libfsntfs_io_handle_t *io_handle          = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute  = NULL;
+	int result                                = 0;
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+	int number_of_malloc_fail_tests           = 1;
+	int test_number                           = 0;
+#endif
+
+	/* Initialize test
+	 */
+	result = libfsntfs_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->cluster_block_size = 4096;
+
+	result = libfsntfs_mft_attribute_initialize(
+	          &mft_attribute,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_attribute",
+	 mft_attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libfsntfs_mft_attribute_read_data(
+	          mft_attribute,
+	          io_handle,
+	          fsntfs_test_cluster_block_stream_data2,
+	          80,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libfsntfs_cluster_block_stream_initialize(
+	          &cluster_block_stream,
+	          io_handle,
+	          mft_attribute,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libfdata_stream_free(
+	          &cluster_block_stream,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "cluster_block_stream",
+	 cluster_block_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libfsntfs_cluster_block_stream_initialize(
+	          NULL,
+	          io_handle,
+	          mft_attribute,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_cluster_block_stream_initialize(
+	          &cluster_block_stream,
+	          NULL,
+	          mft_attribute,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_cluster_block_stream_initialize(
+	          &cluster_block_stream,
+	          io_handle,
+	          NULL,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libfsntfs_cluster_block_stream_initialize with malloc failing
+		 */
+		fsntfs_test_malloc_attempts_before_fail = test_number;
+
+		result = libfsntfs_cluster_block_stream_initialize(
+		          &cluster_block_stream,
+		          io_handle,
+		          mft_attribute,
+		          NULL,
+		          0,
+		          &error );
+
+		if( fsntfs_test_malloc_attempts_before_fail != -1 )
+		{
+			fsntfs_test_malloc_attempts_before_fail = -1;
+
+			if( cluster_block_stream != NULL )
+			{
+				libfdata_stream_free(
+				 &cluster_block_stream,
+				 NULL );
+			}
+		}
+		else
+		{
+			FSNTFS_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			FSNTFS_TEST_ASSERT_IS_NULL(
+			 "cluster_block_stream",
+			 cluster_block_stream );
+
+			FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
+
 	/* Clean up
 	 */
 	result = libfsntfs_mft_attribute_free(
@@ -668,9 +1462,13 @@ int main(
 	 "libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs",
 	 fsntfs_test_cluster_block_stream_initialize_from_compressed_data_runs );
 
-	/* TODO add tests for libfsntfs_cluster_block_stream_initialize_from_compressed_stream */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_cluster_block_stream_initialize_from_compressed_stream",
+	 fsntfs_test_cluster_block_stream_initialize_from_compressed_stream );
 
-	/* TODO add tests for libfsntfs_cluster_block_stream_initialize */
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_cluster_block_stream_initialize",
+	 fsntfs_test_cluster_block_stream_initialize );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

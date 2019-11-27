@@ -32,7 +32,9 @@
 #include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
+#include "fsntfs_test_libfdata.h"
 #include "fsntfs_test_macros.h"
+#include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_cluster_block_data.h"
@@ -696,6 +698,66 @@ int fsntfs_test_cluster_block_data_read_segment_data(
 	 "error",
 	 error );
 
+	/* Initialize test
+	 */
+	offset = libfsntfs_cluster_block_data_seek_segment_offset(
+	          NULL,
+	          file_io_handle,
+	          0,
+	          0,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	read_count = libfsntfs_cluster_block_data_read_segment_data(
+	              NULL,
+	              file_io_handle,
+	              0,
+	              0,
+	              segment_data,
+	              12,
+	              0,
+	              LIBFDATA_RANGE_FLAG_IS_SPARSE,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 12 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	offset = libfsntfs_cluster_block_data_seek_segment_offset(
+	          NULL,
+	          file_io_handle,
+	          0,
+	          0,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "offset",
+	 offset,
+	 (int64_t) 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	read_count = libfsntfs_cluster_block_data_read_segment_data(
@@ -766,6 +828,52 @@ int fsntfs_test_cluster_block_data_read_segment_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_FSNTFS_TEST_MEMORY )
+
+	/* Test libfsntfs_cluster_block_data_read_segment_data with memset failing
+	 */
+	fsntfs_test_memset_attempts_before_fail = 0;
+
+	read_count = libfsntfs_cluster_block_data_read_segment_data(
+	              NULL,
+	              file_io_handle,
+	              0,
+	              0,
+	              segment_data,
+	              12,
+	              0,
+	              LIBFDATA_RANGE_FLAG_IS_SPARSE,
+	              &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT64(
+	 "read_count",
+	 read_count,
+	 (ssize_t) 12 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( fsntfs_test_memset_attempts_before_fail != -1 )
+	{
+		fsntfs_test_memset_attempts_before_fail = -1;
+	}
+	else
+	{
+		FSNTFS_TEST_ASSERT_EQUAL_INT64(
+		 "read_count",
+		 read_count,
+		 (ssize_t) -1 );
+
+		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
 
 	/* Clean up file IO handle
 	 */

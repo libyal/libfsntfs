@@ -436,18 +436,18 @@ int libfsntfs_reparse_point_values_read_data(
 		{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
-				  &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
-				  (size_t) reparse_point_values->substitute_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
+			          &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
+			          (size_t) reparse_point_values->substitute_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          &value_string_size,
+			          error );
 #else
 			result = libuna_utf8_string_size_from_utf16_stream(
-				  &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
-				  (size_t) reparse_point_values->substitute_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
+			          &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
+			          (size_t) reparse_point_values->substitute_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          &value_string_size,
+			          error );
 #endif
 			if( result != 1 )
 			{
@@ -461,7 +461,7 @@ int libfsntfs_reparse_point_values_read_data(
 				goto on_error;
 			}
 			value_string = system_string_allocate(
-					value_string_size );
+			                value_string_size );
 
 			if( value_string == NULL )
 			{
@@ -476,20 +476,20 @@ int libfsntfs_reparse_point_values_read_data(
 			}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
-				  (size_t) reparse_point_values->substitute_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
+			          (libuna_utf16_character_t *) value_string,
+			          value_string_size,
+			          &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
+			          (size_t) reparse_point_values->substitute_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          error );
 #else
 			result = libuna_utf8_string_copy_from_utf16_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
-				  (size_t) reparse_point_values->substitute_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
+			          (libuna_utf8_character_t *) value_string,
+			          value_string_size,
+			          &( reparse_point_values->reparse_data[ reparse_point_values->substitute_name_offset ] ),
+			          (size_t) reparse_point_values->substitute_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          error );
 #endif
 			if( result != 1 )
 			{
@@ -543,18 +543,18 @@ int libfsntfs_reparse_point_values_read_data(
 		{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
-				  &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
-				  (size_t) reparse_point_values->print_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
+			          &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
+			          (size_t) reparse_point_values->print_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          &value_string_size,
+			          error );
 #else
 			result = libuna_utf8_string_size_from_utf16_stream(
-				  &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
-				  (size_t) reparse_point_values->print_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
+			          &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
+			          (size_t) reparse_point_values->print_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          &value_string_size,
+			          error );
 #endif
 			if( result != 1 )
 			{
@@ -568,7 +568,7 @@ int libfsntfs_reparse_point_values_read_data(
 				goto on_error;
 			}
 			value_string = system_string_allocate(
-					value_string_size );
+			                value_string_size );
 
 			if( value_string == NULL )
 			{
@@ -583,20 +583,20 @@ int libfsntfs_reparse_point_values_read_data(
 			}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
-				  (size_t) reparse_point_values->print_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
+			          (libuna_utf16_character_t *) value_string,
+			          value_string_size,
+			          &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
+			          (size_t) reparse_point_values->print_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          error );
 #else
 			result = libuna_utf8_string_copy_from_utf16_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
-				  (size_t) reparse_point_values->print_name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
+			          (libuna_utf8_character_t *) value_string,
+			          value_string_size,
+			          &( reparse_point_values->reparse_data[ reparse_point_values->print_name_offset ] ),
+			          (size_t) reparse_point_values->print_name_size,
+			          LIBUNA_ENDIAN_LITTLE,
+			          error );
 #endif
 			if( result != 1 )
 			{

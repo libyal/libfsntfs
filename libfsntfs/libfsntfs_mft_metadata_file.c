@@ -347,12 +347,12 @@ int libfsntfs_mft_metadata_file_open(
 	     1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set track offsets read in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -364,12 +364,12 @@ int libfsntfs_mft_metadata_file_open(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set filename in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -516,12 +516,12 @@ int libfsntfs_mft_metadata_file_open_wide(
 	     1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set track offsets read in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -533,12 +533,12 @@ int libfsntfs_mft_metadata_file_open_wide(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set filename in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -1416,8 +1416,8 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name_size(
 		     volume_name_attribute,
 		     utf8_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -1512,8 +1512,8 @@ int libfsntfs_mft_metadata_file_get_utf8_volume_name(
 		     utf8_string,
 		     utf8_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -1606,8 +1606,8 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name_size(
 		     volume_name_attribute,
 		     utf16_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -1702,8 +1702,8 @@ int libfsntfs_mft_metadata_file_get_utf16_volume_name(
 		     utf16_string,
 		     utf16_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -1796,8 +1796,8 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 		     major_version,
 		     minor_version,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,

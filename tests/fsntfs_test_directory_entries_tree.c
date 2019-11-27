@@ -27,13 +27,19 @@
 #include <stdlib.h>
 #endif
 
+#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
+#include "../libfsntfs/libfsntfs_definitions.h"
 #include "../libfsntfs/libfsntfs_directory_entries_tree.h"
+#include "../libfsntfs/libfsntfs_index_node.h"
+#include "../libfsntfs/libfsntfs_index_value.h"
+#include "../libfsntfs/libfsntfs_io_handle.h"
+#include "../libfsntfs/libfsntfs_mft_entry.h"
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
@@ -270,6 +276,420 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libfsntfs_directory_entries_tree_insert_index_value function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entries_tree_insert_index_value(
+     void )
+{
+	libcerror_error_t *error                                   = NULL;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_index_value_t *index_value                       = NULL;
+	int result                                                 = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_directory_entries_tree_initialize(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entries_tree_insert_index_value(
+	          NULL,
+	          0,
+	          index_value,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_insert_index_value(
+	          directory_entries_tree,
+	          0,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_directory_entries_tree_free(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entries_tree != NULL )
+	{
+		libfsntfs_directory_entries_tree_free(
+		 &directory_entries_tree,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_directory_entries_tree_read_from_index_node function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entries_tree_read_from_index_node(
+     void )
+{
+	libbfio_handle_t *file_io_handle                           = NULL;
+	libcerror_error_t *error                                   = NULL;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_index_node_t *index_node                         = NULL;
+	int result                                                 = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_directory_entries_tree_initialize(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entries_tree_read_from_index_node(
+	          NULL,
+	          file_io_handle,
+	          index_node,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_index_node(
+	          directory_entries_tree,
+	          NULL,
+	          index_node,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_index_node(
+	          directory_entries_tree,
+	          file_io_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_index_node(
+	          directory_entries_tree,
+	          file_io_handle,
+	          index_node,
+	          LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH + 1,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_directory_entries_tree_free(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entries_tree != NULL )
+	{
+		libfsntfs_directory_entries_tree_free(
+		 &directory_entries_tree,
+		 NULL );
+	}
+	return( 0 );
+}
+
+/* Tests the libfsntfs_directory_entries_tree_read_from_i30_index function
+ * Returns 1 if successful or 0 if not
+ */
+int fsntfs_test_directory_entries_tree_read_from_i30_index(
+     void )
+{
+	libbfio_handle_t *file_io_handle                           = NULL;
+	libcerror_error_t *error                                   = NULL;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_io_handle_t *io_handle                           = NULL;
+	libfsntfs_mft_entry_t *mft_entry                           = NULL;
+	int result                                                 = 0;
+
+	/* Initialize test
+	 */
+	result = libfsntfs_directory_entries_tree_initialize(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+/* TODO implement test with LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY */
+
+	/* Test error cases
+	 */
+	result = libfsntfs_directory_entries_tree_read_from_i30_index(
+	          NULL,
+	          io_handle,
+	          file_io_handle,
+	          mft_entry,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_i30_index(
+	          directory_entries_tree,
+	          NULL,
+	          file_io_handle,
+	          mft_entry,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_i30_index(
+	          directory_entries_tree,
+	          io_handle,
+	          NULL,
+	          mft_entry,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_directory_entries_tree_read_from_i30_index(
+	          directory_entries_tree,
+	          io_handle,
+	          file_io_handle,
+	          NULL,
+	          0,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_directory_entries_tree_free(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entries_tree != NULL )
+	{
+		libfsntfs_directory_entries_tree_free(
+		 &directory_entries_tree,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 /* The main program
@@ -284,6 +704,17 @@ int main(
      char * const argv[] FSNTFS_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
+	libbfio_handle_t *file_io_handle                           = NULL;
+	libcerror_error_t *error                                   = NULL;
+	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
+	libfsntfs_io_handle_t *io_handle                           = NULL;
+	libfsntfs_mft_entry_t *mft_entry                           = NULL;
+	int result                                                 = 0;
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
+
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -297,13 +728,98 @@ int main(
 	 "libfsntfs_directory_entries_tree_free",
 	 fsntfs_test_directory_entries_tree_free );
 
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_directory_entries_tree_insert_index_value",
+	 fsntfs_test_directory_entries_tree_insert_index_value );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_directory_entries_tree_read_from_index_node",
+	 fsntfs_test_directory_entries_tree_read_from_index_node );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_directory_entries_tree_read_from_i30_index",
+	 fsntfs_test_directory_entries_tree_read_from_i30_index );
+
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
+	/* Initialize data stream for tests
+	 */
+	result = libfsntfs_directory_entries_tree_initialize(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+/* TODO
+	FSNTFS_TEST_RUN_WITH_ARGS(
+	 "libfsntfs_directory_entries_tree_get_number_of_entries",
+	 fsntfs_test_directory_entries_tree_get_number_of_entries,
+	 directory_entries_tree );
+*/
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_number_of_entries */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_entry_by_index */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_entry_by_utf8_name */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_get_entry_by_utf16_name */
+
+	/* TODO add tests for libfsntfs_directory_entries_tree_read_element_data */
+
+	/* Clean up
+	 */
+	result = libfsntfs_directory_entries_tree_free(
+	          &directory_entries_tree,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "directory_entries_tree",
+	 directory_entries_tree );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
-
 on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( directory_entries_tree != NULL )
+	{
+		libfsntfs_directory_entries_tree_free(
+		 &directory_entries_tree,
+		 NULL );
+	}
 	return( EXIT_FAILURE );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */

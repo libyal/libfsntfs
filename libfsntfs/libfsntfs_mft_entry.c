@@ -1965,10 +1965,10 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf8_name(
 			return( -1 );
 		}
 		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
-			  *attribute,
-			  utf8_string,
-			  utf8_string_length,
-			  error );
+		          *attribute,
+		          utf8_string,
+		          utf8_string_length,
+		          error );
 
 		if( result == -1 )
 		{
@@ -2068,10 +2068,10 @@ int libfsntfs_mft_entry_get_alternate_data_attribute_by_utf16_name(
 			return( -1 );
 		}
 		result = libfsntfs_mft_attribute_compare_name_with_utf16_string(
-			  *attribute,
-			  utf16_string,
-			  utf16_string_length,
-			  error );
+		          *attribute,
+		          utf16_string,
+		          utf16_string_length,
+		          error );
 
 		if( result == -1 )
 		{
@@ -2197,11 +2197,11 @@ int libfsntfs_mft_entry_set_attribute_helper_values(
 				return( -1 );
 			}
 			result = libuna_utf8_string_compare_with_utf8_stream(
-				  utf8_attribute_name,
-				  utf8_attribute_name_size,
-				  (uint8_t *) "$I30",
-				  4,
-				  error );
+			          utf8_attribute_name,
+			          utf8_attribute_name_size,
+			          (uint8_t *) "$I30",
+			          4,
+			          error );
 
 			if( result == -1 )
 			{
@@ -2343,12 +2343,12 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			return( -1 );
 		}
 		result = libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
-			  mft_entry,
-			  utf8_attribute_name,
-			  utf8_attribute_name_size,
-			  &attribute_index,
-			  &existing_data_attribute,
-			  error );
+		          mft_entry,
+		          utf8_attribute_name,
+		          utf8_attribute_name_size,
+		          &attribute_index,
+		          &existing_data_attribute,
+		          error );
 
 		if( result == -1 )
 		{
@@ -2414,10 +2414,10 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			}
 		}
 		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
-			  data_attribute,
-			  (uint8_t *) "WofCompressedData",
-			  17,
-			  error );
+		          data_attribute,
+		          (uint8_t *) "WofCompressedData",
+		          17,
+		          error );
 
 		if( result == -1 )
 		{
@@ -2545,10 +2545,10 @@ int libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
 			return( -1 );
 		}
 		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
-			  safe_attribute,
-			  utf8_string,
-			  utf8_string_length,
-			  error );
+		          safe_attribute,
+		          utf8_string,
+		          utf8_string_length,
+		          error );
 
 		if( result == -1 )
 		{

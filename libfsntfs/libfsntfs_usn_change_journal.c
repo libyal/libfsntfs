@@ -490,10 +490,10 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 				read_size = (size_t) ( internal_usn_change_journal->extent_size - internal_usn_change_journal->extent_offset );
 			}
 			read_count = libfsntfs_data_stream_read_buffer(
-				      internal_usn_change_journal->data_stream,
-				      internal_usn_change_journal->journal_block_data,
-				      read_size,
-				      error );
+			              internal_usn_change_journal->data_stream,
+			              internal_usn_change_journal->journal_block_data,
+			              read_size,
+			              error );
 
 			if( read_count != (ssize_t) read_size )
 			{

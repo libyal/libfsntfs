@@ -179,6 +179,10 @@
 				RelativePath="..\..\tests\fsntfs_test_cluster_block_stream.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_memory.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_memory.h"
 				>
 			</File>
 			<File

@@ -607,18 +607,18 @@ int libfsntfs_debug_print_utf16_string_value(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_utf16_stream(
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  &string_size,
-		  error );
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          &string_size,
+	          error );
 #else
 	result = libuna_utf8_string_size_from_utf16_stream(
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  &string_size,
-		  error );
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          &string_size,
+	          error );
 #endif
 	if( result != 1 )
 	{
@@ -659,20 +659,20 @@ int libfsntfs_debug_print_utf16_string_value(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_copy_from_utf16_stream(
-		  (libuna_utf16_character_t *) string,
-		  string_size,
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  error );
+	          (libuna_utf16_character_t *) string,
+	          string_size,
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          error );
 #else
 	result = libuna_utf8_string_copy_from_utf16_stream(
-		  (libuna_utf8_character_t *) string,
-		  string_size,
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  error );
+	          (libuna_utf8_character_t *) string,
+	          string_size,
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          error );
 #endif
 	if( result != 1 )
 	{
@@ -713,8 +713,8 @@ int libfsntfs_debug_print_read_offsets(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_debug_print_read_offsets";
-	off64_t offset        = 0;
 	size64_t size         = 0;
+	off64_t offset        = 0;
 	int number_of_offsets = 0;
 	int offset_iterator   = 0;
 

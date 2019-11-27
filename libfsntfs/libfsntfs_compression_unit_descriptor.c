@@ -232,8 +232,8 @@ int libfsntfs_compression_unit_descriptor_print(
 {
 	char *compression_unit_data_type = NULL;
 	static char *function            = "libfsntfs_compression_unit_descriptor_print";
-	off64_t segment_offset           = 0;
 	size64_t segment_size            = 0;
+	off64_t segment_offset           = 0;
 	uint32_t segment_flags           = 0;
 	int number_of_segments           = 0;
 	int segment_file_index           = 0;

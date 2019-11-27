@@ -418,9 +418,9 @@ int libfsntfs_file_system_read_bitmap(
 	libfsntfs_cluster_block_t *cluster_block = NULL;
 	libfsntfs_mft_entry_t *mft_entry         = NULL;
 	static char *function                    = "libfsntfs_file_system_read_bitmap";
+	size_t cluster_block_data_offset         = 0;
 	off64_t bitmap_offset                    = 0;
 	off64_t start_offset                     = 0;
-	size_t cluster_block_data_offset         = 0;
 	uint32_t value_32bit                     = 0;
 	uint8_t bit_index                        = 0;
 	int cluster_block_index                  = 0;

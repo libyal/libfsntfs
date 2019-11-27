@@ -47,8 +47,8 @@ int libfsntfs_cluster_block_vector_initialize(
 	libfsntfs_data_run_t *data_run               = NULL;
 	static char *function                        = "libfsntfs_cluster_block_vector_initialize";
 	size64_t attribute_data_vcn_size             = 0;
-	off64_t calculated_attribute_data_vcn_offset = 0;
 	off64_t attribute_data_vcn_offset            = 0;
+	off64_t calculated_attribute_data_vcn_offset = 0;
 	uint16_t attribute_data_flags                = 0;
 	int attribute_index                          = 0;
 	int data_run_index                           = 0;

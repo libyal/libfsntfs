@@ -353,12 +353,12 @@ int libfsntfs_volume_open(
 	     1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set track offsets read in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -370,12 +370,12 @@ int libfsntfs_volume_open(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set filename in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -522,12 +522,12 @@ int libfsntfs_volume_open_wide(
 	     1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set track offsets read in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set track offsets read in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -539,12 +539,12 @@ int libfsntfs_volume_open_wide(
 	      filename ) + 1,
 	     error ) != 1 )
 	{
-	        libcerror_error_set(
-	         error,
-	         LIBCERROR_ERROR_DOMAIN_RUNTIME,
-	         LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-	         "%s: unable to set filename in file IO handle.",
-	         function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file IO handle.",
+		 function );
 
 		goto on_error;
 	}
@@ -2016,8 +2016,8 @@ int libfsntfs_volume_get_utf8_name_size(
 		     volume_name_attribute,
 		     utf8_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -2112,8 +2112,8 @@ int libfsntfs_volume_get_utf8_name(
 		     utf8_string,
 		     utf8_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -2206,8 +2206,8 @@ int libfsntfs_volume_get_utf16_name_size(
 		     volume_name_attribute,
 		     utf16_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -2302,8 +2302,8 @@ int libfsntfs_volume_get_utf16_name(
 		     utf16_string,
 		     utf16_string_size,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -2396,8 +2396,8 @@ int libfsntfs_volume_get_version(
 		     major_version,
 		     minor_version,
 		     error ) != 1 )
-	        {
-	                libcerror_error_set(
+		{
+			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
@@ -2882,8 +2882,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 			result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 			          directory_entries_tree,
 			          internal_volume->file_io_handle,
-				  utf8_string_segment,
-				  utf8_string_segment_length,
+			          utf8_string_segment,
+			          utf8_string_segment_length,
 			          &safe_directory_entry,
 			          error );
 		}
@@ -3344,8 +3344,8 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 			result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 			          directory_entries_tree,
 			          internal_volume->file_io_handle,
-				  utf16_string_segment,
-				  utf16_string_segment_length,
+			          utf16_string_segment,
+			          utf16_string_segment_length,
 			          &safe_directory_entry,
 			          error );
 		}

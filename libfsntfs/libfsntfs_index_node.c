@@ -297,10 +297,10 @@ int libfsntfs_index_node_read_values(
 {
 	libfsntfs_index_value_t *index_value = NULL;
 	static char *function                = "libfsntfs_index_node_read_values";
-	size_t unknown_data_size             = 0;
-	ssize_t read_count                   = 0;
 	size_t index_node_size               = 0;
 	size_t index_values_offset           = 0;
+	size_t unknown_data_size             = 0;
+	ssize_t read_count                   = 0;
 	uint32_t index_value_flags           = 0;
 	int entry_index                      = 0;
 	int index_value_entry                = 0;
@@ -442,13 +442,13 @@ int libfsntfs_index_node_read_values(
 			goto on_error;
 		}
 		read_count = libfsntfs_index_value_read(
-			      index_value,
-			      index_value_vcn_offset + data_offset,
-			      &index_value_entry,
-			      data,
-			      data_size,
-			      data_offset,
-			      error );
+		              index_value,
+		              index_value_vcn_offset + data_offset,
+		              &index_value_entry,
+		              data,
+		              data_size,
+		              data_offset,
+		              error );
 
 		if( read_count == -1 )
 		{

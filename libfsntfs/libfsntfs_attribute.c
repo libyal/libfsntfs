@@ -378,9 +378,9 @@ int libfsntfs_internal_attribute_read_value(
 		case LIBFSNTFS_ATTRIBUTE_TYPE_LOGGED_UTILITY_STREAM:
 			result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
 			          internal_attribute->mft_attribute,
-				  (uint8_t *) "$TXF_DATA",
-				  9,
-				  error );
+			          (uint8_t *) "$TXF_DATA",
+			          9,
+			          error );
 
 			if( result == -1 )
 			{

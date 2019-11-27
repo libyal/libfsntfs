@@ -260,10 +260,10 @@ int libfsntfs_cluster_block_read_file_io_handle(
 		return( -1 );
 	}
 	read_count = libbfio_handle_read_buffer(
-		      file_io_handle,
-		      cluster_block->data,
-		      cluster_block->data_size,
-		      error );
+	              file_io_handle,
+	              cluster_block->data,
+	              cluster_block->data_size,
+	              error );
 
 	if( read_count != (ssize_t) cluster_block->data_size )
 	{

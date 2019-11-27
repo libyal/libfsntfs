@@ -399,7 +399,7 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 			}
 			data_segment_offset += data_segment_size;
 
-			if( data_segment_offset >= valid_data_size )
+			if( (size64_t) data_segment_offset >= valid_data_size )
 			{
 				break;
 			}
