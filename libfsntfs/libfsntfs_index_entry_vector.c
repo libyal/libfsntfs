@@ -41,9 +41,9 @@ int libfsntfs_index_entry_vector_initialize(
      libfdata_vector_t **index_entry_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *mft_attribute,
-     uint32_t index_entry_size,
      libcerror_error_t **error )
 {
+	libfdata_vector_t *safe_index_entry_vector   = NULL;
 	libfsntfs_data_run_t *data_run               = NULL;
 	static char *function                        = "libfsntfs_index_entry_vector_initialize";
 	size64_t attribute_data_vcn_size             = 0;
@@ -66,6 +66,17 @@ int libfsntfs_index_entry_vector_initialize(
 
 		return( -1 );
 	}
+	if( *index_entry_vector != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid index entry vector value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -73,6 +84,28 @@ int libfsntfs_index_entry_vector_initialize(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->cluster_block_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid IO handle - cluster block size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->index_entry_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid IO handle - index entry size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -103,12 +136,12 @@ int libfsntfs_index_entry_vector_initialize(
 		goto on_error;
 	}
 	if( libfdata_vector_initialize(
-	     index_entry_vector,
-	     (size64_t) index_entry_size,
-	     (intptr_t *) io_handle,
+	     &safe_index_entry_vector,
+	     (size64_t) io_handle->index_entry_size,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_index_entry_read_element_data,
+	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_vector_t *, libfdata_cache_t *, int, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libfsntfs_index_entry_vector_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -231,7 +264,7 @@ int libfsntfs_index_entry_vector_initialize(
 				goto on_error;
 			}
 			if( libfdata_vector_append_segment(
-			     *index_entry_vector,
+			     safe_index_entry_vector,
 			     &segment_index,
 			     0,
 			     data_run->start_offset,
@@ -269,13 +302,130 @@ int libfsntfs_index_entry_vector_initialize(
 			goto on_error;
 		}
 	}
+	*index_entry_vector = safe_index_entry_vector;
+
 	return( 1 );
 
 on_error:
-	if( *index_entry_vector != NULL )
+	if( safe_index_entry_vector != NULL )
 	{
 		libfdata_vector_free(
-		 index_entry_vector,
+		 &safe_index_entry_vector,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the index entry
+ * Callback function for the index entry vector
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_entry_vector_read_element_data(
+     intptr_t *data_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *vector,
+     libfdata_cache_t *cache,
+     int element_index,
+     int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
+     off64_t index_entry_offset,
+     size64_t index_entry_size,
+     uint32_t element_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+     uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
+     libcerror_error_t **error )
+{
+	libfsntfs_index_entry_t *index_entry = NULL;
+	static char *function                = "libfsntfs_index_entry_vector_read_element_data";
+
+	LIBFSNTFS_UNREFERENCED_PARAMETER( data_handle )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( element_flags )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
+
+	if( (uint64_t) element_index > (uint64_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: element index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_index_entry_initialize(
+	     &index_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create index entry.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_index_entry_read_file_io_handle(
+	     index_entry,
+	     file_io_handle,
+	     index_entry_offset,
+	     index_entry_size,
+	     (uint32_t) element_index,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read index entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 element_index,
+		 index_entry_offset,
+		 index_entry_offset );
+
+		goto on_error;
+	}
+	if( libfdata_vector_set_element_value_by_index(
+	     vector,
+	     (intptr_t *) file_io_handle,
+	     cache,
+	     element_index,
+	     (intptr_t *) index_entry->node,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_node_free,
+	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set index node as element value.",
+		 function );
+
+		goto on_error;
+	}
+	index_entry->node = NULL;
+
+	if( libfsntfs_index_entry_free(
+	     &index_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free index entry.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( index_entry != NULL )
+	{
+		libfsntfs_index_entry_free(
+		 &index_entry,
 		 NULL );
 	}
 	return( -1 );

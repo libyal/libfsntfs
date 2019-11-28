@@ -315,7 +315,6 @@ int libfsntfs_index_read(
 	libfsntfs_mft_attribute_t *mft_attribute              = NULL;
 	static char *function                                 = "libfsntfs_index_read";
 	uint32_t attribute_type                               = 0;
-	uint32_t index_entry_size                             = 0;
 	int attribute_index                                   = 0;
 	int number_of_attributes                              = 0;
 	int result                                            = 0;
@@ -499,25 +498,10 @@ int libfsntfs_index_read(
 	 */
 	if( index_allocation_attribute != NULL )
 	{
-		if( libfsntfs_index_root_header_get_index_entry_size(
-		     index->root_header,
-		     &index_entry_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index entry size.",
-			 function );
-
-			goto on_error;
-		}
 		if( libfsntfs_index_entry_vector_initialize(
 		     &( index->index_entry_vector ),
 		     index->io_handle,
 		     index_allocation_attribute,
-		     index_entry_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -574,10 +558,7 @@ int libfsntfs_index_read_root(
 	static char *function     = "libfsntfs_index_read_root";
 	size_t data_offset        = 0;
 	size_t data_size          = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t index_entry_size = 0;
-#endif
 
 	if( index == NULL )
 	{
@@ -657,35 +638,33 @@ int libfsntfs_index_read_root(
 	}
 	data_offset = sizeof( fsntfs_index_root_header_t );
 
-/* TODO for directory entries index check if collation type is COLLATION_FILENAME */
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+	if( libfsntfs_index_root_header_get_index_entry_size(
+	     index->root_header,
+	     &index_entry_size,
+	     error ) != 1 )
 	{
-		if( libfsntfs_index_root_header_get_index_entry_size(
-		     index->root_header,
-		     &index_entry_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index entry size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
+		 function );
 
-			goto on_error;
-		}
-		if( index_entry_size != index->io_handle->index_entry_size )
-		{
-			libcnotify_printf(
-			 "%s: mismatch in index entry size (in index root header: %" PRIu32 ", in volume header: %" PRIu32 ").\n",
-			 function,
-			 index_entry_size,
-			 index->io_handle->index_entry_size );
-		}
+		goto on_error;
 	}
-#endif
+	if( index_entry_size != index->io_handle->index_entry_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: mismatch in index entry size (in index root header: %" PRIu32 ", in volume header: %" PRIu32 ").",
+		 function,
+		 index_entry_size,
+		 index->io_handle->index_entry_size );
+
+		goto on_error;
+	}
 	if( libfsntfs_index_node_initialize(
 	     &( index->root_node ),
 	     error ) != 1 )

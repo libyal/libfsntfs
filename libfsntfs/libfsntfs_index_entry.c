@@ -20,25 +20,16 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_data_run.h"
-#include "libfsntfs_debug.h"
-#include "libfsntfs_definitions.h"
 #include "libfsntfs_fixup_values.h"
 #include "libfsntfs_index_entry.h"
 #include "libfsntfs_index_entry_header.h"
 #include "libfsntfs_index_node.h"
-#include "libfsntfs_index_value.h"
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
-#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_libfdata.h"
-#include "libfsntfs_unused.h"
 
 #include "fsntfs_index.h"
 
@@ -170,9 +161,8 @@ int libfsntfs_index_entry_free(
 /* Reads the index entry
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_index_entry_read(
+int libfsntfs_index_entry_read_file_io_handle(
      libfsntfs_index_entry_t *index_entry,
-     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
      uint32_t index_entry_size,
@@ -181,7 +171,7 @@ int libfsntfs_index_entry_read(
 {
 	libfsntfs_index_entry_header_t *index_entry_header = NULL;
 	uint8_t *index_entry_data                          = NULL;
-	static char *function                              = "libfsntfs_index_entry_read";
+	static char *function                              = "libfsntfs_index_entry_read_file_io_handle";
 	size_t data_offset                                 = 0;
 	size_t index_node_size                             = 0;
 	size_t index_values_offset                         = 0;
@@ -209,17 +199,6 @@ int libfsntfs_index_entry_read(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid index entry - node value already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -527,121 +506,6 @@ on_error:
 	{
 		memory_free(
 		 index_entry_data );
-	}
-	return( -1 );
-}
-
-/* Reads the index entry
- * Callback function for the index entry vector
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_index_entry_read_element_data(
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *vector,
-     libfdata_cache_t *cache,
-     int element_index,
-     int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
-     off64_t index_entry_offset,
-     size64_t index_entry_size,
-     uint32_t element_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
-     uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
-     libcerror_error_t **error )
-{
-	libfsntfs_index_entry_t *index_entry = NULL;
-	static char *function                = "libfsntfs_index_entry_read_element_data";
-
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_flags )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
-
-	if( (uint64_t) element_index > (uint64_t) UINT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: element index value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_index_entry_initialize(
-	     &index_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create index entry.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_index_entry_read(
-	     index_entry,
-	     io_handle,
-	     file_io_handle,
-	     index_entry_offset,
-	     index_entry_size,
-	     (uint32_t) element_index,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read index entry: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 element_index,
-		 index_entry_offset,
-		 index_entry_offset );
-
-		goto on_error;
-	}
-	if( libfdata_vector_set_element_value_by_index(
-	     vector,
-	     (intptr_t *) file_io_handle,
-	     cache,
-	     element_index,
-	     (intptr_t *) index_entry->node,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_index_node_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set index node as element value.",
-		 function );
-
-		goto on_error;
-	}
-	index_entry->node = NULL;
-
-	if( libfsntfs_index_entry_free(
-	     &index_entry,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free index entry.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( index_entry != NULL )
-	{
-		libfsntfs_index_entry_free(
-		 &index_entry,
-		 NULL );
 	}
 	return( -1 );
 }

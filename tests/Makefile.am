@@ -72,6 +72,7 @@ check_PROGRAMS = \
 	fsntfs_test_index \
 	fsntfs_test_index_entry \
 	fsntfs_test_index_entry_header \
+	fsntfs_test_index_entry_vector \
 	fsntfs_test_index_node \
 	fsntfs_test_index_node_header \
 	fsntfs_test_index_root_header \
@@ -552,7 +553,9 @@ fsntfs_test_index_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_index_entry_SOURCES = \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_index_entry.c \
+	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -560,6 +563,14 @@ fsntfs_test_index_entry_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_index_entry_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -572,6 +583,32 @@ fsntfs_test_index_entry_header_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_index_entry_header_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_index_entry_vector_SOURCES = \
+	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_index_entry_vector.c \
+	fsntfs_test_libbfio.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfcache.h \
+	fsntfs_test_libfdata.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_index_entry_vector_LDADD = \
+	@LIBFDATA_LIBADD@ \
+	@LIBFCACHE_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

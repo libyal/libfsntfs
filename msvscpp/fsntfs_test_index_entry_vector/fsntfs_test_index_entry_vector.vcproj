@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_index_entry"
-	ProjectGUID="{5F5EFDC4-BB68-493C-B4CB-44C82892090C}"
-	RootNamespace="fsntfs_test_index_entry"
+	Name="fsntfs_test_index_entry_vector"
+	ProjectGUID="{60828C47-8A89-42DA-98CB-6775272A2FDC}"
+	RootNamespace="fsntfs_test_index_entry_vector"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -180,7 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_index_entry.c"
+				RelativePath="..\..\tests\fsntfs_test_index_entry_vector.c"
 				>
 			</File>
 			<File
@@ -203,6 +203,14 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_libfcache.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\fsntfs_test_libfdata.h"
 				>
 			</File>
 			<File

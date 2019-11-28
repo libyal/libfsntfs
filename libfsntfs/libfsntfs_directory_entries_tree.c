@@ -1446,6 +1446,17 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 
 		return( -1 );
 	}
+	if( directory_entries_tree->i30_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - missing $I30 index.",
+		 function );
+
+		return( -1 );
+	}
 	result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 	          directory_entries_tree,
 	          file_io_handle,
@@ -1858,6 +1869,17 @@ int libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid directory entries tree.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->i30_index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entries tree - missing $I30 index.",
 		 function );
 
 		return( -1 );
