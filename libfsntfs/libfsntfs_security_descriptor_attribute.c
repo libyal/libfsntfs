@@ -40,6 +40,7 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_security_descriptor_attribute_get_security_descriptor_size";
 	uint32_t attribute_type                            = 0;
+	int result                                         = 0;
 
 	if( attribute == NULL )
 	{
@@ -90,10 +91,12 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
 
 		return( -1 );
 	}
-	if( libfsntfs_security_descriptor_values_get_data_size(
-	     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
-	     data_size,
-	     error ) != 1 )
+	result = libfsntfs_security_descriptor_values_get_data_size(
+	          (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
+	          data_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -104,7 +107,7 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor_size(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Retrieves the security descriptor (data)
@@ -119,6 +122,7 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor(
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_security_descriptor_attribute_get_security_descriptor";
 	uint32_t attribute_type                            = 0;
+	int result                                         = 0;
 
 	if( attribute == NULL )
 	{
@@ -169,11 +173,13 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor(
 
 		return( -1 );
 	}
-	if( libfsntfs_security_descriptor_values_get_data(
-	     (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
-	     data,
-	     data_size,
-	     error ) != 1 )
+	result = libfsntfs_security_descriptor_values_get_data(
+	          (libfsntfs_security_descriptor_values_t *) internal_attribute->value,
+	          data,
+	          data_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -184,6 +190,6 @@ int libfsntfs_security_descriptor_attribute_get_security_descriptor(
 
 		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 

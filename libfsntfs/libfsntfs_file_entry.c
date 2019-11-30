@@ -40,6 +40,7 @@
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_reparse_point_attribute.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_standard_information_values.h"
@@ -2782,6 +2783,558 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 	return( result );
 }
 
+/* Retrieves the size of the UTF-8 encoded path hint for a specific $FILE_NAME attribute
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_path_hint_size(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf8_string_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *attribute                     = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	libfsntfs_path_hint_t *path_hint                     = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_path_hint_size";
+	uint64_t parent_file_reference                       = 0;
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	     internal_file_entry,
+	     internal_file_entry->mft_entry,
+	     attribute_index,
+	     &attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	          attribute,
+	          &parent_file_reference,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent reference from file name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		result = libfsntfs_file_system_get_path_hint(
+		          internal_file_entry->file_system,
+		          internal_file_entry->file_io_handle,
+		          parent_file_reference,
+		          &path_hint,
+		          0,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
+			 function,
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+
+			result = -1;
+		}
+		else if( result != 0 )
+		{
+			result = libfsntfs_path_hint_get_utf8_path_size(
+			          path_hint,
+			          utf8_string_size,
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of UTF-8 path hint.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-8 encoded path hint
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf8_path_hint(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *attribute                     = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	libfsntfs_path_hint_t *path_hint                     = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf8_path_hint";
+	uint64_t parent_file_reference                       = 0;
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	     internal_file_entry,
+	     internal_file_entry->mft_entry,
+	     attribute_index,
+	     &attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	          attribute,
+	          &parent_file_reference,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent reference from file name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		result = libfsntfs_file_system_get_path_hint(
+		          internal_file_entry->file_system,
+		          internal_file_entry->file_io_handle,
+		          parent_file_reference,
+		          &path_hint,
+		          0,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
+			 function,
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+
+			result = -1;
+		}
+		else if( result != 0 )
+		{
+			result = libfsntfs_path_hint_get_utf8_path(
+			          path_hint,
+			          utf8_string,
+			          utf8_string_size,
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-8 path hint.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size of the UTF-16 encoded path hint for a specific $FILE_NAME attribute
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_path_hint_size(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf16_string_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *attribute                     = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	libfsntfs_path_hint_t *path_hint                     = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_path_hint_size";
+	uint64_t parent_file_reference                       = 0;
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	     internal_file_entry,
+	     internal_file_entry->mft_entry,
+	     attribute_index,
+	     &attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	          attribute,
+	          &parent_file_reference,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent reference from file name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		result = libfsntfs_file_system_get_path_hint(
+		          internal_file_entry->file_system,
+		          internal_file_entry->file_io_handle,
+		          parent_file_reference,
+		          &path_hint,
+		          0,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
+			 function,
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+
+			result = -1;
+		}
+		else if( result != 0 )
+		{
+			result = libfsntfs_path_hint_get_utf16_path_size(
+			          path_hint,
+			          utf16_string_size,
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of UTF-16 path hint.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-16 encoded path hint
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_utf16_path_hint(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *attribute                     = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	libfsntfs_path_hint_t *path_hint                     = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_utf16_path_hint";
+	uint64_t parent_file_reference                       = 0;
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	     internal_file_entry,
+	     internal_file_entry->mft_entry,
+	     attribute_index,
+	     &attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		result = -1;
+	}
+	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
+	          attribute,
+	          &parent_file_reference,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve parent reference from file name attribute.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		result = libfsntfs_file_system_get_path_hint(
+		          internal_file_entry->file_system,
+		          internal_file_entry->file_io_handle,
+		          parent_file_reference,
+		          &path_hint,
+		          0,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
+			 function,
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+
+			result = -1;
+		}
+		else if( result != 0 )
+		{
+			result = libfsntfs_path_hint_get_utf16_path(
+			          path_hint,
+			          utf16_string,
+			          utf16_string_size,
+			          error );
+
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-16 path hint.",
+				 function );
+
+				result = -1;
+			}
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the size of the UTF-8 encoded reparse point substitute name
  * The returned size includes the end of string character
  * This value is retrieved from the $REPARSE_POINT attribute
@@ -3711,10 +4264,12 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 		}
 		security_descriptor_values = internal_file_entry->security_descriptor_values;
 	}
-	if( libfsntfs_security_descriptor_values_get_data_size(
-	     security_descriptor_values,
-	     data_size,
-	     error ) != 1 )
+	result = libfsntfs_security_descriptor_values_get_data_size(
+	          security_descriptor_values,
+	          data_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3725,7 +4280,7 @@ int libfsntfs_file_entry_get_security_descriptor_size(
 
 		goto on_error;
 	}
-	return( 1 );
+	return( result );
 
 on_error:
 	if( internal_file_entry->security_descriptor_values != NULL )
@@ -3883,11 +4438,13 @@ int libfsntfs_file_entry_get_security_descriptor(
 		}
 		security_descriptor_values = internal_file_entry->security_descriptor_values;
 	}
-	if( libfsntfs_security_descriptor_values_get_data(
-	     security_descriptor_values,
-	     data,
-	     data_size,
-	     error ) != 1 )
+	result = libfsntfs_security_descriptor_values_get_data(
+	          security_descriptor_values,
+	          data,
+	          data_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3898,7 +4455,7 @@ int libfsntfs_file_entry_get_security_descriptor(
 
 		goto on_error;
 	}
-	return( 1 );
+	return( result );
 
 on_error:
 	if( internal_file_entry->security_descriptor_values != NULL )

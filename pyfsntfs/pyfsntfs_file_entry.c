@@ -278,6 +278,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the file attribute flags." },
 
+	{ "get_path_hint",
+	  (PyCFunction) pyfsntfs_file_entry_get_path_hint,
+	  METH_VARARGS | METH_KEYWORDS,
+	  "get_path_hint(attribute_index) -> Unicode string or None\n"
+	  "\n"
+	  "Returns the name." },
+
 	{ "get_reparse_point_substitute_name",
 	  (PyCFunction) pyfsntfs_file_entry_get_reparse_point_substitute_name,
 	  METH_NOARGS,
@@ -3039,6 +3046,133 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 	                  (uint64_t) file_attribute_flags );
 
 	return( integer_object );
+}
+
+/* Retrieves the path hint for a specific $FILE_NAME attribute
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_path_hint(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	libcerror_error_t *error    = NULL;
+	PyObject *string_object     = NULL;
+	const char *errors          = NULL;
+	uint8_t *path               = NULL;
+	static char *function       = "pyfsntfs_file_entry_get_path_hint";
+	static char *keyword_list[] = { "attribute_index", NULL };
+	size_t path_size            = 0;
+	int attribute_index         = 0;
+	int result                  = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	if( PyArg_ParseTupleAndKeywords(
+	     arguments,
+	     keywords,
+	     "i",
+	     keyword_list,
+	     &attribute_index ) == 0 )
+	{
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_utf8_path_hint_size(
+	          pyfsntfs_file_entry->file_entry,
+	          attribute_index,
+	          &path_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve path size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	else if( path_size == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	path = (uint8_t *) PyMem_Malloc(
+	                    sizeof( uint8_t ) * path_size );
+
+	if( path == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to create path.",
+		 function );
+
+		goto on_error;
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_utf8_path_hint(
+		  pyfsntfs_file_entry->file_entry,
+	          attribute_index,
+		  path,
+		  path_size,
+		  &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve path.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	/* Pass the string length to PyUnicode_DecodeUTF8
+	 * otherwise it makes the end of string character is part
+	 * of the string
+	 */
+	string_object = PyUnicode_DecodeUTF8(
+			 (char *) path,
+			 (Py_ssize_t) path_size - 1,
+			 errors );
+
+	PyMem_Free(
+	 path );
+
+	return( string_object );
+
+on_error:
+	if( path != NULL )
+	{
+		PyMem_Free(
+		 path );
+	}
+	return( NULL );
 }
 
 /* Retrieves the reparse point substitute name

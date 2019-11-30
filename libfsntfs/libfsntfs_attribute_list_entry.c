@@ -277,7 +277,7 @@ int libfsntfs_attribute_list_entry_read_data(
 		 attribute_list_entry->data_first_vcn );
 
 		libcnotify_printf(
-		 "%s: file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 function,
 		 attribute_list_entry->file_reference & 0xffffffffffffUL,
 		 attribute_list_entry->file_reference >> 48 );

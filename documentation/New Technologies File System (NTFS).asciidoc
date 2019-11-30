@@ -1645,7 +1645,9 @@ the last compression unit (blocks 65 to 80) would be sparse.
 
 [NOTE]
 A compression unit can consists of multiple compressed data runs, e.g. 1 data
-block followed by 4 data blocks followed by 11 sparse blocks.
+block followed by 4 data blocks followed by 11 sparse blocks. Data runs have
+been observed where the last data run size does not align with the compression
+unit size.
 
 [NOTE]
 The sparse blocks data run can be stored in a subsequent attribute in an

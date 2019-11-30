@@ -362,6 +362,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_path_hint.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_profiler.c"
 				>
 			</File>
@@ -737,6 +741,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_object_identifier_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_path_hint.h"
 				>
 			</File>
 			<File

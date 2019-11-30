@@ -1714,6 +1714,7 @@ on_error:
  */
 int info_handle_attribute_fprint(
      info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      int attribute_index,
      libcerror_error_t **error )
@@ -1996,6 +1997,94 @@ int info_handle_attribute_fprint(
 
 		default:
 			break;
+	}
+	if( ( info_handle->input_mft_metadata_file != NULL )
+	 && ( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME ) )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tPath hint\t\t\t: " );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_file_entry_get_utf16_path_hint_size(
+		          file_entry,
+		          attribute_index,
+		          &value_string_size,
+		          error );
+#else
+		result = libfsntfs_file_entry_get_utf8_path_hint_size(
+		          file_entry,
+		          attribute_index,
+		          &value_string_size,
+		          error );
+#endif
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve path hint string size.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( result != 0 )
+		 && ( value_string_size > 0 ) )
+		{
+			value_string = system_string_allocate(
+			                value_string_size );
+
+			if( value_string == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create path hint string.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfsntfs_file_entry_get_utf16_path_hint(
+			          file_entry,
+			          attribute_index,
+			          (uint16_t *) value_string,
+			          value_string_size,
+			          error );
+#else
+			result = libfsntfs_file_entry_get_utf8_path_hint(
+			          file_entry,
+			          attribute_index,
+			          (uint8_t *) value_string,
+			          value_string_size,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve path hint string.",
+				 function );
+
+				goto on_error;
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIs_SYSTEM "",
+			 value_string );
+
+			memory_free(
+			 value_string );
+
+			value_string = NULL;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
 	}
 	fprintf(
 	 info_handle->notify_stream,
@@ -2762,6 +2851,74 @@ int info_handle_reparse_point_attribute_fprint(
 	 "\tTag\t\t\t\t: 0x%08" PRIx32 "\n",
 	 value_32bit );
 
+	result = libfsntfs_reparse_point_attribute_get_compression_method(
+	          attribute,
+	          &value_32bit,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve compression method.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tCompression method\t\t: " );
+
+		switch( value_32bit )
+		{
+			case 0:
+				fprintf(
+				 info_handle->notify_stream,
+				 "XPRESS4K (%" PRIu32 ")",
+				 value_32bit );
+
+				break;
+
+			case 1:
+				fprintf(
+				 info_handle->notify_stream,
+				 "LZX (%" PRIu32 ")",
+				 value_32bit );
+
+				break;
+
+			case 2:
+				fprintf(
+				 info_handle->notify_stream,
+				 "XPRESS8K (%" PRIu32 ")",
+				 value_32bit );
+
+				break;
+
+			case 3:
+				fprintf(
+				 info_handle->notify_stream,
+				 "XPRESS16K (%" PRIu32 ")",
+				 value_32bit );
+
+				break;
+
+			default:
+				fprintf(
+				 info_handle->notify_stream,
+				 "%" PRIu32 "",
+				 value_32bit );
+
+				break;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\n" );
+	}
 /* TODO print sanitized substitute name */
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -4666,7 +4823,7 @@ int info_handle_mft_entry_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve base record_file reference.",
+			 "%s: unable to retrieve base record file reference.",
 			 function );
 
 			goto on_error;
@@ -4749,6 +4906,7 @@ int info_handle_mft_entry_fprint(
 			}
 			if( info_handle_attribute_fprint(
 			     info_handle,
+			     file_entry,
 			     attribute,
 			     attribute_index,
 			     error ) != 1 )
@@ -4862,10 +5020,12 @@ int info_handle_mft_entries_fprint(
 	     file_entry_index < number_of_file_entries;
 	     file_entry_index++ )
 	{
-		if( info_handle_mft_entry_fprint(
-		     info_handle,
-		     file_entry_index,
-		     error ) != 1 )
+		result = info_handle_mft_entry_fprint(
+		          info_handle,
+		          file_entry_index,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -4876,6 +5036,13 @@ int info_handle_mft_entries_fprint(
 			 file_entry_index );
 
 			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "Unable to print MFT entry: %" PRIu64 ".\n\n",
+			 file_entry_index );
 		}
 	}
 	return( 1 );

@@ -592,7 +592,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 "%s: index value: %03d file reference: %" PRIu64 "-%" PRIu64 "\n",
 			 function,
 			 index_value_entry,
 			 index_value->file_reference & 0xffffffffffffUL,
@@ -748,6 +748,17 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
 		 "%s: invalid directory entries tree - $I30 index value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( directory_entries_tree->short_names_tree != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid directory entries tree - short names tree value already set.",
 		 function );
 
 		return( -1 );
@@ -1174,7 +1185,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 "%s: index value: %03d file reference: %" PRIu64 "-%" PRIu64 "\n",
 			 function,
 			 index_value_entry,
 			 index_value->file_reference & 0xffffffffffffUL,
@@ -1601,7 +1612,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: index value: %03d file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+			 "%s: index value: %03d file reference: %" PRIu64 "-%" PRIu64 "\n",
 			 function,
 			 index_value_entry,
 			 index_value->file_reference & 0xffffffffffffUL,

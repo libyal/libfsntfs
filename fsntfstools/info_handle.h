@@ -123,6 +123,7 @@ int info_handle_security_descriptor_fprint(
 
 int info_handle_attribute_fprint(
      info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      int attribute_index,
      libcerror_error_t **error );

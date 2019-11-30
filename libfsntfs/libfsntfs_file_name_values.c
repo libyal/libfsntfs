@@ -463,7 +463,7 @@ int libfsntfs_file_name_values_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: parent file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: parent file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 function,
 		 file_name_values->parent_file_reference & 0xffffffffffffUL,
 		 file_name_values->parent_file_reference >> 48 );

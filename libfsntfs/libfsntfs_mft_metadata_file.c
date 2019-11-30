@@ -29,6 +29,7 @@
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
+#include "libfsntfs_file_name_values.h"
 #include "libfsntfs_file_system.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
@@ -1835,6 +1836,7 @@ int libfsntfs_mft_metadata_file_get_number_of_file_entries(
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_number_of_file_entries";
+	int result                                                         = 1;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1849,6 +1851,21 @@ int libfsntfs_mft_metadata_file_get_number_of_file_entries(
 	}
 	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
 
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_file_system_get_number_of_mft_entries(
 	     internal_mft_metadata_file->file_system,
 	     number_of_file_entries,
@@ -1861,9 +1878,24 @@ int libfsntfs_mft_metadata_file_get_number_of_file_entries(
 		 "%s: unable to retrieve number of MFT entries.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the file entry of a specific MFT entry index
@@ -1877,6 +1909,7 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 {
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
 	static char *function                                              = "libfsntfs_mft_metadata_file_get_file_entry_by_index";
+	int result                                                         = 1;
 
 	if( mft_metadata_file == NULL )
 	{
@@ -1913,6 +1946,21 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_file_entry_initialize(
 	     file_entry,
 	     internal_mft_metadata_file->io_handle,
@@ -1931,8 +1979,23 @@ int libfsntfs_mft_metadata_file_get_file_entry_by_index(
 		 function,
 		 mft_entry_index );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 

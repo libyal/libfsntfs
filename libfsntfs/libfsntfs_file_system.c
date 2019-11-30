@@ -28,6 +28,7 @@
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_system.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libcthreads.h"
@@ -35,6 +36,7 @@
 #include "libfsntfs_mft.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_name.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_values.h"
 
@@ -169,6 +171,23 @@ int libfsntfs_file_system_free(
 			result = -1;
 		}
 #endif
+		if( ( *file_system )->path_hints_tree != NULL )
+		{
+			if( libcdata_btree_free(
+			     &( ( *file_system )->path_hints_tree ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_path_hint_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free path hints tree.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *file_system )->security_descriptor_index != NULL )
 		{
 			if( libfsntfs_security_descriptor_index_free(
@@ -378,6 +397,21 @@ int libfsntfs_file_system_read_mft(
 			goto on_error;
 		}
 		file_system->mft->number_of_mft_entries = number_of_mft_entries;
+
+		if( libcdata_btree_initialize(
+		     &( file_system->path_hints_tree ),
+		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create path hints B-tree.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( libfsntfs_mft_entry_free(
 	     &mft_entry,
@@ -395,6 +429,13 @@ int libfsntfs_file_system_read_mft(
 	return( 1 );
 
 on_error:
+	if( file_system->path_hints_tree != NULL )
+	{
+		libcdata_btree_free(
+		 &( file_system->path_hints_tree ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_path_hint_free,
+		 NULL );
+	}
 	if( mft_entry != NULL )
 	{
 		libfsntfs_mft_entry_free(
@@ -1138,5 +1179,456 @@ int libfsntfs_file_system_get_security_descriptor_values_by_identifier(
 		}
 	}
 	return( result );
+}
+
+/* Retrieves the path hint of a specific file reference
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_system_get_path_hint(
+     libfsntfs_file_system_t *file_system,
+     libbfio_handle_t *file_io_handle,
+     uint64_t file_reference,
+     libfsntfs_path_hint_t **path_hint,
+     int recursion_depth,
+     libcerror_error_t **error )
+{
+	libcdata_tree_node_t *upper_node               = NULL;
+	libfsntfs_file_name_values_t *file_name_values = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute       = NULL;
+	libfsntfs_mft_entry_t *mft_entry               = NULL;
+	libfsntfs_path_hint_t *existing_path_hint      = NULL;
+	libfsntfs_path_hint_t *lookup_path_hint        = NULL;
+	libfsntfs_path_hint_t *parent_path_hint        = NULL;
+	libfsntfs_path_hint_t *safe_path_hint          = NULL;
+	uint8_t *parent_path                           = NULL;
+	static char *function                          = "libfsntfs_file_system_get_path_hint";
+	size_t name_size                               = 0;
+	size_t parent_path_size                        = 0;
+	uint64_t mft_entry_index                       = 0;
+	uint64_t parent_file_reference                 = 0;
+	uint64_t parent_mft_entry_index                = 0;
+	uint32_t attribute_type                        = 0;
+	int attribute_index                            = 0;
+	int number_of_attributes                       = 0;
+	int result                                     = 0;
+	int value_index                                = 0;
+
+	if( file_system == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file system.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_hint == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path hint.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	mft_entry_index = file_reference & 0xffffffffffffUL;
+
+	if( libfsntfs_file_system_get_mft_entry_by_index(
+	     file_system,
+	     file_io_handle,
+	     mft_entry_index,
+	     &mft_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
+
+		goto on_error;
+	}
+	if( libfsntfs_path_hint_initialize(
+	     &lookup_path_hint,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create path hint.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_entry_get_file_reference(
+	     mft_entry,
+	     &( lookup_path_hint->file_reference ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		goto on_error;
+	}
+	result = libcdata_btree_get_value_by_value(
+	          file_system->path_hints_tree,
+	          (intptr_t *) lookup_path_hint,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_path_hint_compare_by_file_reference,
+	          &upper_node,
+	          (intptr_t **) path_hint,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve path hint from tree.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		if( libfsntfs_mft_entry_get_number_of_attributes(
+		     mft_entry,
+		     &number_of_attributes,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of attributes.",
+			 function );
+
+			goto on_error;
+		}
+		for( attribute_index = 0;
+		     attribute_index < number_of_attributes;
+		     attribute_index++ )
+		{
+			if( libfsntfs_mft_entry_get_attribute_by_index(
+			     mft_entry,
+			     attribute_index,
+			     &mft_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute: %d.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+			if( libfsntfs_mft_attribute_get_type(
+			     mft_attribute,
+			     &attribute_type,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute: %d type.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+			if( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+			{
+				continue;
+			}
+			if( libfsntfs_file_name_values_initialize(
+			     &file_name_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create file name values.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_file_name_values_read_from_mft_attribute(
+			     file_name_values,
+			     mft_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read file name values.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_file_name_values_get_parent_file_reference(
+			     file_name_values,
+			     &parent_file_reference,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve parent file reference.",
+				 function );
+
+				goto on_error;
+			}
+			parent_mft_entry_index = parent_file_reference & 0xffffffffffffUL;
+
+			if( file_name_values->name_namespace != LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+			{
+				parent_path      = NULL;
+				parent_path_size = 0;
+
+				if( ( mft_entry_index != LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY )
+				 && ( parent_mft_entry_index == LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY ) )
+				{
+					parent_path      = (uint8_t *) "";
+					parent_path_size = 1;
+				}
+				else if( ( parent_mft_entry_index != 0 )
+				      && ( parent_mft_entry_index != mft_entry_index ) )
+				{
+					result = libfsntfs_file_system_get_path_hint(
+					          file_system,
+					          file_io_handle,
+					          parent_file_reference,
+					          &parent_path_hint,
+					          recursion_depth + 1,
+					          error );
+
+					if( result == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve path hint for MFT entry: %" PRIu64 ".",
+						 function,
+						 parent_mft_entry_index );
+
+						goto on_error;
+					}
+					else if( result != 0 )
+					{
+						parent_path      = parent_path_hint->path;
+						parent_path_size = parent_path_hint->path_size;
+					}
+				}
+				if( libfsntfs_file_name_values_get_utf8_name_size(
+				     file_name_values,
+				     &name_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve size of UTF-8 name.",
+					 function );
+
+					goto on_error;
+				}
+				if( libfsntfs_path_hint_initialize(
+				     &safe_path_hint,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create path hint.",
+					 function );
+
+					goto on_error;
+				}
+				safe_path_hint->file_reference = file_reference;
+				safe_path_hint->path_size      = parent_path_size + name_size;
+
+				safe_path_hint->path = (uint8_t *) memory_allocate(
+								    sizeof( uint8_t ) * safe_path_hint->path_size );
+
+				if( safe_path_hint->path == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_MEMORY,
+					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create path.",
+					 function );
+
+					goto on_error;
+				}
+				if( ( parent_path != NULL )
+				 && ( parent_path_size > 0 ) )
+				{
+					if( memory_copy(
+					     safe_path_hint->path,
+					     parent_path,
+					     parent_path_size ) == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+						 "%s: unable to copy parent path to path.",
+						 function );
+
+						goto on_error;
+					}
+					safe_path_hint->path[ parent_path_size - 1 ] = '\\';
+				}
+				if( name_size > 0 )
+				{
+					if( libfsntfs_file_name_values_get_utf8_name(
+					     file_name_values,
+					     &( safe_path_hint->path[ parent_path_size ] ),
+					     name_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve UTF-8 name.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				if( mft_entry_index == LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY )
+				{
+					safe_path_hint->path[ 0 ] = '\\';
+				}
+				result = libcdata_btree_insert_value(
+					  file_system->path_hints_tree,
+					  &value_index,
+					  (intptr_t *) safe_path_hint,
+					  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_path_hint_compare_by_file_reference,
+					  &upper_node,
+					  (intptr_t **) &existing_path_hint,
+					  error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to insert path hint into tree.",
+					 function );
+
+					goto on_error;
+				}
+				else if( result == 0 )
+				{
+					if( libfsntfs_path_hint_free(
+					     &safe_path_hint,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+						 "%s: unable to free path hint.",
+						 function );
+
+						goto on_error;
+					}
+					*path_hint = existing_path_hint;
+				}
+				else
+				{
+					*path_hint = safe_path_hint;
+
+					safe_path_hint = NULL;
+				}
+				result = 1;
+			}
+			if( libfsntfs_file_name_values_free(
+			     &file_name_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free file name values.",
+				 function );
+
+				goto on_error;
+			}
+		}
+	}
+	if( libfsntfs_path_hint_free(
+	     &lookup_path_hint,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free path hint.",
+		 function );
+
+		goto on_error;
+	}
+	return( result );
+
+on_error:
+	if( safe_path_hint != NULL )
+	{
+		libfsntfs_path_hint_free(
+		 &safe_path_hint,
+		 NULL );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
+		 NULL );
+	}
+	if( lookup_path_hint != NULL )
+	{
+		libfsntfs_path_hint_free(
+		 &lookup_path_hint,
+		 NULL );
+	}
+	return( -1 );
 }
 

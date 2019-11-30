@@ -97,6 +97,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_notify.c libfsntfs_notify.h \
 	libfsntfs_object_identifier_attribute.c libfsntfs_object_identifier_attribute.h \
 	libfsntfs_object_identifier_values.c libfsntfs_object_identifier_values.h \
+	libfsntfs_path_hint.c libfsntfs_path_hint.h \
 	libfsntfs_profiler.c libfsntfs_profiler.h \
 	libfsntfs_reparse_point_attribute.c libfsntfs_reparse_point_attribute.h \
 	libfsntfs_reparse_point_values.c libfsntfs_reparse_point_values.h \

@@ -189,6 +189,11 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_path_hint(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments,
+           PyObject *keywords );
+
 PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );

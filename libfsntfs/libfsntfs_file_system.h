@@ -27,9 +27,11 @@
 
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_security_descriptor_index.h"
 #include "libfsntfs_security_descriptor_values.h"
 
@@ -48,6 +50,10 @@ struct libfsntfs_file_system
 	/* The security descriptor index
 	 */
 	libfsntfs_security_descriptor_index_t *security_descriptor_index;
+
+	/* The path hints B-tree
+	 */
+	libcdata_btree_t *path_hints_tree;
 
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
@@ -109,6 +115,14 @@ int libfsntfs_file_system_get_security_descriptor_values_by_identifier(
      libbfio_handle_t *file_io_handle,
      uint32_t security_descriptor_identifier,
      libfsntfs_security_descriptor_values_t **security_descriptor_values,
+     libcerror_error_t **error );
+
+int libfsntfs_file_system_get_path_hint(
+     libfsntfs_file_system_t *file_system,
+     libbfio_handle_t *file_io_handle,
+     uint64_t file_reference,
+     libfsntfs_path_hint_t **path_hint,
+     int recursion_depth,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

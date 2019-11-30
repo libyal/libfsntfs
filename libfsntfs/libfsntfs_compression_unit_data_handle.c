@@ -254,7 +254,8 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			attribute_data_vcn_offset *= io_handle->cluster_block_size;
 			attribute_data_vcn_size   *= io_handle->cluster_block_size;
 
-			if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
+			if( ( calculated_attribute_data_vcn_offset != 0 )
+			 && ( calculated_attribute_data_vcn_offset != attribute_data_vcn_offset ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -370,15 +371,28 @@ int libfsntfs_compression_unit_data_handle_initialize(
 					 */
 					if( data_run_size < (size64_t) remaining_compression_unit_size )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-						 "%s: invalid sparse data run: %d size value out of bounds.",
-						 function,
-						 data_run_index );
+						if( data_run_index < ( number_of_data_runs - 1 ) )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+							 "%s: invalid sparse data run: %d size value out of bounds.",
+							 function,
+							 data_run_index );
 
-						goto on_error;
+							goto on_error;
+						}
+#if defined( HAVE_DEBUG_OUTPUT )
+						else if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+							 "%s: last sparse data run: %d size does not align with compression unit size.",
+							 function,
+							 data_run_index );
+						}
+#endif
+						remaining_compression_unit_size = 0;
 					}
 					descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
 				}

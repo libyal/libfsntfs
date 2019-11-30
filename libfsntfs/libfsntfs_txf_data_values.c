@@ -241,7 +241,7 @@ int libfsntfs_txf_data_values_read_data(
 		 0 );
 
 		libcnotify_printf(
-		 "%s: resource manager root file reference\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: resource manager root file reference\t: %" PRIu64 "- %" PRIu64 "\n",
 		 function,
 		 txf_data_values->rm_root_file_reference & 0xffffffffffffUL,
 		 txf_data_values->rm_root_file_reference >> 48 );

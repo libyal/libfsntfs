@@ -719,7 +719,7 @@ on_error:
 }
 
 /* Retrieves the security descriptor data size
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_security_descriptor_values_get_data_size(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
@@ -750,13 +750,17 @@ int libfsntfs_security_descriptor_values_get_data_size(
 
 		return( -1 );
 	}
+	if( security_descriptor_values->data == NULL )
+	{
+		return( 0 );
+	}
 	*data_size = security_descriptor_values->data_size;
 
 	return( 1 );
 }
 
 /* Retrieves the security descriptor data size
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_security_descriptor_values_get_data(
      libfsntfs_security_descriptor_values_t *security_descriptor_values,
@@ -809,6 +813,10 @@ int libfsntfs_security_descriptor_values_get_data(
 		 function );
 
 		return( -1 );
+	}
+	if( security_descriptor_values->data == NULL )
+	{
+		return( 0 );
 	}
 	if( memory_copy(
 	     data,

@@ -201,7 +201,8 @@ int libfsntfs_index_entry_vector_initialize(
 			attribute_data_vcn_offset *= io_handle->cluster_block_size;
 			attribute_data_vcn_size   *= io_handle->cluster_block_size;
 
-			if( attribute_data_vcn_offset != calculated_attribute_data_vcn_offset )
+			if( ( calculated_attribute_data_vcn_offset != 0 )
+			 && ( calculated_attribute_data_vcn_offset != attribute_data_vcn_offset ) )
 			{
 				libcerror_error_set(
 				 error,

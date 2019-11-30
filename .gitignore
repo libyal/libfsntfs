@@ -171,6 +171,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_name
 /tests/fsntfs_test_notify
 /tests/fsntfs_test_object_identifier_values
+/tests/fsntfs_test_path_hint
 /tests/fsntfs_test_reparse_point_attribute
 /tests/fsntfs_test_reparse_point_values
 /tests/fsntfs_test_sds_index_value

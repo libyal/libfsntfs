@@ -288,6 +288,36 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_path_hint_size(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf8_path_hint(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_path_hint_size(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_utf16_path_hint(
+     libfsntfs_file_entry_t *file_entry,
+     int attribute_index,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf8_string_size,

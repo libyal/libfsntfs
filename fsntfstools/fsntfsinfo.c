@@ -155,6 +155,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                       = 0;
 	uint64_t mft_entry_index                   = 0;
 	int option_mode                            = FSNTFSINFO_MODE_VOLUME;
+	int result                                 = 0;
 	int verbose                                = 0;
 
 	libcnotify_stream_set(
@@ -411,10 +412,21 @@ int main( int argc, char * const argv[] )
 
 					goto on_error;
 				}
-				if( info_handle_mft_entry_fprint(
-				     fsntfsinfo_info_handle,
-				     mft_entry_index,
-				     &error ) != 1 )
+				result = info_handle_mft_entry_fprint(
+				          fsntfsinfo_info_handle,
+				          mft_entry_index,
+				          &error );
+
+				if( result == -1 )
+				{
+					fprintf(
+					 stderr,
+					 "Error printing MFT entry: %" PRIu64 ".\n",
+					 mft_entry_index );
+
+					goto on_error;
+				}
+				else if( result == 0 )
 				{
 					fprintf(
 					 stderr,

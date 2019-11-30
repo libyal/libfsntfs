@@ -87,6 +87,7 @@ check_PROGRAMS = \
 	fsntfs_test_name \
 	fsntfs_test_notify \
 	fsntfs_test_object_identifier_values \
+	fsntfs_test_path_hint \
 	fsntfs_test_reparse_point_attribute \
 	fsntfs_test_reparse_point_values \
 	fsntfs_test_sds_index_value \
@@ -803,6 +804,18 @@ fsntfs_test_object_identifier_values_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_object_identifier_values_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_path_hint_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_path_hint.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_path_hint_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

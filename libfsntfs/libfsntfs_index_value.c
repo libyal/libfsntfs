@@ -278,7 +278,7 @@ size_t libfsntfs_index_value_read(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: index value: %03d file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: index value: %03d file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 function,
 		 *index_value_entry,
 		 index_value->file_reference & 0xffffffffffffUL,

@@ -29,7 +29,6 @@
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_directory_entry.h"
-#include "libfsntfs_file_name_values.h"
 #include "libfsntfs_fixup_values.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -1401,7 +1400,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: reading data file reference: MFT entry: %" PRIu64 ", sequence: %" PRIu16 "\n",
+			 "%s: reading data file reference: %" PRIu64 "-%" PRIu16 "\n",
 			 function,
 			 data_mft_entry_index,
 			 sequence_number );

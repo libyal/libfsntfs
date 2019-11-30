@@ -347,7 +347,7 @@ int libfsntfs_mft_entry_header_read_data(
 		 mft_entry_header->total_entry_size );
 
 		libcnotify_printf(
-		 "%s: base record file reference\t\t: MFT entry: %" PRIu64 ", sequence: %" PRIu64 "\n",
+		 "%s: base record file reference\t\t: %" PRIu64 "-%" PRIu64 "\n",
 		 function,
 		 mft_entry_header->base_record_file_reference & 0xffffffffffffUL,
 		 mft_entry_header->base_record_file_reference >> 48 );
