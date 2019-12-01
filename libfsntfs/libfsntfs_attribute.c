@@ -43,6 +43,7 @@
 #include "libfsntfs_logged_utility_stream_values.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_object_identifier_values.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_reparse_point_values.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_standard_information_values.h"
@@ -229,6 +230,22 @@ int libfsntfs_internal_attribute_free(
 			result = -1;
 		}
 #endif
+		if( ( *internal_attribute )->path_hint != NULL )
+		{
+			if( libfsntfs_path_hint_free(
+			     &( ( *internal_attribute )->path_hint ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute path hint.",
+				 function );
+
+				result = -1;
+			}
+		}
 		if( ( *internal_attribute )->value != NULL )
 		{
 			if( ( *internal_attribute )->free_value != NULL )

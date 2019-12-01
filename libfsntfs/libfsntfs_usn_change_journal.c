@@ -24,7 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_data_stream.h"
+#include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_libcerror.h"
@@ -47,6 +47,8 @@ int libfsntfs_usn_change_journal_initialize(
 {
 	libfsntfs_internal_usn_change_journal_t *internal_usn_change_journal = NULL;
 	static char *function                                                = "libfsntfs_usn_change_journal_initialize";
+	off64_t segment_offset                                               = 0;
+	int segment_file_index                                               = 0;
 
 	if( usn_change_journal == NULL )
 	{
@@ -123,11 +125,12 @@ int libfsntfs_usn_change_journal_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_data_stream_initialize(
+	if( libfsntfs_cluster_block_stream_initialize(
 	     &( internal_usn_change_journal->data_stream ),
-	     file_io_handle,
 	     io_handle,
 	     data_attribute,
+	     NULL,
+	     0,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -139,7 +142,7 @@ int libfsntfs_usn_change_journal_initialize(
 
 		return( -1 );
 	}
-	if( libfsntfs_data_stream_get_size(
+	if( libfdata_stream_get_size(
 	     internal_usn_change_journal->data_stream,
 	     &( internal_usn_change_journal->data_size ),
 	     error ) != 1 )
@@ -153,7 +156,7 @@ int libfsntfs_usn_change_journal_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_data_stream_get_number_of_extents(
+	if( libfdata_stream_get_number_of_segments(
 	     internal_usn_change_journal->data_stream,
 	     &( internal_usn_change_journal->number_of_extents ),
 	     error ) != 1 )
@@ -167,10 +170,11 @@ int libfsntfs_usn_change_journal_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_data_stream_get_extent_by_index(
+	if( libfdata_stream_get_segment_by_index(
 	     internal_usn_change_journal->data_stream,
 	     internal_usn_change_journal->extent_index,
-	     &( internal_usn_change_journal->extent_offset ),
+	     &segment_file_index,
+	     &segment_offset,
 	     &( internal_usn_change_journal->extent_size ),
 	     &( internal_usn_change_journal->extent_flags ),
 	     error ) != 1 )
@@ -214,7 +218,7 @@ on_error:
 	{
 		if( internal_usn_change_journal->data_stream != NULL )
 		{
-			libfsntfs_data_stream_free(
+			libfdata_stream_free(
 			 &( internal_usn_change_journal->data_stream ),
 			 NULL );
 		}
@@ -266,7 +270,7 @@ int libfsntfs_usn_change_journal_free(
 
 			result = -1;
 		}
-		if( libfsntfs_data_stream_free(
+		if( libfdata_stream_free(
 		     &( internal_usn_change_journal->data_stream ),
 		     error ) != 1 )
 		{
@@ -340,8 +344,10 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 	static char *function                                                = "libfsntfs_usn_change_journal_read_usn_record";
 	size_t read_size                                                     = 0;
 	ssize_t read_count                                                   = 0;
+	off64_t segment_offset                                               = 0;
 	uint32_t usn_record_size                                             = 0;
 	int read_journal_block                                               = 0;
+	int segment_file_index                                               = 0;
 
 	if( usn_change_journal == NULL )
 	{
@@ -406,10 +412,11 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 				return( 0 );
 			}
 /* TODO make sure internal values are reset on error */
-			if( libfsntfs_data_stream_get_extent_by_index(
+			if( libfdata_stream_get_segment_by_index(
 			     internal_usn_change_journal->data_stream,
 			     internal_usn_change_journal->extent_index,
-			     &( internal_usn_change_journal->extent_offset ),
+			     &segment_file_index,
+			     &segment_offset,
 			     &( internal_usn_change_journal->extent_size ),
 			     &( internal_usn_change_journal->extent_flags ),
 			     error ) != 1 )
@@ -430,11 +437,11 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 			}
 			else
 			{
-				if( libfsntfs_data_stream_seek_offset(
+				if( libfdata_stream_seek_offset(
 				     internal_usn_change_journal->data_stream,
 				     internal_usn_change_journal->extent_offset,
 				     SEEK_SET,
-				     error ) != internal_usn_change_journal->extent_offset )
+				     error ) == -1 )
 				{
 					libcerror_error_set(
 					 error,
@@ -446,8 +453,6 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 
 					return( -1 );
 				}
-				internal_usn_change_journal->extent_size += internal_usn_change_journal->extent_offset;
-
 				read_journal_block = 1;
 			}
 		}
@@ -489,10 +494,12 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 			{
 				read_size = (size_t) ( internal_usn_change_journal->extent_size - internal_usn_change_journal->extent_offset );
 			}
-			read_count = libfsntfs_data_stream_read_buffer(
+			read_count = libfdata_stream_read_buffer(
 			              internal_usn_change_journal->data_stream,
+			              (intptr_t *) internal_usn_change_journal->file_io_handle,
 			              internal_usn_change_journal->journal_block_data,
 			              read_size,
+			              0,
 			              error );
 
 			if( read_count != (ssize_t) read_size )

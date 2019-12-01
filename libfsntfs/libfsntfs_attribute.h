@@ -33,6 +33,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
@@ -50,6 +51,10 @@ struct libfsntfs_internal_attribute
 	/* The attribute list entry
 	 */
 	libfsntfs_attribute_list_entry_t *attribute_list_entry;
+
+	/* The path hint
+	 */
+	libfsntfs_path_hint_t *path_hint;
 
 	/* The item value
 	 */

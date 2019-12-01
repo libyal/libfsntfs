@@ -1326,7 +1326,7 @@ int libfsntfs_file_entry_get_parent_file_reference_by_attribute_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve parent reference from $FILE_NAME attribute.",
 		 function );
 
 		result = -1;
@@ -2480,7 +2480,7 @@ int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-8 name from file name attribute.",
+		 "%s: unable to retrieve size of UTF-8 name from $FILE_NAME attribute.",
 		 function );
 
 		result = -1;
@@ -2574,7 +2574,7 @@ int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 name from file name attribute.",
+		 "%s: unable to retrieve UTF-8 name from $FILE_NAME attribute.",
 		 function );
 
 		result = -1;
@@ -2666,7 +2666,7 @@ int libfsntfs_file_entry_get_utf16_name_size_by_attribute_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size of UTF-16 name from file name attribute.",
+		 "%s: unable to retrieve size of UTF-16 name from $FILE_NAME attribute.",
 		 function );
 
 		result = -1;
@@ -2760,7 +2760,7 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 name from file name attribute.",
+		 "%s: unable to retrieve UTF-16 name from $FILE_NAME attribute.",
 		 function );
 
 		result = -1;
@@ -2783,6 +2783,265 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
 	return( result );
 }
 
+/* Retrieves the path hint for a specific $FILE_NAME attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_internal_file_entry_get_path_hint(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     int attribute_index,
+     libfsntfs_path_hint_t **path_hint,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *attribute               = NULL;
+	libfsntfs_file_name_values_t *file_name_values = NULL;
+	libfsntfs_path_hint_t *parent_path_hint        = NULL;
+	libfsntfs_path_hint_t *safe_path_hint          = NULL;
+	uint8_t *parent_path                           = NULL;
+	static char *function                          = "libfsntfs_internal_file_entry_get_path_hint";
+	size_t name_size                               = 0;
+	size_t parent_path_size                        = 0;
+	uint64_t file_reference                        = 0;
+	uint64_t mft_entry_index                       = 0;
+	uint64_t parent_file_reference                 = 0;
+	uint64_t parent_mft_entry_index                = 0;
+	int result                                     = 0;
+
+	if( internal_file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( path_hint == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid path hint.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO cache path hint in attribute */
+	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	     internal_file_entry,
+	     internal_file_entry->mft_entry,
+	     attribute_index,
+	     &attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute: %d.",
+		 function,
+		 attribute_index );
+
+		goto on_error;
+	}
+	if( attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing attribute?: %d.",
+		 function,
+		 attribute_index );
+
+		goto on_error;
+	}
+	if( ( (libfsntfs_internal_attribute_t *) attribute )->path_hint == NULL )
+	{
+		if( libfsntfs_mft_entry_get_file_reference(
+		     internal_file_entry->mft_entry,
+		     &file_reference,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file reference from MFT entry.",
+			 function );
+
+			goto on_error;
+		}
+		mft_entry_index = file_reference & 0xffffffffffffUL;
+
+		if( libfsntfs_file_name_attribute_get_parent_file_reference(
+		     attribute,
+		     &parent_file_reference,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve parent reference from $FILE_NAME attribute.",
+			 function );
+
+			result = -1;
+		}
+		parent_mft_entry_index = parent_file_reference & 0xffffffffffffUL;
+
+		parent_path      = NULL;
+		parent_path_size = 0;
+
+		if( ( mft_entry_index != LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY )
+		 && ( parent_mft_entry_index == LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY ) )
+		{
+			parent_path      = (uint8_t *) "";
+			parent_path_size = 1;
+		}
+		else if( ( parent_mft_entry_index != 0 )
+		      && ( parent_mft_entry_index != mft_entry_index ) )
+		{
+			result = libfsntfs_file_system_get_path_hint(
+			          internal_file_entry->file_system,
+			          internal_file_entry->file_io_handle,
+			          parent_file_reference,
+			          &parent_path_hint,
+			          0,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve path hint for MFT entry: %" PRIu64 ".",
+				 function,
+				 parent_mft_entry_index );
+
+				goto on_error;
+			}
+			else if( result == 0 )
+			{
+				parent_path      = (uint8_t *) "$Orphan";
+				parent_path_size = 8;
+			}
+			else
+			{
+				parent_path      = parent_path_hint->path;
+				parent_path_size = parent_path_hint->path_size;
+			}
+		}
+		if( libfsntfs_file_name_attribute_get_utf8_name_size(
+		     attribute,
+		     &name_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size of UTF-8 name from $FILE_NAME attribute.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_path_hint_initialize(
+		     &safe_path_hint,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create path hint.",
+			 function );
+
+			goto on_error;
+		}
+		safe_path_hint->file_reference = file_reference;
+		safe_path_hint->path_size      = parent_path_size + name_size;
+
+		safe_path_hint->path = (uint8_t *) memory_allocate(
+						    sizeof( uint8_t ) * safe_path_hint->path_size );
+
+		if( safe_path_hint->path == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create path.",
+			 function );
+
+			goto on_error;
+		}
+		if( ( parent_path != NULL )
+		 && ( parent_path_size > 0 ) )
+		{
+			if( memory_copy(
+			     safe_path_hint->path,
+			     parent_path,
+			     parent_path_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy parent path to path.",
+				 function );
+
+				goto on_error;
+			}
+			safe_path_hint->path[ parent_path_size - 1 ] = '\\';
+		}
+		if( name_size > 0 )
+		{
+			if( libfsntfs_file_name_attribute_get_utf8_name(
+			     attribute,
+			     &( safe_path_hint->path[ parent_path_size ] ),
+			     name_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-8 name from $FILE_NAME attribute.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( mft_entry_index == LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY )
+		{
+			safe_path_hint->path[ 0 ] = '\\';
+		}
+		( (libfsntfs_internal_attribute_t *) attribute )->path_hint = safe_path_hint;
+	}
+	*path_hint = ( (libfsntfs_internal_attribute_t *) attribute )->path_hint;
+
+	return( 1 );
+
+on_error:
+	if( safe_path_hint != NULL )
+	{
+		libfsntfs_path_hint_free(
+		 &safe_path_hint,
+		 NULL );
+	}
+	if( file_name_values != NULL )
+	{
+		libfsntfs_file_name_values_free(
+		 &file_name_values,
+		 NULL );
+	}
+	return( -1 );
+}
+
 /* Retrieves the size of the UTF-8 encoded path hint for a specific $FILE_NAME attribute
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if not available or -1 on error
@@ -2793,12 +3052,10 @@ int libfsntfs_file_entry_get_utf8_path_hint_size(
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_path_hint_t *path_hint                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_path_hint_size";
-	uint64_t parent_file_reference                       = 0;
-	int result                                           = 0;
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -2828,78 +3085,36 @@ int libfsntfs_file_entry_get_utf8_path_hint_size(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	if( libfsntfs_internal_file_entry_get_path_hint(
 	     internal_file_entry,
-	     internal_file_entry->mft_entry,
 	     attribute_index,
-	     &attribute,
+	     &path_hint,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute: %d.",
-		 function,
-		 attribute_index );
-
-		result = -1;
-	}
-	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	          attribute,
-	          &parent_file_reference,
-	          error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve path hint.",
 		 function );
 
 		result = -1;
 	}
 	else
 	{
-		result = libfsntfs_file_system_get_path_hint(
-		          internal_file_entry->file_system,
-		          internal_file_entry->file_io_handle,
-		          parent_file_reference,
-		          &path_hint,
-		          0,
-		          error );
-
-		if( result == -1 )
+		if( libfsntfs_path_hint_get_utf8_path_size(
+		     path_hint,
+		     utf8_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
-			 function,
-			 parent_file_reference & 0xffffffffffffUL,
-			 parent_file_reference >> 48 );
+			 "%s: unable to retrieve size of UTF-8 path hint.",
+			 function );
 
 			result = -1;
-		}
-		else if( result != 0 )
-		{
-			result = libfsntfs_path_hint_get_utf8_path_size(
-			          path_hint,
-			          utf8_string_size,
-			          error );
-
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve size of UTF-8 path hint.",
-				 function );
-
-				result = -1;
-			}
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -2931,12 +3146,10 @@ int libfsntfs_file_entry_get_utf8_path_hint(
      size_t utf8_string_size,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_path_hint_t *path_hint                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_path_hint";
-	uint64_t parent_file_reference                       = 0;
-	int result                                           = 0;
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -2966,79 +3179,37 @@ int libfsntfs_file_entry_get_utf8_path_hint(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	if( libfsntfs_internal_file_entry_get_path_hint(
 	     internal_file_entry,
-	     internal_file_entry->mft_entry,
 	     attribute_index,
-	     &attribute,
+	     &path_hint,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute: %d.",
-		 function,
-		 attribute_index );
-
-		result = -1;
-	}
-	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	          attribute,
-	          &parent_file_reference,
-	          error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve path hint.",
 		 function );
 
 		result = -1;
 	}
 	else
 	{
-		result = libfsntfs_file_system_get_path_hint(
-		          internal_file_entry->file_system,
-		          internal_file_entry->file_io_handle,
-		          parent_file_reference,
-		          &path_hint,
-		          0,
-		          error );
-
-		if( result == -1 )
+		if( libfsntfs_path_hint_get_utf8_path(
+		     path_hint,
+		     utf8_string,
+		     utf8_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
-			 function,
-			 parent_file_reference & 0xffffffffffffUL,
-			 parent_file_reference >> 48 );
+			 "%s: unable to retrieve UTF-8 path hint.",
+			 function );
 
 			result = -1;
-		}
-		else if( result != 0 )
-		{
-			result = libfsntfs_path_hint_get_utf8_path(
-			          path_hint,
-			          utf8_string,
-			          utf8_string_size,
-			          error );
-
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve UTF-8 path hint.",
-				 function );
-
-				result = -1;
-			}
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3069,12 +3240,10 @@ int libfsntfs_file_entry_get_utf16_path_hint_size(
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_path_hint_t *path_hint                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_path_hint_size";
-	uint64_t parent_file_reference                       = 0;
-	int result                                           = 0;
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -3104,78 +3273,36 @@ int libfsntfs_file_entry_get_utf16_path_hint_size(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	if( libfsntfs_internal_file_entry_get_path_hint(
 	     internal_file_entry,
-	     internal_file_entry->mft_entry,
 	     attribute_index,
-	     &attribute,
+	     &path_hint,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute: %d.",
-		 function,
-		 attribute_index );
-
-		result = -1;
-	}
-	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	          attribute,
-	          &parent_file_reference,
-	          error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve path hint.",
 		 function );
 
 		result = -1;
 	}
 	else
 	{
-		result = libfsntfs_file_system_get_path_hint(
-		          internal_file_entry->file_system,
-		          internal_file_entry->file_io_handle,
-		          parent_file_reference,
-		          &path_hint,
-		          0,
-		          error );
-
-		if( result == -1 )
+		if( libfsntfs_path_hint_get_utf16_path_size(
+		     path_hint,
+		     utf16_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
-			 function,
-			 parent_file_reference & 0xffffffffffffUL,
-			 parent_file_reference >> 48 );
+			 "%s: unable to retrieve size of UTF-16 path hint.",
+			 function );
 
 			result = -1;
-		}
-		else if( result != 0 )
-		{
-			result = libfsntfs_path_hint_get_utf16_path_size(
-			          path_hint,
-			          utf16_string_size,
-			          error );
-
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve size of UTF-16 path hint.",
-				 function );
-
-				result = -1;
-			}
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3207,12 +3334,10 @@ int libfsntfs_file_entry_get_utf16_path_hint(
      size_t utf16_string_size,
      libcerror_error_t **error )
 {
-	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	libfsntfs_path_hint_t *path_hint                     = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_path_hint";
-	uint64_t parent_file_reference                       = 0;
-	int result                                           = 0;
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -3242,79 +3367,37 @@ int libfsntfs_file_entry_get_utf16_path_hint(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_internal_file_entry_get_attribute_by_index(
+	if( libfsntfs_internal_file_entry_get_path_hint(
 	     internal_file_entry,
-	     internal_file_entry->mft_entry,
 	     attribute_index,
-	     &attribute,
+	     &path_hint,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve attribute: %d.",
-		 function,
-		 attribute_index );
-
-		result = -1;
-	}
-	else if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	          attribute,
-	          &parent_file_reference,
-	          error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from file name attribute.",
+		 "%s: unable to retrieve path hint.",
 		 function );
 
 		result = -1;
 	}
 	else
 	{
-		result = libfsntfs_file_system_get_path_hint(
-		          internal_file_entry->file_system,
-		          internal_file_entry->file_io_handle,
-		          parent_file_reference,
-		          &path_hint,
-		          0,
-		          error );
-
-		if( result == -1 )
+		if( libfsntfs_path_hint_get_utf16_path(
+		     path_hint,
+		     utf16_string,
+		     utf16_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve path hint for file reference: %" PRIu64 "-%" PRIu64 ".",
-			 function,
-			 parent_file_reference & 0xffffffffffffUL,
-			 parent_file_reference >> 48 );
+			 "%s: unable to retrieve UTF-16 path hint.",
+			 function );
 
 			result = -1;
-		}
-		else if( result != 0 )
-		{
-			result = libfsntfs_path_hint_get_utf16_path(
-			          path_hint,
-			          utf16_string,
-			          utf16_string_size,
-			          error );
-
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve UTF-16 path hint.",
-				 function );
-
-				result = -1;
-			}
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )

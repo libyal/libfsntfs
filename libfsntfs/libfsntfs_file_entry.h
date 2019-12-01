@@ -37,6 +37,7 @@
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
+#include "libfsntfs_path_hint.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_volume.h"
@@ -285,6 +286,12 @@ int libfsntfs_file_entry_get_utf16_name_by_attribute_index(
      int attribute_index,
      uint16_t *utf16_string,
      size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libfsntfs_internal_file_entry_get_path_hint(
+     libfsntfs_internal_file_entry_t *internal_file_entry,
+     int attribute_index,
+     libfsntfs_path_hint_t **path_hint,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

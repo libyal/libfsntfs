@@ -29,6 +29,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
 
@@ -50,7 +51,7 @@ struct libfsntfs_internal_usn_change_journal
 
 	/* The $J data stream
 	 */
-	libfsntfs_data_stream_t *data_stream;
+	libfdata_stream_t *data_stream;
 
 	/* The data offset
 	 */

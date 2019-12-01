@@ -1205,9 +1205,12 @@ int libfsntfs_file_system_get_path_hint(
 	size_t name_size                               = 0;
 	size_t parent_path_size                        = 0;
 	uint64_t mft_entry_index                       = 0;
+	uint64_t mft_entry_file_reference              = 0;
 	uint64_t parent_file_reference                 = 0;
 	uint64_t parent_mft_entry_index                = 0;
 	uint32_t attribute_type                        = 0;
+	uint16_t mft_entry_sequence_number             = 0;
+	uint16_t sequence_number                       = 0;
 	int attribute_index                            = 0;
 	int number_of_attributes                       = 0;
 	int result                                     = 0;
@@ -1266,6 +1269,53 @@ int libfsntfs_file_system_get_path_hint(
 
 		goto on_error;
 	}
+	if( libfsntfs_mft_entry_get_file_reference(
+	     mft_entry,
+	     &mft_entry_file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+		 function,
+		 mft_entry_index );
+
+		goto on_error;
+	}
+	if( mft_entry_file_reference != file_reference )
+	{
+		result = libfsntfs_mft_entry_is_allocated(
+		          mft_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+			 function,
+			 mft_entry_index );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			return( 0 );
+		}
+		/* The sequence number is updated when the MFT entry is deleted
+		 */
+		sequence_number           = (uint16_t) ( file_reference >> 48 );
+		mft_entry_sequence_number = (uint16_t) ( mft_entry_file_reference >> 48 );
+
+		if( sequence_number != ( mft_entry_sequence_number - 1 ) )
+		{
+			return( 0 );
+		}
+	}
 	if( libfsntfs_path_hint_initialize(
 	     &lookup_path_hint,
 	     error ) != 1 )
@@ -1279,20 +1329,8 @@ int libfsntfs_file_system_get_path_hint(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_get_file_reference(
-	     mft_entry,
-	     &( lookup_path_hint->file_reference ),
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file reference.",
-		 function );
+	lookup_path_hint->file_reference = mft_entry_file_reference;
 
-		goto on_error;
-	}
 	result = libcdata_btree_get_value_by_value(
 	          file_system->path_hints_tree,
 	          (intptr_t *) lookup_path_hint,
@@ -1444,7 +1482,12 @@ int libfsntfs_file_system_get_path_hint(
 
 						goto on_error;
 					}
-					else if( result != 0 )
+					else if( result == 0 )
+					{
+						parent_path      = (uint8_t *) "$Orphan";
+						parent_path_size = 8;
+					}
+					else
 					{
 						parent_path      = parent_path_hint->path;
 						parent_path_size = parent_path_hint->path_size;
