@@ -374,9 +374,9 @@ const char *libfsntfs_debug_print_collation_type(
 /* Prints the file name attribute namespace
  */
 const char *libfsntfs_debug_print_file_name_attribute_namespace(
-             uint8_t name_namespace )
+             uint8_t namespace )
 {
-	switch( name_namespace )
+	switch( namespace )
 	{
 		case LIBFSNTFS_FILE_NAME_NAMESPACE_POSIX:
 			return( "POSIX" );

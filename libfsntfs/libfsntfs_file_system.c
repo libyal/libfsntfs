@@ -1448,7 +1448,7 @@ int libfsntfs_file_system_get_path_hint(
 			}
 			parent_mft_entry_index = parent_file_reference & 0xffffffffffffUL;
 
-			if( file_name_values->name_namespace != LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+			if( file_name_values->namespace != LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
 			{
 				parent_path      = NULL;
 				parent_path_size = 0;

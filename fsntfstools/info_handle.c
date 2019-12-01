@@ -2219,6 +2219,7 @@ int info_handle_file_name_attribute_fprint(
 	size_t value_string_size         = 0;
 	uint64_t value_64bit             = 0;
 	uint32_t value_32bit             = 0;
+	uint8_t value_8bit               = 0;
 	int result                       = 0;
 
 	if( info_handle == NULL )
@@ -2398,6 +2399,70 @@ int info_handle_file_name_attribute_fprint(
 	info_handle_file_attribute_flags_fprint(
 	 value_32bit,
 	 info_handle->notify_stream );
+
+	if( libfsntfs_file_name_attribute_get_namespace(
+	     attribute,
+	     &value_8bit,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve namespace.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tNamespcae\t\t: " );
+
+	switch( value_8bit )
+	{
+		case 0:
+			fprintf(
+			 info_handle->notify_stream,
+			 "POSIX (%" PRIu8 ")",
+			 value_8bit );
+
+			break;
+
+		case 1:
+			fprintf(
+			 info_handle->notify_stream,
+			 "Windows (%" PRIu8 ")",
+			 value_8bit );
+
+			break;
+
+		case 2:
+			fprintf(
+			 info_handle->notify_stream,
+			 "DOS (%" PRIu8 ")",
+			 value_8bit );
+
+			break;
+
+		case 3:
+			fprintf(
+			 info_handle->notify_stream,
+			 "DOS and Windows (%" PRIu8 ")",
+			 value_8bit );
+
+			break;
+
+		default:
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIu8 "",
+			 value_8bit );
+
+			break;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_file_name_attribute_get_utf16_name_size(

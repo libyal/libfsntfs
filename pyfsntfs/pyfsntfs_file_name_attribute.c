@@ -110,6 +110,13 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the file attribute flags." },
 
+	{ "get_namespace",
+	  (PyCFunction) pyfsntfs_file_name_attribute_get_namespace,
+	  METH_NOARGS,
+	  "get_namespace() -> Integer\n"
+	  "\n"
+	  "Returns the namespace." },
+
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_file_name_attribute_get_name,
 	  METH_NOARGS,
@@ -157,6 +164,12 @@ PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_name_attribute_get_file_attribute_flags,
 	  (setter) 0,
 	  "The file attribute flags.",
+	  NULL },
+
+	{ "namespace",
+	  (getter) pyfsntfs_file_name_attribute_get_namespace,
+	  (setter) 0,
+	  "The namespace.",
 	  NULL },
 
 	{ "name",
@@ -836,6 +849,58 @@ PyObject *pyfsntfs_file_name_attribute_get_file_attribute_flags(
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  (uint64_t) file_attribute_flags );
+
+	return( integer_object );
+}
+
+/* Retrieves the namespace
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_name_attribute_get_namespace(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	PyObject *integer_object = NULL;
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_file_name_attribute_get_namespace";
+	uint8_t namespace        = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_name_attribute_get_namespace(
+	          pyfsntfs_attribute->attribute,
+	          &namespace,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve namespace.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) namespace );
 
 	return( integer_object );
 }

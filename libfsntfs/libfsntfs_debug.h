@@ -56,7 +56,7 @@ const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );
 
 const char *libfsntfs_debug_print_file_name_attribute_namespace(
-             uint8_t name_namespace );
+             uint8_t namespace );
 
 const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );

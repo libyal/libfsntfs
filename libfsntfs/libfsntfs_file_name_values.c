@@ -457,7 +457,7 @@ int libfsntfs_file_name_values_read_data(
 
 	name_size = (uint16_t) ( (fsntfs_file_name_t *) data )->name_size;
 
-	file_name_values->name_namespace = ( (fsntfs_file_name_t *) data )->name_namespace;
+	file_name_values->namespace = ( (fsntfs_file_name_t *) data )->namespace;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -579,11 +579,11 @@ int libfsntfs_file_name_values_read_data(
 		 name_size );
 
 		libcnotify_printf(
-		 "%s: name namespace\t\t\t: %" PRIu8 " (%s)\n",
+		 "%s: namespace\t\t\t\t: %" PRIu8 " (%s)\n",
 		 function,
-		 file_name_values->name_namespace,
+		 file_name_values->namespace,
 		 libfsntfs_debug_print_file_name_attribute_namespace(
-		  file_name_values->name_namespace ) );
+		  file_name_values->namespace ) );
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
@@ -994,6 +994,43 @@ int libfsntfs_file_name_values_get_file_attribute_flags(
 		return( -1 );
 	}
 	*file_attribute_flags = file_name_values->file_attribute_flags;
+
+	return( 1 );
+}
+
+/* Retrieves the namespace
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_get_namespace(
+     libfsntfs_file_name_values_t *file_name_values,
+     uint8_t *namespace,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_file_name_values_get_namespace";
+
+	if( file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( namespace == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid namespace.",
+		 function );
+
+		return( -1 );
+	}
+	*namespace = file_name_values->namespace;
 
 	return( 1 );
 }

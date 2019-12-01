@@ -1218,6 +1218,15 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libfsntfs_error_t **error );
 
+/* Retrieves the namespace
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_name_attribute_get_namespace(
+     libfsntfs_attribute_t *attribute,
+     uint8_t *namespace,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error

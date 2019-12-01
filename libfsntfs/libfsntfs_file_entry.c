@@ -2396,7 +2396,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 			return( -1 );
 		}
-		if( ( internal_file_entry->directory_entry->file_name_values->name_namespace == file_name_values->name_namespace )
+		if( ( internal_file_entry->directory_entry->file_name_values->namespace == file_name_values->namespace )
 		 && ( internal_file_entry->directory_entry->file_name_values->name_size == file_name_values->name_size )
 		 && ( memory_compare(
 		       internal_file_entry->directory_entry->file_name_values->name,

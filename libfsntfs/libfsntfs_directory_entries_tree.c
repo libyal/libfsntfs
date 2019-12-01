@@ -223,7 +223,7 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 	libfsntfs_directory_entry_t *existing_directory_entry = NULL;
 	libfsntfs_file_name_values_t *file_name_values        = NULL;
 	static char *function                                 = "libfsntfs_directory_entries_tree_insert_index_value";
-	uint8_t file_name_namespace                           = 0;
+	uint8_t namespace                                     = 0;
 	int element_file_index                                = 0;
 	int element_index                                     = 0;
 	int result                                            = 0;
@@ -311,9 +311,9 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 		}
 		return( 0 );
 	}
-	file_name_namespace = file_name_values->name_namespace;
+	namespace = file_name_values->namespace;
 
-	if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+	if( namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
 	{
 		if( libfsntfs_directory_entry_initialize(
 		     &directory_entry,
@@ -366,7 +366,7 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 
 				goto on_error;
 			}
-			if( file_name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+			if( namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
 			{
 				if( existing_directory_entry->short_file_name_values != NULL )
 				{
@@ -413,7 +413,7 @@ int libfsntfs_directory_entries_tree_insert_index_value(
 			}
 		}
 	}
-	if( file_name_namespace != LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
+	if( namespace != LIBFSNTFS_FILE_NAME_NAMESPACE_DOS )
 	{
 		/* The element file index value contains the index value entry + 1
 		 */
@@ -1294,7 +1294,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 		file_name_values = NULL;
 
-		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+		if( safe_directory_entry->file_name_values->namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 		{
 			result = libcdata_btree_get_value_by_value(
 			          directory_entries_tree->short_names_tree,
@@ -1721,7 +1721,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 		file_name_values = NULL;
 
-		if( safe_directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+		if( safe_directory_entry->file_name_values->namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 		{
 			result = libcdata_btree_get_value_by_value(
 			          directory_entries_tree->short_names_tree,
@@ -2130,7 +2130,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 		goto on_error;
 	}
-	if( directory_entry->file_name_values->name_namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
+	if( directory_entry->file_name_values->namespace == LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS )
 	{
 		result = libcdata_btree_get_value_by_value(
 		          directory_entries_tree->short_names_tree,
