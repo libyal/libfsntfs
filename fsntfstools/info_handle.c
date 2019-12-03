@@ -2416,7 +2416,7 @@ int info_handle_file_name_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tNamespcae\t\t: " );
+	 "\tNamespace\t\t\t: " );
 
 	switch( value_8bit )
 	{

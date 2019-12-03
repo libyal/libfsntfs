@@ -228,7 +228,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 		if( libfsntfs_mft_attribute_get_data(
 		     attribute,
 		     &data,
-		     &data_size,
+		     (size_t *) &data_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
