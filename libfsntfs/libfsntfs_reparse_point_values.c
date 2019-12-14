@@ -294,7 +294,7 @@ int libfsntfs_reparse_point_values_read_data(
 			 &( reparse_point_values->reparse_data[ 0 ] ),
 			 value_32bit );
 			libcnotify_printf(
-			 "%s: external version\t: %" PRIu32 "\n",
+			 "%s: external version\t\t: %" PRIu32 "\n",
 			 function,
 			 value_32bit );
 
@@ -302,7 +302,7 @@ int libfsntfs_reparse_point_values_read_data(
 			 &( reparse_point_values->reparse_data[ 4 ] ),
 			 value_32bit );
 			libcnotify_printf(
-			 "%s: external provider\t: %" PRIu32 "\n",
+			 "%s: external provider\t\t: %" PRIu32 "\n",
 			 function,
 			 value_32bit );
 
@@ -310,12 +310,12 @@ int libfsntfs_reparse_point_values_read_data(
 			 &( reparse_point_values->reparse_data[ 8 ] ),
 			 value_32bit );
 			libcnotify_printf(
-			 "%s: internal version\t: %" PRIu32 "\n",
+			 "%s: internal version\t\t: %" PRIu32 "\n",
 			 function,
 			 value_32bit );
 
 			libcnotify_printf(
-			 "%s: compression method\t: %" PRIu32 "\n",
+			 "%s: compression method\t\t: %" PRIu32 "\n",
 			 function,
 			 reparse_point_values->compression_method );
 		}
@@ -391,14 +391,9 @@ int libfsntfs_reparse_point_values_read_data(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( ( reparse_point_values->tag == 0x80000017 )
-		 || ( reparse_point_values->tag == 0xa0000003 )
-		 || ( reparse_point_values->tag == 0xa000000c ) )
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-		else
+		if( ( reparse_point_values->tag != 0x80000017 )
+		 && ( reparse_point_values->tag != 0xa0000003 )
+		 && ( reparse_point_values->tag != 0xa000000c ) )
 		{
 			libcnotify_printf(
 			 "%s: unusupported reparse point tag: 0x%08" PRIx32 "\n",
@@ -512,7 +507,7 @@ int libfsntfs_reparse_point_values_read_data(
 
 			value_string = NULL;
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
 	if( reparse_point_values->print_name_size > 0 )
 	{
@@ -619,7 +614,7 @@ int libfsntfs_reparse_point_values_read_data(
 
 			value_string = NULL;
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

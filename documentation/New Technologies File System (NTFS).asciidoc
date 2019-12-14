@@ -1702,12 +1702,20 @@ following attributes:
 |===
 | Offset | Size | Value | Description
 4+| _Chunk offset table_
-| 0 | ... | | Array of 32-bit compressed data block offsets +
-The offset is relative from the start of the compressed data +
-Note that the offset of the first compressed data block is not stored.
+| 0 | ... | | Array of 32-bit of 64-bit compressed data block offsets +
+The offset is relative from the start of the compressed data
 4+| _Compressed data_
 | ... | ... | | One or more compressed data blocks
 |===
+
+The size of the chunk offset table is:
+
+....
+number of chunk offsets = uncompressed size / compression unit size
+....
+
+The offset of the first compressed data block is at the end of the chunk offset
+table and is not stored in the chunk offset table.
 
 For more information about the compression methods see section
 <<wof_compression_method,Windows Overlay Filter (WOF) compression method>>
@@ -1895,7 +1903,7 @@ See section <<wof_compression_method,Windows Overlay Filter (WOF) compression me
 |===
 | Value | Identifier | Description
 | 0 | | LZXPRESS Huffman with 4k window (compression unit)
-| 1 | | [yellow-background]*Unknown (LZX)*
+| 1 | | LZX with 32k window (compression unit)
 | 2 | | LZXPRESS Huffman with 8k window (compression unit)
 | 3 | | LZXPRESS Huffman with 16k window (compression unit)
 |===
