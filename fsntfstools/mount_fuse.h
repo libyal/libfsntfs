@@ -99,6 +99,11 @@ int mount_fuse_getattr(
      const char *path,
      struct stat *stat_info );
 
+int mount_fuse_readlink(
+     const char *path,
+     char *buffer,
+     size_t size );
+
 void mount_fuse_destroy(
       void *private_data );
 

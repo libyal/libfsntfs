@@ -29,6 +29,7 @@
 #endif
 
 #include "fsntfs_test_functions.h"
+#include "fsntfs_test_libbfio.h"
 #include "fsntfs_test_libcerror.h"
 #include "fsntfs_test_libfsntfs.h"
 #include "fsntfs_test_macros.h"

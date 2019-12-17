@@ -44,7 +44,6 @@ int libfsntfs_decompress_data(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_decompress_data";
-	int result            = 0;
 
 	if( compressed_data == NULL )
 	{
@@ -90,59 +89,75 @@ int libfsntfs_decompress_data(
 
 		return( -1 );
 	}
-	if( compression_method == LIBFSNTFS_COMPRESSION_METHOD_LZNT1 )
+	switch( compression_method )
 	{
-		result = libfwnt_lznt1_decompress(
-		          compressed_data,
-		          compressed_data_size,
-		          uncompressed_data,
-		          uncompressed_data_size,
-		          error );
+		case LIBFSNTFS_COMPRESSION_METHOD_LZNT1:
+			if( libfwnt_lznt1_decompress(
+			     compressed_data,
+			     compressed_data_size,
+			     uncompressed_data,
+			     uncompressed_data_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+				 "%s: unable to decompress LZNT1 compressed data.",
+				 function );
 
-		if( result != 1 )
-		{
+				return( -1 );
+			}
+			break;
+
+		case LIBFSNTFS_COMPRESSION_METHOD_LZX:
+			if( libfwnt_lzx_decompress(
+			     compressed_data,
+			     compressed_data_size,
+			     uncompressed_data,
+			     uncompressed_data_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+				 "%s: unable to decompress LZX compressed data.",
+				 function );
+
+				return( -1 );
+			}
+			break;
+
+		case LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN:
+			if( libfwnt_lzxpress_huffman_decompress(
+			     compressed_data,
+			     compressed_data_size,
+			     uncompressed_data,
+			     uncompressed_data_size,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
+				 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
+				 "%s: unable to decompress LZXPRESS Huffman compressed data.",
+				 function );
+
+				return( -1 );
+			}
+			break;
+
+		default:
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
-			 "%s: unable to decompress LZNT1 compressed data.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported compression method.",
 			 function );
 
 			return( -1 );
-		}
 	}
-	else if( compression_method == LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN )
-	{
-		result = libfwnt_lzxpress_huffman_decompress(
-		          compressed_data,
-		          compressed_data_size,
-		          uncompressed_data,
-		          uncompressed_data_size,
-		          error );
-
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_COMPRESSION,
-			 LIBCERROR_COMPRESSION_ERROR_DECOMPRESS_FAILED,
-			 "%s: unable to decompress LZXPRESS Huffman compressed data.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported compression method.",
-		 function );
-
-		return( -1 );
-	}
-	return( result );
+	return( 1 );
 }
 

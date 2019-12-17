@@ -223,6 +223,21 @@ int libfsntfs_mft_entry_get_attribute_by_index(
      libfsntfs_mft_attribute_t **attribute,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_get_standard_information_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_get_volume_information_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_get_volume_name_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_set_attribute_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      int attribute_index,

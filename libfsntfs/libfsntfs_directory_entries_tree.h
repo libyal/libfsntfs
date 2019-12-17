@@ -59,6 +59,10 @@ struct libfsntfs_directory_entries_tree
 	/* The entries cache
 	 */
 	libfcache_cache_t *entries_cache;
+
+	/* Value to indicate case folding should be used
+	 */
+	uint8_t use_case_folding;
 };
 
 int libfsntfs_directory_entries_tree_initialize(

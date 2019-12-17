@@ -4906,22 +4906,22 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size function
+/* Tests the libfsntfs_file_entry_get_utf8_symbolic_link_target_size function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
+int fsntfs_test_file_entry_get_utf8_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry )
 {
 	libcerror_error_t *error         = NULL;
 	libfsntfs_mft_entry_t *mft_entry = NULL;
-	size_t utf8_name_size            = 0;
+	size_t utf8_string_size          = 0;
 	int result                       = 0;
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
@@ -4935,9 +4935,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          NULL,
-	          &utf8_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -4956,9 +4956,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
@@ -4976,7 +4976,7 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
 	 &error );
 
 /* TODO test with file entry that has a reparse point with a substitute name
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          file_entry,
 	          NULL,
 	          &error );
@@ -4996,13 +4996,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
 
 #if defined( HAVE_FSNTFS_TEST_RWLOCK )
 
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	/* Test libfsntfs_file_entry_get_utf8_symbolic_link_target_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
 	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
@@ -5023,13 +5023,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	/* Test libfsntfs_file_entry_get_utf8_symbolic_link_target_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
 	 */
 	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
@@ -5063,13 +5063,13 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_substitute_name function
+/* Tests the libfsntfs_file_entry_get_utf8_symbolic_link_target function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name(
+int fsntfs_test_file_entry_get_utf8_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry )
 {
-	uint8_t utf8_name[ 16 ];
+	uint8_t utf8_string[ 16 ];
 
 	libcerror_error_t *error         = NULL;
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -5077,9 +5077,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf8_string,
 	          16,
 	          &error );
 
@@ -5094,9 +5094,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          NULL,
-	          utf8_name,
+	          utf8_string,
 	          16,
 	          &error );
 
@@ -5116,366 +5116,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name(
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
-	          16,
-	          &error );
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-/* TODO test with file entry that has a reparse point with a substitute name
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
-	          file_entry,
-	          NULL,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
-	          file_entry,
-	          utf8_name,
-	          0,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
-	          file_entry,
-	          utf8_name,
-	          (size_t) SSIZE_MAX + 1,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-*/
-
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
-
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
-	 */
-	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
-	          file_entry,
-	          utf8_name,
-	          16,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_substitute_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
-	 */
-	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
-	          file_entry,
-	          utf8_name,
-	          16,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name_size(
-     libfsntfs_file_entry_t *file_entry )
-{
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	size_t utf16_name_size           = 0;
-	int result                       = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          NULL,
-	          &utf16_name_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-/* TODO test with file entry that has a reparse point with a substitute name
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          file_entry,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-*/
-
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
-
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
-	 */
-	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
-	 */
-	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_substitute_name function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
-     libfsntfs_file_entry_t *file_entry )
-{
-	uint16_t utf16_name[ 16 ];
-
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	int result                       = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
-	          file_entry,
-	          utf16_name,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
-	          NULL,
-	          utf16_name,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
-	          file_entry,
-	          utf16_name,
+	          utf8_string,
 	          16,
 	          &error );
 
@@ -5494,7 +5137,7 @@ int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
 	 &error );
 
 /* TODO test with file entry that has a reparse point with a substitute name
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
 	          NULL,
 	          16,
@@ -5512,9 +5155,9 @@ int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf16_name,
+	          utf8_string,
 	          0,
 	          &error );
 
@@ -5530,9 +5173,9 @@ int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf16_name,
+	          utf8_string,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -5551,13 +5194,13 @@ int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
 
 #if defined( HAVE_FSNTFS_TEST_RWLOCK )
 
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	/* Test libfsntfs_file_entry_get_utf8_symbolic_link_target with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
 	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf16_name,
+	          utf8_string,
 	          16,
 	          &error );
 
@@ -5579,13 +5222,13 @@ int fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name(
 		libcerror_error_free(
 		 &error );
 	}
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_substitute_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	/* Test libfsntfs_file_entry_get_utf8_symbolic_link_target with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
 	 */
 	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	          file_entry,
-	          utf16_name,
+	          utf8_string,
 	          16,
 	          &error );
 
@@ -5620,22 +5263,22 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_print_name_size function
+/* Tests the libfsntfs_file_entry_get_utf16_symbolic_link_target_size function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
+int fsntfs_test_file_entry_get_utf16_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry )
 {
 	libcerror_error_t *error         = NULL;
 	libfsntfs_mft_entry_t *mft_entry = NULL;
-	size_t utf8_name_size            = 0;
+	size_t utf16_string_size         = 0;
 	int result                       = 0;
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf16_string_size,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
@@ -5649,9 +5292,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          NULL,
-	          &utf8_name_size,
+	          &utf16_string_size,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -5670,9 +5313,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf16_string_size,
 	          &error );
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
@@ -5689,8 +5332,8 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
 	libcerror_error_free(
 	 &error );
 
-/* TODO test with file entry that has a reparse point with a print name
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          file_entry,
 	          NULL,
 	          &error );
@@ -5710,13 +5353,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
 
 #if defined( HAVE_FSNTFS_TEST_RWLOCK )
 
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	/* Test libfsntfs_file_entry_get_utf16_symbolic_link_target_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
 	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf16_string_size,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
@@ -5737,13 +5380,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	/* Test libfsntfs_file_entry_get_utf16_symbolic_link_target_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
 	 */
 	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	          file_entry,
-	          &utf8_name_size,
+	          &utf16_string_size,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
@@ -5777,13 +5420,13 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_file_entry_get_utf8_reparse_point_print_name function
+/* Tests the libfsntfs_file_entry_get_utf16_symbolic_link_target function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
+int fsntfs_test_file_entry_get_utf16_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry )
 {
-	uint8_t utf8_name[ 16 ];
+	uint16_t utf16_string[ 16 ];
 
 	libcerror_error_t *error         = NULL;
 	libfsntfs_mft_entry_t *mft_entry = NULL;
@@ -5791,9 +5434,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf16_string,
 	          16,
 	          &error );
 
@@ -5808,9 +5451,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          NULL,
-	          utf8_name,
+	          utf16_string,
 	          16,
 	          &error );
 
@@ -5830,9 +5473,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 
 	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf16_string,
 	          16,
 	          &error );
 
@@ -5850,8 +5493,8 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 	libcerror_error_free(
 	 &error );
 
-/* TODO test with file entry that has a reparse point with a print name
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+/* TODO test with file entry that has a reparse point with a substitute name
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
 	          NULL,
 	          16,
@@ -5869,9 +5512,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf16_string,
 	          0,
 	          &error );
 
@@ -5887,9 +5530,9 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf16_string,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -5908,13 +5551,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 
 #if defined( HAVE_FSNTFS_TEST_RWLOCK )
 
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
+	/* Test libfsntfs_file_entry_get_utf16_symbolic_link_target with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
 	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
+	          utf16_string,
 	          16,
 	          &error );
 
@@ -5936,370 +5579,13 @@ int fsntfs_test_file_entry_get_utf8_reparse_point_print_name(
 		libcerror_error_free(
 		 &error );
 	}
-	/* Test libfsntfs_file_entry_get_utf8_reparse_point_print_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
+	/* Test libfsntfs_file_entry_get_utf16_symbolic_link_target with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
 	 */
 	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	          file_entry,
-	          utf8_name,
-	          16,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_print_name_size function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_file_entry_get_utf16_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry )
-{
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	size_t utf16_name_size           = 0;
-	int result                       = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          NULL,
-	          &utf16_name_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-/* TODO test with file entry that has a reparse point with a print name
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          file_entry,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-*/
-
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
-
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name_size with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
-	 */
-	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name_size with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
-	 */
-	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-	          file_entry,
-	          &utf16_name_size,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_file_entry_get_utf16_reparse_point_print_name function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_file_entry_get_utf16_reparse_point_print_name(
-     libfsntfs_file_entry_t *file_entry )
-{
-	uint16_t utf16_name[ 16 ];
-
-	libcerror_error_t *error         = NULL;
-	libfsntfs_mft_entry_t *mft_entry = NULL;
-	int result                       = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          NULL,
-	          utf16_name,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	mft_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry;
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = NULL;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
-	          16,
-	          &error );
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->mft_entry = mft_entry;
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-/* TODO test with file entry that has a reparse point with a print name
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          NULL,
-	          16,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
-	          0,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
-	          (size_t) SSIZE_MAX + 1,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-*/
-
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
-
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
-	 */
-	fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
-	          16,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_wrlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_file_entry_get_utf16_reparse_point_print_name with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_write
-	 */
-	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
-
-	result = libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-	          file_entry,
-	          utf16_name,
+	          utf16_string,
 	          16,
 	          &error );
 
@@ -9389,43 +8675,23 @@ int main(
 	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size",
-	 fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name_size,
+	 "libfsntfs_file_entry_get_utf8_symbolic_link_target_size",
+	 fsntfs_test_file_entry_get_utf8_symbolic_link_target_size,
 	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name",
-	 fsntfs_test_file_entry_get_utf8_reparse_point_substitute_name,
+	 "libfsntfs_file_entry_get_utf8_symbolic_link_target",
+	 fsntfs_test_file_entry_get_utf8_symbolic_link_target,
 	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size",
-	 fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name_size,
+	 "libfsntfs_file_entry_get_utf16_symbolic_link_target_size",
+	 fsntfs_test_file_entry_get_utf16_symbolic_link_target_size,
 	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name",
-	 fsntfs_test_file_entry_get_utf16_reparse_point_substitute_name,
-	 file_entry );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf8_reparse_point_print_name_size",
-	 fsntfs_test_file_entry_get_utf8_reparse_point_print_name_size,
-	 file_entry );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf8_reparse_point_print_name",
-	 fsntfs_test_file_entry_get_utf8_reparse_point_print_name,
-	 file_entry );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf16_reparse_point_print_name_size",
-	 fsntfs_test_file_entry_get_utf16_reparse_point_print_name_size,
-	 file_entry );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_file_entry_get_utf16_reparse_point_print_name",
-	 fsntfs_test_file_entry_get_utf16_reparse_point_print_name,
+	 "libfsntfs_file_entry_get_utf16_symbolic_link_target",
+	 fsntfs_test_file_entry_get_utf16_symbolic_link_target,
 	 file_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

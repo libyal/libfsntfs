@@ -146,11 +146,13 @@ int libfsntfs_standard_information_values_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_standard_information_values_read_data";
+	static char *function               = "libfsntfs_standard_information_values_read_data";
+	uint32_t maximum_number_of_versions = 0;
+	uint32_t version_number             = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint64_t value_64bit  = 0;
-	uint32_t value_32bit  = 0;
+	uint64_t value_64bit                = 0;
+	uint32_t value_32bit                = 0;
 #endif
 
 	if( standard_information_values == NULL )
@@ -230,6 +232,14 @@ int libfsntfs_standard_information_values_read_data(
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_standard_information_t *) data )->file_attribute_flags,
 	 standard_information_values->file_attribute_flags );
+
+	byte_stream_copy_to_uint32_little_endian(
+	 ( (fsntfs_standard_information_t *) data )->maximum_number_of_versions,
+	 maximum_number_of_versions );
+
+	byte_stream_copy_to_uint32_little_endian(
+	 ( (fsntfs_standard_information_t *) data )->version_number,
+	 version_number );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -315,21 +325,15 @@ int libfsntfs_standard_information_values_read_data(
 		libcnotify_printf(
 		 "\n" );
 
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_standard_information_t *) data )->maximum_number_of_versions,
-		 value_32bit );
 		libcnotify_printf(
 		 "%s: maximum number of versions\t: %" PRIu32 "\n",
 		 function,
-		 value_32bit );
+		 maximum_number_of_versions );
 
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_standard_information_t *) data )->version_number,
-		 value_32bit );
 		libcnotify_printf(
 		 "%s: version number\t\t\t: %" PRIu32 "\n",
 		 function,
-		 value_32bit );
+		 version_number );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (fsntfs_standard_information_t *) data )->class_identifier,
@@ -339,7 +343,13 @@ int libfsntfs_standard_information_values_read_data(
 		 function,
 		 value_32bit );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	if( ( maximum_number_of_versions == 0 )
+	 && ( version_number == 1 ) )
+	{
+		standard_information_values->is_case_sensitive = 1;
+	}
 	if( data_size > 48 )
 	{
 		byte_stream_copy_to_uint32_little_endian(
@@ -380,7 +390,7 @@ int libfsntfs_standard_information_values_read_data(
 			 function,
 			 standard_information_values->update_sequence_number );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

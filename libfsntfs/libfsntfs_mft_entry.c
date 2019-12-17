@@ -41,6 +41,7 @@
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_mft_entry_header.h"
+#include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 
@@ -1813,6 +1814,138 @@ int libfsntfs_mft_entry_get_attribute_by_index(
 	return( 1 );
 }
 
+/* Retrieves the $STANDARD_INFORMATION attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_mft_entry_get_standard_information_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_standard_information_attribute";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->standard_information_attribute_index == -1 )
+	{
+		return( 0 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     mft_entry->attributes_array,
+	     mft_entry->standard_information_attribute_index,
+	     (intptr_t **) attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from attributes array.",
+		 function,
+		 mft_entry->standard_information_attribute_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the $VOLUME_INFORMATION attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_mft_entry_get_volume_information_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_volume_information_attribute";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->volume_information_attribute_index == -1 )
+	{
+		return( 0 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     mft_entry->attributes_array,
+	     mft_entry->volume_information_attribute_index,
+	     (intptr_t **) attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from attributes array.",
+		 function,
+		 mft_entry->volume_information_attribute_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the $VOLUME_NAME attribute
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_mft_entry_get_volume_name_attribute(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_mft_attribute_t **attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_volume_name_attribute";
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->volume_name_attribute_index == -1 )
+	{
+		return( 0 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     mft_entry->attributes_array,
+	     mft_entry->volume_name_attribute_index,
+	     (intptr_t **) attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from attributes array.",
+		 function,
+		 mft_entry->volume_name_attribute_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the number of alternate data attributes
  * Returns 1 if successful or -1 on error
  */
@@ -2109,10 +2242,14 @@ int libfsntfs_mft_entry_set_attribute_helper_values(
 {
 	uint8_t utf8_attribute_name[ 64 ];
 
-	static char *function           = "libfsntfs_mft_entry_set_attribute_helper_values";
-	size_t utf8_attribute_name_size = 0;
-	uint32_t attribute_type         = 0;
-	int result                      = 0;
+	static char *function                                                = "libfsntfs_mft_entry_set_attribute_helper_values";
+	size_t utf8_attribute_name_size                                      = 0;
+	uint32_t attribute_type                                              = 0;
+	int result                                                           = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+#endif
 
 	if( mft_entry == NULL )
 	{
@@ -2220,43 +2357,140 @@ int libfsntfs_mft_entry_set_attribute_helper_values(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_REPARSE_POINT:
-			if( ( mft_entry->reparse_point_attribute_index == -1 )
-			 && ( utf8_attribute_name_size <= 1 ) )
+			/* Assume only one reparse point attribute per MFT entry is allowed
+			 */
+			if( mft_entry->reparse_point_attribute_index != -1 )
 			{
-				mft_entry->reparse_point_attribute_index = attribute_index;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid MFT entry - reparse point attribute index value already set.",
+				 function );
+
+				return( -1 );
 			}
+			mft_entry->reparse_point_attribute_index = attribute_index;
+
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_SECURITY_DESCRIPTOR:
-			if( ( mft_entry->security_descriptor_attribute_index == -1 )
-			 && ( utf8_attribute_name_size <= 1 ) )
+			/* Assume only one security descriptor attribute per MFT entry is allowed
+			 */
+			if( mft_entry->security_descriptor_attribute_index != -1 )
 			{
-				mft_entry->security_descriptor_attribute_index = attribute_index;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid MFT entry - security descriptor attribute index value already set.",
+				 function );
+
+				return( -1 );
 			}
+			mft_entry->security_descriptor_attribute_index = attribute_index;
+
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_STANDARD_INFORMATION:
-			if( ( mft_entry->standard_information_attribute_index == -1 )
-			 && ( utf8_attribute_name_size <= 1 ) )
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libfsntfs_standard_information_values_initialize(
+			     &standard_information_values,
+			     error ) != 1 )
 			{
-				mft_entry->standard_information_attribute_index = attribute_index;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create standard information values.",
+				 function );
+
+				return( -1 );
 			}
+			if( libfsntfs_standard_information_values_read_from_mft_attribute(
+			     standard_information_values,
+			     attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read standard information values from MFT attribute.",
+				 function );
+
+				libfsntfs_standard_information_values_free(
+				 &standard_information_values,
+				 NULL );
+
+				return( -1 );
+			}
+			if( libfsntfs_standard_information_values_free(
+			     &standard_information_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free standard information values.",
+				 function );
+
+				return( -1 );
+			}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+			/* Assume only one standard information attribute per MFT entry is allowed
+			 */
+			if( mft_entry->standard_information_attribute_index != -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid MFT entry - standard information attribute index value already set.",
+				 function );
+
+				return( -1 );
+			}
+			mft_entry->standard_information_attribute_index = attribute_index;
+
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_INFORMATION:
-			if( ( mft_entry->volume_information_attribute_index == -1 )
-			 && ( utf8_attribute_name_size <= 1 ) )
+			/* Assume only one volume information attribute per MFT entry is allowed
+			 */
+			if( mft_entry->volume_information_attribute_index != -1 )
 			{
-				mft_entry->volume_information_attribute_index = attribute_index;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid MFT entry - volume information attribute index value already set.",
+				 function );
+
+				return( -1 );
 			}
+			mft_entry->volume_information_attribute_index = attribute_index;
+
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME:
-			if( ( mft_entry->volume_name_attribute_index == -1 )
-			 && ( utf8_attribute_name_size <= 1 ) )
+			/* Assume only one volume name attribute per MFT entry is allowed
+			 */
+			if( mft_entry->volume_name_attribute_index != -1 )
 			{
-				mft_entry->volume_name_attribute_index = attribute_index;
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+				 "%s: invalid MFT entry - volume name attribute index value already set.",
+				 function );
+
+				return( -1 );
 			}
+			mft_entry->volume_name_attribute_index = attribute_index;
+
 			break;
 
 		default:

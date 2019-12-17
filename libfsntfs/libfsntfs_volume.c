@@ -1419,6 +1419,7 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 {
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	static char *function                    = "libfsntfs_internal_volume_get_volume_information_attribute";
+	int result                               = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -1462,40 +1463,27 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 			return( -1 );
 		}
 	}
-	if( internal_volume->volume_mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
-
-		return( -1 );
-	}
-	if( internal_volume->volume_mft_entry->volume_information_attribute_index == -1 )
-	{
-		return( 0 );
-	}
 	if( internal_volume->volume_information_attribute == NULL )
 	{
-		if( libfsntfs_mft_entry_get_attribute_by_index(
-		     internal_volume->volume_mft_entry,
-		     internal_volume->volume_mft_entry->volume_information_attribute_index,
-		     &mft_attribute,
-		     error ) != 1 )
+		result = libfsntfs_mft_entry_get_volume_information_attribute(
+		          internal_volume->volume_mft_entry,
+		          &mft_attribute,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d from MFT entry: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_information_attribute_index,
-			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+			 "%s: unable to retrieve $VOLUME_INFORMATION attribute.",
+			 function );
 
 			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			return( 0 );
 		}
 		if( libfsntfs_attribute_initialize(
 		     &( internal_volume->volume_information_attribute ),
@@ -1507,9 +1495,8 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_information_attribute_index );
+			 "%s: unable to create $VOLUME_INFORMATION attribute.",
+			 function );
 
 			return( -1 );
 		}
@@ -1524,9 +1511,8 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read value of attribute: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_information_attribute_index );
+			 "%s: unable to read value of $VOLUME_INFORMATION attribute.",
+			 function );
 
 			return( -1 );
 		}
@@ -1546,6 +1532,7 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 {
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	static char *function                    = "libfsntfs_internal_volume_get_volume_name_attribute";
+	int result                               = 0;
 
 	if( internal_volume == NULL )
 	{
@@ -1589,40 +1576,27 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 			return( -1 );
 		}
 	}
-	if( internal_volume->volume_mft_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
-
-		return( -1 );
-	}
-	if( internal_volume->volume_mft_entry->volume_name_attribute_index == -1 )
-	{
-		return( 0 );
-	}
 	if( internal_volume->volume_name_attribute == NULL )
 	{
-		if( libfsntfs_mft_entry_get_attribute_by_index(
-		     internal_volume->volume_mft_entry,
-		     internal_volume->volume_mft_entry->volume_name_attribute_index,
-		     &mft_attribute,
-		     error ) != 1 )
+		result = libfsntfs_mft_entry_get_volume_name_attribute(
+		          internal_volume->volume_mft_entry,
+		          &mft_attribute,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d from MFT entry: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_name_attribute_index,
-			 LIBFSNTFS_MFT_ENTRY_INDEX_VOLUME );
+			 "%s: unable to retrieve $VOLUME_NAME attribute.",
+			 function );
 
 			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			return( 0 );
 		}
 		if( libfsntfs_attribute_initialize(
 		     &( internal_volume->volume_name_attribute ),
@@ -1634,9 +1608,8 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_name_attribute_index );
+			 "%s: unable to create $VOLUME_NAME attribute.",
+			 function );
 
 			return( -1 );
 		}
@@ -1651,9 +1624,8 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read value of attribute: %d.",
-			 function,
-			 internal_volume->volume_mft_entry->volume_name_attribute_index );
+			 "%s: unable to read value of $VOLUME_NAME attribute.",
+			 function );
 
 			return( -1 );
 		}

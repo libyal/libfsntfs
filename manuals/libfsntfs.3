@@ -1,4 +1,4 @@
-.Dd December  1, 2019
+.Dd December 17, 2019
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -157,21 +157,13 @@ File entry functions
 .Ft int
 .Fn libfsntfs_file_entry_get_utf16_name_by_attribute_index "libfsntfs_file_entry_t *file_entry" "int attribute_index" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_symbolic_link_target_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf8_symbolic_link_target "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_symbolic_link_target_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_substitute_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_file_entry_get_utf8_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name_size "libfsntfs_file_entry_t *file_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_file_entry_get_utf16_reparse_point_print_name "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
+.Fn libfsntfs_file_entry_get_utf16_symbolic_link_target "libfsntfs_file_entry_t *file_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_security_descriptor_size "libfsntfs_file_entry_t *file_entry" "size_t *data_size" "libfsntfs_error_t **error"
 .Ft int
@@ -184,6 +176,8 @@ File entry functions
 .Fn libfsntfs_file_entry_has_directory_entries_index "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_has_default_data_stream "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_is_symbolic_link "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_number_of_alternate_data_streams "libfsntfs_file_entry_t *file_entry" "int *number_of_alternate_data_streams" "libfsntfs_error_t **error"
 .Ft int

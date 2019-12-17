@@ -285,19 +285,12 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the name." },
 
-	{ "get_reparse_point_substitute_name",
-	  (PyCFunction) pyfsntfs_file_entry_get_reparse_point_substitute_name,
+	{ "get_symbolic_link_target",
+	  (PyCFunction) pyfsntfs_file_entry_get_symbolic_link_target,
 	  METH_NOARGS,
-	  "get_reparse_point_substitute_name() -> Unicode string or None\n"
+	  "get_symbolic_link_target() -> Unicode string or None\n"
 	  "\n"
-	  "Returns the reparse point substitute name." },
-
-	{ "get_reparse_point_print_name",
-	  (PyCFunction) pyfsntfs_file_entry_get_reparse_point_print_name,
-	  METH_NOARGS,
-	  "get_reparse_point_print_name() -> Unicode string or None\n"
-	  "\n"
-	  "Returns the reparse point print name." },
+	  "Returns the symbolic link target." },
 
 	{ "get_security_descriptor_data",
 	  (PyCFunction) pyfsntfs_file_entry_get_security_descriptor_data,
@@ -452,16 +445,10 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The file attribute flags.",
 	  NULL },
 
-	{ "reparse_point_substitute_name",
-	  (getter) pyfsntfs_file_entry_get_reparse_point_substitute_name,
+	{ "symbolic_link_target",
+	  (getter) pyfsntfs_file_entry_get_symbolic_link_target,
 	  (setter) 0,
-	  "The reparse point substitute name.",
-	  NULL },
-
-	{ "reparse_point_print_name",
-	  (getter) pyfsntfs_file_entry_get_reparse_point_print_name,
-	  (setter) 0,
-	  "The reparse point print name.",
+	  "The symbolic link target.",
 	  NULL },
 
 	{ "security_descriptor_data",
@@ -3175,10 +3162,10 @@ on_error:
 	return( NULL );
 }
 
-/* Retrieves the reparse point substitute name
+/* Retrieves the symbolic link target
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
+PyObject *pyfsntfs_file_entry_get_symbolic_link_target(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
@@ -3186,7 +3173,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 	PyObject *string_object  = NULL;
 	const char *errors       = NULL;
 	uint8_t *name            = NULL;
-	static char *function    = "pyfsntfs_file_entry_get_reparse_point_substitute_name";
+	static char *function    = "pyfsntfs_file_entry_get_symbolic_link_target";
 	size_t name_size         = 0;
 	int result               = 0;
 
@@ -3203,7 +3190,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	          pyfsntfs_file_entry->file_entry,
 	          &name_size,
 	          &error );
@@ -3215,7 +3202,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve reparse point substitute name size.",
+		 "%s: unable to retrieve symbolic link target size.",
 		 function );
 
 		libcerror_error_free(
@@ -3245,7 +3232,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
 		  pyfsntfs_file_entry->file_entry,
 		  name,
 		  name_size,
@@ -3258,121 +3245,7 @@ PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve reparse point substitute name.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		goto on_error;
-	}
-	/* Pass the string length to PyUnicode_DecodeUTF8
-	 * otherwise it makes the end of string character is part
-	 * of the string
-	 */
-	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
-			 errors );
-
-	PyMem_Free(
-	 name );
-
-	return( string_object );
-
-on_error:
-	if( name != NULL )
-	{
-		PyMem_Free(
-		 name );
-	}
-	return( NULL );
-}
-
-/* Retrieves the reparse point print name
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_file_entry_get_reparse_point_print_name(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error = NULL;
-	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
-	uint8_t *name            = NULL;
-	static char *function    = "pyfsntfs_file_entry_get_reparse_point_print_name";
-	size_t name_size         = 0;
-	int result               = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_file_entry == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
-	          pyfsntfs_file_entry->file_entry,
-	          &name_size,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result == -1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve reparse point print name size.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		goto on_error;
-	}
-	else if( ( result == 0 )
-	      || ( name_size == 0 ) )
-	{
-		Py_IncRef(
-		 Py_None );
-
-		return( Py_None );
-	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
-
-	if( name == NULL )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: unable to create name.",
-		 function );
-
-		goto on_error;
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_get_utf8_reparse_point_print_name(
-		  pyfsntfs_file_entry->file_entry,
-		  name,
-		  name_size,
-		  &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve reparse point print name.",
+		 "%s: unable to retrieve symbolic link target.",
 		 function );
 
 		libcerror_error_free(

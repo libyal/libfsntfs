@@ -13,14 +13,13 @@ Read-only supported NTFS formats:
 Supported NTFS format features:
 
 * LZNT1 compression
-* LZXPRESS-Huffman Windows Overlay Filter (WOF) compressed data
+* Windows Overlay Filter (WOF) compressed data (LZX and LZXPRESS-Huffman)
+* Case sensitive directories
 
 Unsupported NTFS format features:
 
 * NTFS version 1.2
 * Encrypted File System (EFS)
-* Case sensitive directories
-* LZX Windows Overlay Filter (WOF) compressed data
 
 For more information see:
 

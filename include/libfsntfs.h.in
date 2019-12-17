@@ -740,93 +740,47 @@ int libfsntfs_file_entry_get_utf16_path_hint(
      size_t utf16_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the size of the UTF-8 encoded reparse point substitute name
+/* Retrieves the size of the UTF-8 encoded symbolic link target
  * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf8_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the UTF-8 encoded reparse point substitute name
+/* Retrieves the UTF-8 encoded symbolic link target
  * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the size of the UTF-16 encoded reparse point substitute name
+/* Retrieves the size of the UTF-16 encoded symbolic link target
  * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf16_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the UTF-16 encoded reparse point substitute name
+/* Retrieves the UTF-16 encoded symbolic link target
  * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_string,
-     size_t utf16_string_size,
-     libfsntfs_error_t **error );
-
-/* Retrieves the size of the UTF-8 encoded reparse point print name
- * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_string_size,
-     libfsntfs_error_t **error );
-
-/* Retrieves the UTF-8 encoded reparse point print name
- * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libfsntfs_error_t **error );
-
-/* Retrieves the size of the UTF-16 encoded reparse point print name
- * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_string_size,
-     libfsntfs_error_t **error );
-
-/* Retrieves the UTF-16 encoded reparse point print name
- * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
@@ -883,6 +837,14 @@ int libfsntfs_file_entry_has_directory_entries_index(
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
+/* Determines if the file entry is a symbolic link
+ * Returns 1 if the file entry is a symbolic link, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_symbolic_link(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_error_t **error );
 

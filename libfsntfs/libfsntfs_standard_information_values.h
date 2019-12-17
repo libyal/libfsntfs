@@ -67,6 +67,10 @@ struct libfsntfs_standard_information_values
 	/* The update sequence number (USN)
 	 */
 	uint64_t update_sequence_number;
+
+	/* Value to indicate the is case sensitive flag is set
+	 */
+	uint8_t is_case_sensitive;
 };
 
 int libfsntfs_standard_information_values_initialize(

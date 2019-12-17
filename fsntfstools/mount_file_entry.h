@@ -107,6 +107,12 @@ int mount_file_entry_get_name(
      size_t string_size,
      libcerror_error_t **error );
 
+int mount_file_entry_get_symbolic_link_target(
+     mount_file_entry_t *file_entry,
+     system_character_t *string,
+     size_t string_size,
+     libcerror_error_t **error );
+
 int mount_file_entry_get_number_of_sub_file_entries(
      mount_file_entry_t *file_entry,
      int *number_of_sub_entries,

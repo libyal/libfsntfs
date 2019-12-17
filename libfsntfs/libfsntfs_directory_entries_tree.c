@@ -37,6 +37,7 @@
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_name.h"
+#include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_unused.h"
 
 /* Creates a directory entries tree
@@ -725,10 +726,12 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	static char *function   = "libfsntfs_directory_entries_tree_read_from_i30_index";
-	uint32_t attribute_type = 0;
-	uint32_t collation_type = 0;
-	int result              = 0;
+	libfsntfs_mft_attribute_t *mft_attribute                             = NULL;
+	libfsntfs_standard_information_values_t *standard_information_values = NULL;
+	static char *function                                                = "libfsntfs_directory_entries_tree_read_from_i30_index";
+	uint32_t attribute_type                                              = 0;
+	uint32_t collation_type                                              = 0;
+	int result                                                           = 0;
 
 	if( directory_entries_tree == NULL )
 	{
@@ -916,10 +919,78 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
 
 			goto on_error;
 		}
+		if( libfsntfs_mft_entry_get_standard_information_attribute(
+		     mft_entry,
+		     &mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve $STANDARD_INFORMATION attribute from MFT entry.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_standard_information_values_initialize(
+		     &standard_information_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create standard information values.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_standard_information_values_read_from_mft_attribute(
+		     standard_information_values,
+		     mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read standard information values from MFT attribute.",
+			 function );
+
+			goto on_error;
+		}
+		if( standard_information_values->is_case_sensitive == 0 )
+		{
+			directory_entries_tree->use_case_folding = 1;
+		}
+		else
+		{
+			directory_entries_tree->use_case_folding = 0;
+		}
+		if( libfsntfs_standard_information_values_free(
+		     &standard_information_values,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free standard information values.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 
 on_error:
+	if( standard_information_values != NULL )
+	{
+		libfsntfs_standard_information_values_free(
+		 &standard_information_values,
+		 NULL );
+	}
 	if( directory_entries_tree->short_names_tree != NULL )
 	{
 		libcdata_btree_free(
@@ -1232,7 +1303,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		          file_name_values->name_size,
 		          utf8_string,
 		          utf8_string_length,
-		          1,
+		          directory_entries_tree->use_case_folding,
 		          error );
 
 		if( result == -1 )
@@ -1659,7 +1730,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		          file_name_values->name_size,
 		          utf16_string,
 		          utf16_string_length,
-		          1,
+		          directory_entries_tree->use_case_folding,
 		          error );
 
 		if( result == -1 )

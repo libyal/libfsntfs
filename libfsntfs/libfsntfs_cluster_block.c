@@ -61,7 +61,8 @@ int libfsntfs_cluster_block_initialize(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
+	if( ( data_size == 0 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -105,24 +106,22 @@ int libfsntfs_cluster_block_initialize(
 
 		return( -1 );
 	}
-	if( data_size > 0 )
+	( *cluster_block )->data = (uint8_t *) memory_allocate(
+	                                        sizeof( uint8_t ) * data_size );
+
+	if( ( *cluster_block )->data == NULL )
 	{
-		( *cluster_block )->data = (uint8_t *) memory_allocate(
-		                                        sizeof( uint8_t ) * data_size );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create data.",
+		 function );
 
-		if( ( *cluster_block )->data == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create data.",
-			 function );
-
-			goto on_error;
-		}
-		( *cluster_block )->data_size = data_size;
+		goto on_error;
 	}
+	( *cluster_block )->data_size = data_size;
+
 	return( 1 );
 
 on_error:
@@ -158,11 +157,9 @@ int libfsntfs_cluster_block_free(
 	}
 	if( *cluster_block != NULL )
 	{
-		if( ( *cluster_block )->data != NULL )
-		{
-			memory_free(
-			 ( *cluster_block )->data );
-		}
+		memory_free(
+		 ( *cluster_block )->data );
+
 		memory_free(
 		 *cluster_block );
 
@@ -187,6 +184,17 @@ int libfsntfs_cluster_block_clear(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid cluster block.",
+		 function );
+
+		return( -1 );
+	}
+	if( cluster_block->data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid cluster block - missing data.",
 		 function );
 
 		return( -1 );

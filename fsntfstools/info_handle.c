@@ -2984,8 +2984,81 @@ int info_handle_reparse_point_attribute_fprint(
 		 info_handle->notify_stream,
 		 "\n" );
 	}
-/* TODO print sanitized substitute name */
+/* TODO sanitize substitute name ? */
 
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#else
+	result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+	          attribute,
+	          &value_string_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve substitute name string size.",
+		 function );
+
+		goto on_error;
+	}
+	if( ( result != 0 )
+	 && ( value_string_size > 0 ) )
+	{
+		value_string = system_string_allocate(
+		                value_string_size );
+
+		if( value_string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create substitute name string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		          attribute,
+		          (uint16_t *) value_string,
+		          value_string_size,
+		          error );
+#else
+		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		          attribute,
+		          (uint8_t *) value_string,
+		          value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve substitute name string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tSubstitute name\t\t\t: %" PRIs_SYSTEM "\n",
+		 value_string );
+
+		memory_free(
+		 value_string );
+
+		value_string = NULL;
+	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
 	          attribute,

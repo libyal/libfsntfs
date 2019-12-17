@@ -43,6 +43,10 @@
 #define S_IFREG 0x8000
 #endif
 
+#if !defined( S_IFLNK )
+#define S_IFLNK 0xa000
+#endif
+
 /* Creates a file entry
  * Make sure the value file_entry is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
@@ -566,8 +570,9 @@ int mount_file_entry_get_file_mode(
      uint16_t *file_mode,
      libcerror_error_t **error )
 {
-	static char *function = "mount_file_entry_get_file_mode";
-	int result            = 0;
+	static char *function         = "mount_file_entry_get_file_mode";
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
 
 	if( file_entry == NULL )
 	{
@@ -591,6 +596,20 @@ int mount_file_entry_get_file_mode(
 
 		return( -1 );
 	}
+	if( libfsntfs_file_entry_get_file_attribute_flags(
+	     file_entry->fsntfs_file_entry,
+	     &file_attribute_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		return( -1 );
+	}
 	result = libfsntfs_file_entry_has_directory_entries_index(
 	          file_entry->fsntfs_file_entry,
 	          error );
@@ -606,13 +625,35 @@ int mount_file_entry_get_file_mode(
 
 		return( -1 );
 	}
-	if( result != 0 )
+	else if( result != 0 )
 	{
 		*file_mode = S_IFDIR | 0555;
 	}
 	else
 	{
-		*file_mode = S_IFREG | 0444;
+		result = libfsntfs_file_entry_is_symbolic_link(
+		          file_entry->fsntfs_file_entry,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry is a symbolic link.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			*file_mode = S_IFLNK | 0555;
+		}
+		else
+		{
+			*file_mode = S_IFREG | 0444;
+		}
 	}
 	return( 1 );
 }
@@ -738,6 +779,58 @@ int mount_file_entry_get_name(
 	}
 	string[ file_entry->name_size - 1 ] = 0;
 
+	return( 1 );
+}
+
+/* Retrieves the symbolic link target
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int mount_file_entry_get_symbolic_link_target(
+     mount_file_entry_t *file_entry,
+     system_character_t *string,
+     size_t string_size,
+     libcerror_error_t **error )
+{
+	static char *function = "mount_file_entry_get_symbolic_link_target";
+	int result            = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
+	          file_entry->fsntfs_file_entry,
+	          (uint16_t *) string,
+	          string_size,
+	          error );
+#else
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
+	          file_entry->fsntfs_file_entry,
+	          (uint8_t *) string,
+	          string_size,
+	          error );
+#endif
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve symbolic link target string.",
+		 function );
+
+		return( -1 );
+	}
+/* TODO rewrite symbolic link target */
 	return( 1 );
 }
 
@@ -910,6 +1003,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
          libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_read_buffer_at_offset";
+	size64_t file_size    = 0;
 	ssize_t read_count    = 0;
 
 	if( file_entry == NULL )
@@ -922,6 +1016,27 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		 function );
 
 		return( -1 );
+	}
+/* TODO certain files have no default data stream such as $ObjId
+ * for now work-around this
+ */
+	if( libfsntfs_file_entry_get_size(
+	     file_entry->fsntfs_file_entry,
+	     &file_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size from file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_size == 0 )
+	{
+		return( 0 );
 	}
 	read_count = libfsntfs_file_entry_read_buffer_at_offset(
 	              file_entry->fsntfs_file_entry,

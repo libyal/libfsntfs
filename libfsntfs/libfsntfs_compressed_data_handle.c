@@ -83,19 +83,22 @@ int libfsntfs_compressed_data_handle_initialize(
 	{
 		case 0:
 			compression_method    = LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN;
-			compression_unit_size = 4 * 1024;
+			compression_unit_size = 4096;
 			break;
 
-/* TODO add support for LIBFSNTFS_COMPRESSION_METHOD_LZX (case 1) */
+		case 1:
+			compression_method    = LIBFSNTFS_COMPRESSION_METHOD_LZX;
+			compression_unit_size = 32768;
+			break;
 
 		case 2:
 			compression_method    = LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN;
-			compression_unit_size = 8 * 1024;
+			compression_unit_size = 8192;
 			break;
 
 		case 3:
 			compression_method    = LIBFSNTFS_COMPRESSION_METHOD_LZXPRESS_HUFFMAN;
-			compression_unit_size = 16 * 1024;
+			compression_unit_size = 16384;
 			break;
 
 		default:
@@ -103,8 +106,9 @@ int libfsntfs_compressed_data_handle_initialize(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported compression method.",
-			 function );
+			 "%s: unsupported compression method: %" PRIu32 ".",
+			 function,
+			 compression_method );
 
 			return( -1 );
 	}
@@ -623,6 +627,10 @@ ssize_t libfsntfs_compressed_data_handle_read_segment_data(
 #endif
 			data_handle->segment_data_size = data_handle->compression_unit_size;
 
+			if( data_handle->segment_data_size > ( data_handle->uncompressed_data_size - data_handle->current_offset ) )
+			{
+				data_handle->segment_data_size = data_handle->uncompressed_data_size - data_handle->current_offset;
+			}
 			if( libfsntfs_decompress_data(
 			     data_handle->compressed_segment_data,
 			     (size_t) read_count,

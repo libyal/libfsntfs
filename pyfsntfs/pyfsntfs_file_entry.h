@@ -194,11 +194,7 @@ PyObject *pyfsntfs_file_entry_get_path_hint(
            PyObject *arguments,
            PyObject *keywords );
 
-PyObject *pyfsntfs_file_entry_get_reparse_point_substitute_name(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments );
-
-PyObject *pyfsntfs_file_entry_get_reparse_point_print_name(
+PyObject *pyfsntfs_file_entry_get_symbolic_link_target(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 

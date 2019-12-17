@@ -3418,19 +3418,19 @@ int libfsntfs_file_entry_get_utf16_path_hint(
 	return( result );
 }
 
-/* Retrieves the size of the UTF-8 encoded reparse point substitute name
+/* Retrieves the size of the UTF-8 encoded symbolic link target
  * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size";
+	static char *function                                = "libfsntfs_file_entry_get_utf8_symbolic_link_target_size";
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3515,12 +3515,12 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-8 encoded reparse point substitute name
+/* Retrieves the UTF-8 encoded symbolic link target
  * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
@@ -3528,7 +3528,7 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 {
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_substitute_name";
+	static char *function                                = "libfsntfs_file_entry_get_utf8_symbolic_link_target";
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3614,19 +3614,19 @@ int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
 	return( result );
 }
 
-/* Retrieves the size of the UTF-16 encoded reparse point substitute name
+/* Retrieves the size of the UTF-16 encoded symbolic link target
  * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size";
+	static char *function                                = "libfsntfs_file_entry_get_utf16_symbolic_link_target_size";
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3711,12 +3711,12 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
 	return( result );
 }
 
-/* Retrieves the UTF-16 encoded reparse point substitute name
+/* Retrieves the UTF-16 encoded symbolic link target
  * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
+ * This value is retrieved from a symbolic link $REPARSE_POINT attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
@@ -3724,7 +3724,7 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 {
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_substitute_name";
+	static char *function                                = "libfsntfs_file_entry_get_utf16_symbolic_link_target";
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3787,398 +3787,6 @@ int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve UTF-16 substitute name from reparse point attribute.",
-			 function );
-
-			result = -1;
-		}
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the size of the UTF-8 encoded reparse point print name
- * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_string_size,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_print_name_size";
-	int result                                           = 0;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
-
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
-	          internal_file_entry,
-	          internal_file_entry->mft_entry,
-	          &reparse_point_attribute,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve reparse point attribute.",
-		 function );
-
-		result = -1;
-	}
-	else if( result != 0 )
-	{
-		result = libfsntfs_reparse_point_attribute_get_utf8_print_name_size(
-		          reparse_point_attribute,
-		          utf8_string_size,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size of UTF-8 print name from reparse point attribute.",
-			 function );
-
-			result = -1;
-		}
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the UTF-8 encoded reparse point print name
- * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf8_reparse_point_print_name";
-	int result                                           = 0;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
-
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
-	          internal_file_entry,
-	          internal_file_entry->mft_entry,
-	          &reparse_point_attribute,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve reparse point attribute.",
-		 function );
-
-		result = -1;
-	}
-	else if( result != 0 )
-	{
-		result = libfsntfs_reparse_point_attribute_get_utf8_print_name(
-		          reparse_point_attribute,
-		          utf8_string,
-		          utf8_string_size,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 print name from reparse point attribute.",
-			 function );
-
-			result = -1;
-		}
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the size of the UTF-16 encoded reparse point print name
- * The returned size includes the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_string_size,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_print_name_size";
-	int result                                           = 0;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
-
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
-	          internal_file_entry,
-	          internal_file_entry->mft_entry,
-	          &reparse_point_attribute,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve reparse point attribute.",
-		 function );
-
-		result = -1;
-	}
-	else if( result != 0 )
-	{
-		result = libfsntfs_reparse_point_attribute_get_utf16_print_name_size(
-		          reparse_point_attribute,
-		          utf16_string_size,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size of UTF-16 print name from reparse point attribute.",
-			 function );
-
-			result = -1;
-		}
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the UTF-16 encoded reparse point print name
- * The size should include the end of string character
- * This value is retrieved from the $REPARSE_POINT attribute
- * Returns 1 if successful, 0 if not available or -1 on error
- */
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_string,
-     size_t utf16_string_size,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
-	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
-	static char *function                                = "libfsntfs_file_entry_get_utf16_reparse_point_print_name";
-	int result                                           = 0;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
-
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_file_entry->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
-	          internal_file_entry,
-	          internal_file_entry->mft_entry,
-	          &reparse_point_attribute,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve reparse point attribute.",
-		 function );
-
-		result = -1;
-	}
-	else if( result != 0 )
-	{
-		result = libfsntfs_reparse_point_attribute_get_utf16_print_name(
-		          reparse_point_attribute,
-		          utf16_string,
-		          utf16_string_size,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 print name from reparse point attribute.",
 			 function );
 
 			result = -1;
@@ -4845,6 +4453,107 @@ int libfsntfs_file_entry_has_default_data_stream(
 	if( internal_file_entry->mft_entry->data_attribute != NULL )
 	{
 		result = 1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Determines if the file entry is a symbolic link
+ * Returns 1 if the file entry is a symbolic link, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_is_symbolic_link(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_is_symbolic_link";
+	uint32_t reparse_point_tag                           = 0;
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
+	          internal_file_entry,
+	          internal_file_entry->mft_entry,
+	          &reparse_point_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve reparse point attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_reparse_point_attribute_get_tag(
+		     reparse_point_attribute,
+		     &reparse_point_tag,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve tag from reparse point attribute.",
+			 function );
+
+			result = -1;
+		}
+		if( reparse_point_tag == 0xa000000cUL )
+		{
+			result = 1;
+		}
+		else
+		{
+			result = 0;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

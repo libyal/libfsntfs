@@ -380,7 +380,7 @@ int libfsntfs_reparse_point_values_read_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: flags\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 flags );
 		}

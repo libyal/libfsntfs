@@ -354,6 +354,7 @@ int main( int argc, char * const argv[] )
 	fsntfsmount_fuse_operations.readdir    = &mount_fuse_readdir;
 	fsntfsmount_fuse_operations.releasedir = &mount_fuse_releasedir;
 	fsntfsmount_fuse_operations.getattr    = &mount_fuse_getattr;
+	fsntfsmount_fuse_operations.readlink   = &mount_fuse_readlink;
 	fsntfsmount_fuse_operations.destroy    = &mount_fuse_destroy;
 
 	fsntfsmount_fuse_channel = fuse_mount(

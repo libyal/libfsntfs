@@ -39,6 +39,11 @@
 #include "../libfsntfs/libfsntfs_compressed_data_handle.h"
 #include "../libfsntfs/libfsntfs_definitions.h"
 
+/* Define to make fsntfs_test_file generate verbose output
+#define FSNTFS_TEST_COMPRESSED_DATA_HANDLE_VERBOSE
+ */
+#define FSNTFS_TEST_COMPRESSED_DATA_HANDLE_VERBOSE
+
 uint8_t fsntfs_test_compressed_data_handle_lzxpress_huffman_compressed_data1[ 3414 ] = {
 	0x00, 0x00, 0x00, 0x00, 0xa0, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x04, 0x08, 0x00, 0xb0, 0x89, 0x00, 0xb7, 0x98, 0xa9, 0x9a, 0xba, 0xba, 0xb0, 0x0a, 0x0b, 0x0b,
@@ -824,6 +829,8 @@ int fsntfs_test_compressed_data_handle_read_segment_data(
 	              0,
 	              &error );
 
+FSNTFS_TEST_FPRINT_ERROR( error );
+
 	FSNTFS_TEST_ASSERT_EQUAL_INT64(
 	 "read_count",
 	 read_count,
@@ -1205,6 +1212,14 @@ int main(
 {
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argc )
 	FSNTFS_TEST_UNREFERENCED_PARAMETER( argv )
+
+#if defined( HAVE_DEBUG_OUTPUT ) && defined( FSNTFS_TEST_COMPRESSED_DATA_HANDLE_VERBOSE )
+	libfsntfs_notify_set_verbose(
+	 1 );
+	libfsntfs_notify_set_stream(
+	 stderr,
+	 NULL );
+#endif
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 

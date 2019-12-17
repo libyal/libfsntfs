@@ -325,52 +325,26 @@ int libfsntfs_file_entry_get_utf16_path_hint(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_substitute_name(
+int libfsntfs_file_entry_get_utf8_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint8_t *utf8_string,
      size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name_size(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_substitute_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint16_t *utf16_string,
-     size_t utf16_string_size,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf8_string_size,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf8_reparse_point_print_name(
-     libfsntfs_file_entry_t *file_entry,
-     uint8_t *utf8_string,
-     size_t utf8_string_size,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name_size(
-     libfsntfs_file_entry_t *file_entry,
-     size_t *utf16_string_size,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_file_entry_get_utf16_reparse_point_print_name(
+int libfsntfs_file_entry_get_utf16_symbolic_link_target(
      libfsntfs_file_entry_t *file_entry,
      uint16_t *utf16_string,
      size_t utf16_string_size,
@@ -409,6 +383,11 @@ int libfsntfs_file_entry_has_directory_entries_index(
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_symbolic_link(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );
 
