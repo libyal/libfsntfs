@@ -1702,11 +1702,15 @@ following attributes:
 |===
 | Offset | Size | Value | Description
 4+| _Chunk offset table_
-| 0 | ... | | Array of 32-bit of 64-bit compressed data block offsets +
-The offset is relative from the start of the compressed data
-4+| _Compressed data_
-| ... | ... | | One or more compressed data blocks
+| 0 | ... | | Array of 32-bit of 64-bit compressed data chunk offsets +
+The offset is relative from the start of the data chunks
+4+| _Data chunks_
+| ... | ... | | One or more compressed or uncompressed data chunks
 |===
+
+[NOTE]
+If the chunk size equals the size of the uncompressed data the chunk is stored
+(as-is) uncompressed.
 
 The size of the chunk offset table is:
 
@@ -1714,7 +1718,7 @@ The size of the chunk offset table is:
 number of chunk offsets = uncompressed size / compression unit size
 ....
 
-The offset of the first compressed data block is at the end of the chunk offset
+The offset of the first compressed data chunk is at the end of the chunk offset
 table and is not stored in the chunk offset table.
 
 For more information about the compression methods see section

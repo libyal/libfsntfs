@@ -71,11 +71,11 @@ struct libfsntfs_compressed_data_handle
 
 	/* The number of compressed blocks
 	 */
-	uint32_t number_of_compressed_blocks;
+	uint64_t number_of_compressed_blocks;
 
 	/* The compressed block offsets
 	 */
-	uint32_t *compressed_block_offsets;
+	uint64_t *compressed_block_offsets;
 
 	/* The compression unit size
 	 */
