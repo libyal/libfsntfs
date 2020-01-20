@@ -1,4 +1,4 @@
-.Dd April 14, 2016
+.Dd December 27, 2019
 .Dt fsntfsinfo
 .Os libfsntfs
 .Sh NAME
@@ -6,6 +6,7 @@
 .Nd determines information about a Windows NT File System (NTFS) volume
 .Sh SYNOPSIS
 .Nm fsntfsinfo
+.Op Fl B Ar bodyfile
 .Op Fl E Ar mft_entry_index
 .Op Fl F Ar file_entry
 .Op Fl o Ar offset
@@ -29,6 +30,8 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl a
 shows allocation information
+.It Fl B Ar bodyfile
+output file system information as a bodyfile
 .It Fl E Ar mft_entry_index
 show information about a specific MFT entry index or "all"
 .It Fl F Ar file_entry
@@ -54,9 +57,9 @@ None
 .Bd -literal
 # fsntfsinfo ntfs-img-kw-1.dd
 fsntfsinfo 20160414
-
+.sp
 Windows NT File System information:
-
+.sp
 Volume information:
 	Name				: KW-SRCH-1
 	Version				: 3.1
@@ -64,7 +67,7 @@ Volume information:
 	Cluster block size		: 512
 	MFT entry size			: 1024
 	Index entry size		: 4096
-
+.sp
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
@@ -75,6 +78,6 @@ https://github.com/libyal/libfsntfs/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2010-2016, Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2010-2019, Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO

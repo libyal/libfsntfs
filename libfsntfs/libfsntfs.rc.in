@@ -24,7 +24,7 @@ BEGIN
       VALUE "FileDescription",		"Library to access the Windows New Technology File System (NTFS) format\0"
       VALUE "FileVersion",		"@VERSION@" "\0"
       VALUE "InternalName",		"libfsntfs.dll\0"
-      VALUE "LegalCopyright",		"(C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>\0"
+      VALUE "LegalCopyright",		"(C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>\0"
       VALUE "OriginalFilename",		"libfsntfs.dll\0"
       VALUE "ProductName",		"libfsntfs\0"
       VALUE "ProductVersion",		"@VERSION@" "\0"

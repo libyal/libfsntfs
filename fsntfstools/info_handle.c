@@ -1,7 +1,7 @@
 /*
  * Info handle
  *
- * Copyright (C) 2010-2019, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -4753,13 +4753,13 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				goto on_error;
 			}
 		}
-	}
-	if( sub_path != NULL )
-	{
-		memory_free(
-		 sub_path );
+		if( sub_path != NULL )
+		{
+			memory_free(
+			 sub_path );
 
-		sub_path = NULL;
+			sub_path = NULL;
+		}
 	}
 	if( file_entry_name != NULL )
 	{
