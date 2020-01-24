@@ -25,7 +25,7 @@
 #include "libfsntfs_attribute_list.h"
 #include "libfsntfs_attribute_list_entry.h"
 #include "libfsntfs_cluster_block.h"
-#include "libfsntfs_cluster_block_vector.h"
+#include "libfsntfs_cluster_block_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -35,6 +35,8 @@
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
+
+#include "fsntfs_attribute_list.h"
 
 /* Reads the attribute list
  * Returns 1 if successful or -1 on error
@@ -185,17 +187,16 @@ int libfsntfs_attribute_list_read_from_attribute(
      libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
-	libfcache_cache_t *cluster_block_cache   = NULL;
-	libfdata_vector_t *cluster_block_vector  = NULL;
-	libfsntfs_cluster_block_t *cluster_block = NULL;
-	uint8_t *data                            = NULL;
-	static char *function                    = "libfsntfs_attribute_list_read_from_attribute";
-	size64_t data_size                       = 0;
-	size_t cluster_block_data_size           = 0;
-	uint16_t attribute_data_flags            = 0;
-	int cluster_block_index                  = 0;
-	int number_of_cluster_blocks             = 0;
-	int number_of_data_runs                  = 0;
+	uint8_t data[ sizeof( fsntfs_attribute_list_entry_header_t ) + 256 ];
+
+	libfdata_stream_t *cluster_block_stream                = NULL;
+	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	static char *function                                  = "libfsntfs_attribute_list_read_from_attribute";
+	size64_t data_size                                     = 0;
+	ssize_t read_count                                     = 0;
+	off64_t data_offset                                    = 0;
+	int attribute_index                                    = 0;
+	int entry_index                                        = 0;
 
 	if( attribute_list == NULL )
 	{
@@ -208,259 +209,148 @@ int libfsntfs_attribute_list_read_from_attribute(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_number_of_data_runs(
+	if( libfsntfs_cluster_block_stream_initialize(
+	     &cluster_block_stream,
+	     io_handle,
 	     attribute,
-	     &number_of_data_runs,
+	     NULL,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create cluster block stream.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdata_stream_get_size(
+	     cluster_block_stream,
+	     &data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of data runs.",
+		 "%s: unable to retrieve size from cluster block stream.",
 		 function );
 
 		goto on_error;
 	}
-/* TODO move support of no data run into cluster block vector */
-	if( number_of_data_runs == 0 )
+	while( (size64_t) data_offset < data_size )
 	{
-		if( libfsntfs_mft_attribute_get_data(
-		     attribute,
-		     &data,
-		     (size_t *) &data_size,
+		if( libfdata_stream_seek_offset(
+		     cluster_block_stream,
+		     data_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek attribute list entry: %d offset: %" PRIi64 " (0x%08" PRIx64 ") in cluster block stream.",
+			 function,
+			 attribute_index,
+			 data_offset,
+			 data_offset );
+
+			goto on_error;
+		}
+		read_count = libfdata_stream_read_buffer(
+		              cluster_block_stream,
+		              (intptr_t *) file_io_handle,
+		              data,
+		              sizeof( fsntfs_attribute_list_entry_header_t ) + 256,
+		              0,
+		              error );
+
+		if( read_count < 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to seek attribute list entry: %d from cluster block stream.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+		if( libfsntfs_attribute_list_entry_initialize(
+		     &attribute_list_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute data.",
-			 function );
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create attribute list entry: %d.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
-		if( data_size > (size64_t) SSIZE_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid data size value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_list_read_data(
-		     attribute_list,
+		if( libfsntfs_attribute_list_entry_read_data(
+		     attribute_list_entry,
 		     data,
-		     (size_t) data_size,
+		     sizeof( fsntfs_attribute_list_entry_header_t ) + 256,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attribute list.",
+			 "%s: unable to read attribute list entry: %d.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+		data_offset += attribute_list_entry->size;
+
+		if( libcdata_array_append_entry(
+		     attribute_list,
+		     &entry_index,
+		     (intptr_t *) attribute_list_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append list attribute to array.",
 			 function );
 
 			goto on_error;
 		}
+		attribute_list_entry = NULL;
+
+		attribute_index++;
 	}
-	else
+	if( libfdata_stream_free(
+	     &cluster_block_stream,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_data_flags(
-		     attribute,
-		     &attribute_data_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute data flags.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free cluster block stream.",
+		 function );
 
-			goto on_error;
-		}
-		if( ( attribute_data_flags & LIBFSNTFS_ATTRIBUTE_FLAG_COMPRESSION_MASK ) != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported compressed attribute data.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_mft_attribute_get_data_size(
-		     attribute,
-		     &data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute data size.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_cluster_block_vector_initialize(
-		     &cluster_block_vector,
-		     io_handle,
-		     attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create cluster block vector.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfcache_cache_initialize(
-		     &cluster_block_cache,
-		     1,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create cluster block cache.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfdata_vector_get_number_of_elements(
-		     cluster_block_vector,
-		     &number_of_cluster_blocks,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of cluster blocks.",
-			 function );
-
-			goto on_error;
-		}
-		for( cluster_block_index = 0;
-		     cluster_block_index < number_of_cluster_blocks;
-		     cluster_block_index++ )
-		{
-			if( libfdata_vector_get_element_value_by_index(
-			     cluster_block_vector,
-			     (intptr_t *) file_io_handle,
-			     (libfdata_cache_t *) cluster_block_cache,
-			     cluster_block_index,
-			     (intptr_t **) &cluster_block,
-			     0,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve cluster block: %d from vector.",
-				 function,
-				 cluster_block_index );
-
-				goto on_error;
-			}
-			if( cluster_block == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing cluster block: %d.",
-				 function,
-				 cluster_block_index );
-
-				goto on_error;
-			}
-			if( cluster_block->data == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid cluster block: %d - missing data.",
-				 function,
-				 cluster_block_index );
-
-				goto on_error;
-			}
-			cluster_block_data_size = cluster_block->data_size;
-
-			if( (size64_t) cluster_block_data_size > data_size )
-			{
-				cluster_block_data_size = (size_t) data_size;
-			}
-			if( libfsntfs_attribute_list_read_data(
-			     attribute_list,
-			     cluster_block->data,
-			     cluster_block_data_size,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read attribute list.",
-				 function );
-
-				goto on_error;
-			}
-			data_size -= cluster_block_data_size;
-		}
-		if( libfdata_vector_free(
-		     &cluster_block_vector,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free cluster block vector.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfcache_cache_free(
-		     &cluster_block_cache,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free cluster block cache.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
 on_error:
-	if( cluster_block_cache != NULL )
+	if( cluster_block_stream != NULL )
 	{
-		libfcache_cache_free(
-		 &cluster_block_cache,
-		 NULL );
-	}
-	if( cluster_block_vector != NULL )
-	{
-		libfdata_vector_free(
-		 &cluster_block_vector,
+		libfdata_stream_free(
+		 &cluster_block_stream,
 		 NULL );
 	}
 	return( -1 );

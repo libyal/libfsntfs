@@ -1166,7 +1166,6 @@ int fsntfs_test_file_entry_initialize(
 	          io_handle,
 	          file_io_handle,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
@@ -8474,7 +8473,6 @@ int main(
 	          io_handle,
 	          file_io_handle,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 

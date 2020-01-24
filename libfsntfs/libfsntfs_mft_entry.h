@@ -30,6 +30,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_mft_entry_header.h"
@@ -89,6 +90,14 @@ struct libfsntfs_mft_entry
 	/* The (attribute) list attribute
 	 */
 	libfsntfs_mft_attribute_t *list_attribute;
+
+	/* The attribute list
+	 */
+	libcdata_array_t *attribute_list;
+
+	/* The attribute list data MFT entries
+	 */
+	libcdata_array_t *attribute_list_data_mft_entries;
 
 	/* The default (nameless) $DATA attribute
 	 */
@@ -179,14 +188,26 @@ int libfsntfs_mft_entry_read_attributes(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
-     uint8_t flags,
      libcerror_error_t **error );
 
-int libfsntfs_mft_entry_read_attributes_from_attribute_list(
+int libfsntfs_mft_entry_read_attribute_list(
+     libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
      libfsntfs_mft_entry_t *mft_entry,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
-     libcdata_array_t *attribute_list,
+     libfcache_cache_t *mft_entry_cache,
+     int attribute_list_data_mft_entry_index,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_read_attribute_list_data_mft_entries(
+     libfsntfs_mft_entry_t *mft_entry,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *mft_entry_vector,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_is_empty(

@@ -330,6 +330,43 @@ int libfsntfs_mft_entry_free(
 
 			result = -1;
 		}
+		if( ( *mft_entry )->attribute_list != NULL )
+		{
+			if( libcdata_array_free(
+			     &( ( *mft_entry )->attribute_list ),
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute list.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *mft_entry )->attribute_list_data_mft_entries != NULL )
+		{
+			/* The attribute_list_data_mft_entries only contains references that are managed
+			 * by the attribute_list
+			 */
+			if( libcdata_array_free(
+			     &( ( *mft_entry )->attribute_list_data_mft_entries ),
+			     NULL,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute list data MFT entries.",
+				 function );
+
+				result = -1;
+			}
+		}
 		/* The alternate_data_attributes_array only contains references that are managed
 		 * by the attributes_array
 		 */
@@ -1072,11 +1109,9 @@ int libfsntfs_mft_entry_read_attributes(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
-     uint8_t flags,
      libcerror_error_t **error )
 {
-	libcdata_array_t *attribute_list = NULL;
-	static char *function            = "libfsntfs_mft_entry_read_attributes";
+	static char *function = "libfsntfs_mft_entry_read_attributes";
 
 	if( mft_entry == NULL )
 	{
@@ -1089,7 +1124,6 @@ int libfsntfs_mft_entry_read_attributes(
 
 		return( -1 );
 	}
-/* TODO refactor need to pass file_io_handle, io_handle and flags */
 	if( libfsntfs_mft_entry_read_attributes_data(
 	     mft_entry,
 	     io_handle,
@@ -1101,34 +1135,18 @@ int libfsntfs_mft_entry_read_attributes(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read MFT attributes.",
-		 function );
+		 "%s: unable to read attributes of MFT entry: %d.",
+		 function,
+		 mft_entry->index );
 
 		goto on_error;
 	}
-/* TODO if flag is set mark MFT entry as incomplete ? */
-	if( ( mft_entry->list_attribute != NULL )
-	 && ( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 ) )
+	if( mft_entry->list_attribute != NULL )
 	{
-		if( libcdata_array_initialize(
-		     &attribute_list,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute list array.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_list_read_from_attribute(
-		     attribute_list,
+		if( libfsntfs_mft_entry_read_attribute_list(
+		     mft_entry,
 		     io_handle,
 		     file_io_handle,
-		     mft_entry->list_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1140,32 +1158,17 @@ int libfsntfs_mft_entry_read_attributes(
 
 			goto on_error;
 		}
-		if( libfsntfs_mft_entry_read_attributes_from_attribute_list(
+		if( libfsntfs_mft_entry_read_attribute_list_data_mft_entries(
 		     mft_entry,
 		     file_io_handle,
 		     mft_entry_vector,
-		     attribute_list,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attributes from attribute list.",
-			 function );
-
-			goto on_error;
-		}
-		if( libcdata_array_free(
-		     &attribute_list,
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free attribute list array.",
+			 "%s: unable to read attribute list data MFT entries.",
 			 function );
 
 			goto on_error;
@@ -1174,10 +1177,17 @@ int libfsntfs_mft_entry_read_attributes(
 	return( 1 );
 
 on_error:
-	if( attribute_list != NULL )
+	if( mft_entry->attribute_list_data_mft_entries != NULL )
 	{
 		libcdata_array_free(
-		 &attribute_list,
+		 &( mft_entry->attribute_list_data_mft_entries ),
+		 NULL,
+		 NULL );
+	}
+	if( mft_entry->attribute_list != NULL )
+	{
+		libcdata_array_free(
+		 &( mft_entry->attribute_list ),
 		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 		 NULL );
 	}
@@ -1194,29 +1204,22 @@ on_error:
 	return( -1 );
 }
 
-/* Reads attributes from an attribute list
+/* Reads the attribute list
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_entry_read_attributes_from_attribute_list(
+int libfsntfs_mft_entry_read_attribute_list(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_vector_t *mft_entry_vector,
-     libcdata_array_t *attribute_list,
      libcerror_error_t **error )
 {
-	libcdata_array_t *data_mft_entry_array                 = NULL;
-	libfcache_cache_t *mft_entry_cache                     = NULL;
 	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
-	libfsntfs_mft_attribute_t *mft_attribute               = NULL;
-	libfsntfs_mft_entry_t *data_mft_entry                  = NULL;
-	static char *function                                  = "libfsntfs_mft_entry_read_attributes_from_attribute_list";
-	uint64_t data_mft_entry_index                          = 0;
+	static char *function                                  = "libfsntfs_mft_entry_read_attribute_list";
+	uint64_t attribute_list_data_mft_entry_index           = 0;
 	uint16_t sequence_number                               = 0;
-	int attribute_index                                    = 0;
 	int attribute_list_entry_index                         = 0;
 	int entry_index                                        = 0;
 	int number_of_attribute_list_entries                   = 0;
-	int number_of_attributes                               = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -1229,10 +1232,41 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		return( -1 );
 	}
-	/* Determine the individual data MFT entries in the attribute list
-	 */
+	if( mft_entry->list_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid MFT entry - missing list attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->attribute_list != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid MFT entry - attribute list value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( mft_entry->attribute_list_data_mft_entries != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid MFT entry - attribute list data MFT entries value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( libcdata_array_initialize(
-	     &data_mft_entry_array,
+	     &( mft_entry->attribute_list ),
 	     0,
 	     error ) != 1 )
 	{
@@ -1240,13 +1274,43 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create data MFT entry array.",
+		 "%s: unable to create attribute list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_attribute_list_read_from_attribute(
+	     mft_entry->attribute_list,
+	     io_handle,
+	     file_io_handle,
+	     mft_entry->list_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read attribute list.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_initialize(
+	     &( mft_entry->attribute_list_data_mft_entries ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create attribute list data MFT entries.",
 		 function );
 
 		goto on_error;
 	}
 	if( libcdata_array_get_number_of_entries(
-	     attribute_list,
+	     mft_entry->attribute_list,
 	     &number_of_attribute_list_entries,
 	     error ) != 1 )
 	{
@@ -1264,7 +1328,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 	     attribute_list_entry_index++ )
 	{
 		if( libcdata_array_get_entry_by_index(
-		     attribute_list,
+		     mft_entry->attribute_list,
 		     attribute_list_entry_index,
 		     (intptr_t **) &attribute_list_entry,
 		     error ) != 1 )
@@ -1281,7 +1345,7 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		}
 		if( libfsntfs_attribute_list_entry_get_file_reference(
 		     attribute_list_entry,
-		     &data_mft_entry_index,
+		     &attribute_list_data_mft_entry_index,
 		     &sequence_number,
 		     error ) != 1 )
 		{
@@ -1295,25 +1359,25 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 			goto on_error;
 		}
-		if( data_mft_entry_index > (uint64_t) INT_MAX )
+		if( attribute_list_data_mft_entry_index > (uint64_t) INT_MAX )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: data MFT entry reference value out of bounds.",
+			 "%s: attribute list data MFT entry reference value out of bounds.",
 			 function );
 
 			goto on_error;
 		}
 		/* Ignore the current MFT entry
 		 */
-		if( data_mft_entry_index == (uint64_t) mft_entry->index )
+		if( attribute_list_data_mft_entry_index == (uint64_t) mft_entry->index )
 		{
 			continue;
 		}
 		if( libcdata_array_insert_entry(
-		     data_mft_entry_array,
+		     mft_entry->attribute_list_data_mft_entries,
 		     &entry_index,
 		     (intptr_t *) attribute_list_entry,
 		     (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_attribute_list_entry_compare_by_file_reference,
@@ -1324,13 +1388,244 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to insert attribute list entry in data MFT entry array.",
+			 "%s: unable to insert attribute list data MFT entry in array.",
 			 function );
 
 			goto on_error;
 		}
 	}
-	/* Read the data MFT entries
+	return( 1 );
+
+on_error:
+	if( mft_entry->attribute_list_data_mft_entries != NULL )
+	{
+		libcdata_array_free(
+		 &( mft_entry->attribute_list_data_mft_entries ),
+		 NULL,
+		 NULL );
+	}
+	if( mft_entry->attribute_list != NULL )
+	{
+		libcdata_array_free(
+		 &( mft_entry->attribute_list ),
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads a specific attribute list data MFT entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
+     libfsntfs_mft_entry_t *mft_entry,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *mft_entry_vector,
+     libfcache_cache_t *mft_entry_cache,
+     int attribute_list_data_mft_entry_index,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute               = NULL;
+	libfsntfs_mft_entry_t *data_mft_entry                  = NULL;
+	static char *function                                  = "libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index";
+	uint64_t attribute_list_data_mft_entry                 = 0;
+	uint16_t sequence_number                               = 0;
+	int attribute_index                                    = 0;
+	int entry_index                                        = 0;
+	int number_of_attributes                               = 0;
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     mft_entry->attribute_list_data_mft_entries,
+	     attribute_list_data_mft_entry_index,
+	     (intptr_t **) &attribute_list_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute list data MFT entry: %d.",
+		 function,
+		 attribute_list_data_mft_entry_index );
+
+		return( -1 );
+	}
+	if( libfsntfs_attribute_list_entry_get_file_reference(
+	     attribute_list_entry,
+	     &attribute_list_data_mft_entry,
+	     &sequence_number,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute list entry: %d file reference.",
+		 function,
+		 attribute_list_data_mft_entry_index );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading data file reference: %" PRIu64 "-%" PRIu16 "\n",
+		 function,
+		 attribute_list_data_mft_entry,
+		 sequence_number );
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
+	if( libfdata_vector_get_element_value_by_index(
+	     mft_entry_vector,
+	     (intptr_t *) file_io_handle,
+	     (libfdata_cache_t *) mft_entry_cache,
+	     (int) attribute_list_data_mft_entry,
+	     (intptr_t **) &data_mft_entry,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+		 function,
+		 attribute_list_data_mft_entry );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     data_mft_entry->attributes_array,
+	     &number_of_attributes,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of attributes.",
+		 function );
+
+		return( -1 );
+	}
+	for( attribute_index = 0;
+	     attribute_index < number_of_attributes;
+	     attribute_index++ )
+	{
+		if( libcdata_array_get_entry_by_index(
+		     data_mft_entry->attributes_array,
+		     attribute_index,
+		     (intptr_t **) &mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d from list MFT entry.",
+			 function,
+			 attribute_index );
+
+			return( -1 );
+		}
+		if( libcdata_array_set_entry_by_index(
+		     data_mft_entry->attributes_array,
+		     attribute_index,
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set attribute: %d in list MFT entry.",
+			 function,
+			 attribute_index );
+
+			return( -1 );
+		}
+		/* mft_entry->attributes_array takes over management of mft_attribute
+		 */
+		if( libcdata_array_append_entry(
+		     mft_entry->attributes_array,
+		     &entry_index,
+		     (intptr_t *) mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append attribute to array.",
+			 function );
+
+			libfsntfs_mft_attribute_free(
+			 &mft_attribute,
+			 NULL );
+
+			return( -1 );
+		}
+		if( libfsntfs_mft_entry_set_attribute_helper_values(
+		     mft_entry,
+		     entry_index,
+		     mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set helper values for attribute: %d.",
+			 function,
+			 entry_index );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Reads the attribute list data MFT entries
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_read_attribute_list_data_mft_entries(
+     libfsntfs_mft_entry_t *mft_entry,
+     libbfio_handle_t *file_io_handle,
+     libfdata_vector_t *mft_entry_vector,
+     libcerror_error_t **error )
+{
+	libfcache_cache_t *mft_entry_cache            = NULL;
+	static char *function                         = "libfsntfs_mft_entry_read_attribute_list_data_mft_entries";
+	int attribute_list_data_mft_entry_index       = 0;
+	int number_of_attribute_list_data_mft_entries = 0;
+
+	if( mft_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry.",
+		 function );
+
+		return( -1 );
+	}
+	/* Read the list data MFT entries
 	 * Use a local cache to prevent cache outs
 	 */
 	if( libfcache_cache_initialize(
@@ -1348,173 +1643,40 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 		goto on_error;
 	}
 	if( libcdata_array_get_number_of_entries(
-	     data_mft_entry_array,
-	     &number_of_attribute_list_entries,
+	     mft_entry->attribute_list_data_mft_entries,
+	     &number_of_attribute_list_data_mft_entries,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of attribute list entries.",
+		 "%s: unable to retrieve number of attribute list data MFT entries.",
 		 function );
 
 		goto on_error;
 	}
-	for( attribute_list_entry_index = 0;
-	     attribute_list_entry_index < number_of_attribute_list_entries;
-	     attribute_list_entry_index++ )
+	for( attribute_list_data_mft_entry_index = 0;
+	     attribute_list_data_mft_entry_index < number_of_attribute_list_data_mft_entries;
+	     attribute_list_data_mft_entry_index++ )
 	{
-		if( libcdata_array_get_entry_by_index(
-		     data_mft_entry_array,
-		     attribute_list_entry_index,
-		     (intptr_t **) &attribute_list_entry,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute list entry: %d.",
-			 function,
-			 attribute_list_entry_index );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_list_entry_get_file_reference(
-		     attribute_list_entry,
-		     &data_mft_entry_index,
-		     &sequence_number,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute list entry: %d file reference.",
-			 function,
-			 attribute_list_entry_index );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: reading data file reference: %" PRIu64 "-%" PRIu16 "\n",
-			 function,
-			 data_mft_entry_index,
-			 sequence_number );
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-		if( libfdata_vector_get_element_value_by_index(
+		if( libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
+		     mft_entry,
+		     file_io_handle,
 		     mft_entry_vector,
-		     (intptr_t *) file_io_handle,
-		     (libfdata_cache_t *) mft_entry_cache,
-		     (int) data_mft_entry_index,
-		     (intptr_t **) &data_mft_entry,
-		     0,
+		     mft_entry_cache,
+		     attribute_list_data_mft_entry_index,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve MFT entry: %" PRIu64 ".",
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read attribute list data MFT entry: %d.",
 			 function,
-			 data_mft_entry_index );
+			 attribute_list_data_mft_entry_index );
 
 			goto on_error;
-		}
-		if( libcdata_array_get_number_of_entries(
-		     data_mft_entry->attributes_array,
-		     &number_of_attributes,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve number of attributes.",
-			 function );
-
-			goto on_error;
-		}
-		for( attribute_index = 0;
-		     attribute_index < number_of_attributes;
-		     attribute_index++ )
-		{
-			if( libcdata_array_get_entry_by_index(
-			     data_mft_entry->attributes_array,
-			     attribute_index,
-			     (intptr_t **) &mft_attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute: %d from list MFT entry.",
-				 function,
-				 attribute_index );
-
-				goto on_error;
-			}
-			if( libcdata_array_set_entry_by_index(
-			     data_mft_entry->attributes_array,
-			     attribute_index,
-			     NULL,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set attribute: %d in list MFT entry.",
-				 function,
-				 attribute_index );
-
-				goto on_error;
-			}
-			/* mft_entry->attributes_array takes over management of mft_attribute
-			 */
-			if( libcdata_array_append_entry(
-			     mft_entry->attributes_array,
-			     &entry_index,
-			     (intptr_t *) mft_attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append attribute to array.",
-				 function );
-
-				libfsntfs_mft_attribute_free(
-				 &mft_attribute,
-				 NULL );
-
-				goto on_error;
-			}
-			if( libfsntfs_mft_entry_set_attribute_helper_values(
-			     mft_entry,
-			     entry_index,
-			     mft_attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set helper values for attribute: %d.",
-				 function,
-				 entry_index );
-
-				goto on_error;
-			}
 		}
 	}
 	if( libfcache_cache_free(
@@ -1530,20 +1692,6 @@ int libfsntfs_mft_entry_read_attributes_from_attribute_list(
 
 		goto on_error;
 	}
-	if( libcdata_array_free(
-	     &data_mft_entry_array,
-	     NULL,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free data MFT entry array.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
 
 on_error:
@@ -1551,13 +1699,6 @@ on_error:
 	{
 		libfcache_cache_free(
 		 &mft_entry_cache,
-		 NULL );
-	}
-	if( data_mft_entry_array != NULL )
-	{
-		libcdata_array_free(
-		 &data_mft_entry_array,
-		 NULL,
 		 NULL );
 	}
 	return( -1 );
@@ -2849,15 +2990,15 @@ int libfsntfs_mft_entry_read_element_data(
      int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
      off64_t element_data_offset,
      size64_t element_data_size,
-     uint32_t element_flags,
+     uint32_t element_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	libfsntfs_mft_entry_t *mft_entry = NULL;
 	static char *function            = "libfsntfs_mft_entry_read_element_data";
-	uint8_t flags                    = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( element_flags )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
 #if ( SIZEOF_INT <= 4 )
@@ -2918,10 +3059,6 @@ int libfsntfs_mft_entry_read_element_data(
 
 		goto on_error;
 	}
-	if( ( element_flags & LIBFSNTFS_MFT_ENTRY_FLAG_MFT_ONLY ) != 0 )
-	{
-		flags = LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY;
-	}
 	if( mft_entry->is_empty == 0 )
 	{
 		if( libfsntfs_mft_entry_read_attributes(
@@ -2929,7 +3066,6 @@ int libfsntfs_mft_entry_read_element_data(
 		     io_handle,
 		     file_io_handle,
 		     vector,
-		     flags,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

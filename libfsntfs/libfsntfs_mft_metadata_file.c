@@ -990,7 +990,6 @@ int libfsntfs_internal_mft_metadata_file_open_read(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_internal_mft_metadata_file_open_read";
-	size64_t file_size    = 0;
 
 	if( internal_mft_metadata_file == NULL )
 	{
@@ -1024,20 +1023,6 @@ int libfsntfs_internal_mft_metadata_file_open_read(
 		 function );
 
 		return( -1 );
-	}
-	if( libbfio_handle_get_size(
-	     file_io_handle,
-	     &file_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file size.",
-		 function );
-
-		goto on_error;
 	}
 /* TODO allow to set the values */
 /* TODO scan for signature to determine MFT entry size */
@@ -1073,7 +1058,6 @@ int libfsntfs_internal_mft_metadata_file_open_read(
 	     internal_mft_metadata_file->io_handle,
 	     file_io_handle,
 	     0,
-	     file_size,
 	     LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	     error ) != 1 )
 	{

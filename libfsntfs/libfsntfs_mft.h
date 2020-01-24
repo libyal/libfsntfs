@@ -61,29 +61,11 @@ struct libfsntfs_mft
 int libfsntfs_mft_initialize(
      libfsntfs_mft_t **mft,
      libfsntfs_io_handle_t *io_handle,
-     off64_t file_offset,
-     size64_t file_size,
      size64_t mft_entry_size,
-     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_free(
      libfsntfs_mft_t **mft,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_set_data_runs(
-     libfsntfs_mft_t *mft,
-     libfsntfs_mft_entry_t *mft_entry,
-     libcerror_error_t **error );
-
-int libfsntfs_mft_read_mft_entry(
-     libfsntfs_mft_t *mft,
-     libfsntfs_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     off64_t file_offset,
-     uint32_t mft_entry_index,
-     libfsntfs_mft_entry_t *mft_entry,
-     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_number_of_entries(

@@ -1011,7 +1011,6 @@ int libfsntfs_internal_volume_open_read(
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_internal_volume_open_read";
-	size64_t volume_size  = 0;
 	off64_t mft_offset    = 0;
 
 	if( internal_volume == NULL )
@@ -1149,20 +1148,6 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-	if( libfsntfs_volume_header_get_volume_size(
-	     internal_volume->volume_header,
-	     &volume_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve volume size.",
-		 function );
-
-		goto on_error;
-	}
 	if( libfsntfs_volume_header_get_mft_offset(
 	     internal_volume->volume_header,
 	     &mft_offset,
@@ -1190,8 +1175,7 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-	if( ( mft_offset < 0 )
-	 || ( (size64_t) mft_offset >= volume_size ) )
+	if( mft_offset < 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1214,7 +1198,6 @@ int libfsntfs_internal_volume_open_read(
 	     internal_volume->io_handle,
 	     file_io_handle,
 	     mft_offset,
-	     volume_size - mft_offset,
 	     0,
 	     error ) != 1 )
 	{

@@ -81,10 +81,7 @@ int fsntfs_test_mft_initialize(
 	result = libfsntfs_mft_initialize(
 	          &mft,
 	          io_handle,
-	          0,
-	          4096,
 	          1024,
-	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -122,10 +119,7 @@ int fsntfs_test_mft_initialize(
 	result = libfsntfs_mft_initialize(
 	          NULL,
 	          io_handle,
-	          0,
-	          4096,
 	          1024,
-	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -145,10 +139,7 @@ int fsntfs_test_mft_initialize(
 	result = libfsntfs_mft_initialize(
 	          &mft,
 	          io_handle,
-	          0,
-	          4096,
 	          1024,
-	          0,
 	          &error );
 
 	mft = NULL;
@@ -168,10 +159,7 @@ int fsntfs_test_mft_initialize(
 	result = libfsntfs_mft_initialize(
 	          &mft,
 	          NULL,
-	          0,
-	          4096,
 	          1024,
-	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -199,10 +187,7 @@ int fsntfs_test_mft_initialize(
 		result = libfsntfs_mft_initialize(
 		          &mft,
 		          io_handle,
-		          0,
-		          4096,
 		          1024,
-		          0,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -246,10 +231,7 @@ int fsntfs_test_mft_initialize(
 		result = libfsntfs_mft_initialize(
 		          &mft,
 		          io_handle,
-		          0,
-		          4096,
 		          1024,
-		          0,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
@@ -360,142 +342,6 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_mft_set_data_runs function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_mft_set_data_runs(
-     void )
-{
-	libcerror_error_t *error         = NULL;
-	libfsntfs_io_handle_t *io_handle = NULL;
-	libfsntfs_mft_t *mft             = NULL;
-	int result                       = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_io_handle_initialize(
-	          &io_handle,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "io_handle",
-	 io_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	io_handle->cluster_block_size = 4096;
-
-	result = libfsntfs_mft_initialize(
-	          &mft,
-	          io_handle,
-	          0,
-	          4096,
-	          1024,
-	          0,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "mft",
-	 mft );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-/* TODO implement */
-
-	/* Test error cases
-	 */
-	result = libfsntfs_mft_set_data_runs(
-	          NULL,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libfsntfs_io_handle_free(
-	          &io_handle,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "io_handle",
-	 io_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_mft_free(
-	          &mft,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "mft",
-	 mft );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( mft != NULL )
-	{
-		libfsntfs_mft_free(
-		 &mft,
-		 NULL );
-	}
-	if( io_handle != NULL )
-	{
-		libfsntfs_io_handle_free(
-		 &io_handle,
-		 NULL );
 	}
 	return( 0 );
 }
@@ -614,10 +460,6 @@ int main(
 	 "libfsntfs_mft_free",
 	 fsntfs_test_mft_free );
 
-	FSNTFS_TEST_RUN(
-	 "libfsntfs_mft_set_data_runs",
-	 fsntfs_test_mft_set_data_runs );
-
 	/* TODO: add tests for libfsntfs_mft_read_mft_entry */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
@@ -646,10 +488,7 @@ int main(
 	result = libfsntfs_mft_initialize(
 	          &mft,
 	          io_handle,
-	          0,
-	          4096,
 	          1024,
-	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -672,7 +511,7 @@ int main(
 
 	/* TODO: add tests for libfsntfs_mft_get_mft_entry_by_index */
 
-	/* TODO: add tests for libfsntfs_mft_get_mft_entry_by_index_no_cache: */
+	/* TODO: add tests for libfsntfs_mft_get_mft_entry_by_index_no_cache */
 
 	/* Clean up
 	 */

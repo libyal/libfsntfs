@@ -1380,7 +1380,6 @@ int fsntfs_test_file_system_read_mft(
 	          io_handle,
 	          file_io_handle,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
@@ -1400,7 +1399,6 @@ int fsntfs_test_file_system_read_mft(
 	          io_handle,
 	          file_io_handle,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
@@ -1421,7 +1419,6 @@ int fsntfs_test_file_system_read_mft(
 	          NULL,
 	          file_io_handle,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
@@ -1442,7 +1439,6 @@ int fsntfs_test_file_system_read_mft(
 	          io_handle,
 	          NULL,
 	          0,
-	          16384,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
@@ -1463,28 +1459,6 @@ int fsntfs_test_file_system_read_mft(
 	          io_handle,
 	          file_io_handle,
 	          -1,
-	          16384,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_file_system_read_mft(
-	          file_system,
-	          io_handle,
-	          file_io_handle,
-	          0,
-	          (size64_t) INT64_MAX + 1,
 	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
 	          &error );
 
