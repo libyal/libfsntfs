@@ -68,7 +68,7 @@ Switched to asccidoc format.
 | 0.0.17 | J.B. Metz | August 2019 | Additional information regarding volumes created by Windows 10 (1903) and mkntfs.
 | 0.0.18 | J.B. Metz | September 2019 | Additional information regarding Windows Overlay Filter (WOF) compressed data.
 | 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
-| 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $ATTRIBUTE_LIST attribute.
+| 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $STANDARD_INFORMATION and $ATTRIBUTE_LIST attributes.
 |===
 
 :numbered:
@@ -890,6 +890,10 @@ See section: <<access_control,Access Control>>
 | 64 | 8 | | Update Sequence Number (USN) +
 [yellow-background]*What does it contain and what is it used for?*
 |===
+
+[NOTE]
+MFT entries without a $STANDARD_INFORMATION attribute but with other attributes,
+such as $FILE_NAME, and an $I30 index have been observed.
 
 === The attribute list attribute
 

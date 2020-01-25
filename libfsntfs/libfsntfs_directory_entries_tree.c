@@ -919,10 +919,14 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
 
 			goto on_error;
 		}
-		if( libfsntfs_mft_entry_get_standard_information_attribute(
-		     mft_entry,
-		     &mft_attribute,
-		     error ) != 1 )
+		directory_entries_tree->use_case_folding = 0;
+
+		result = libfsntfs_mft_entry_get_standard_information_attribute(
+		          mft_entry,
+		          &mft_attribute,
+		          error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -933,53 +937,52 @@ int libfsntfs_directory_entries_tree_read_from_i30_index(
 
 			goto on_error;
 		}
-		if( libfsntfs_standard_information_values_initialize(
-		     &standard_information_values,
-		     error ) != 1 )
+		else if( result != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create standard information values.",
-			 function );
+			if( libfsntfs_standard_information_values_initialize(
+			     &standard_information_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create standard information values.",
+				 function );
 
-			goto on_error;
-		}
-		if( libfsntfs_standard_information_values_read_from_mft_attribute(
-		     standard_information_values,
-		     mft_attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read standard information values from MFT attribute.",
-			 function );
+				goto on_error;
+			}
+			if( libfsntfs_standard_information_values_read_from_mft_attribute(
+			     standard_information_values,
+			     mft_attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read standard information values from MFT attribute.",
+				 function );
 
-			goto on_error;
-		}
-		if( standard_information_values->is_case_sensitive == 0 )
-		{
-			directory_entries_tree->use_case_folding = 1;
-		}
-		else
-		{
-			directory_entries_tree->use_case_folding = 0;
-		}
-		if( libfsntfs_standard_information_values_free(
-		     &standard_information_values,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free standard information values.",
-			 function );
+				goto on_error;
+			}
+			if( standard_information_values->is_case_sensitive == 0 )
+			{
+				directory_entries_tree->use_case_folding = 1;
+			}
+			if( libfsntfs_standard_information_values_free(
+			     &standard_information_values,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free standard information values.",
+				 function );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 	}
 	return( 1 );

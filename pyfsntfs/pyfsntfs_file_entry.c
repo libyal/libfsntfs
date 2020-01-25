@@ -2833,7 +2833,7 @@ PyObject *pyfsntfs_file_entry_get_name_attribute_index(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -2845,6 +2845,13 @@ PyObject *pyfsntfs_file_entry_get_name_attribute_index(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 #if PY_MAJOR_VERSION >= 3
 	integer_object = PyLong_FromLong(
