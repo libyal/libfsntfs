@@ -239,7 +239,7 @@ int libfsntfs_compressed_block_data_handle_free(
 ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
          libfsntfs_compressed_block_data_handle_t *data_handle,
          libbfio_handle_t *file_io_handle,
-         int segment_index,
+         int segment_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          uint8_t *segment_data,
          size_t segment_data_size,
@@ -251,8 +251,10 @@ ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
 	static char *function                          = "libfsntfs_compressed_block_data_handle_read_segment_data";
 	size_t read_size                               = 0;
 	size_t segment_data_offset                     = 0;
+	ssize_t read_count                             = 0;
 	off64_t compressed_block_offset                = 0;
 
+	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_flags )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
@@ -279,17 +281,6 @@ ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
 
 		return( -1 );
 	}
-	if( segment_index < 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment index value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_data == NULL )
 	{
 		libcerror_error_set(
@@ -312,98 +303,120 @@ ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
 
 		return( -1 );
 	}
-	if( (size64_t) data_handle->current_offset >= data_handle->data_size )
+	if( ( segment_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 	{
-		return( 0 );
-	}
-	while( segment_data_size > 0 )
-	{
-		if( libfdata_vector_get_element_value_at_offset(
-		     data_handle->compressed_block_vector,
-		     (intptr_t *) file_io_handle,
-		     (libfdata_cache_t *) data_handle->compressed_block_cache,
-		     data_handle->current_offset,
-		     &compressed_block_offset,
-		     (intptr_t **) &compressed_block,
+		if( memory_set(
+		     segment_data,
 		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve compressed block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-			 function,
-			 data_handle->current_offset,
-			 data_handle->current_offset );
-
-			return( -1 );
-		}
-		if( compressed_block == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid compressed block.",
-			 function );
-
-			return( -1 );
-		}
-		if( compressed_block->data == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid compressed block - missing data.",
-			 function );
-
-			return( -1 );
-		}
-		if( ( compressed_block_offset < 0 )
-		 || ( (size64_t) compressed_block_offset >= compressed_block->data_size ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid compressed block offset value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
-		read_size = compressed_block->data_size - compressed_block_offset;
-
-		if( read_size > segment_data_size )
-		{
-			read_size = segment_data_size;
-		}
-		if( memory_copy(
-		     &( segment_data[ segment_data_offset ] ),
-		     &( ( compressed_block->data )[ compressed_block_offset ] ),
-		     read_size ) == NULL )
+		     segment_data_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy compressed block data.",
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear segment data.",
 			 function );
 
 			return( -1 );
 		}
-		segment_data_offset += read_size;
-		segment_data_size   -= read_size;
-
-		data_handle->current_offset += read_size;
-
+		read_count = (ssize_t) segment_data_size;
+	}
+	else
+	{
 		if( (size64_t) data_handle->current_offset >= data_handle->data_size )
 		{
-			break;
+			return( 0 );
 		}
+		while( segment_data_size > 0 )
+		{
+			if( libfdata_vector_get_element_value_at_offset(
+			     data_handle->compressed_block_vector,
+			     (intptr_t *) file_io_handle,
+			     (libfdata_cache_t *) data_handle->compressed_block_cache,
+			     data_handle->current_offset,
+			     &compressed_block_offset,
+			     (intptr_t **) &compressed_block,
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve compressed block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 data_handle->current_offset,
+				 data_handle->current_offset );
+
+				return( -1 );
+			}
+			if( compressed_block == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid compressed block.",
+				 function );
+
+				return( -1 );
+			}
+			if( compressed_block->data == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: invalid compressed block - missing data.",
+				 function );
+
+				return( -1 );
+			}
+			if( ( compressed_block_offset < 0 )
+			 || ( (size64_t) compressed_block_offset >= compressed_block->data_size ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid compressed block offset value out of bounds.",
+				 function );
+
+				return( -1 );
+			}
+			read_size = compressed_block->data_size - compressed_block_offset;
+
+			if( read_size > segment_data_size )
+			{
+				read_size = segment_data_size;
+			}
+			if( memory_copy(
+			     &( segment_data[ segment_data_offset ] ),
+			     &( ( compressed_block->data )[ compressed_block_offset ] ),
+			     read_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+				 "%s: unable to copy compressed block data.",
+				 function );
+
+				return( -1 );
+			}
+			segment_data_offset += read_size;
+			segment_data_size   -= read_size;
+
+			data_handle->current_offset += read_size;
+
+			if( (size64_t) data_handle->current_offset >= data_handle->data_size )
+			{
+				break;
+			}
+		}
+		read_count = (ssize_t) segment_data_offset;
 	}
-	return( (ssize_t) segment_data_offset );
+	return( read_count );
 }
 
 /* Seeks a certain offset of the data
@@ -413,7 +426,7 @@ ssize_t libfsntfs_compressed_block_data_handle_read_segment_data(
 off64_t libfsntfs_compressed_block_data_handle_seek_segment_offset(
          libfsntfs_compressed_block_data_handle_t *data_handle,
          intptr_t *file_io_handle LIBFSNTFS_ATTRIBUTE_UNUSED,
-         int segment_index,
+         int segment_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          int segment_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
          off64_t segment_offset,
          libcerror_error_t **error )
@@ -421,6 +434,7 @@ off64_t libfsntfs_compressed_block_data_handle_seek_segment_offset(
 	static char *function = "libfsntfs_compressed_block_data_handle_seek_segment_offset";
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( file_io_handle )
+	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_index )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( segment_file_index )
 
 	if( data_handle == NULL )
@@ -430,17 +444,6 @@ off64_t libfsntfs_compressed_block_data_handle_seek_segment_offset(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid data handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_index != 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid segment index value out of bounds.",
 		 function );
 
 		return( -1 );

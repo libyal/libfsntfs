@@ -54,7 +54,7 @@ struct libfsntfs_index
 
 	/* The name size
 	 */
-	uint16_t name_size;
+	size_t name_size;
 
 	/* The flags
 	 */

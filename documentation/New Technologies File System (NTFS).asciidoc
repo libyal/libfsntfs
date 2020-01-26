@@ -349,7 +349,7 @@ the partition must 128 KiB aligned. The default partition partition alignment
 appears to be 64 KiB.
 
 [NOTE]
-mkntfs restricts the cluster size to: bytes per sector >= cluster size > 4096 * bytes per sector 
+mkntfs restricts the cluster size to: bytes per sector >= cluster size > 4096 * bytes per sector
 
 The MFT offset can be determined as following:
 ....
@@ -1927,6 +1927,8 @@ The metadata file $Bitmap contains the allocation bitmap.
 Every bit in the allocation bitmap represents a block the size of the cluster
 block, where the LSB is the first bit in a byte.
 
+[yellow-background]*TODO determine and describe what the $SRAT data stream is used for.*
+
 == [[access_control]]Access control
 
 The $Secure metadata file contains the security descriptors used for access control.
@@ -2596,6 +2598,72 @@ _For now the latter is assumed._
 | 0x20000000 | | [yellow-background]*Is index view* +
 [yellow-background]*(copy from corresponding bit in MFT record)*
 |===
+
+== Corruption scenarios
+
+=== Directory entry with outdated file reference
+
+The directory entry: \ProgramData\McAfee\Common Framework\Task\5.ini
+
+....
+File entry:
+	Path				: \ProgramData\McAfee\Common Framework\Task\5.ini
+	File reference			: 51106-400
+	Name				: 5.ini
+	Parent file reference		: 65804-10
+	Size				: 723
+	Creation time			: Sep 16, 2011 20:47:54.561041200 UTC
+	Modification time		: Apr 07, 2012 21:07:02.684060000 UTC
+	Access time			: Apr 07, 2012 21:07:02.652810200 UTC
+	Entry modification time		: Apr 07, 2012 21:07:02.684060000 UTC
+	File attribute flags		: 0x00002020
+		Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+		Content should not be indexed (FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+....
+
+The corresponding MFT entry:
+
+....
+MFT entry: 51106 information:
+	Is allocated			: true
+	File reference			: 51106-496
+	Base record file reference	: Not set (0)
+	Journal sequence number		: 0
+	Number of attributes		: 3
+
+Attribute: 1
+	Type				: $STANDARD_INFORMATION (0x00000010)
+	Creation time			: Sep 16, 2011 20:47:54.561041200 UTC
+	Modification time		: Apr 07, 2012 21:07:02.684060000 UTC
+	Access time			: Apr 07, 2012 21:07:02.652810200 UTC
+	Entry modification time		: Apr 07, 2012 21:07:02.684060000 UTC
+	Owner identifier		: 0
+	Security descriptor identifier	: 1368
+	Update sequence number		: 1947271600
+	File attribute flags		: 0x00002020
+		Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+		Content should not be indexed (FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+
+Attribute: 2
+	Type				: $FILE_NAME (0x00000030)
+	Parent file reference		: 65804-10
+	Creation time			: Sep 16, 2011 20:47:54.561041200 UTC
+	Modification time		: Apr 07, 2012 21:07:02.652810200 UTC
+	Access time			: Apr 07, 2012 21:07:02.652810200 UTC
+	Entry modification time		: Apr 07, 2012 21:07:02.652810200 UTC
+	File attribute flags		: 0x00002020
+		Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+		Content should not be indexed (FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+	Namespace			: DOS and Windows (3)
+	Name				: 1.ini
+
+Attribute: 3
+	Type				: $DATA (0x00000080)
+	Data size			: 723 bytes
+	Data flags			: 0x0000
+....
+
+[yellow-background]*TODO look into using $LogFile*
 
 == Notes
 

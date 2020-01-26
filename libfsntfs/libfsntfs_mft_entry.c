@@ -47,7 +47,7 @@
 
 #include "fsntfs_mft_entry.h"
 
-const char fsntfs_mft_entry_signature[ 4 ] = "FILE";
+const char fsntfs_mft_entry_signature[ 4 ] = { 'F', 'I', 'L', 'E' };
 
 /* Checks if a buffer containing the MFT entry is filled with 0-byte values (empty-block)
  * Returns 1 if empty, 0 if not or -1 on error

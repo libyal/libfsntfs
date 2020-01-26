@@ -80,14 +80,14 @@ int libfsntfs_index_value_free(
      libfsntfs_index_value_t **index_value,
      libcerror_error_t **error );
 
-size_t libfsntfs_index_value_read(
-        libfsntfs_index_value_t *index_value,
-        off64_t index_value_vcn_offset,
-        int *index_value_entry,
-        const uint8_t *data,
-        size_t data_size,
-        size_t data_offset,
-        libcerror_error_t **error );
+ssize_t libfsntfs_index_value_read(
+         libfsntfs_index_value_t *index_value,
+         off64_t index_value_vcn_offset,
+         int *index_value_entry,
+         const uint8_t *data,
+         size_t data_size,
+         size_t data_offset,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }

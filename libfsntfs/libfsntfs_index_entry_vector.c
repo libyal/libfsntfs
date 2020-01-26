@@ -348,7 +348,18 @@ int libfsntfs_index_entry_vector_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: element index value out of bounds.",
+		 "%s: invalid element index value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( (uint64_t) index_entry_size > (uint64_t) UINT32_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalie index entry size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -370,7 +381,7 @@ int libfsntfs_index_entry_vector_read_element_data(
 	     index_entry,
 	     file_io_handle,
 	     index_entry_offset,
-	     index_entry_size,
+	     (uint32_t) index_entry_size,
 	     (uint32_t) element_index,
 	     error ) != 1 )
 	{

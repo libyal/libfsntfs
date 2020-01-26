@@ -45,7 +45,7 @@ int libfsntfs_attribute_list_read_from_attribute(
      libcdata_array_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *list_attribute,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

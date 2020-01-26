@@ -153,14 +153,14 @@ int libfsntfs_index_value_free(
 /* Reads the index value
  * Returns the number of bytes read if successful or -1 on error
  */
-size_t libfsntfs_index_value_read(
-        libfsntfs_index_value_t *index_value,
-        off64_t index_value_vcn_offset,
-        int *index_value_entry,
-        const uint8_t *data,
-        size_t data_size,
-        size_t data_offset,
-        libcerror_error_t **error )
+ssize_t libfsntfs_index_value_read(
+         libfsntfs_index_value_t *index_value,
+         off64_t index_value_vcn_offset,
+         int *index_value_entry,
+         const uint8_t *data,
+         size_t data_size,
+         size_t data_offset,
+         libcerror_error_t **error )
 {
 	static char *function   = "libfsntfs_index_value_read";
 	uint32_t remaining_size = 0;

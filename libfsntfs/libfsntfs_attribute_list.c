@@ -184,7 +184,7 @@ int libfsntfs_attribute_list_read_from_attribute(
      libcdata_array_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfsntfs_mft_attribute_t *attribute,
+     libfsntfs_mft_attribute_t *list_attribute,
      libcerror_error_t **error )
 {
 	uint8_t data[ sizeof( fsntfs_attribute_list_entry_header_t ) + 256 ];
@@ -212,7 +212,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 	if( libfsntfs_cluster_block_stream_initialize(
 	     &cluster_block_stream,
 	     io_handle,
-	     attribute,
+	     list_attribute,
 	     NULL,
 	     0,
 	     error ) != 1 )
@@ -274,7 +274,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to seek attribute list entry: %d from cluster block stream.",
+			 "%s: unable to read attribute list entry: %d from cluster block stream.",
 			 function,
 			 attribute_index );
 

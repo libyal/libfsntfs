@@ -2197,7 +2197,7 @@ int info_handle_bitmap_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tData size\t\t\t: %" PRIu64 " bytes \n",
+		 "\tData size\t\t\t: %" PRIu64 " bytes\n",
 		 data_size );
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -2365,7 +2365,7 @@ int info_handle_data_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tData size\t\t\t: %" PRIu64 " bytes \n",
+		 "\tData size\t\t\t: %" PRIu64 " bytes\n",
 		 data_size );
 	}
 	if( libfsntfs_attribute_get_data_flags(

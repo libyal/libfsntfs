@@ -1066,6 +1066,17 @@ int libfsntfs_file_entry_get_file_reference(
 	}
 	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
 
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_file_entry->read_write_lock,
@@ -1081,19 +1092,39 @@ int libfsntfs_file_entry_get_file_reference(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_mft_entry_get_file_reference(
-	     internal_file_entry->mft_entry,
-	     file_reference,
-	     error ) != 1 )
+	if( internal_file_entry->directory_entry != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve file reference from MFT entry.",
-		 function );
+		if( libfsntfs_directory_entry_get_file_reference(
+		     internal_file_entry->directory_entry,
+		     file_reference,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve reference from directory entry.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
+	}
+	else
+	{
+		if( libfsntfs_mft_entry_get_file_reference(
+		     internal_file_entry->mft_entry,
+		     file_reference,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file reference from MFT entry.",
+			 function );
+
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

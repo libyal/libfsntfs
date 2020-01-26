@@ -1540,29 +1540,6 @@ int fsntfs_test_compressed_block_data_handle_read_segment_data(
 	read_count = libfsntfs_compressed_block_data_handle_read_segment_data(
 	              compressed_block_data_handle,
 	              file_io_handle,
-	              -1,
-	              0,
-	              segment_data,
-	              16,
-	              0,
-	              0,
-	              &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT64(
-	 "read_count",
-	 read_count,
-	 (ssize_t) -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	read_count = libfsntfs_compressed_block_data_handle_read_segment_data(
-	              compressed_block_data_handle,
-	              file_io_handle,
 	              0,
 	              0,
 	              NULL,
@@ -1860,26 +1837,6 @@ int fsntfs_test_compressed_block_data_handle_seek_segment_offset(
 	          NULL,
 	          NULL,
 	          0,
-	          0,
-	          0,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT64(
-	 "offset",
-	 offset,
-	 (int64_t) -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	offset = libfsntfs_compressed_block_data_handle_seek_segment_offset(
-	          compressed_block_data_handle,
-	          NULL,
-	          -1,
 	          0,
 	          0,
 	          &error );

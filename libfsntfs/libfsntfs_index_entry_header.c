@@ -31,7 +31,7 @@
 
 #include "fsntfs_index.h"
 
-const char fsntfs_index_entry_signature[ 4 ] = "INDX";
+const char fsntfs_index_entry_signature[ 4 ] = { 'I', 'N', 'D', 'X' };
 
 /* Creates an index entry header
  * Make sure the value index_entry_header is referencing, is set to NULL
