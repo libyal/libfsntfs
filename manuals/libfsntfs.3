@@ -1,4 +1,4 @@
-.Dd December 21, 2019
+.Dd February  1, 2020
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -118,6 +118,8 @@ File entry functions
 .Fn libfsntfs_file_entry_is_empty "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_is_allocated "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_file_entry_is_corrupted "libfsntfs_file_entry_t *file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_entry_get_file_reference "libfsntfs_file_entry_t *file_entry" "uint64_t *file_reference" "libfsntfs_error_t **error"
 .Ft int

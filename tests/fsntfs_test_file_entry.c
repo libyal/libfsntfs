@@ -8541,7 +8541,7 @@ int main(
 	          file_system,
 	          LIBFSNTFS_MFT_ENTRY_INDEX_MFT,
 		  directory_entry,
-	          LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

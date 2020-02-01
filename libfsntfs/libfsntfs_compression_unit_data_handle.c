@@ -54,7 +54,6 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
 	off64_t data_run_offset                             = 0;
-	uint16_t attribute_data_flags                       = 0;
 	uint16_t data_flags                                 = 0;
 	int attribute_index                                 = 0;
 	int data_run_index                                  = 0;
@@ -267,31 +266,6 @@ int libfsntfs_compression_unit_data_handle_initialize(
 				goto on_error;
 			}
 			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
-		}
-		if( libfsntfs_mft_attribute_get_data_flags(
-		     mft_attribute,
-		     &attribute_data_flags,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute data flags.",
-			 function );
-
-			goto on_error;
-		}
-		if( data_flags != attribute_data_flags )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid attribute data flags value out of bounds.",
-			 function );
-
-			goto on_error;
 		}
 		if( libfsntfs_mft_attribute_get_number_of_data_runs(
 		     mft_attribute,

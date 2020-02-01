@@ -5080,6 +5080,7 @@ int info_handle_mft_entry_fprint(
 	uint64_t value_64bit                = 0;
 	int attribute_index                 = 0;
 	int is_allocated                    = 0;
+	int is_corrupted                    = 0;
 	int is_empty                        = 0;
 	int number_of_attributes            = 0;
 	int result                          = 0;
@@ -5282,6 +5283,27 @@ int info_handle_mft_entry_fprint(
 		 "\tNumber of attributes\t\t: %d\n",
 		 number_of_attributes );
 
+		is_corrupted = libfsntfs_file_entry_is_corrupted(
+		                file_entry,
+		                error );
+
+		if( is_corrupted == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry is corrupted.",
+			 function );
+
+			goto on_error;
+		}
+		else if( is_corrupted != 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tIs corrupted\n" );
+		}
 		fprintf(
 		 info_handle->notify_stream,
 		 "\n" );

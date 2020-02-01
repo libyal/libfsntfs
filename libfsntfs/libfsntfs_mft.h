@@ -27,6 +27,7 @@
 
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
@@ -56,16 +57,34 @@ struct libfsntfs_mft
 	/* The single MFT entry cache
 	 */
 	libfcache_cache_t *single_mft_entry_cache;
+
+	/* The attribute list B-tree
+	 */
+	libcdata_btree_t *attribute_list_tree;
+
+	/* The IO handle
+	 */
+	libfsntfs_io_handle_t *io_handle;
+
+	/* The flags
+	 */
+	uint8_t flags;
 };
 
 int libfsntfs_mft_initialize(
      libfsntfs_mft_t **mft,
      libfsntfs_io_handle_t *io_handle,
      size64_t mft_entry_size,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_free(
      libfsntfs_mft_t **mft,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_read_list_data_mft_entries(
+     libfsntfs_mft_t *mft,
+     libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
 
 int libfsntfs_mft_get_number_of_entries(

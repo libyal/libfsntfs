@@ -51,6 +51,10 @@ struct libfsntfs_file_system
 	 */
 	libfsntfs_security_descriptor_index_t *security_descriptor_index;
 
+	/* The list data MFT entry B-tree
+	 */
+	libcdata_btree_t *list_data_mft_entry_tree;
+
 	/* The path hints B-tree
 	 */
 	libcdata_btree_t *path_hints_tree;

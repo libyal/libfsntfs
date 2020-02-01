@@ -142,6 +142,11 @@ int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_corrupted(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
 int libfsntfs_internal_file_entry_get_attribute_by_index(
      libfsntfs_internal_file_entry_t *internal_file_entry,
      libfsntfs_mft_entry_t *mft_entry,

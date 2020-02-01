@@ -1,4 +1,7 @@
 TODO
+* attribute list expose list data MFT entries in API
+* fsntfsinfo for list attributes print MFT entry
+
 * Ntfs compressed stream add uncompressed size check
 * add raw (no valid size) data stream support
 * check data size of WOF reparse point

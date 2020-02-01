@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_attribute_list.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -63,26 +64,6 @@ struct libfsntfs_mft_entry
 	 */
 	uint64_t file_reference;
 
-	/* The sequence
-	 */
-	uint16_t sequence;
-
-	/* The journal sequence number
-	 */
-	uint64_t journal_sequence_number;
-
-	/* The reference count
-	 */
-	uint16_t reference_count;
-
-	/* The base record file reference
-	 */
-	uint64_t base_record_file_reference;
-
-	/* The used entry size 
-	 */
-	uint16_t used_entry_size;
-
 	/* The attributes array
 	 */
 	libcdata_array_t *attributes_array;
@@ -93,11 +74,7 @@ struct libfsntfs_mft_entry
 
 	/* The attribute list
 	 */
-	libcdata_array_t *attribute_list;
-
-	/* The attribute list data MFT entries
-	 */
-	libcdata_array_t *attribute_list_data_mft_entries;
+	libfsntfs_attribute_list_t *attribute_list;
 
 	/* The default (nameless) $DATA attribute
 	 */
@@ -146,6 +123,10 @@ struct libfsntfs_mft_entry
 	/* Value to indicate the MFT entry has an $I30 index
 	 */
 	uint8_t has_i30_index;
+
+	/* Value to indicate the attributes have been read
+	 */
+	uint8_t attributes_read;
 };
 
 int libfsntfs_mft_entry_check_for_empty_block(
@@ -188,6 +169,8 @@ int libfsntfs_mft_entry_read_attributes(
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
+     libcdata_btree_t *attribute_list_tree,
+     uint8_t flags,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_attribute_list(
@@ -198,14 +181,17 @@ int libfsntfs_mft_entry_read_attribute_list(
 
 int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
      libfcache_cache_t *mft_entry_cache,
-     int attribute_list_data_mft_entry_index,
+     uint64_t file_reference,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_attribute_list_data_mft_entries(
      libfsntfs_mft_entry_t *mft_entry,
+     libfsntfs_attribute_list_t *attribute_list,
+     libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,
      libcerror_error_t **error );
@@ -215,6 +201,10 @@ int libfsntfs_mft_entry_is_empty(
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_is_allocated(
+     libfsntfs_mft_entry_t *mft_entry,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_is_corrupted(
      libfsntfs_mft_entry_t *mft_entry,
      libcerror_error_t **error );
 
@@ -314,7 +304,7 @@ int libfsntfs_mft_entry_has_directory_entries_index(
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_read_element_data(
-     libfsntfs_io_handle_t *io_handle,
+     intptr_t *data_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,

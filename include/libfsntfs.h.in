@@ -496,6 +496,14 @@ int libfsntfs_file_entry_is_allocated(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_error_t **error );
 
+/* Determines if the file entry is corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_is_corrupted(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
 /* Retrieves the file reference
  * Returns 1 if successful or -1 on error
  */
@@ -506,7 +514,7 @@ int libfsntfs_file_entry_get_file_reference(
      libfsntfs_error_t **error );
 
 /* Retrieves the base record file reference
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_base_record_file_reference(

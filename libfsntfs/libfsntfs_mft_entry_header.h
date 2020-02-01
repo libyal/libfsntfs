@@ -109,6 +109,16 @@ int libfsntfs_mft_entry_header_get_number_of_fixup_values(
      uint16_t *number_of_fixup_values,
      libcerror_error_t **error );
 
+int libfsntfs_mft_entry_header_get_journal_sequence_number(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint64_t *journal_sequence_number,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_header_get_reference_count(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *reference_count,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_entry_header_get_attributes_offset(
      libfsntfs_mft_entry_header_t *mft_entry_header,
      uint16_t *attributes_offset,
@@ -122,6 +132,11 @@ int libfsntfs_mft_entry_header_get_used_entry_size(
 int libfsntfs_mft_entry_header_get_total_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
      uint16_t *total_entry_size,
+     libcerror_error_t **error );
+
+int libfsntfs_mft_entry_header_get_base_record_file_reference(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint64_t *base_record_file_reference,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

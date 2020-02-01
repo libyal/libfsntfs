@@ -66,6 +66,7 @@ int libfsntfs_file_entry_initialize(
 	libfsntfs_mft_attribute_t *wof_compressed_data_attribute = NULL;
 	libfsntfs_mft_entry_t *mft_entry                         = NULL;
 	static char *function                                    = "libfsntfs_file_entry_initialize";
+	uint64_t base_record_file_reference                      = 0;
 	uint32_t compression_method                              = 0;
 	int result                                               = 0;
 
@@ -173,121 +174,141 @@ int libfsntfs_file_entry_initialize(
 
 		return( -1 );
 	}
-	if( mft_entry->base_record_file_reference == 0 )
+	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
 	{
-		if( mft_entry->has_i30_index != 0 )
+		result = libfsntfs_mft_entry_get_base_record_file_reference(
+		          mft_entry,
+		          &base_record_file_reference,
+		          error );
+
+		if( result == -1 )
 		{
-			if( libfsntfs_directory_entries_tree_initialize(
-			     &( internal_file_entry->directory_entries_tree ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create directory entries tree.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve base record file reference.",
+			 function );
 
-				goto on_error;
-			}
-			if( libfsntfs_directory_entries_tree_read_from_i30_index(
-			     internal_file_entry->directory_entries_tree,
-			     io_handle,
-			     file_io_handle,
-			     mft_entry,
-			     flags,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read MFT entry: %" PRIu32 " directory entries tree.",
-				 function,
-				 mft_entry->index );
-
-				goto on_error;
-			}
+			goto on_error;
 		}
-		if( mft_entry->data_attribute != NULL )
+		if( ( result == 1 )
+		 && ( base_record_file_reference == 0 ) )
 		{
-			if( mft_entry->wof_compressed_data_attribute != NULL )
+			if( mft_entry->has_i30_index != 0 )
 			{
-				result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
-				          internal_file_entry,
-				          mft_entry,
-				          &reparse_point_attribute,
-				          error );
-
-				if( result == -1 )
+				if( libfsntfs_directory_entries_tree_initialize(
+				     &( internal_file_entry->directory_entries_tree ),
+				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve reparse point attribute.",
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create directory entries tree.",
 					 function );
 
 					goto on_error;
 				}
-				else if( result != 0 )
+				if( libfsntfs_directory_entries_tree_read_from_i30_index(
+				     internal_file_entry->directory_entries_tree,
+				     io_handle,
+				     file_io_handle,
+				     mft_entry,
+				     flags,
+				     error ) != 1 )
 				{
-					if( libfsntfs_reparse_point_attribute_get_compression_method(
-					     reparse_point_attribute,
-					     &compression_method,
-					     error ) != 1 )
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read MFT entry: %" PRIu32 " directory entries tree.",
+					 function,
+					 mft_entry->index );
+
+					goto on_error;
+				}
+			}
+			if( mft_entry->data_attribute != NULL )
+			{
+				if( mft_entry->wof_compressed_data_attribute != NULL )
+				{
+					result = libfsntfs_internal_file_entry_get_reparse_point_attribute(
+						  internal_file_entry,
+						  mft_entry,
+						  &reparse_point_attribute,
+						  error );
+
+					if( result == -1 )
 					{
 						libcerror_error_set(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve compression method from $REPARSE_POINT attribute.",
+						 "%s: unable to retrieve reparse point attribute.",
 						 function );
 
 						goto on_error;
 					}
-					wof_compressed_data_attribute = mft_entry->wof_compressed_data_attribute;
+					else if( result != 0 )
+					{
+						if( libfsntfs_reparse_point_attribute_get_compression_method(
+						     reparse_point_attribute,
+						     &compression_method,
+						     error ) != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+							 "%s: unable to retrieve compression method from $REPARSE_POINT attribute.",
+							 function );
+
+							goto on_error;
+						}
+						wof_compressed_data_attribute = mft_entry->wof_compressed_data_attribute;
+					}
 				}
-			}
-			if( wof_compressed_data_attribute == NULL )
-			{
-				data_extents_attribute = mft_entry->data_attribute;
-			}
-			else
-			{
-				data_extents_attribute = wof_compressed_data_attribute;
-			}
-			if( libfsntfs_mft_attribute_get_data_extents_array(
-			     data_extents_attribute,
-			     io_handle,
-			     &( internal_file_entry->extents_array ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create extents array.",
-				 function );
+				if( wof_compressed_data_attribute == NULL )
+				{
+					data_extents_attribute = mft_entry->data_attribute;
+				}
+				else
+				{
+					data_extents_attribute = wof_compressed_data_attribute;
+				}
+				if( libfsntfs_mft_attribute_get_data_extents_array(
+				     data_extents_attribute,
+				     io_handle,
+				     &( internal_file_entry->extents_array ),
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create extents array.",
+					 function );
 
-				goto on_error;
-			}
-			if( libfsntfs_cluster_block_stream_initialize(
-			     &( internal_file_entry->data_cluster_block_stream ),
-			     io_handle,
-			     mft_entry->data_attribute,
-			     wof_compressed_data_attribute,
-			     compression_method,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create data cluster block stream.",
-				 function );
+					goto on_error;
+				}
+				if( libfsntfs_cluster_block_stream_initialize(
+				     &( internal_file_entry->data_cluster_block_stream ),
+				     io_handle,
+				     mft_entry->data_attribute,
+				     wof_compressed_data_attribute,
+				     compression_method,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+					 "%s: unable to create data cluster block stream.",
+					 function );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
 		}
 	}
@@ -637,6 +658,78 @@ int libfsntfs_file_entry_is_allocated(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if MFT entry is allocated.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Determines if the file entry is corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_is_corrupted(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_is_corrupted";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libfsntfs_mft_entry_is_corrupted(
+	          internal_file_entry->mft_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MFT entry is corrupted.",
 		 function );
 
 		result = -1;
@@ -1145,7 +1238,7 @@ int libfsntfs_file_entry_get_file_reference(
 }
 
 /* Retrieves the base record file reference
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_base_record_file_reference(
      libfsntfs_file_entry_t *file_entry,
@@ -1184,10 +1277,12 @@ int libfsntfs_file_entry_get_base_record_file_reference(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_mft_entry_get_base_record_file_reference(
-	     internal_file_entry->mft_entry,
-	     file_reference,
-	     error ) != 1 )
+	result = libfsntfs_mft_entry_get_base_record_file_reference(
+	          internal_file_entry->mft_entry,
+	          file_reference,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,

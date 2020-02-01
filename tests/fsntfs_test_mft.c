@@ -82,6 +82,7 @@ int fsntfs_test_mft_initialize(
 	          &mft,
 	          io_handle,
 	          1024,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -120,6 +121,7 @@ int fsntfs_test_mft_initialize(
 	          NULL,
 	          io_handle,
 	          1024,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -140,6 +142,7 @@ int fsntfs_test_mft_initialize(
 	          &mft,
 	          io_handle,
 	          1024,
+	          0,
 	          &error );
 
 	mft = NULL;
@@ -160,6 +163,7 @@ int fsntfs_test_mft_initialize(
 	          &mft,
 	          NULL,
 	          1024,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -188,6 +192,7 @@ int fsntfs_test_mft_initialize(
 		          &mft,
 		          io_handle,
 		          1024,
+		          0,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -232,6 +237,7 @@ int fsntfs_test_mft_initialize(
 		          &mft,
 		          io_handle,
 		          1024,
+		          0,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
@@ -489,6 +495,7 @@ int main(
 	          &mft,
 	          io_handle,
 	          1024,
+	          0,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

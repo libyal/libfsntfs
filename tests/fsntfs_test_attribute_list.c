@@ -35,7 +35,6 @@
 #include "fsntfs_test_unused.h"
 
 #include "../libfsntfs/libfsntfs_attribute_list.h"
-#include "../libfsntfs/libfsntfs_attribute_list_entry.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
 
@@ -72,13 +71,13 @@ uint8_t fsntfs_test_attribute_list_data1[ 368 ] = {
 int fsntfs_test_attribute_list_read_data(
      void )
 {
-	libcdata_array_t *attribute_list = NULL;
-	libcerror_error_t *error         = NULL;
-	int result                       = 0;
+	libcerror_error_t *error                   = NULL;
+	libfsntfs_attribute_list_t *attribute_list = NULL;
+	int result                                 = 0;
 
 	/* Initialize test
 	 */
-	result = libcdata_array_initialize(
+	result = libfsntfs_attribute_list_initialize(
 	          &attribute_list,
 	          0,
 	          &error );
@@ -203,9 +202,8 @@ int fsntfs_test_attribute_list_read_data(
 
 	/* Clean up
 	 */
-	result = libcdata_array_free(
+	result = libfsntfs_attribute_list_free(
 	          &attribute_list,
-	          (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -231,9 +229,8 @@ on_error:
 	}
 	if( attribute_list != NULL )
 	{
-		libcdata_array_free(
+		libfsntfs_attribute_list_free(
 		 &attribute_list,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 		 NULL );
 	}
 	return( 0 );
@@ -245,11 +242,11 @@ on_error:
 int fsntfs_test_attribute_list_read_from_attribute(
      void )
 {
-	libcdata_array_t *attribute_list         = NULL;
-	libcerror_error_t *error                 = NULL;
-	libfsntfs_io_handle_t *io_handle         = NULL;
-	libfsntfs_mft_attribute_t *mft_attribute = NULL;
-	int result                               = 0;
+	libcerror_error_t *error                   = NULL;
+	libfsntfs_attribute_list_t *attribute_list = NULL;
+	libfsntfs_io_handle_t *io_handle           = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute   = NULL;
+	int result                                 = 0;
 
 	/* Initialize test
 	 */
@@ -305,7 +302,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 	 "error",
 	 error );
 
-	result = libcdata_array_initialize(
+	result = libfsntfs_attribute_list_initialize(
 	          &attribute_list,
 	          0,
 	          &error );
@@ -383,9 +380,8 @@ int fsntfs_test_attribute_list_read_from_attribute(
 
 	/* Clean up
 	 */
-	result = libcdata_array_free(
+	result = libfsntfs_attribute_list_free(
 	          &attribute_list,
-	          (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -445,9 +441,8 @@ on_error:
 	}
 	if( attribute_list != NULL )
 	{
-		libcdata_array_free(
+		libfsntfs_attribute_list_free(
 		 &attribute_list,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
 		 NULL );
 	}
 	if( mft_attribute != NULL )

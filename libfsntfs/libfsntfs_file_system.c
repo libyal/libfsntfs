@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_attribute_list.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_definitions.h"
@@ -245,13 +246,14 @@ int libfsntfs_file_system_read_mft(
 	libfsntfs_mft_entry_t *mft_entry               = NULL;
 	static char *function                          = "libfsntfs_file_system_read_mft";
 	size64_t mft_size                              = 0;
+	uint64_t file_reference                        = 0;
 	uint64_t number_of_mft_entries                 = 0;
 	uint16_t attribute_data_flags                  = 0;
 	int attribute_index                            = 0;
-	int attribute_list_data_mft_entry_index        = 0;
 	int data_run_index                             = 0;
-	int number_of_attribute_list_data_mft_entries  = 0;
+	int file_reference_index                       = 0;
 	int number_of_data_runs                        = 0;
+	int number_of_file_entries                     = 0;
 	int segment_index                              = 0;
 
 	if( file_system == NULL )
@@ -424,6 +426,7 @@ int libfsntfs_file_system_read_mft(
 	     &( file_system->mft ),
 	     io_handle,
 	     (size64_t) io_handle->mft_entry_size,
+	     flags,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -542,9 +545,9 @@ int libfsntfs_file_system_read_mft(
 
 			goto on_error;
 		}
-		if( libcdata_array_get_number_of_entries(
-		     mft_entry->attribute_list_data_mft_entries,
-		     &number_of_attribute_list_data_mft_entries,
+		if( libfsntfs_attribute_list_get_number_of_file_references(
+		     mft_entry->attribute_list,
+		     &number_of_file_entries,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -556,25 +559,43 @@ int libfsntfs_file_system_read_mft(
 
 			goto on_error;
 		}
-		for( attribute_list_data_mft_entry_index = 0;
-		     attribute_list_data_mft_entry_index < number_of_attribute_list_data_mft_entries;
-		     attribute_list_data_mft_entry_index++ )
+		for( file_reference_index = 0;
+		     file_reference_index < number_of_file_entries;
+		     file_reference_index++ )
 		{
+			if( libfsntfs_attribute_list_get_file_reference_by_index(
+			     mft_entry->attribute_list,
+			     file_reference_index,
+			     &file_reference,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute list data MFT entry: %d.",
+				 function,
+				 file_reference_index );
+
+				goto on_error;
+			}
 			if( libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 			     mft_entry,
+			     io_handle,
 			     file_io_handle,
 			     file_system->mft->mft_entry_vector,
 			     file_system->mft->mft_entry_cache,
-			     attribute_list_data_mft_entry_index,
+			     file_reference,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read attribute list data MFT entry: %d.",
+				 "%s: unable to read attribute list data MFT entry: %" PRIu64 "-%" PRIu64 ".",
 				 function,
-				 attribute_list_data_mft_entry_index );
+				 file_reference & 0xffffffffffffUL,
+				 file_reference >> 48 );
 
 				goto on_error;
 			}

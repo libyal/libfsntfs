@@ -1070,6 +1070,20 @@ int libfsntfs_internal_mft_metadata_file_open_read(
 
 		goto on_error;
 	}
+	if( libfsntfs_mft_read_list_data_mft_entries(
+	     internal_mft_metadata_file->file_system->mft,
+	     file_io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read list data MFT entries.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:

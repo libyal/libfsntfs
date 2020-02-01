@@ -2601,6 +2601,63 @@ _For now the latter is assumed._
 
 == Corruption scenarios
 
+=== Data steam with inconsistent data flags
+
+An MFT entry contains an $ATTRIBUTE_LIST that contains multiple $DATA
+attributes. The $DATA attributes define a LZNT1 compressed data stream
+though only the first $DATA attribute has the compressed data flag set.
+
+[NOTE]
+It is unclear if this is a corruption scenario or not.
+
+....
+MFT entry: 220 information:
+	Is allocated			: true
+	File reference			: 220-59
+	Base record file reference	: Not set (0)
+	Journal sequence number		: 51876429013
+	Number of attributes		: 5
+
+Attribute: 1
+	Type				: $STANDARD_INFORMATION (0x00000010)
+	Creation time			: Jun 05, 2019 06:56:26.032730300 UTC
+	Modification time		: Oct 05, 2019 06:56:04.150940700 UTC
+	Access time			: Oct 05, 2019 06:56:04.150940700 UTC
+	Entry modification time		: Oct 05, 2019 06:56:04.150940700 UTC
+	Owner identifier		: 0
+	Security descriptor identifier	: 5862
+	Update sequence number		: 11553149976
+	File attribute flags		: 0x00000820
+		Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+		Is compressed (FILE_ATTRIBUTE_COMPRESSED)
+
+Attribute: 2
+	Type				: $ATTRIBUTE_LIST (0x00000020)
+
+Attribute: 3
+	Type				: $FILE_NAME (0x00000030)
+	Parent file reference		: 33996-57
+	Creation time			: Jun 05, 2019 06:56:26.032730300 UTC
+	Modification time		: Oct 05, 2019 06:56:03.510061800 UTC
+	Access time			: Oct 05, 2019 06:56:03.510061800 UTC
+	Entry modification time		: Oct 05, 2019 06:56:03.510061800 UTC
+	File attribute flags		: 0x00000020
+		Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+	Namespace			: POSIX (0)
+	Name				: setupapi.dev.20191005_085603.log
+
+Attribute: 4
+	Type				: $DATA (0x00000080)
+	Data VCN range			: 513 - 1103
+	Data flags			: 0x0000
+
+Attribute: 5
+	Type				: $DATA (0x00000080)
+	Data VCN range			: 0 - 512
+	Data size			: 4487594 bytes
+	Data flags			: 0x0001
+....
+
 === Directory entry with outdated file reference
 
 The directory entry: \ProgramData\McAfee\Common Framework\Task\5.ini

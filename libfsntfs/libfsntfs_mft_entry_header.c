@@ -479,6 +479,80 @@ int libfsntfs_mft_entry_header_get_number_of_fixup_values(
 	return( 1 );
 }
 
+/* Retrieves the journal sequence number
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_journal_sequence_number(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint64_t *journal_sequence_number,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_journal_sequence_number";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( journal_sequence_number == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid journal sequence number.",
+		 function );
+
+		return( -1 );
+	}
+	*journal_sequence_number = mft_entry_header->journal_sequence_number;
+
+	return( 1 );
+}
+
+/* Retrieves the reference count
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_reference_count(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint16_t *reference_count,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_reference_count";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( reference_count == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid reference count.",
+		 function );
+
+		return( -1 );
+	}
+	*reference_count = mft_entry_header->reference_count;
+
+	return( 1 );
+}
+
 /* Retrieves the attributes offset
  * Returns 1 if successful or -1 on error
  */
@@ -586,6 +660,43 @@ int libfsntfs_mft_entry_header_get_total_entry_size(
 		return( -1 );
 	}
 	*total_entry_size = mft_entry_header->total_entry_size;
+
+	return( 1 );
+}
+
+/* Retrieves the base record file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_entry_header_get_base_record_file_reference(
+     libfsntfs_mft_entry_header_t *mft_entry_header,
+     uint64_t *base_record_file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_header_get_base_record_file_reference";
+
+	if( mft_entry_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT entry header.",
+		 function );
+
+		return( -1 );
+	}
+	if( base_record_file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid base record file reference.",
+		 function );
+
+		return( -1 );
+	}
+	*base_record_file_reference = mft_entry_header->base_record_file_reference;
 
 	return( 1 );
 }

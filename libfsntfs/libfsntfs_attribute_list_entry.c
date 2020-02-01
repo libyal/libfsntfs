@@ -34,7 +34,7 @@
 
 #include "fsntfs_attribute_list.h"
 
-/* Creates attribute list header
+/* Creates attribute list entry
  * Make sure the value attribute_list_entry is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -50,7 +50,7 @@ int libfsntfs_attribute_list_entry_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute list header.",
+		 "%s: invalid attribute list entry.",
 		 function );
 
 		return( -1 );
@@ -61,7 +61,7 @@ int libfsntfs_attribute_list_entry_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid attribute list header value already set.",
+		 "%s: invalid attribute list entry value already set.",
 		 function );
 
 		return( -1 );
@@ -75,7 +75,7 @@ int libfsntfs_attribute_list_entry_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create attribute list header.",
+		 "%s: unable to create attribute list entry.",
 		 function );
 
 		goto on_error;
@@ -89,7 +89,7 @@ int libfsntfs_attribute_list_entry_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear attribute list header.",
+		 "%s: unable to clear attribute list entry.",
 		 function );
 
 		goto on_error;
@@ -107,7 +107,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees attribute list header
+/* Frees attribute list entry
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_attribute_list_entry_free(
@@ -122,7 +122,7 @@ int libfsntfs_attribute_list_entry_free(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute list header.",
+		 "%s: invalid attribute list entry.",
 		 function );
 
 		return( -1 );
@@ -142,7 +142,7 @@ int libfsntfs_attribute_list_entry_free(
 	return( 1 );
 }
 
-/* Reads the attribute list header
+/* Reads the attribute list entry
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_attribute_list_entry_read_data(
@@ -161,7 +161,7 @@ int libfsntfs_attribute_list_entry_read_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute list header.",
+		 "%s: invalid attribute list entry.",
 		 function );
 
 		return( -1 );
@@ -448,7 +448,7 @@ on_error:
 	return( -1 );
 }
 
-/* Compares attribute list entriess by their file reference
+/* Compares attribute list entries by their file reference
  * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
  */
 int libfsntfs_attribute_list_entry_compare_by_file_reference(

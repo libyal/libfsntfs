@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <memory.h>
 #include <types.h>
 
 #include "libfsntfs_attribute_list.h"
@@ -38,11 +39,216 @@
 
 #include "fsntfs_attribute_list.h"
 
+/* Creates attribute list
+ * Make sure the value attribute_list is referencing, is set to NULL
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_initialize(
+     libfsntfs_attribute_list_t **attribute_list,
+     uint64_t base_record_file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_initialize";
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( *attribute_list != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid attribute list value already set.",
+		 function );
+
+		return( -1 );
+	}
+	*attribute_list = memory_allocate_structure(
+	                   libfsntfs_attribute_list_t );
+
+	if( *attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create attribute list.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_set(
+	     *attribute_list,
+	     0,
+	     sizeof( libfsntfs_attribute_list_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear attribute list.",
+		 function );
+
+		memory_free(
+		 *attribute_list );
+
+		*attribute_list = NULL;
+
+		return( -1 );
+	}
+	if( libcdata_array_initialize(
+	     &( ( *attribute_list )->entries_array ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create entries array.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_initialize(
+	     &( ( *attribute_list )->file_references_array ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file references array.",
+		 function );
+
+		goto on_error;
+	}
+	( *attribute_list )->base_record_file_reference = base_record_file_reference;
+
+	return( 1 );
+
+on_error:
+	if( *attribute_list != NULL )
+	{
+		if( ( *attribute_list )->entries_array != NULL )
+		{
+			libcdata_array_free(
+			 &( ( *attribute_list )->entries_array ),
+			 NULL,
+			 NULL );
+		}
+		memory_free(
+		 *attribute_list );
+
+		*attribute_list = NULL;
+	}
+	return( -1 );
+}
+
+/* Frees attribute list
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_free(
+     libfsntfs_attribute_list_t **attribute_list,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_free";
+	int result            = 1;
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( *attribute_list != NULL )
+	{
+		if( libcdata_array_free(
+		     &( ( *attribute_list )->entries_array ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free entries array.",
+			 function );
+
+			result = -1;
+		}
+		if( libcdata_array_free(
+		     &( ( *attribute_list )->file_references_array ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_file_reference_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file references array.",
+			 function );
+
+			result = -1;
+		}
+		memory_free(
+		 *attribute_list );
+
+		*attribute_list = NULL;
+	}
+	return( result );
+}
+
+/* Frees attribute list file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_file_reference_free(
+     uint64_t **file_reference,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_file_reference_free";
+
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+	if( *file_reference != NULL )
+	{
+		memory_free(
+		 *file_reference );
+
+		*file_reference = NULL;
+	}
+	return( 1 );
+}
+
 /* Reads the attribute list
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_attribute_list_read_data(
-     libcdata_array_t *attribute_list,
+     libfsntfs_attribute_list_t *attribute_list,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
@@ -132,7 +338,7 @@ int libfsntfs_attribute_list_read_data(
 		data_offset += attribute_list_entry->size;
 
 		if( libcdata_array_append_entry(
-		     attribute_list,
+		     attribute_list->entries_array,
 		     &entry_index,
 		     (intptr_t *) attribute_list_entry,
 		     error ) != 1 )
@@ -141,8 +347,9 @@ int libfsntfs_attribute_list_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append list attribute to array.",
-			 function );
+			 "%s: unable to append attribute list entry: %d to array.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
@@ -181,7 +388,7 @@ on_error:
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_attribute_list_read_from_attribute(
-     libcdata_array_t *attribute_list,
+     libfsntfs_attribute_list_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfsntfs_mft_attribute_t *list_attribute,
@@ -313,7 +520,7 @@ int libfsntfs_attribute_list_read_from_attribute(
 		data_offset += attribute_list_entry->size;
 
 		if( libcdata_array_append_entry(
-		     attribute_list,
+		     attribute_list->entries_array,
 		     &entry_index,
 		     (intptr_t *) attribute_list_entry,
 		     error ) != 1 )
@@ -322,8 +529,9 @@ int libfsntfs_attribute_list_read_from_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append list attribute to array.",
-			 function );
+			 "%s: unable to append attribute list entry: %d to array.",
+			 function,
+			 attribute_index );
 
 			goto on_error;
 		}
@@ -352,6 +560,349 @@ on_error:
 		libfdata_stream_free(
 		 &cluster_block_stream,
 		 NULL );
+	}
+	return( -1 );
+}
+
+/* Retrieves the number of attribute list entries
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_get_number_of_entries(
+     libfsntfs_attribute_list_t *attribute_list,
+     int *number_of_entries,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_get_number_of_entries";
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     attribute_list->entries_array,
+	     number_of_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific attribute list entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_get_entry_by_index(
+     libfsntfs_attribute_list_t *attribute_list,
+     int entry_index,
+     libfsntfs_attribute_list_entry_t **attribute_list_entry,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_entry_get_attribute_by_index";
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     attribute_list->entries_array,
+	     entry_index,
+	     (intptr_t **) attribute_list_entry,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from array.",
+		 function,
+		 entry_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Compares attribute lists by their base record file reference
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
+ */
+int libfsntfs_attribute_list_compare_by_base_record_file_reference(
+     libfsntfs_attribute_list_t *first_attribute_list,
+     libfsntfs_attribute_list_t *second_attribute_list,
+     libcerror_error_t **error )
+{
+	static char *function           = "libfsntfs_attribute_list_compare_by_base_record_file_reference";
+	uint64_t first_mft_entry_index  = 0;
+	uint64_t second_mft_entry_index = 0;
+
+	if( first_attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	first_mft_entry_index  = first_attribute_list->base_record_file_reference & 0xffffffffffffUL;
+	second_mft_entry_index = second_attribute_list->base_record_file_reference & 0xffffffffffffUL;
+
+	if( first_mft_entry_index < second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_LESS );
+	}
+	else if( first_mft_entry_index > second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_GREATER );
+	}
+	return( LIBCDATA_COMPARE_EQUAL );
+}
+
+/* Retrieves the number of attribute list data file references
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_get_number_of_file_references(
+     libfsntfs_attribute_list_t *attribute_list,
+     int *number_of_file_references,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_attribute_list_get_number_of_file_references";
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     attribute_list->file_references_array,
+	     number_of_file_references,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from array.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific attribute list data file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_get_file_reference_by_index(
+     libfsntfs_attribute_list_t *attribute_list,
+     int file_reference_index,
+     uint64_t *file_reference,
+     libcerror_error_t **error )
+{
+	uint64_t *safe_file_reference = NULL;
+	static char *function         = "libfsntfs_attribute_list_get_file_reference_by_index";
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     attribute_list->file_references_array,
+	     file_reference_index,
+	     (intptr_t **) &safe_file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry: %d from array.",
+		 function,
+		 file_reference_index );
+
+		return( -1 );
+	}
+	*file_reference = *safe_file_reference;
+
+	return( 1 );
+}
+
+/* Compares attribute list data file references
+ * Returns LIBCDATA_COMPARE_LESS, LIBCDATA_COMPARE_EQUAL, LIBCDATA_COMPARE_GREATER if successful or -1 on error
+ */
+int libfsntfs_attribute_list_compare_file_reference(
+     uint64_t *first_file_reference,
+     uint64_t *second_file_reference,
+     libcerror_error_t **error )
+{
+	static char *function           = "libfsntfs_attribute_list_compare_file_reference";
+	uint64_t first_mft_entry_index  = 0;
+	uint64_t second_mft_entry_index = 0;
+
+	if( first_file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid first file reference.",
+		 function );
+
+		return( -1 );
+	}
+	if( second_file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid second file reference.",
+		 function );
+
+		return( -1 );
+	}
+	first_mft_entry_index  = *first_file_reference & 0xffffffffffffUL;
+	second_mft_entry_index = *second_file_reference & 0xffffffffffffUL;
+
+	if( first_mft_entry_index < second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_LESS );
+	}
+	else if( first_mft_entry_index > second_mft_entry_index )
+	{
+		return( LIBCDATA_COMPARE_GREATER );
+	}
+	return( LIBCDATA_COMPARE_EQUAL );
+}
+
+/* Insert an attribute list data file reference
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_attribute_list_insert_file_reference(
+     libfsntfs_attribute_list_t *attribute_list,
+     uint64_t file_reference,
+     libcerror_error_t **error )
+{
+	uint64_t *safe_file_reference = NULL;
+	static char *function         = "libfsntfs_attribute_list_insert_file_reference";
+	int entry_index               = 0;
+	int result                    = 0;
+
+	if( attribute_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid attribute list.",
+		 function );
+
+		return( -1 );
+	}
+	safe_file_reference = (uint64_t *) memory_allocate(
+	                                    sizeof( uint64_t ) );
+
+	if( safe_file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create file reference.",
+		 function );
+
+		goto on_error;
+	}
+	*safe_file_reference = file_reference;
+
+	result = libcdata_array_insert_entry(
+	          attribute_list->file_references_array,
+	          &entry_index,
+	          (intptr_t *) safe_file_reference,
+	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_attribute_list_compare_file_reference,
+	          LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to insert file reference in array.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		memory_free(
+		 safe_file_reference );
+	}
+	return( 1 );
+
+on_error:
+	if( safe_file_reference != NULL )
+	{
+		memory_free(
+		 safe_file_reference );
 	}
 	return( -1 );
 }
