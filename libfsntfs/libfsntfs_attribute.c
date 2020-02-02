@@ -20,15 +20,10 @@
  */
 
 #include <common.h>
-#include <byte_stream.h>
 #include <memory.h>
-#include <narrow_string.h>
-#include <system_string.h>
 #include <types.h>
-#include <wide_string.h>
 
 #include "libfsntfs_attribute.h"
-#include "libfsntfs_attribute_list_entry.h"
 #include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
@@ -42,12 +37,14 @@
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_logged_utility_stream_values.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_attribute_list_entry.h"
 #include "libfsntfs_object_identifier_values.h"
 #include "libfsntfs_path_hint.h"
 #include "libfsntfs_reparse_point_values.h"
 #include "libfsntfs_security_descriptor_values.h"
 #include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_txf_data_values.h"
+#include "libfsntfs_types.h"
 #include "libfsntfs_unused.h"
 #include "libfsntfs_volume_information_values.h"
 #include "libfsntfs_volume_name_values.h"
@@ -59,7 +56,7 @@
 int libfsntfs_attribute_initialize(
      libfsntfs_attribute_t **attribute,
      libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -88,15 +85,15 @@ int libfsntfs_attribute_initialize(
 		return( -1 );
 	}
 	if( ( ( mft_attribute == NULL )
-	  &&  ( attribute_list_entry == NULL ) )
+	  &&  ( mft_attribute_list_entry == NULL ) )
 	 || ( ( mft_attribute != NULL )
-	  &&  ( attribute_list_entry != NULL ) ) )
+	  &&  ( mft_attribute_list_entry != NULL ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT attribute and attribute list entry.",
+		 "%s: invalid MFT attribute and MFT attribute list entry.",
 		 function );
 
 		return( -1 );
@@ -147,8 +144,8 @@ int libfsntfs_attribute_initialize(
 		goto on_error;
 	}
 #endif
-	internal_attribute->mft_attribute        = mft_attribute;
-	internal_attribute->attribute_list_entry = attribute_list_entry;
+	internal_attribute->mft_attribute            = mft_attribute;
+	internal_attribute->mft_attribute_list_entry = mft_attribute_list_entry;
 
 	*attribute = (libfsntfs_attribute_t *) internal_attribute;
 
@@ -213,7 +210,7 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
-		/* The mft_attribute and attribute_list_entry references are freed elsewhere
+		/* The mft_attribute and mft_attribute_list_entry references are freed elsewhere
 		 */
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 		if( libcthreads_read_write_lock_free(
@@ -729,8 +726,8 @@ int libfsntfs_internal_attribute_get_type(
 	}
 	else
 	{
-		if( libfsntfs_attribute_list_entry_get_type(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_type(
+		     internal_attribute->mft_attribute_list_entry,
 		     type,
 		     error ) != 1 )
 		{
@@ -1007,8 +1004,8 @@ int libfsntfs_attribute_get_utf8_name_size(
 	}
 	else
 	{
-		if( libfsntfs_attribute_list_entry_get_utf8_name_size(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
+		     internal_attribute->mft_attribute_list_entry,
 		     utf8_string_size,
 		     error ) != 1 )
 		{
@@ -1102,8 +1099,8 @@ int libfsntfs_attribute_get_utf8_name(
 	}
 	else
 	{
-		if( libfsntfs_attribute_list_entry_get_utf8_name(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_utf8_name(
+		     internal_attribute->mft_attribute_list_entry,
 		     utf8_string,
 		     utf8_string_size,
 		     error ) != 1 )
@@ -1196,8 +1193,8 @@ int libfsntfs_attribute_get_utf16_name_size(
 	}
 	else
 	{
-		if( libfsntfs_attribute_list_entry_get_utf16_name_size(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
+		     internal_attribute->mft_attribute_list_entry,
 		     utf16_string_size,
 		     error ) != 1 )
 		{
@@ -1291,8 +1288,8 @@ int libfsntfs_attribute_get_utf16_name(
 	}
 	else
 	{
-		if( libfsntfs_attribute_list_entry_get_utf16_name(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_utf16_name(
+		     internal_attribute->mft_attribute_list_entry,
 		     utf16_string,
 		     utf16_string_size,
 		     error ) != 1 )
@@ -1485,8 +1482,8 @@ int libfsntfs_attribute_get_file_reference(
 #endif
 	if( internal_attribute->mft_attribute == NULL )
 	{
-		if( libfsntfs_attribute_list_entry_get_file_reference(
-		     internal_attribute->attribute_list_entry,
+		if( libfsntfs_mft_attribute_list_entry_get_file_reference(
+		     internal_attribute->mft_attribute_list_entry,
 		     &safe_mft_entry_index,
 		     &safe_sequence_number,
 		     error ) != 1 )

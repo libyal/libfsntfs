@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute_list_entry.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_io_handle.h"
@@ -33,6 +32,7 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_attribute_list_entry.h"
 #include "libfsntfs_path_hint.h"
 #include "libfsntfs_types.h"
 
@@ -48,9 +48,9 @@ struct libfsntfs_internal_attribute
 	 */
 	libfsntfs_mft_attribute_t *mft_attribute;
 
-	/* The attribute list entry
+	/* The MFT attribute list entry
 	 */
-	libfsntfs_attribute_list_entry_t *attribute_list_entry;
+	libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry;
 
 	/* The path hint
 	 */
@@ -76,7 +76,7 @@ struct libfsntfs_internal_attribute
 int libfsntfs_attribute_initialize(
      libfsntfs_attribute_t **attribute,
      libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \

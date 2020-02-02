@@ -1837,6 +1837,21 @@ int info_handle_attribute_fprint(
 	switch( attribute_type )
 	{
 		case LIBFSNTFS_ATTRIBUTE_TYPE_ATTRIBUTE_LIST:
+			if( info_handle_attribute_list_attribute_fprint(
+			     info_handle,
+			     attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print attribute list attribute: %d information.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
@@ -2113,6 +2128,120 @@ on_error:
 		memory_free(
 		 value_string );
 	}
+	return( -1 );
+}
+
+/* Prints $ATTRIBUTE_LIST attribute information
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_attribute_list_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_attribute_t *attribute,
+     libcerror_error_t **error )
+{
+	static char *function   = "info_handle_attribute_list_attribute_fprint";
+	size64_t data_size      = 0;
+	uint64_t data_first_vcn = 0;
+	uint64_t data_last_vcn  = 0;
+	int entry_index         = 0;
+	int number_of_entries   = 0;
+	int result              = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_attribute_get_data_vcn_range(
+	          attribute,
+	          &data_first_vcn,
+	          &data_last_vcn,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data VCN range.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		if( ( data_first_vcn == data_last_vcn )
+		 || ( data_last_vcn == 0xffffffffffffffffUL ) )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tData VCN\t\t\t: %" PRIu64 "\n",
+			 data_first_vcn );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tData VCN range\t\t\t: %" PRIu64 " - %" PRIu64 "\n",
+			 data_first_vcn,
+			 data_last_vcn );
+		}
+	}
+	if( data_first_vcn == 0 )
+	{
+		if( libfsntfs_attribute_get_data_size(
+		     attribute,
+		     &data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve data size.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tData size\t\t\t: %" PRIu64 " bytes\n",
+		 data_size );
+	}
+	if( libfsntfs_attribute_list_attribute_get_number_of_entries(
+	     attribute,
+	     &number_of_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tNumber of entries\t\t: %d\n",
+	 number_of_entries );
+
+	for( entry_index = 0;
+	     entry_index < number_of_entries;
+	     entry_index++ )
+	{
+	}
+	return( 1 );
+
+on_error:
 	return( -1 );
 }
 

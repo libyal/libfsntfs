@@ -128,8 +128,6 @@ stamp-h[1-9]
 /fsntfstools/fsntfsmount
 /tests/*.exe
 /tests/fsntfs_test_attribute
-/tests/fsntfs_test_attribute_list
-/tests/fsntfs_test_attribute_list_entry
 /tests/fsntfs_test_bitmap_values
 /tests/fsntfs_test_buffer_data_handle
 /tests/fsntfs_test_cluster_block
@@ -166,6 +164,8 @@ stamp-h[1-9]
 /tests/fsntfs_test_logged_utility_stream_values
 /tests/fsntfs_test_mft
 /tests/fsntfs_test_mft_attribute
+/tests/fsntfs_test_mft_attribute_list
+/tests/fsntfs_test_mft_attribute_list_entry
 /tests/fsntfs_test_mft_entry
 /tests/fsntfs_test_mft_entry_header
 /tests/fsntfs_test_mft_metadata_file

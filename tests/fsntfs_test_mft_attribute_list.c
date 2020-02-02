@@ -34,11 +34,11 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_attribute_list.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
+#include "../libfsntfs/libfsntfs_mft_attribute_list.h"
 
-uint8_t fsntfs_test_attribute_list_data1[ 368 ] = {
+uint8_t fsntfs_test_mft_attribute_list_data1[ 368 ] = {
 	0x20, 0x00, 0x00, 0x00, 0x70, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x00,
 	0x58, 0x01, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x1a,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x00,
@@ -65,19 +65,19 @@ uint8_t fsntfs_test_attribute_list_data1[ 368 ] = {
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-/* Tests the libfsntfs_attribute_list_read_data function
+/* Tests the libfsntfs_mft_attribute_list_read_data function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_read_data(
+int fsntfs_test_mft_attribute_list_read_data(
      void )
 {
 	libcerror_error_t *error                   = NULL;
-	libfsntfs_attribute_list_t *attribute_list = NULL;
+	libfsntfs_mft_attribute_list_t *attribute_list = NULL;
 	int result                                 = 0;
 
 	/* Initialize test
 	 */
-	result = libfsntfs_attribute_list_initialize(
+	result = libfsntfs_mft_attribute_list_initialize(
 	          &attribute_list,
 	          0,
 	          &error );
@@ -97,9 +97,9 @@ int fsntfs_test_attribute_list_read_data(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_read_data(
+	result = libfsntfs_mft_attribute_list_read_data(
 	          attribute_list,
-	          &( fsntfs_test_attribute_list_data1[ 24 ] ),
+	          &( fsntfs_test_mft_attribute_list_data1[ 24 ] ),
 	          344,
 	          &error );
 
@@ -114,9 +114,9 @@ int fsntfs_test_attribute_list_read_data(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_read_data(
+	result = libfsntfs_mft_attribute_list_read_data(
 	          NULL,
-	          &( fsntfs_test_attribute_list_data1[ 24 ] ),
+	          &( fsntfs_test_mft_attribute_list_data1[ 24 ] ),
 	          344,
 	          &error );
 
@@ -132,7 +132,7 @@ int fsntfs_test_attribute_list_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_read_data(
+	result = libfsntfs_mft_attribute_list_read_data(
 	          attribute_list,
 	          NULL,
 	          344,
@@ -150,9 +150,9 @@ int fsntfs_test_attribute_list_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_read_data(
+	result = libfsntfs_mft_attribute_list_read_data(
 	          attribute_list,
-	          &( fsntfs_test_attribute_list_data1[ 24 ] ),
+	          &( fsntfs_test_mft_attribute_list_data1[ 24 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -170,13 +170,13 @@ int fsntfs_test_attribute_list_read_data(
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
-	/* Test libfsntfs_attribute_list_read_data with malloc failing in libfsntfs_attribute_list_entry_initialize
+	/* Test libfsntfs_mft_attribute_list_read_data with malloc failing in libfsntfs_mft_attribute_list_entry_initialize
 	 */
 	fsntfs_test_malloc_attempts_before_fail = 0;
 
-	result = libfsntfs_attribute_list_read_data(
+	result = libfsntfs_mft_attribute_list_read_data(
 	          attribute_list,
-	          &( fsntfs_test_attribute_list_data1[ 24 ] ),
+	          &( fsntfs_test_mft_attribute_list_data1[ 24 ] ),
 	          344,
 	          &error );
 
@@ -202,7 +202,7 @@ int fsntfs_test_attribute_list_read_data(
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_list_free(
+	result = libfsntfs_mft_attribute_list_free(
 	          &attribute_list,
 	          &error );
 
@@ -229,21 +229,21 @@ on_error:
 	}
 	if( attribute_list != NULL )
 	{
-		libfsntfs_attribute_list_free(
+		libfsntfs_mft_attribute_list_free(
 		 &attribute_list,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_read_from_attribute function
+/* Tests the libfsntfs_mft_attribute_list_read_from_attribute function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_read_from_attribute(
+int fsntfs_test_mft_attribute_list_read_from_attribute(
      void )
 {
 	libcerror_error_t *error                   = NULL;
-	libfsntfs_attribute_list_t *attribute_list = NULL;
+	libfsntfs_mft_attribute_list_t *attribute_list = NULL;
 	libfsntfs_io_handle_t *io_handle           = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute   = NULL;
 	int result                                 = 0;
@@ -289,7 +289,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 	result = libfsntfs_mft_attribute_read_data(
 	          mft_attribute,
 	          io_handle,
-	          fsntfs_test_attribute_list_data1,
+	          fsntfs_test_mft_attribute_list_data1,
 	          368,
 	          &error );
 
@@ -302,7 +302,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_initialize(
+	result = libfsntfs_mft_attribute_list_initialize(
 	          &attribute_list,
 	          0,
 	          &error );
@@ -322,7 +322,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_read_from_attribute(
+	result = libfsntfs_mft_attribute_list_read_from_attribute(
 	          attribute_list,
 	          io_handle,
 	          NULL,
@@ -340,7 +340,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_read_from_attribute(
+	result = libfsntfs_mft_attribute_list_read_from_attribute(
 	          NULL,
 	          io_handle,
 	          NULL,
@@ -359,7 +359,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_read_from_attribute(
+	result = libfsntfs_mft_attribute_list_read_from_attribute(
 	          attribute_list,
 	          io_handle,
 	          NULL,
@@ -380,7 +380,7 @@ int fsntfs_test_attribute_list_read_from_attribute(
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_list_free(
+	result = libfsntfs_mft_attribute_list_free(
 	          &attribute_list,
 	          &error );
 
@@ -441,7 +441,7 @@ on_error:
 	}
 	if( attribute_list != NULL )
 	{
-		libfsntfs_attribute_list_free(
+		libfsntfs_mft_attribute_list_free(
 		 &attribute_list,
 		 NULL );
 	}
@@ -479,13 +479,33 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_read_data",
-	 fsntfs_test_attribute_list_read_data );
+/* TODO add tests for libfsntfs_mft_attribute_list_initialize */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_free */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_file_reference_free */
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_read_from_attribute",
-	 fsntfs_test_attribute_list_read_from_attribute );
+	 "libfsntfs_mft_attribute_list_read_data",
+	 fsntfs_test_mft_attribute_list_read_data );
+
+	FSNTFS_TEST_RUN(
+	 "libfsntfs_mft_attribute_list_read_from_attribute",
+	 fsntfs_test_mft_attribute_list_read_from_attribute );
+
+/* TODO add tests for libfsntfs_mft_attribute_list_get_number_of_entries */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_get_entry_by_index */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_compare_by_base_record_file_reference */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_get_number_of_file_references */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_get_file_reference_by_index */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_compare_file_reference */
+
+/* TODO add tests for libfsntfs_mft_attribute_list_insert_file_reference */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 

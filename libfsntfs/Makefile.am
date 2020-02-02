@@ -22,11 +22,11 @@ AM_CPPFLAGS = \
 lib_LTLIBRARIES = libfsntfs.la
 
 libfsntfs_la_SOURCES = \
-	fsntfs_attribute_list.h \
 	fsntfs_file_name.h \
 	fsntfs_index.h \
 	fsntfs_logged_utility_stream.h \
 	fsntfs_mft_attribute.h \
+	fsntfs_mft_attribute_list.h \
 	fsntfs_mft_entry.h \
 	fsntfs_object_identifier.h \
 	fsntfs_reparse_point.h \
@@ -37,7 +37,7 @@ libfsntfs_la_SOURCES = \
 	fsntfs_volume_information.h \
 	libfsntfs.c \
 	libfsntfs_attribute.c libfsntfs_attribute.h \
-	libfsntfs_attribute_list.c libfsntfs_attribute_list.h \
+	libfsntfs_attribute_list_attribute.c libfsntfs_attribute_list_attribute.h \
 	libfsntfs_attribute_list_entry.c libfsntfs_attribute_list_entry.h \
 	libfsntfs_bitmap_values.c libfsntfs_bitmap_values.h \
 	libfsntfs_buffer_data_handle.c libfsntfs_buffer_data_handle.h \
@@ -90,6 +90,8 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_logged_utility_stream_values.c libfsntfs_logged_utility_stream_values.h \
 	libfsntfs_mft.c libfsntfs_mft.h \
 	libfsntfs_mft_attribute.c libfsntfs_mft_attribute.h \
+	libfsntfs_mft_attribute_list.c libfsntfs_mft_attribute_list.h \
+	libfsntfs_mft_attribute_list_entry.c libfsntfs_mft_attribute_list_entry.h \
 	libfsntfs_mft_entry.c libfsntfs_mft_entry.h \
 	libfsntfs_mft_entry_header.c libfsntfs_mft_entry_header.h \
 	libfsntfs_mft_metadata_file.c libfsntfs_mft_metadata_file.h \

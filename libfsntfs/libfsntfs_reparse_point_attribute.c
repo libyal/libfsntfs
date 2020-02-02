@@ -25,9 +25,11 @@
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_definitions.h"
-#include "libfsntfs_types.h"
+#include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_reparse_point_attribute.h"
 #include "libfsntfs_reparse_point_values.h"
+#include "libfsntfs_types.h"
 
 /* Retrieves the tag
  * The tag is a combination of the type and flags

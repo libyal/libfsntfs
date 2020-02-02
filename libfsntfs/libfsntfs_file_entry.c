@@ -765,6 +765,7 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 	libfsntfs_attribute_t *safe_attribute    = NULL;
 	libfsntfs_mft_attribute_t *mft_attribute = NULL;
 	static char *function                    = "libfsntfs_internal_file_entry_get_attribute_by_index";
+	uint32_t attribute_type                  = 0;
 	int number_of_attributes                 = 0;
 
 	if( internal_file_entry == NULL )
@@ -854,6 +855,21 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 
 			goto on_error;
 		}
+		if( libfsntfs_mft_attribute_get_type(
+		     mft_attribute,
+		     &attribute_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d type.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
 		if( libfsntfs_attribute_initialize(
 		     &safe_attribute,
 		     mft_attribute,
@@ -870,22 +886,29 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 
 			goto on_error;
 		}
-		if( libfsntfs_internal_attribute_read_value(
-		     (libfsntfs_internal_attribute_t *) safe_attribute,
-		     internal_file_entry->io_handle,
-		     internal_file_entry->file_io_handle,
-		     internal_file_entry->flags,
-		     error ) != 1 )
+		if( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_ATTRIBUTE_LIST )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read value of attribute: %d.",
-			 function,
-			 attribute_index );
+			( (libfsntfs_internal_attribute_t *) safe_attribute )->value = (intptr_t *) mft_entry->attribute_list;
+		}
+		else
+		{
+			if( libfsntfs_internal_attribute_read_value(
+			     (libfsntfs_internal_attribute_t *) safe_attribute,
+			     internal_file_entry->io_handle,
+			     internal_file_entry->file_io_handle,
+			     internal_file_entry->flags,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to read value of attribute: %d.",
+				 function,
+				 attribute_index );
 
-			goto on_error;
+				goto on_error;
+			}
 		}
 		if( libcdata_array_set_entry_by_index(
 		     internal_file_entry->attributes_array,

@@ -1,7 +1,5 @@
 MSVSCPP_FILES = \
 	fsntfs_test_attribute/fsntfs_test_attribute.vcproj \
-	fsntfs_test_attribute_list/fsntfs_test_attribute_list.vcproj \
-	fsntfs_test_attribute_list_entry/fsntfs_test_attribute_list_entry.vcproj \
 	fsntfs_test_bitmap_values/fsntfs_test_bitmap_values.vcproj \
 	fsntfs_test_buffer_data_handle/fsntfs_test_buffer_data_handle.vcproj \
 	fsntfs_test_cluster_block/fsntfs_test_cluster_block.vcproj \
@@ -38,6 +36,8 @@ MSVSCPP_FILES = \
 	fsntfs_test_logged_utility_stream_values/fsntfs_test_logged_utility_stream_values.vcproj \
 	fsntfs_test_mft/fsntfs_test_mft.vcproj \
 	fsntfs_test_mft_attribute/fsntfs_test_mft_attribute.vcproj \
+	fsntfs_test_mft_attribute_list/fsntfs_test_mft_attribute_list.vcproj \
+	fsntfs_test_mft_attribute_list_entry/fsntfs_test_mft_attribute_list_entry.vcproj \
 	fsntfs_test_mft_entry/fsntfs_test_mft_entry.vcproj \
 	fsntfs_test_mft_entry_header/fsntfs_test_mft_entry_header.vcproj \
 	fsntfs_test_mft_metadata_file/fsntfs_test_mft_metadata_file.vcproj \

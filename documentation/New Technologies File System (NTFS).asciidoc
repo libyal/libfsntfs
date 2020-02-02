@@ -904,7 +904,7 @@ to space limitations. The attribute list attribute can be stored as either a
 resident (for a small amount of data) and non-resident MFT attribute.
 
 The attribute list data contains an array of attribute list entries and stored
-as a stream accross one or more cluster blocks.
+as a continous stream accross one or more cluster blocks.
 
 Note that MFT entry 0 also can contain an attribute list and allows to store
 listed attributes beyond the first data run.
@@ -1074,7 +1074,7 @@ name.*
 
 [yellow-background]*Note: behavior dependent on fsutil?*
 
-case 1: "Program Files" becomes "PROGRA\~1" or " ~PLAYMOVIE.REG" becomes "\~PLAYM~1.REG"
+case 1: "Program Files" becomes "PROGRA~1" or " ~PLAYMOVIE.REG" becomes "\~PLAYM~1.REG"
 
 case 2: "Program Data", in the same directory as "Program Files", becomes "PROGRA~2"
 

@@ -34,15 +34,17 @@
 /* The following type definitions hide internal data structures
  */
 #if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
-typedef struct libfsntfs_attribute {}		libfsntfs_attribute_t;
-typedef struct libfsntfs_data_stream {}		libfsntfs_data_stream_t;
-typedef struct libfsntfs_file_entry {}		libfsntfs_file_entry_t;
-typedef struct libfsntfs_mft_metadata_file {}	libfsntfs_mft_metadata_file_t;
-typedef struct libfsntfs_usn_change_journal {}	libfsntfs_usn_change_journal_t;
-typedef struct libfsntfs_volume {}		libfsntfs_volume_t;
+typedef struct libfsntfs_attribute {}			libfsntfs_attribute_t;
+typedef struct libfsntfs_attribute_list_entry {}	libfsntfs_attribute_list_entry_t;
+typedef struct libfsntfs_data_stream {}			libfsntfs_data_stream_t;
+typedef struct libfsntfs_file_entry {}			libfsntfs_file_entry_t;
+typedef struct libfsntfs_mft_metadata_file {}		libfsntfs_mft_metadata_file_t;
+typedef struct libfsntfs_usn_change_journal {}		libfsntfs_usn_change_journal_t;
+typedef struct libfsntfs_volume {}			libfsntfs_volume_t;
 
 #else
 typedef intptr_t libfsntfs_attribute_t;
+typedef intptr_t libfsntfs_attribute_list_entry_t;
 typedef intptr_t libfsntfs_data_stream_t;
 typedef intptr_t libfsntfs_file_entry_t;
 typedef intptr_t libfsntfs_mft_metadata_file_t;

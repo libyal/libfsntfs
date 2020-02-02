@@ -24,7 +24,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute_list.h"
 #include "libfsntfs_cluster_block.h"
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_definitions.h"
@@ -35,6 +34,7 @@
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libuna.h"
 #include "libfsntfs_mft.h"
+#include "libfsntfs_mft_attribute_list.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_name.h"
 #include "libfsntfs_path_hint.h"
@@ -545,7 +545,7 @@ int libfsntfs_file_system_read_mft(
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_list_get_number_of_file_references(
+		if( libfsntfs_mft_attribute_list_get_number_of_file_references(
 		     mft_entry->attribute_list,
 		     &number_of_file_entries,
 		     error ) != 1 )
@@ -563,7 +563,7 @@ int libfsntfs_file_system_read_mft(
 		     file_reference_index < number_of_file_entries;
 		     file_reference_index++ )
 		{
-			if( libfsntfs_attribute_list_get_file_reference_by_index(
+			if( libfsntfs_mft_attribute_list_get_file_reference_by_index(
 			     mft_entry->attribute_list,
 			     file_reference_index,
 			     &file_reference,

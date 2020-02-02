@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libfsntfs_attribute_list.h"
 #include "libfsntfs_directory_entry.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -34,6 +33,7 @@
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
+#include "libfsntfs_mft_attribute_list.h"
 #include "libfsntfs_mft_entry_header.h"
 
 #if defined( __cplusplus )
@@ -74,7 +74,7 @@ struct libfsntfs_mft_entry
 
 	/* The attribute list
 	 */
-	libfsntfs_attribute_list_t *attribute_list;
+	libfsntfs_mft_attribute_list_t *attribute_list;
 
 	/* The default (nameless) $DATA attribute
 	 */
@@ -190,7 +190,7 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 
 int libfsntfs_mft_entry_read_attribute_list_data_mft_entries(
      libfsntfs_mft_entry_t *mft_entry,
-     libfsntfs_attribute_list_t *attribute_list,
+     libfsntfs_mft_attribute_list_t *attribute_list,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
      libfdata_vector_t *mft_entry_vector,

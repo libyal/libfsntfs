@@ -23,7 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute_list.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
@@ -31,6 +30,7 @@
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft.h"
+#include "libfsntfs_mft_attribute_list.h"
 #include "libfsntfs_mft_entry.h"
 #include "libfsntfs_types.h"
 
@@ -255,7 +255,7 @@ int libfsntfs_mft_free(
 		{
 			if( libcdata_btree_free(
 			     &( ( *mft )->attribute_list_tree ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_free,
+			     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_list_free,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -284,16 +284,16 @@ int libfsntfs_mft_read_list_data_mft_entries(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	libcdata_tree_node_t *upper_node                    = NULL;
-	libfsntfs_attribute_list_t *attribute_list          = NULL;
-	libfsntfs_attribute_list_t *existing_attribute_list = NULL;
-	libfsntfs_mft_entry_t *mft_entry                    = NULL;
-	static char *function                               = "libfsntfs_mft_read_list_data_mft_entries";
-	uint64_t base_record_file_reference                 = 0;
-	uint64_t file_reference                             = 0;
-	uint64_t mft_entry_index                            = 0;
-	int result                                          = 0;
-	int value_index                                     = 0;
+	libcdata_tree_node_t *upper_node                        = NULL;
+	libfsntfs_mft_attribute_list_t *attribute_list          = NULL;
+	libfsntfs_mft_attribute_list_t *existing_attribute_list = NULL;
+	libfsntfs_mft_entry_t *mft_entry                        = NULL;
+	static char *function                                   = "libfsntfs_mft_read_list_data_mft_entries";
+	uint64_t base_record_file_reference                     = 0;
+	uint64_t file_reference                                 = 0;
+	uint64_t mft_entry_index                                = 0;
+	int result                                              = 0;
+	int value_index                                         = 0;
 
 	if( mft == NULL )
 	{
@@ -376,7 +376,7 @@ int libfsntfs_mft_read_list_data_mft_entries(
 		{
 			continue;
 		}
-		if( libfsntfs_attribute_list_initialize(
+		if( libfsntfs_mft_attribute_list_initialize(
 		     &attribute_list,
 		     base_record_file_reference,
 		     error ) != 1 )
@@ -394,7 +394,7 @@ int libfsntfs_mft_read_list_data_mft_entries(
 			  mft->attribute_list_tree,
 			  &value_index,
 			  (intptr_t *) attribute_list,
-			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_attribute_list_compare_by_base_record_file_reference,
+			  (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_mft_attribute_list_compare_by_base_record_file_reference,
 			  &upper_node,
 			  (intptr_t **) &existing_attribute_list,
 			  error );
@@ -412,7 +412,7 @@ int libfsntfs_mft_read_list_data_mft_entries(
 		}
 		else if( result == 0 )
 		{
-			if( libfsntfs_attribute_list_free(
+			if( libfsntfs_mft_attribute_list_free(
 			     &attribute_list,
 			     error ) != 1 )
 			{
@@ -447,7 +447,7 @@ int libfsntfs_mft_read_list_data_mft_entries(
 
 			goto on_error;
 		}
-		if( libfsntfs_attribute_list_insert_file_reference(
+		if( libfsntfs_mft_attribute_list_insert_file_reference(
 		     existing_attribute_list,
 		     file_reference,
 		     error ) == -1 )
@@ -467,7 +467,7 @@ int libfsntfs_mft_read_list_data_mft_entries(
 on_error:
 	if( attribute_list != NULL )
 	{
-		libfsntfs_attribute_list_free(
+		libfsntfs_mft_attribute_list_free(
 		 &attribute_list,
 		 NULL );
 	}
@@ -475,7 +475,7 @@ on_error:
 	{
 		libcdata_btree_free(
 		 &( mft->attribute_list_tree ),
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_attribute_list_entry_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_list_entry_free,
 		 NULL );
 	}
 	return( -1 );

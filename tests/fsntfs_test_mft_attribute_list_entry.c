@@ -35,23 +35,23 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_attribute_list_entry.h"
+#include "../libfsntfs/libfsntfs_mft_attribute_list_entry.h"
 
-uint8_t fsntfs_test_attribute_list_entry_data1[ 40 ] = {
+uint8_t fsntfs_test_mft_attribute_list_entry_data1[ 40 ] = {
 	0x80, 0x00, 0x00, 0x00, 0x28, 0x00, 0x04, 0x1a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0xc8, 0x08, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x24, 0x00, 0x53, 0x00, 0x44, 0x00,
 	0x53, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-/* Tests the libfsntfs_attribute_list_entry_initialize function
+/* Tests the libfsntfs_mft_attribute_list_entry_initialize function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_initialize(
+int fsntfs_test_mft_attribute_list_entry_initialize(
      void )
 {
 	libcerror_error_t *error                               = NULL;
-	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
 	int result                                             = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
@@ -62,7 +62,7 @@ int fsntfs_test_attribute_list_entry_initialize(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          &attribute_list_entry,
 	          &error );
 
@@ -79,7 +79,7 @@ int fsntfs_test_attribute_list_entry_initialize(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_entry_free(
+	result = libfsntfs_mft_attribute_list_entry_free(
 	          &attribute_list_entry,
 	          &error );
 
@@ -98,7 +98,7 @@ int fsntfs_test_attribute_list_entry_initialize(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          NULL,
 	          &error );
 
@@ -114,9 +114,9 @@ int fsntfs_test_attribute_list_entry_initialize(
 	libcerror_error_free(
 	 &error );
 
-	attribute_list_entry = (libfsntfs_attribute_list_entry_t *) 0x12345678UL;
+	attribute_list_entry = (libfsntfs_mft_attribute_list_entry_t *) 0x12345678UL;
 
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          &attribute_list_entry,
 	          &error );
 
@@ -140,11 +140,11 @@ int fsntfs_test_attribute_list_entry_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_attribute_list_entry_initialize with malloc failing
+		/* Test libfsntfs_mft_attribute_list_entry_initialize with malloc failing
 		 */
 		fsntfs_test_malloc_attempts_before_fail = test_number;
 
-		result = libfsntfs_attribute_list_entry_initialize(
+		result = libfsntfs_mft_attribute_list_entry_initialize(
 		          &attribute_list_entry,
 		          &error );
 
@@ -154,7 +154,7 @@ int fsntfs_test_attribute_list_entry_initialize(
 
 			if( attribute_list_entry != NULL )
 			{
-				libfsntfs_attribute_list_entry_free(
+				libfsntfs_mft_attribute_list_entry_free(
 				 &attribute_list_entry,
 				 NULL );
 			}
@@ -182,11 +182,11 @@ int fsntfs_test_attribute_list_entry_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libfsntfs_attribute_list_entry_initialize with memset failing
+		/* Test libfsntfs_mft_attribute_list_entry_initialize with memset failing
 		 */
 		fsntfs_test_memset_attempts_before_fail = test_number;
 
-		result = libfsntfs_attribute_list_entry_initialize(
+		result = libfsntfs_mft_attribute_list_entry_initialize(
 		          &attribute_list_entry,
 		          &error );
 
@@ -196,7 +196,7 @@ int fsntfs_test_attribute_list_entry_initialize(
 
 			if( attribute_list_entry != NULL )
 			{
-				libfsntfs_attribute_list_entry_free(
+				libfsntfs_mft_attribute_list_entry_free(
 				 &attribute_list_entry,
 				 NULL );
 			}
@@ -232,17 +232,17 @@ on_error:
 	}
 	if( attribute_list_entry != NULL )
 	{
-		libfsntfs_attribute_list_entry_free(
+		libfsntfs_mft_attribute_list_entry_free(
 		 &attribute_list_entry,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_free function
+/* Tests the libfsntfs_mft_attribute_list_entry_free function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_free(
+int fsntfs_test_mft_attribute_list_entry_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -250,7 +250,7 @@ int fsntfs_test_attribute_list_entry_free(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_free(
+	result = libfsntfs_mft_attribute_list_entry_free(
 	          NULL,
 	          &error );
 
@@ -277,19 +277,19 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_read_data function
+/* Tests the libfsntfs_mft_attribute_list_entry_read_data function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_read_data(
+int fsntfs_test_mft_attribute_list_entry_read_data(
      void )
 {
 	libcerror_error_t *error                               = NULL;
-	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
 	int result                                             = 0;
 
 	/* Initialize test
 	 */
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          &attribute_list_entry,
 	          &error );
 
@@ -308,9 +308,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -325,9 +325,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -345,7 +345,7 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_list_entry_free(
+	result = libfsntfs_mft_attribute_list_entry_free(
 	          &attribute_list_entry,
 	          &error );
 
@@ -364,7 +364,7 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Initialize test
 	 */
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          &attribute_list_entry,
 	          &error );
 
@@ -383,9 +383,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          NULL,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -403,9 +403,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	attribute_list_entry->name = (uint8_t *) 0x12345678UL;
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -423,7 +423,7 @@ int fsntfs_test_attribute_list_entry_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
 	          NULL,
 	          40,
@@ -441,9 +441,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
 
@@ -459,9 +459,9 @@ int fsntfs_test_attribute_list_entry_read_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          0,
 	          &error );
 
@@ -479,13 +479,13 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
 
-	/* Test libfsntfs_attribute_list_entry_read_data with malloc failing
+	/* Test libfsntfs_mft_attribute_list_entry_read_data with malloc failing
 	 */
 	fsntfs_test_malloc_attempts_before_fail = 0;
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -509,13 +509,13 @@ int fsntfs_test_attribute_list_entry_read_data(
 	}
 #if defined( OPTIMIZATION_DISABLED )
 
-	/* Test libfsntfs_attribute_list_entry_read_data with memcpy failing
+	/* Test libfsntfs_mft_attribute_list_entry_read_data with memcpy failing
 	 */
 	fsntfs_test_memcpy_attempts_before_fail = 0;
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -543,17 +543,17 @@ int fsntfs_test_attribute_list_entry_read_data(
 	/* Test error case where size value is invalid
 	 */
 	byte_stream_copy_from_uint16_little_endian(
-	 &( fsntfs_test_attribute_list_entry_data1[ 4 ] ),
+	 &( fsntfs_test_mft_attribute_list_entry_data1[ 4 ] ),
 	 0xffff );
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
 	byte_stream_copy_from_uint16_little_endian(
-	 &( fsntfs_test_attribute_list_entry_data1[ 4 ] ),
+	 &( fsntfs_test_mft_attribute_list_entry_data1[ 4 ] ),
 	 0x0028 );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -570,15 +570,15 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Test error case where name offset value is invalid
 	 */
-	fsntfs_test_attribute_list_entry_data1[ 7 ] = 0xff;
+	fsntfs_test_mft_attribute_list_entry_data1[ 7 ] = 0xff;
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
-	fsntfs_test_attribute_list_entry_data1[ 7 ] = 0x1a;
+	fsntfs_test_mft_attribute_list_entry_data1[ 7 ] = 0x1a;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -594,15 +594,15 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Test error case where name size value is invalid
 	 */
-	fsntfs_test_attribute_list_entry_data1[ 6 ] = 0xff;
+	fsntfs_test_mft_attribute_list_entry_data1[ 6 ] = 0xff;
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
-	fsntfs_test_attribute_list_entry_data1[ 6 ] = 0x04;
+	fsntfs_test_mft_attribute_list_entry_data1[ 6 ] = 0x04;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -618,7 +618,7 @@ int fsntfs_test_attribute_list_entry_read_data(
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_list_entry_free(
+	result = libfsntfs_mft_attribute_list_entry_free(
 	          &attribute_list_entry,
 	          &error );
 
@@ -645,213 +645,18 @@ on_error:
 	}
 	if( attribute_list_entry != NULL )
 	{
-		libfsntfs_attribute_list_entry_free(
+		libfsntfs_mft_attribute_list_entry_free(
 		 &attribute_list_entry,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_compare_by_file_reference function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_type function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_compare_by_file_reference(
-     void )
-{
-	libcerror_error_t *error                                      = NULL;
-	libfsntfs_attribute_list_entry_t *first_attribute_list_entry  = NULL;
-	libfsntfs_attribute_list_entry_t *second_attribute_list_entry = NULL;
-	int result                                                    = 0;
-
-	/* Initialize test
-	 */
-	result = libfsntfs_attribute_list_entry_initialize(
-	          &first_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "first_attribute_list_entry",
-	 first_attribute_list_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_attribute_list_entry_initialize(
-	          &second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "second_attribute_list_entry",
-	 second_attribute_list_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test regular cases
-	 */
-	first_attribute_list_entry->file_reference  = 1;
-	second_attribute_list_entry->file_reference = 2;
-
-	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
-	          first_attribute_list_entry,
-	          second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_LESS );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	first_attribute_list_entry->file_reference  = 1;
-	second_attribute_list_entry->file_reference = 1;
-
-	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
-	          first_attribute_list_entry,
-	          second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_EQUAL );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	first_attribute_list_entry->file_reference  = 2;
-	second_attribute_list_entry->file_reference = 1;
-
-	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
-	          first_attribute_list_entry,
-	          second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 LIBCDATA_COMPARE_GREATER );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
-	          NULL,
-	          second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_attribute_list_entry_compare_by_file_reference(
-	          first_attribute_list_entry,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	/* Clean up
-	 */
-	result = libfsntfs_attribute_list_entry_free(
-	          &second_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "second_attribute_list_entry",
-	 second_attribute_list_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_attribute_list_entry_free(
-	          &first_attribute_list_entry,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "first_attribute_list_entry",
-	 first_attribute_list_entry );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	if( second_attribute_list_entry != NULL )
-	{
-		libfsntfs_attribute_list_entry_free(
-		 &second_attribute_list_entry,
-		 NULL );
-	}
-	if( first_attribute_list_entry != NULL )
-	{
-		libfsntfs_attribute_list_entry_free(
-		 &first_attribute_list_entry,
-		 NULL );
-	}
-	return( 0 );
-}
-
-/* Tests the libfsntfs_attribute_list_entry_get_type function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_attribute_list_entry_get_type(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_type(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	libcerror_error_t *error = NULL;
 	uint32_t type            = 0;
@@ -859,7 +664,7 @@ int fsntfs_test_attribute_list_entry_get_type(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_type(
 	          attribute_list_entry,
 	          &type,
 	          &error );
@@ -880,7 +685,7 @@ int fsntfs_test_attribute_list_entry_get_type(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_type(
 	          NULL,
 	          &type,
 	          &error );
@@ -897,7 +702,7 @@ int fsntfs_test_attribute_list_entry_get_type(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_type(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -925,11 +730,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_get_file_reference function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_file_reference function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_get_file_reference(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_file_reference(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	libcerror_error_t *error = NULL;
 	uint64_t mft_entry_index = 0;
@@ -938,7 +743,7 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_file_reference(
+	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
 	          &mft_entry_index,
 	          &sequence_number,
@@ -955,7 +760,7 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_file_reference(
+	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          NULL,
 	          &mft_entry_index,
 	          &sequence_number,
@@ -973,7 +778,7 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_file_reference(
+	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
 	          NULL,
 	          &sequence_number,
@@ -991,7 +796,7 @@ int fsntfs_test_attribute_list_entry_get_file_reference(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_file_reference(
+	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
 	          &mft_entry_index,
 	          NULL,
@@ -1020,11 +825,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_get_utf8_name_size function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_utf8_name_size function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_get_utf8_name_size(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_utf8_name_size(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint8_t *name            = NULL;
 	libcerror_error_t *error = NULL;
@@ -1033,7 +838,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name_size(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
 	          attribute_list_entry,
 	          &utf8_name_size,
 	          &error );
@@ -1056,7 +861,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name_size(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
 	          attribute_list_entry,
 	          &utf8_name_size,
 	          &error );
@@ -1079,7 +884,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name_size(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
 	          NULL,
 	          &utf8_name_size,
 	          &error );
@@ -1096,7 +901,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -1117,7 +922,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name_size(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -1147,11 +952,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_get_utf8_name function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_utf8_name function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_get_utf8_name(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_utf8_name(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint8_t utf8_name[ 16 ];
 
@@ -1161,7 +966,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          attribute_list_entry,
 	          utf8_name,
 	          16,
@@ -1178,7 +983,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          NULL,
 	          utf8_name,
 	          16,
@@ -1200,7 +1005,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          attribute_list_entry,
 	          utf8_name,
 	          16,
@@ -1220,7 +1025,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          attribute_list_entry,
 	          NULL,
 	          16,
@@ -1238,7 +1043,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          attribute_list_entry,
 	          utf8_name,
 	          0,
@@ -1256,7 +1061,7 @@ int fsntfs_test_attribute_list_entry_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf8_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf8_name(
 	          attribute_list_entry,
 	          utf8_name,
 	          (size_t) SSIZE_MAX + 1,
@@ -1285,11 +1090,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_get_utf16_name_size function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_utf16_name_size function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_get_utf16_name_size(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_utf16_name_size(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint8_t *name            = NULL;
 	libcerror_error_t *error = NULL;
@@ -1298,7 +1103,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name_size(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
 	          attribute_list_entry,
 	          &utf16_name_size,
 	          &error );
@@ -1321,7 +1126,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name_size(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
 	          attribute_list_entry,
 	          &utf16_name_size,
 	          &error );
@@ -1344,7 +1149,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name_size(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
 	          NULL,
 	          &utf16_name_size,
 	          &error );
@@ -1361,7 +1166,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -1382,7 +1187,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name_size(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -1412,11 +1217,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_get_utf16_name function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_utf16_name function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_get_utf16_name(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_get_utf16_name(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint16_t utf16_name[ 16 ];
 
@@ -1426,7 +1231,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          attribute_list_entry,
 	          utf16_name,
 	          16,
@@ -1443,7 +1248,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          NULL,
 	          utf16_name,
 	          16,
@@ -1465,7 +1270,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          attribute_list_entry,
 	          utf16_name,
 	          16,
@@ -1485,7 +1290,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          attribute_list_entry,
 	          NULL,
 	          16,
@@ -1503,7 +1308,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          attribute_list_entry,
 	          utf16_name,
 	          0,
@@ -1521,7 +1326,7 @@ int fsntfs_test_attribute_list_entry_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_get_utf16_name(
+	result = libfsntfs_mft_attribute_list_entry_get_utf16_name(
 	          attribute_list_entry,
 	          utf16_name,
 	          (size_t) SSIZE_MAX + 1,
@@ -1550,11 +1355,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_compare_name_with_utf8_string function
+/* Tests the libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_compare_name_with_utf8_string(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint8_t utf8_name1[ 5 ]  = { '$', 'S', 'D', 'S', 0 };
 	uint8_t utf8_name2[ 6 ]  = { 'b', 'o', 'g', 'u', 's', 0 };
@@ -1564,7 +1369,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry,
 	          utf8_name1,
 	          4,
@@ -1579,7 +1384,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry,
 	          utf8_name2,
 	          5,
@@ -1598,7 +1403,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry,
 	          utf8_name1,
 	          4,
@@ -1617,7 +1422,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          NULL,
 	          utf8_name1,
 	          4,
@@ -1635,7 +1440,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry,
 	          NULL,
 	          4,
@@ -1653,7 +1458,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf8_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf8_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string(
 	          attribute_list_entry,
 	          utf8_name1,
 	          (size_t) SSIZE_MAX + 1,
@@ -1682,11 +1487,11 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_list_entry_compare_name_with_utf16_string function
+/* Tests the libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
-     libfsntfs_attribute_list_entry_t *attribute_list_entry )
+int fsntfs_test_mft_attribute_list_entry_compare_name_with_utf16_string(
+     libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	uint16_t utf16_name1[ 5 ] = { '$', 'S', 'D', 'S', 0 };
 	uint16_t utf16_name2[ 6 ] = { 'b', 'o', 'g', 'u', 's', 0 };
@@ -1696,7 +1501,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry,
 	          utf16_name1,
 	          4,
@@ -1711,7 +1516,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry,
 	          utf16_name2,
 	          5,
@@ -1730,7 +1535,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 
 	attribute_list_entry->name = NULL;
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry,
 	          utf16_name1,
 	          4,
@@ -1749,7 +1554,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          NULL,
 	          utf16_name1,
 	          4,
@@ -1767,7 +1572,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry,
 	          NULL,
 	          4,
@@ -1785,7 +1590,7 @@ int fsntfs_test_attribute_list_entry_compare_name_with_utf16_string(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_attribute_list_entry_compare_name_with_utf16_string(
+	result = libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string(
 	          attribute_list_entry,
 	          utf16_name1,
 	          (size_t) SSIZE_MAX + 1,
@@ -1831,7 +1636,7 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	libcerror_error_t *error                               = NULL;
-	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
 	int result                                             = 0;
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
@@ -1842,26 +1647,22 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_entry_initialize",
-	 fsntfs_test_attribute_list_entry_initialize );
+	 "libfsntfs_mft_attribute_list_entry_initialize",
+	 fsntfs_test_mft_attribute_list_entry_initialize );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_entry_free",
-	 fsntfs_test_attribute_list_entry_free );
+	 "libfsntfs_mft_attribute_list_entry_free",
+	 fsntfs_test_mft_attribute_list_entry_free );
 
 	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_entry_read_data",
-	 fsntfs_test_attribute_list_entry_read_data );
-
-	FSNTFS_TEST_RUN(
-	 "libfsntfs_attribute_list_entry_compare_by_file_reference",
-	 fsntfs_test_attribute_list_entry_compare_by_file_reference );
+	 "libfsntfs_mft_attribute_list_entry_read_data",
+	 fsntfs_test_mft_attribute_list_entry_read_data );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 
 	/* Initialize test
 	 */
-	result = libfsntfs_attribute_list_entry_initialize(
+	result = libfsntfs_mft_attribute_list_entry_initialize(
 	          &attribute_list_entry,
 	          &error );
 
@@ -1878,9 +1679,9 @@ int main(
 	 "error",
 	 error );
 
-	result = libfsntfs_attribute_list_entry_read_data(
+	result = libfsntfs_mft_attribute_list_entry_read_data(
 	          attribute_list_entry,
-	          fsntfs_test_attribute_list_entry_data1,
+	          fsntfs_test_mft_attribute_list_entry_data1,
 	          40,
 	          &error );
 
@@ -1896,48 +1697,48 @@ int main(
 	/* Run tests
 	 */
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_type",
-	 fsntfs_test_attribute_list_entry_get_type,
+	 "libfsntfs_mft_attribute_list_entry_get_type",
+	 fsntfs_test_mft_attribute_list_entry_get_type,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_file_reference",
-	 fsntfs_test_attribute_list_entry_get_file_reference,
+	 "libfsntfs_mft_attribute_list_entry_get_file_reference",
+	 fsntfs_test_mft_attribute_list_entry_get_file_reference,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_utf8_name_size",
-	 fsntfs_test_attribute_list_entry_get_utf8_name_size,
+	 "libfsntfs_mft_attribute_list_entry_get_utf8_name_size",
+	 fsntfs_test_mft_attribute_list_entry_get_utf8_name_size,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_utf8_name",
-	 fsntfs_test_attribute_list_entry_get_utf8_name,
+	 "libfsntfs_mft_attribute_list_entry_get_utf8_name",
+	 fsntfs_test_mft_attribute_list_entry_get_utf8_name,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_utf16_name_size",
-	 fsntfs_test_attribute_list_entry_get_utf16_name_size,
+	 "libfsntfs_mft_attribute_list_entry_get_utf16_name_size",
+	 fsntfs_test_mft_attribute_list_entry_get_utf16_name_size,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_get_utf16_name",
-	 fsntfs_test_attribute_list_entry_get_utf16_name,
+	 "libfsntfs_mft_attribute_list_entry_get_utf16_name",
+	 fsntfs_test_mft_attribute_list_entry_get_utf16_name,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_compare_name_with_utf8_string",
-	 fsntfs_test_attribute_list_entry_compare_name_with_utf8_string,
+	 "libfsntfs_mft_attribute_list_entry_compare_name_with_utf8_string",
+	 fsntfs_test_mft_attribute_list_entry_compare_name_with_utf8_string,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_list_entry_compare_name_with_utf16_string",
-	 fsntfs_test_attribute_list_entry_compare_name_with_utf16_string,
+	 "libfsntfs_mft_attribute_list_entry_compare_name_with_utf16_string",
+	 fsntfs_test_mft_attribute_list_entry_compare_name_with_utf16_string,
 	 attribute_list_entry );
 
 	/* Clean up
 	 */
-	result = libfsntfs_attribute_list_entry_free(
+	result = libfsntfs_mft_attribute_list_entry_free(
 	          &attribute_list_entry,
 	          &error );
 
@@ -1970,7 +1771,7 @@ on_error:
 	}
 	if( attribute_list_entry != NULL )
 	{
-		libfsntfs_attribute_list_entry_free(
+		libfsntfs_mft_attribute_list_entry_free(
 		 &attribute_list_entry,
 		 NULL );
 	}

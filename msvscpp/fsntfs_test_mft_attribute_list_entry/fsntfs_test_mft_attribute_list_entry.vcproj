@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_attribute_list_entry"
-	ProjectGUID="{5A48EC58-BB35-47A7-9A5B-A13B2296E69F}"
-	RootNamespace="fsntfs_test_attribute_list_entry"
+	Name="fsntfs_test_mft_attribute_list_entry"
+	ProjectGUID="{4D7E70CE-57AD-430F-8387-BB518D767BD2}"
+	RootNamespace="fsntfs_test_mft_attribute_list_entry"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,11 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_attribute_list_entry.c"
+				RelativePath="..\..\tests\fsntfs_test_memory.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
+				RelativePath="..\..\tests\fsntfs_test_mft_attribute_list_entry.c"
 				>
 			</File>
 		</Filter>

@@ -1131,6 +1131,19 @@ int libfsntfs_attribute_get_data_size(
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
+ * $ATTRIBUTE_LIST attribute functions
+ * ------------------------------------------------------------------------- */
+
+/* Retrieves the number of entries
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_attribute_get_number_of_entries(
+     libfsntfs_attribute_t *attribute,
+     int *number_of_entries,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
  * $FILE_NAME attribute functions
  * ------------------------------------------------------------------------- */
 

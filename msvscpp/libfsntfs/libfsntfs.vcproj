@@ -178,7 +178,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list.c"
+				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list_attribute.c"
 				>
 			</File>
 			<File
@@ -334,6 +334,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_list.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_list_entry.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft_entry.c"
 				>
 			</File>
@@ -448,10 +456,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\libfsntfs\fsntfs_attribute_list.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\fsntfs_file_name.h"
 				>
 			</File>
@@ -465,6 +469,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\fsntfs_mft_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\fsntfs_mft_attribute_list.h"
 				>
 			</File>
 			<File
@@ -504,7 +512,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list.h"
+				RelativePath="..\..\libfsntfs\libfsntfs_attribute_list_attribute.h"
 				>
 			</File>
 			<File
@@ -713,6 +721,14 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_mft_attribute_list_entry.h"
 				>
 			</File>
 			<File

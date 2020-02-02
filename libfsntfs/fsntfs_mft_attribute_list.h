@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _FSNTFS_ATTRIBUTE_LIST_H )
-#define _FSNTFS_ATTRIBUTE_LIST_H
+#if !defined( _FSNTFS_MFT_ATTRIBUTE_LIST_H )
+#define _FSNTFS_MFT_ATTRIBUTE_LIST_H
 
 #include <common.h>
 #include <types.h>
@@ -29,9 +29,9 @@
 extern "C" {
 #endif
 
-typedef struct fsntfs_attribute_list_entry_header fsntfs_attribute_list_entry_header_t;
+typedef struct fsntfs_mft_attribute_list_entry_header fsntfs_mft_attribute_list_entry_header_t;
 
-struct fsntfs_attribute_list_entry_header
+struct fsntfs_mft_attribute_list_entry_header
 {
 	/* The type
 	 * Consists of 4 bytes
@@ -73,5 +73,5 @@ struct fsntfs_attribute_list_entry_header
 }
 #endif
 
-#endif /* !defined( _FSNTFS_ATTRIBUTE_LIST_H ) */
+#endif /* !defined( _FSNTFS_MFT_ATTRIBUTE_LIST_H ) */
 

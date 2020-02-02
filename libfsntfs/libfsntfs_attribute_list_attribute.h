@@ -1,5 +1,5 @@
 /*
- * Attribute list entry functions
+ * Attribute list attribute ($ATTRIBUTE_LIST) functions
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,50 +19,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_ATTRIBUTE_LIST_ENTRY_H )
-#define _LIBFSNTFS_ATTRIBUTE_LIST_ENTRY_H
+#if !defined( _LIBFSNTFS_ATTRIBUTE_LIST_ATTRIBUTE_H )
+#define _LIBFSNTFS_ATTRIBUTE_LIST_ATTRIBUTE_H
 
 #include <common.h>
 #include <types.h>
 
 #include "libfsntfs_extern.h"
-#include "libfsntfs_libcerror.h"
-#include "libfsntfs_libcthreads.h"
-#include "libfsntfs_mft_attribute_list_entry.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libfsntfs_internal_attribute_list_entry libfsntfs_internal_attribute_list_entry_t;
-
-struct libfsntfs_internal_attribute_list_entry
-{
-	/* The MFT attribute list entry
-	 */
-	libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry;
-
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	/* The read/write lock
-	 */
-	libcthreads_read_write_lock_t *read_write_lock;
-#endif
-};
-
-int libfsntfs_attribute_initialize(
-     libfsntfs_attribute_t **attribute,
-     libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
-     libcerror_error_t **error );
-
 LIBFSNTFS_EXTERN \
-int libfsntfs_attribute_free(
-     libfsntfs_attribute_t **attribute,
+int libfsntfs_attribute_list_attribute_get_number_of_entries(
+     libfsntfs_attribute_t *attribute,
+     int *number_of_entries,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_ATTRIBUTE_LIST_ENTRY_H ) */
+#endif /* !defined( _LIBFSNTFS_ATTRIBUTE_LIST_ATTRIBUTE_H ) */
 

@@ -25,6 +25,8 @@
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_standard_information_attribute.h"
 #include "libfsntfs_standard_information_values.h"
 #include "libfsntfs_types.h"
