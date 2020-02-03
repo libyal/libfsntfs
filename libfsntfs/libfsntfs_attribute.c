@@ -726,7 +726,7 @@ int libfsntfs_internal_attribute_get_type(
 	}
 	else
 	{
-		if( libfsntfs_mft_attribute_list_entry_get_type(
+		if( libfsntfs_mft_attribute_list_entry_get_attribute_type(
 		     internal_attribute->mft_attribute_list_entry,
 		     type,
 		     error ) != 1 )
@@ -735,7 +735,7 @@ int libfsntfs_internal_attribute_get_type(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve type from attribute list entry.",
+			 "%s: unable to retrieve attribute type from attribute list entry.",
 			 function );
 
 			return( -1 );
@@ -1425,20 +1425,16 @@ int libfsntfs_attribute_get_data_vcn_range(
 	return( result );
 }
 
-/* Retrieves the file references as an MFT entry index and sequence number
- * If the value sequence_number is NULL it will be ignored
+/* Retrieves the file reference
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_attribute_get_file_reference(
      libfsntfs_attribute_t *attribute,
-     uint64_t *mft_entry_index,
-     uint16_t *sequence_number,
+     uint64_t *file_reference,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
 	static char *function                              = "libfsntfs_attribute_get_file_reference";
-	uint64_t safe_mft_entry_index                      = 0;
-	uint16_t safe_sequence_number                      = 0;
 	int result                                         = 1;
 
 	if( attribute == NULL )
@@ -1454,13 +1450,13 @@ int libfsntfs_attribute_get_file_reference(
 	}
 	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
 
-	if( mft_entry_index == NULL )
+	if( file_reference == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry index.",
+		 "%s: invalid file reference.",
 		 function );
 
 		return( -1 );
@@ -1484,8 +1480,7 @@ int libfsntfs_attribute_get_file_reference(
 	{
 		if( libfsntfs_mft_attribute_list_entry_get_file_reference(
 		     internal_attribute->mft_attribute_list_entry,
-		     &safe_mft_entry_index,
-		     &safe_sequence_number,
+		     file_reference,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1513,15 +1508,6 @@ int libfsntfs_attribute_get_file_reference(
 		return( -1 );
 	}
 #endif
-	if( result == 1 )
-	{
-		*mft_entry_index = safe_mft_entry_index;
-
-		if( sequence_number != NULL )
-		{
-			*sequence_number = safe_sequence_number;
-		}
-	}
 	return( result );
 }
 

@@ -38,6 +38,13 @@ int libfsntfs_attribute_list_attribute_get_number_of_entries(
      int *number_of_entries,
      libcerror_error_t **error );
 
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_attribute_get_entry_by_index(
+     libfsntfs_attribute_t *attribute,
+     int entry_index,
+     libfsntfs_attribute_list_entry_t **attribute_list_entry,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

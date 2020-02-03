@@ -50,14 +50,52 @@ struct libfsntfs_internal_attribute_list_entry
 #endif
 };
 
-int libfsntfs_attribute_initialize(
-     libfsntfs_attribute_t **attribute,
+int libfsntfs_attribute_list_entry_initialize(
+     libfsntfs_attribute_list_entry_t **attribute_list_entry,
      libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_attribute_free(
-     libfsntfs_attribute_t **attribute,
+int libfsntfs_attribute_list_entry_free(
+     libfsntfs_attribute_list_entry_t **attribute_list_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_attribute_type(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint32_t *attribute_type,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_file_reference(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf8_name_size(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf8_name(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf16_name_size(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf16_name(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

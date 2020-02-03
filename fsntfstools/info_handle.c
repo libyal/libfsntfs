@@ -2139,13 +2139,18 @@ int info_handle_attribute_list_attribute_fprint(
      libfsntfs_attribute_t *attribute,
      libcerror_error_t **error )
 {
-	static char *function   = "info_handle_attribute_list_attribute_fprint";
-	size64_t data_size      = 0;
-	uint64_t data_first_vcn = 0;
-	uint64_t data_last_vcn  = 0;
-	int entry_index         = 0;
-	int number_of_entries   = 0;
-	int result              = 0;
+	libfsntfs_attribute_list_entry_t *attribute_list_entry = NULL;
+	system_character_t *value_string                       = NULL;
+	static char *function                                  = "info_handle_attribute_list_attribute_fprint";
+	size64_t data_size                                     = 0;
+	size_t value_string_size                               = 0;
+	uint64_t data_first_vcn                                = 0;
+	uint64_t data_last_vcn                                 = 0;
+	uint64_t file_reference                                = 0;
+	uint32_t attribute_type                                = 0;
+	int entry_index                                        = 0;
+	int number_of_entries                                  = 0;
+	int result                                             = 0;
 
 	if( info_handle == NULL )
 	{
@@ -2224,7 +2229,7 @@ int info_handle_attribute_list_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of entries.",
+		 "%s: unable to retrieve number of attribute list entries.",
 		 function );
 
 		goto on_error;
@@ -2238,10 +2243,168 @@ int info_handle_attribute_list_attribute_fprint(
 	     entry_index < number_of_entries;
 	     entry_index++ )
 	{
+		if( libfsntfs_attribute_list_attribute_get_entry_by_index(
+		     attribute,
+		     entry_index,
+		     &attribute_list_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute list entry: %d.",
+			 function,
+			 entry_index );
+
+			goto on_error;
+		}
+		if( libfsntfs_attribute_list_entry_get_attribute_type(
+		     attribute_list_entry,
+		     &attribute_type,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute type.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfsntfs_attribute_list_entry_get_file_reference(
+		     attribute_list_entry,
+		     &file_reference,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file reference.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_attribute_list_entry_get_utf16_name_size(
+		          attribute_list_entry,
+		          &value_string_size,
+		          error );
+#else
+		result = libfsntfs_attribute_list_entry_get_utf8_name_size(
+		          attribute_list_entry,
+		          &value_string_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve name string size.",
+			 function );
+
+			goto on_error;
+		}
+		if( value_string_size > 0 )
+		{
+			value_string = system_string_allocate(
+			                value_string_size );
+
+			if( value_string == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create name string.",
+				 function );
+
+				goto on_error;
+			}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfsntfs_attribute_list_entry_get_utf16_name(
+			          attribute_list_entry,
+			          (uint16_t *) value_string,
+			          value_string_size,
+			          error );
+#else
+			result = libfsntfs_attribute_list_entry_get_utf8_name(
+			          attribute_list_entry,
+			          (uint8_t *) value_string,
+			          value_string_size,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve name string.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tEntry: %d\t\t\t: %s (0x%08" PRIx32 ")",
+		 entry_index,
+		 info_handle_get_attribute_type_description(
+		  attribute_type ),
+		 attribute_type );
+
+		if( value_string != NULL )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 " %" PRIs_SYSTEM "",
+			 value_string );
+
+			memory_free(
+			 value_string );
+
+			value_string = NULL;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 " in file reference: %" PRIu64 "-%" PRIu64 "\n",
+		 file_reference & 0xffffffffffffUL,
+		 file_reference >> 48 );
+
+		if( libfsntfs_attribute_list_entry_free(
+		     &attribute_list_entry,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free attribute list entry: %d.",
+			 function,
+			 entry_index );
+
+			goto on_error;
+		}
 	}
 	return( 1 );
 
 on_error:
+	if( value_string != NULL )
+	{
+		memory_free(
+		 value_string );
+	}
+	if( attribute_list_entry != NULL )
+	{
+		libfsntfs_attribute_list_entry_free(
+		 &attribute_list_entry,
+		 NULL );
+	}
 	return( -1 );
 }
 
@@ -4516,7 +4679,22 @@ int info_handle_file_entry_value_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d.",
+			 "%s: unable to retrieve $FILE_NAME attribute: %d.",
+			 function,
+			 name_attribute_index );
+
+			goto on_error;
+		}
+		if( libfsntfs_attribute_get_data_size(
+		     attribute,
+		     &size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d data size.",
 			 function,
 			 name_attribute_index );
 
@@ -4531,8 +4709,9 @@ int info_handle_file_entry_value_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve creation time.",
-			 function );
+			 "%s: unable to retrieve $FILE_NAME attribute: %d creation time.",
+			 function,
+			 name_attribute_index );
 
 			goto on_error;
 		}
@@ -4545,8 +4724,9 @@ int info_handle_file_entry_value_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve modification time.",
-			 function );
+			 "%s: unable to retrieve $FILE_NAME attribute: %d modification time.",
+			 function,
+			 name_attribute_index );
 
 			goto on_error;
 		}
@@ -4559,8 +4739,9 @@ int info_handle_file_entry_value_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve access time.",
-			 function );
+			 "%s: unable to retrieve $FILE_NAME attribute: %d access time.",
+			 function,
+			 name_attribute_index );
 
 			goto on_error;
 		}
@@ -4573,8 +4754,9 @@ int info_handle_file_entry_value_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve entry modification time.",
-			 function );
+			 "%s: unable to retrieve $FILE_NAME attribute: %d entry modification time.",
+			 function,
+			 name_attribute_index );
 
 			goto on_error;
 		}

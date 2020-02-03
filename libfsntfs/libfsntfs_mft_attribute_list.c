@@ -253,11 +253,11 @@ int libfsntfs_mft_attribute_list_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
-	static char *function                                      = "libfsntfs_mft_attribute_list_read_data";
-	size_t data_offset                                         = 0;
-	int attribute_index                                        = 0;
-	int entry_index                                            = 0;
+	libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry = NULL;
+	static char *function                                          = "libfsntfs_mft_attribute_list_read_data";
+	size_t data_offset                                             = 0;
+	int attribute_index                                            = 0;
+	int entry_index                                                = 0;
 
 	if( attribute_list == NULL )
 	{
@@ -307,20 +307,20 @@ int libfsntfs_mft_attribute_list_read_data(
 	while( data_offset < data_size )
 	{
 		if( libfsntfs_mft_attribute_list_entry_initialize(
-		     &attribute_list_entry,
+		     &mft_attribute_list_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create attribute list entry.",
+			 "%s: unable to create MFT attribute list entry.",
 			 function );
 
 			goto on_error;
 		}
 		if( libfsntfs_mft_attribute_list_entry_read_data(
-		     attribute_list_entry,
+		     mft_attribute_list_entry,
 		     &( data[ data_offset ] ),
 		     data_size,
 		     error ) != 1 )
@@ -329,31 +329,31 @@ int libfsntfs_mft_attribute_list_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attribute list entry: %d.",
+			 "%s: unable to read MFT attribute list entry: %d.",
 			 function,
 			 attribute_index );
 
 			goto on_error;
 		}
-		data_offset += attribute_list_entry->size;
+		data_offset += mft_attribute_list_entry->size;
 
 		if( libcdata_array_append_entry(
 		     attribute_list->entries_array,
 		     &entry_index,
-		     (intptr_t *) attribute_list_entry,
+		     (intptr_t *) mft_attribute_list_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append attribute list entry: %d to array.",
+			 "%s: unable to append MFT attribute list entry: %d to array.",
 			 function,
 			 attribute_index );
 
 			goto on_error;
 		}
-		attribute_list_entry = NULL;
+		mft_attribute_list_entry = NULL;
 
 		attribute_index++;
 	}
@@ -375,10 +375,10 @@ int libfsntfs_mft_attribute_list_read_data(
 	return( 1 );
 
 on_error:
-	if( attribute_list_entry != NULL )
+	if( mft_attribute_list_entry != NULL )
 	{
 		libfsntfs_mft_attribute_list_entry_free(
-		 &attribute_list_entry,
+		 &mft_attribute_list_entry,
 		 NULL );
 	}
 	return( -1 );
@@ -396,14 +396,14 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 {
 	uint8_t data[ sizeof( fsntfs_mft_attribute_list_entry_header_t ) + 256 ];
 
-	libfdata_stream_t *cluster_block_stream                    = NULL;
-	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
-	static char *function                                      = "libfsntfs_mft_attribute_list_read_from_attribute";
-	size64_t data_size                                         = 0;
-	ssize_t read_count                                         = 0;
-	off64_t data_offset                                        = 0;
-	int attribute_index                                        = 0;
-	int entry_index                                            = 0;
+	libfdata_stream_t *cluster_block_stream                        = NULL;
+	libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry = NULL;
+	static char *function                                          = "libfsntfs_mft_attribute_list_read_from_attribute";
+	size64_t data_size                                             = 0;
+	ssize_t read_count                                             = 0;
+	off64_t data_offset                                            = 0;
+	int attribute_index                                            = 0;
+	int entry_index                                                = 0;
 
 	if( attribute_list == NULL )
 	{
@@ -488,7 +488,7 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 			goto on_error;
 		}
 		if( libfsntfs_mft_attribute_list_entry_initialize(
-		     &attribute_list_entry,
+		     &mft_attribute_list_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -502,7 +502,7 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 			goto on_error;
 		}
 		if( libfsntfs_mft_attribute_list_entry_read_data(
-		     attribute_list_entry,
+		     mft_attribute_list_entry,
 		     data,
 		     sizeof( fsntfs_mft_attribute_list_entry_header_t ) + 256,
 		     error ) != 1 )
@@ -517,12 +517,12 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-		data_offset += attribute_list_entry->size;
+		data_offset += mft_attribute_list_entry->size;
 
 		if( libcdata_array_append_entry(
 		     attribute_list->entries_array,
 		     &entry_index,
-		     (intptr_t *) attribute_list_entry,
+		     (intptr_t *) mft_attribute_list_entry,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -535,7 +535,7 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-		attribute_list_entry = NULL;
+		mft_attribute_list_entry = NULL;
 
 		attribute_index++;
 	}
@@ -608,7 +608,7 @@ int libfsntfs_mft_attribute_list_get_number_of_entries(
 int libfsntfs_mft_attribute_list_get_entry_by_index(
      libfsntfs_mft_attribute_list_t *attribute_list,
      int entry_index,
-     libfsntfs_mft_attribute_list_entry_t **attribute_list_entry,
+     libfsntfs_mft_attribute_list_entry_t **mft_attribute_list_entry,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_get_attribute_by_index";
@@ -627,7 +627,7 @@ int libfsntfs_mft_attribute_list_get_entry_by_index(
 	if( libcdata_array_get_entry_by_index(
 	     attribute_list->entries_array,
 	     entry_index,
-	     (intptr_t **) attribute_list_entry,
+	     (intptr_t **) mft_attribute_list_entry,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

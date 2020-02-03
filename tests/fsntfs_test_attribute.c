@@ -1866,31 +1866,14 @@ int fsntfs_test_attribute_get_file_reference(
      libfsntfs_attribute_t *attribute )
 {
 	libcerror_error_t *error = NULL;
-	uint64_t mft_entry_index = 0;
-	uint16_t sequence_number = 0;
+	uint64_t file_reference  = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
 	result = libfsntfs_attribute_get_file_reference(
 	          attribute,
-	          &mft_entry_index,
-	          &sequence_number,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfsntfs_attribute_get_file_reference(
-	          attribute,
-	          &mft_entry_index,
-	          NULL,
+	          &file_reference,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1906,8 +1889,7 @@ int fsntfs_test_attribute_get_file_reference(
 	 */
 	result = libfsntfs_attribute_get_file_reference(
 	          NULL,
-	          &mft_entry_index,
-	          &sequence_number,
+	          &file_reference,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1925,7 +1907,6 @@ int fsntfs_test_attribute_get_file_reference(
 	result = libfsntfs_attribute_get_file_reference(
 	          attribute,
 	          NULL,
-	          &sequence_number,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1948,8 +1929,7 @@ int fsntfs_test_attribute_get_file_reference(
 
 	result = libfsntfs_attribute_get_file_reference(
 	          attribute,
-	          &mft_entry_index,
-	          &sequence_number,
+	          &file_reference,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
@@ -1976,8 +1956,7 @@ int fsntfs_test_attribute_get_file_reference(
 
 	result = libfsntfs_attribute_get_file_reference(
 	          attribute,
-	          &mft_entry_index,
-	          &sequence_number,
+	          &file_reference,
 	          &error );
 
 	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )

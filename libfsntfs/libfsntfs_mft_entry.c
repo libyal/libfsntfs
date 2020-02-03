@@ -1270,7 +1270,7 @@ int libfsntfs_mft_entry_read_attribute_list(
 	libfsntfs_mft_attribute_list_entry_t *attribute_list_entry = NULL;
 	static char *function                                      = "libfsntfs_mft_entry_read_attribute_list";
 	uint64_t attribute_list_data_mft_entry_index               = 0;
-	uint16_t sequence_number                                   = 0;
+	uint64_t file_reference                                    = 0;
 	int attribute_list_entry_index                             = 0;
 	int number_of_attribute_list_entries                       = 0;
 
@@ -1373,8 +1373,7 @@ int libfsntfs_mft_entry_read_attribute_list(
 		}
 		if( libfsntfs_mft_attribute_list_entry_get_file_reference(
 		     attribute_list_entry,
-		     &attribute_list_data_mft_entry_index,
-		     &sequence_number,
+		     &file_reference,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1387,6 +1386,8 @@ int libfsntfs_mft_entry_read_attribute_list(
 
 			goto on_error;
 		}
+		attribute_list_data_mft_entry_index = file_reference & 0xffffffffffffUL;
+
 		if( attribute_list_data_mft_entry_index > (uint64_t) INT_MAX )
 		{
 			libcerror_error_set(
@@ -1406,7 +1407,7 @@ int libfsntfs_mft_entry_read_attribute_list(
 		}
 		if( libfsntfs_mft_attribute_list_insert_file_reference(
 		     mft_entry->attribute_list,
-		     attribute_list_entry->file_reference,
+		     file_reference,
 		     error ) == -1 )
 		{
 			libcerror_error_set(

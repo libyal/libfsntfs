@@ -153,8 +153,7 @@ int libfsntfs_attribute_get_data_vcn_range(
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_file_reference(
      libfsntfs_attribute_t *attribute,
-     uint64_t *mft_entry_index,
-     uint16_t *sequence_number,
+     uint64_t *file_reference,
      libcerror_error_t **error );
 
 int libfsntfs_internal_attribute_get_data_size(

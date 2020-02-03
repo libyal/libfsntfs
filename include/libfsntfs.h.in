@@ -1110,15 +1110,13 @@ int libfsntfs_attribute_get_data_vcn_range(
      uint64_t *data_last_vcn,
      libfsntfs_error_t **error );
 
-/* Retrieves the file references as an MFT entry index and sequence number
- * If the value sequence_number is NULL it will be ignored
+/* Retrieves the file reference
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_get_file_reference(
      libfsntfs_attribute_t *attribute,
-     uint64_t *mft_entry_index,
-     uint16_t *sequence_number,
+     uint64_t *file_reference,
      libfsntfs_error_t **error );
 
 /* Retrieves the data size
@@ -1134,13 +1132,95 @@ int libfsntfs_attribute_get_data_size(
  * $ATTRIBUTE_LIST attribute functions
  * ------------------------------------------------------------------------- */
 
-/* Retrieves the number of entries
+/* Retrieves the number of attribute list entries
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_attribute_list_attribute_get_number_of_entries(
      libfsntfs_attribute_t *attribute,
      int *number_of_entries,
+     libfsntfs_error_t **error );
+
+/* Retrieves a specific attribute list entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_attribute_get_entry_by_index(
+     libfsntfs_attribute_t *attribute,
+     int entry_index,
+     libfsntfs_attribute_list_entry_t **entry,
+     libfsntfs_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Attribute list entry functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees an attribute list entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_free(
+     libfsntfs_attribute_list_entry_t **attribute_list_entry,
+     libfsntfs_error_t **error );
+
+/* Retrieves the attribute type
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_attribute_type(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint32_t *attribute_type,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file reference
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_file_reference(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint64_t *file_reference,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-8 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf8_name_size(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     size_t *utf8_string_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-8 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf8_name(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size of the UTF-16 encoded name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf16_name_size(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     size_t *utf16_string_size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the UTF-16 encoded name
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_list_entry_get_utf16_name(
+     libfsntfs_attribute_list_entry_t *attribute_list_entry,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libfsntfs_error_t **error );
 
 /* -------------------------------------------------------------------------
@@ -1562,7 +1642,7 @@ int libfsntfs_volume_name_attribute_get_utf16_name(
  * Data stream functions
  * ------------------------------------------------------------------------- */
 
-/* Frees an data stream
+/* Frees a data stream
  * Returns 1 if successful or -1 on error
  */
 LIBFSNTFS_EXTERN \

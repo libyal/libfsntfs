@@ -224,7 +224,7 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 #endif
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_mft_attribute_list_entry_header_t *) data )->type,
-	 attribute_list_entry->type );
+	 attribute_list_entry->attribute_type );
 
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_attribute_list_entry_header_t *) data )->size,
@@ -252,9 +252,9 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 		libcnotify_printf(
 		 "%s: type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
-		 attribute_list_entry->type,
+		 attribute_list_entry->attribute_type,
 		 libfsntfs_debug_print_attribute_type(
-		  attribute_list_entry->type ) );
+		  attribute_list_entry->attribute_type ) );
 
 		libcnotify_printf(
 		 "%s: size\t\t\t\t: %" PRIu16 "\n",
@@ -448,15 +448,15 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the type
+/* Retrieves the attribute type
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_attribute_list_entry_get_type(
+int libfsntfs_mft_attribute_list_entry_get_attribute_type(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry,
-     uint32_t *type,
+     uint32_t *attribute_type,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_mft_attribute_list_entry_get_type";
+	static char *function = "libfsntfs_mft_attribute_list_entry_get_attribute_type";
 
 	if( attribute_list_entry == NULL )
 	{
@@ -469,18 +469,18 @@ int libfsntfs_mft_attribute_list_entry_get_type(
 
 		return( -1 );
 	}
-	if( type == NULL )
+	if( attribute_type == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid type.",
+		 "%s: invalid attribute type.",
 		 function );
 
 		return( -1 );
 	}
-	*type = attribute_list_entry->type;
+	*attribute_type = attribute_list_entry->attribute_type;
 
 	return( 1 );
 }
@@ -491,8 +491,7 @@ int libfsntfs_mft_attribute_list_entry_get_type(
  */
 int libfsntfs_mft_attribute_list_entry_get_file_reference(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry,
-     uint64_t *mft_entry_index,
-     uint16_t *sequence_number,
+     uint64_t *file_reference,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_attribute_list_entry_get_file_reference";
@@ -508,30 +507,18 @@ int libfsntfs_mft_attribute_list_entry_get_file_reference(
 
 		return( -1 );
 	}
-	if( mft_entry_index == NULL )
+	if( file_reference == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry index.",
+		 "%s: invalid file reference.",
 		 function );
 
 		return( -1 );
 	}
-	if( sequence_number == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT entry index.",
-		 function );
-
-		return( -1 );
-	}
-	*mft_entry_index = attribute_list_entry->file_reference & 0xffffffffffffUL;
-	*sequence_number = (uint16_t) ( attribute_list_entry->file_reference >> 48 );
+	*file_reference = attribute_list_entry->file_reference;
 
 	return( 1 );
 }

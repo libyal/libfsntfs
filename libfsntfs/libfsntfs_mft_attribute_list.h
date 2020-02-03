@@ -87,7 +87,7 @@ int libfsntfs_mft_attribute_list_get_number_of_entries(
 int libfsntfs_mft_attribute_list_get_entry_by_index(
      libfsntfs_mft_attribute_list_t *attribute_list,
      int entry_index,
-     libfsntfs_mft_attribute_list_entry_t **attribute_list_entry,
+     libfsntfs_mft_attribute_list_entry_t **mft_attribute_list_entry,
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_list_compare_by_base_record_file_reference(

@@ -652,21 +652,21 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_mft_attribute_list_entry_get_type function
+/* Tests the libfsntfs_mft_attribute_list_entry_get_attribute_type function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_mft_attribute_list_entry_get_type(
+int fsntfs_test_mft_attribute_list_entry_get_attribute_type(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	libcerror_error_t *error = NULL;
-	uint32_t type            = 0;
+	uint32_t attribute_type  = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_mft_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_attribute_type(
 	          attribute_list_entry,
-	          &type,
+	          &attribute_type,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -675,8 +675,8 @@ int fsntfs_test_mft_attribute_list_entry_get_type(
 	 1 );
 
 	FSNTFS_TEST_ASSERT_EQUAL_UINT32(
-	 "type",
-	 type,
+	 "attribute_type",
+	 attribute_type,
 	 (uint32_t) 0x00000080UL );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
@@ -685,9 +685,9 @@ int fsntfs_test_mft_attribute_list_entry_get_type(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_mft_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_attribute_type(
 	          NULL,
-	          &type,
+	          &attribute_type,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -702,7 +702,7 @@ int fsntfs_test_mft_attribute_list_entry_get_type(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_mft_attribute_list_entry_get_type(
+	result = libfsntfs_mft_attribute_list_entry_get_attribute_type(
 	          attribute_list_entry,
 	          NULL,
 	          &error );
@@ -737,16 +737,14 @@ int fsntfs_test_mft_attribute_list_entry_get_file_reference(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry )
 {
 	libcerror_error_t *error = NULL;
-	uint64_t mft_entry_index = 0;
-	uint16_t sequence_number = 0;
+	uint64_t file_reference  = 0;
 	int result               = 0;
 
 	/* Test regular cases
 	 */
 	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
-	          &mft_entry_index,
-	          &sequence_number,
+	          &file_reference,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -762,8 +760,7 @@ int fsntfs_test_mft_attribute_list_entry_get_file_reference(
 	 */
 	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          NULL,
-	          &mft_entry_index,
-	          &sequence_number,
+	          &file_reference,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -780,25 +777,6 @@ int fsntfs_test_mft_attribute_list_entry_get_file_reference(
 
 	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
 	          attribute_list_entry,
-	          NULL,
-	          &sequence_number,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_mft_attribute_list_entry_get_file_reference(
-	          attribute_list_entry,
-	          &mft_entry_index,
 	          NULL,
 	          &error );
 
@@ -1697,8 +1675,8 @@ int main(
 	/* Run tests
 	 */
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_mft_attribute_list_entry_get_type",
-	 fsntfs_test_mft_attribute_list_entry_get_type,
+	 "libfsntfs_mft_attribute_list_entry_get_attribute_type",
+	 fsntfs_test_mft_attribute_list_entry_get_attribute_type,
 	 attribute_list_entry );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

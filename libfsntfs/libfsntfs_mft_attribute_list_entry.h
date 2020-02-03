@@ -35,9 +35,9 @@ typedef struct libfsntfs_mft_attribute_list_entry libfsntfs_mft_attribute_list_e
 
 struct libfsntfs_mft_attribute_list_entry
 {
-	/* The type
+	/* The attribute type
 	 */
-	uint32_t type;
+	uint32_t attribute_type;
 
 	/* The size
 	 */
@@ -78,15 +78,14 @@ int libfsntfs_mft_attribute_list_entry_read_data(
      size_t data_size,
      libcerror_error_t **error );
 
-int libfsntfs_mft_attribute_list_entry_get_type(
+int libfsntfs_mft_attribute_list_entry_get_attribute_type(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry,
      uint32_t *type,
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_list_entry_get_file_reference(
      libfsntfs_mft_attribute_list_entry_t *attribute_list_entry,
-     uint64_t *mft_entry_index,
-     uint16_t *sequence_number,
+     uint64_t *file_reference,
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
