@@ -184,6 +184,14 @@ int info_handle_file_entry_value_fprint(
      const system_character_t *path,
      libcerror_error_t **error );
 
+int info_handle_file_entry_value_with_name_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     const system_character_t *path,
+     const system_character_t *file_entry_name,
+     const system_character_t *data_stream_name,
+     libcerror_error_t **error );
+
 int info_handle_file_system_hierarchy_fprint_file_entry(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
