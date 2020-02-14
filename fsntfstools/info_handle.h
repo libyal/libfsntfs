@@ -181,10 +181,25 @@ int info_handle_volume_name_attribute_fprint(
 int info_handle_file_entry_value_fprint(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
-     const system_character_t *path,
      libcerror_error_t **error );
 
-int info_handle_file_entry_value_with_name_fprint(
+int info_handle_bodyfile_file_name_attribute_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_attribute_t *attribute,
+     const system_character_t *path,
+     const system_character_t *file_entry_name,
+     libcerror_error_t **error );
+
+int info_handle_bodyfile_file_entry_value_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     const system_character_t *path,
+     const system_character_t *file_entry_name,
+     const system_character_t *data_stream_name,
+     libcerror_error_t **error );
+
+int info_handle_bodyfile_file_entry_fprint(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
      const system_character_t *path,
