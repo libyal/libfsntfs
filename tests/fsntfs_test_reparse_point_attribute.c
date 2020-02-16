@@ -994,7 +994,6 @@ int main(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

@@ -647,7 +647,7 @@ int libfsntfs_file_entry_get_utf16_name(
      size_t utf16_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the name attribute index
+/* Retrieves the $FILE_NAME attribute index
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -1108,15 +1108,6 @@ int libfsntfs_attribute_get_data_vcn_range(
      libfsntfs_attribute_t *attribute,
      uint64_t *data_first_vcn,
      uint64_t *data_last_vcn,
-     libfsntfs_error_t **error );
-
-/* Retrieves the file reference
- * Returns 1 if successful or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_attribute_get_file_reference(
-     libfsntfs_attribute_t *attribute,
-     uint64_t *file_reference,
      libfsntfs_error_t **error );
 
 /* Retrieves the data size

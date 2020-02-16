@@ -873,7 +873,6 @@ int libfsntfs_internal_file_entry_get_attribute_by_index(
 		if( libfsntfs_attribute_initialize(
 		     &safe_attribute,
 		     mft_attribute,
-		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2430,7 +2429,7 @@ int libfsntfs_file_entry_get_utf16_name(
 	return( result );
 }
 
-/* Retrieves the name attribute index
+/* Retrieves the $FILE_NAME attribute index
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_file_entry_get_name_attribute_index(
@@ -2438,11 +2437,16 @@ int libfsntfs_file_entry_get_name_attribute_index(
      int *attribute_index,
      libcerror_error_t **error )
 {
+	uint8_t lookup_name_root[ 2 ]                        = { '.', 0 };
+
 	libfsntfs_attribute_t *attribute                     = NULL;
 	libfsntfs_file_name_values_t *file_name_values       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	uint8_t *lookup_name                                 = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_name_attribute_index";
+	size_t lookup_name_size                              = 0;
 	uint32_t attribute_type                              = 0;
+	uint8_t lookup_namespace                             = 0;
 	int number_of_attributes                             = 0;
 	int safe_attribute_index                             = 0;
 
@@ -2474,7 +2478,26 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 	if( internal_file_entry->directory_entry == NULL )
 	{
-		return( 0 );
+		lookup_name      = lookup_name_root;
+		lookup_name_size = 2;
+		lookup_namespace = LIBFSNTFS_FILE_NAME_NAMESPACE_DOS_WINDOWS;
+	}
+	else
+	{
+		if( internal_file_entry->directory_entry->file_name_values == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file entry - invalid directory entry - missing file name values.",
+			 function );
+
+			return( -1 );
+		}
+		lookup_name      = internal_file_entry->directory_entry->file_name_values->name;
+		lookup_name_size = internal_file_entry->directory_entry->file_name_values->name_size;
+		lookup_namespace = internal_file_entry->directory_entry->file_name_values->namespace;
 	}
 	if( libfsntfs_mft_entry_get_number_of_attributes(
 	     internal_file_entry->mft_entry,
@@ -2545,10 +2568,10 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 			return( -1 );
 		}
-		if( ( internal_file_entry->directory_entry->file_name_values->namespace == file_name_values->namespace )
-		 && ( internal_file_entry->directory_entry->file_name_values->name_size == file_name_values->name_size )
+		if( ( lookup_namespace == file_name_values->namespace )
+		 && ( lookup_name_size == file_name_values->name_size )
 		 && ( memory_compare(
-		       internal_file_entry->directory_entry->file_name_values->name,
+		       lookup_name,
 		       file_name_values->name,
 		       file_name_values->name_size ) == 0 ) )
 		{

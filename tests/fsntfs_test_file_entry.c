@@ -3965,26 +3965,6 @@ int fsntfs_test_file_entry_get_name_attribute_index(
 	 "error",
 	 error );
 
-	directory_entry = ( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry;
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry = NULL;
-
-	result = libfsntfs_file_entry_get_name_attribute_index(
-	          file_entry,
-	          &attribute_index,
-	          &error );
-
-	( (libfsntfs_internal_file_entry_t *) file_entry )->directory_entry = directory_entry;
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 0 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	/* Test error cases
 	 */
 	result = libfsntfs_file_entry_get_name_attribute_index(

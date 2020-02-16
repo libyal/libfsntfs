@@ -37,7 +37,6 @@
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_logged_utility_stream_values.h"
 #include "libfsntfs_mft_attribute.h"
-#include "libfsntfs_mft_attribute_list_entry.h"
 #include "libfsntfs_object_identifier_values.h"
 #include "libfsntfs_path_hint.h"
 #include "libfsntfs_reparse_point_values.h"
@@ -56,7 +55,6 @@
 int libfsntfs_attribute_initialize(
      libfsntfs_attribute_t **attribute,
      libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
@@ -84,16 +82,13 @@ int libfsntfs_attribute_initialize(
 
 		return( -1 );
 	}
-	if( ( ( mft_attribute == NULL )
-	  &&  ( mft_attribute_list_entry == NULL ) )
-	 || ( ( mft_attribute != NULL )
-	  &&  ( mft_attribute_list_entry != NULL ) ) )
+	if( mft_attribute == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid MFT attribute and MFT attribute list entry.",
+		 "%s: invalid MFT attribute.",
 		 function );
 
 		return( -1 );
@@ -144,8 +139,7 @@ int libfsntfs_attribute_initialize(
 		goto on_error;
 	}
 #endif
-	internal_attribute->mft_attribute            = mft_attribute;
-	internal_attribute->mft_attribute_list_entry = mft_attribute_list_entry;
+	internal_attribute->mft_attribute = mft_attribute;
 
 	*attribute = (libfsntfs_attribute_t *) internal_attribute;
 
@@ -210,7 +204,7 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
-		/* The mft_attribute and mft_attribute_list_entry references are freed elsewhere
+		/* The mft_attribute references is freed elsewhere
 		 */
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 		if( libcthreads_read_write_lock_free(
@@ -707,39 +701,19 @@ int libfsntfs_internal_attribute_get_type(
 
 		return( -1 );
 	}
-	if( internal_attribute->mft_attribute != NULL )
+	if( libfsntfs_mft_attribute_get_type(
+	     internal_attribute->mft_attribute,
+	     type,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_type(
-		     internal_attribute->mft_attribute,
-		     type,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve type from MFT attribute.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve type from MFT attribute.",
+		 function );
 
-			return( -1 );
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_attribute_type(
-		     internal_attribute->mft_attribute_list_entry,
-		     type,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute type from attribute list entry.",
-			 function );
-
-			return( -1 );
-		}
+		return( -1 );
 	}
 	return( 1 );
 }
@@ -985,39 +959,19 @@ int libfsntfs_attribute_get_utf8_name_size(
 		return( -1 );
 	}
 #endif
-	if( internal_attribute->mft_attribute != NULL )
+	if( libfsntfs_mft_attribute_get_utf8_name_size(
+	     internal_attribute->mft_attribute,
+	     utf8_string_size,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_utf8_name_size(
-		     internal_attribute->mft_attribute,
-		     utf8_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name size from MFT attribute.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size from MFT attribute.",
+		 function );
 
-			result = -1;
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_utf8_name_size(
-		     internal_attribute->mft_attribute_list_entry,
-		     utf8_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name size from attribute list entry.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1079,41 +1033,20 @@ int libfsntfs_attribute_get_utf8_name(
 		return( -1 );
 	}
 #endif
-	if( internal_attribute->mft_attribute != NULL )
+	if( libfsntfs_mft_attribute_get_utf8_name(
+	     internal_attribute->mft_attribute,
+	     utf8_string,
+	     utf8_string_size,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_utf8_name(
-		     internal_attribute->mft_attribute,
-		     utf8_string,
-		     utf8_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name from MFT attribute.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name from MFT attribute.",
+		 function );
 
-			result = -1;
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_utf8_name(
-		     internal_attribute->mft_attribute_list_entry,
-		     utf8_string,
-		     utf8_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 name from attribute list entry.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1174,39 +1107,19 @@ int libfsntfs_attribute_get_utf16_name_size(
 		return( -1 );
 	}
 #endif
-	if( internal_attribute->mft_attribute != NULL )
+	if( libfsntfs_mft_attribute_get_utf16_name_size(
+	     internal_attribute->mft_attribute,
+	     utf16_string_size,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_utf16_name_size(
-		     internal_attribute->mft_attribute,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 name size from MFT attribute.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size from MFT attribute.",
+		 function );
 
-			result = -1;
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_utf16_name_size(
-		     internal_attribute->mft_attribute_list_entry,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 name size from attribute list entry.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1268,41 +1181,20 @@ int libfsntfs_attribute_get_utf16_name(
 		return( -1 );
 	}
 #endif
-	if( internal_attribute->mft_attribute != NULL )
+	if( libfsntfs_mft_attribute_get_utf16_name(
+	     internal_attribute->mft_attribute,
+	     utf16_string,
+	     utf16_string_size,
+	     error ) != 1 )
 	{
-		if( libfsntfs_mft_attribute_get_utf16_name(
-		     internal_attribute->mft_attribute,
-		     utf16_string,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 name from MFT attribute.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name from MFT attribute.",
+		 function );
 
-			result = -1;
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_utf16_name(
-		     internal_attribute->mft_attribute_list_entry,
-		     utf16_string,
-		     utf16_string_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 name from attribute list entry.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -1407,92 +1299,6 @@ int libfsntfs_attribute_get_data_vcn_range(
 	}
 /* TODO add support for attribute list entry ? */
 
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_read(
-	     internal_attribute->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
-}
-
-/* Retrieves the file reference
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_attribute_get_file_reference(
-     libfsntfs_attribute_t *attribute,
-     uint64_t *file_reference,
-     libcerror_error_t **error )
-{
-	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_attribute_get_file_reference";
-	int result                                         = 1;
-
-	if( attribute == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid attribute.",
-		 function );
-
-		return( -1 );
-	}
-	internal_attribute = (libfsntfs_internal_attribute_t *) attribute;
-
-	if( file_reference == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file reference.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_read(
-	     internal_attribute->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for reading.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( internal_attribute->mft_attribute == NULL )
-	{
-		if( libfsntfs_mft_attribute_list_entry_get_file_reference(
-		     internal_attribute->mft_attribute_list_entry,
-		     file_reference,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file reference.",
-			 function );
-
-			result = -1;
-		}
-	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
 	     internal_attribute->read_write_lock,

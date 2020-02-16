@@ -1471,7 +1471,6 @@ int libfsntfs_internal_volume_get_volume_information_attribute(
 		if( libfsntfs_attribute_initialize(
 		     &( internal_volume->volume_information_attribute ),
 		     mft_attribute,
-		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1584,7 +1583,6 @@ int libfsntfs_internal_volume_get_volume_name_attribute(
 		if( libfsntfs_attribute_initialize(
 		     &( internal_volume->volume_name_attribute ),
 		     mft_attribute,
-		     NULL,
 		     error ) != 1 )
 		{
 			libcerror_error_set(

@@ -88,7 +88,6 @@ int fsntfs_test_attribute_initialize(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -126,7 +125,6 @@ int fsntfs_test_attribute_initialize(
 	result = libfsntfs_attribute_initialize(
 	          NULL,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -146,7 +144,6 @@ int fsntfs_test_attribute_initialize(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	attribute = NULL;
@@ -165,7 +162,6 @@ int fsntfs_test_attribute_initialize(
 
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
-	          NULL,
 	          NULL,
 	          &error );
 
@@ -194,7 +190,6 @@ int fsntfs_test_attribute_initialize(
 		result = libfsntfs_attribute_initialize(
 		          &attribute,
 		          mft_attribute,
-		          NULL,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -238,7 +233,6 @@ int fsntfs_test_attribute_initialize(
 		result = libfsntfs_attribute_initialize(
 		          &attribute,
 		          mft_attribute,
-		          NULL,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
@@ -486,7 +480,6 @@ int fsntfs_test_internal_attribute_read_value(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -569,7 +562,6 @@ int fsntfs_test_internal_attribute_read_value(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1859,137 +1851,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_attribute_get_file_reference function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_attribute_get_file_reference(
-     libfsntfs_attribute_t *attribute )
-{
-	libcerror_error_t *error = NULL;
-	uint64_t file_reference  = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_attribute_get_file_reference(
-	          attribute,
-	          &file_reference,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_attribute_get_file_reference(
-	          NULL,
-	          &file_reference,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_attribute_get_file_reference(
-	          attribute,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
-
-	/* Test libfsntfs_attribute_get_file_reference with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
-	 */
-	fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = 0;
-
-	result = libfsntfs_attribute_get_file_reference(
-	          attribute,
-	          &file_reference,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_rdlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-	/* Test libfsntfs_attribute_get_file_reference with pthread_rwlock_unlock failing in libcthreads_read_write_lock_release_for_read
-	 */
-	fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = 0;
-
-	result = libfsntfs_attribute_get_file_reference(
-	          attribute,
-	          &file_reference,
-	          &error );
-
-	if( fsntfs_test_pthread_rwlock_unlock_attempts_before_fail != -1 )
-	{
-		fsntfs_test_pthread_rwlock_unlock_attempts_before_fail = -1;
-	}
-	else
-	{
-		FSNTFS_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 /* Tests the libfsntfs_internal_attribute_get_data_size function
  * Returns 1 if successful or 0 if not
  */
@@ -2433,7 +2294,6 @@ int main(
 	result = libfsntfs_attribute_initialize(
 	          &attribute,
 	          mft_attribute,
-	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -2494,11 +2354,6 @@ int main(
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_attribute_get_data_vcn_range",
 	 fsntfs_test_attribute_get_data_vcn_range,
-	 attribute );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_attribute_get_file_reference",
-	 fsntfs_test_attribute_get_file_reference,
 	 attribute );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

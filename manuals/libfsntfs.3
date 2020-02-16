@@ -1,4 +1,4 @@
-.Dd February  3, 2020
+.Dd February 16, 2020
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -240,8 +240,6 @@ Attribute functions
 .Fn libfsntfs_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_attribute_get_data_vcn_range "libfsntfs_attribute_t *attribute" "uint64_t *data_first_vcn" "uint64_t *data_last_vcn" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_attribute_get_file_reference "libfsntfs_attribute_t *attribute" "uint64_t *file_reference" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_attribute_get_data_size "libfsntfs_attribute_t *attribute" "size64_t *data_size" "libfsntfs_error_t **error"
 .Pp

@@ -32,7 +32,6 @@
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
-#include "libfsntfs_mft_attribute_list_entry.h"
 #include "libfsntfs_path_hint.h"
 #include "libfsntfs_types.h"
 
@@ -47,10 +46,6 @@ struct libfsntfs_internal_attribute
 	/* The MFT attribute
 	 */
 	libfsntfs_mft_attribute_t *mft_attribute;
-
-	/* The MFT attribute list entry
-	 */
-	libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry;
 
 	/* The path hint
 	 */
@@ -76,7 +71,6 @@ struct libfsntfs_internal_attribute
 int libfsntfs_attribute_initialize(
      libfsntfs_attribute_t **attribute,
      libfsntfs_mft_attribute_t *mft_attribute,
-     libfsntfs_mft_attribute_list_entry_t *mft_attribute_list_entry,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
@@ -148,12 +142,6 @@ int libfsntfs_attribute_get_data_vcn_range(
      libfsntfs_attribute_t *attribute,
      uint64_t *data_first_vcn,
      uint64_t *data_last_vcn,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_attribute_get_file_reference(
-     libfsntfs_attribute_t *attribute,
-     uint64_t *file_reference,
      libcerror_error_t **error );
 
 int libfsntfs_internal_attribute_get_data_size(

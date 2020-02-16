@@ -4230,8 +4230,6 @@ int info_handle_file_entry_value_fprint(
 	uint64_t modification_time           = 0;
 	uint64_t parent_file_reference       = 0;
 	uint32_t file_attribute_flags        = 0;
-	uint32_t group_identifier            = 0;
-	uint32_t owner_identifier            = 0;
 	int result                           = 0;
 
 	if( info_handle == NULL )
@@ -4640,10 +4638,10 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 	uint64_t entry_modification_time = 0;
 	uint64_t file_reference          = 0;
 	uint64_t modification_time       = 0;
-	uint64_t parent_file_reference   = 0;
 	uint32_t file_attribute_flags    = 0;
 	uint32_t group_identifier        = 0;
 	uint32_t owner_identifier        = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -4666,20 +4664,6 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file reference.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_file_name_attribute_get_parent_file_reference(
-	     attribute,
-	     &parent_file_reference,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent file reference.",
 		 function );
 
 		return( -1 );
@@ -4768,8 +4752,22 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 
 		return( -1 );
 	}
-/* TODO move into function */
-	if( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_DIRECTORY ) != 0 )
+	result = libfsntfs_file_entry_has_directory_entries_index(
+		  file_entry,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has directory entries index.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
 	{
 		file_mode_string[ 0 ] = 'd';
 		file_mode_string[ 2 ] = 'd';
@@ -4807,8 +4805,8 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 		 "%" PRIs_SYSTEM "",
 		 file_entry_name );
 	}
-/* TODO determine owner and group */
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
+/* TODO determine $FILE_NAME attribute address */
 
 	fprintf(
 	 info_handle->bodyfile_stream,
@@ -4826,30 +4824,32 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 	return( 1 );
 }
 
-/* Prints a file entry value to a bodyfile
+/* Prints a $INDEX_ROOT attribute to a bodyfile
  * Returns 1 if successful, 0 if not or -1 on error
  */
-int info_handle_bodyfile_file_entry_value_fprint(
+int info_handle_bodyfile_index_root_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
+     libfsntfs_attribute_t *attribute,
      const system_character_t *path,
      const system_character_t *file_entry_name,
-     const system_character_t *data_stream_name,
+     const system_character_t *attribute_name,
+     size_t attribute_name_size,
      libcerror_error_t **error )
 {
 	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
-	static char *function            = "info_handle_bodyfile_file_entry_value_fprint";
+	static char *function            = "info_handle_bodyfile_index_root_attribute_fprint";
 	size64_t size                    = 0;
 	uint64_t access_time             = 0;
 	uint64_t creation_time           = 0;
 	uint64_t entry_modification_time = 0;
 	uint64_t file_reference          = 0;
 	uint64_t modification_time       = 0;
-	uint64_t parent_file_reference   = 0;
 	uint32_t file_attribute_flags    = 0;
 	uint32_t group_identifier        = 0;
 	uint32_t owner_identifier        = 0;
+	int result                       = 0;
 
 	if( info_handle == NULL )
 	{
@@ -4872,20 +4872,6 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve file reference.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfsntfs_file_entry_get_parent_file_reference(
-	     file_entry,
-	     &parent_file_reference,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent file reference.",
 		 function );
 
 		return( -1 );
@@ -4960,8 +4946,8 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		return( -1 );
 	}
-	if( libfsntfs_file_entry_get_size(
-	     file_entry,
+	if( libfsntfs_attribute_get_data_size(
+	     attribute,
 	     &size,
 	     error ) != 1 )
 	{
@@ -4969,13 +4955,266 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve size.",
+		 "%s: unable to retrieve data size.",
 		 function );
 
 		return( -1 );
 	}
-/* TODO move into function */
-	if( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_DIRECTORY ) != 0 )
+	result = libfsntfs_file_entry_has_directory_entries_index(
+		  file_entry,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has directory entries index.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		file_mode_string[ 0 ] = 'd';
+		file_mode_string[ 2 ] = 'd';
+	}
+	else
+	{
+		file_mode_string[ 0 ] = 'r';
+		file_mode_string[ 2 ] = 'r';
+	}
+	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
+	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
+	{
+		file_mode_string[ 4 ]  = '-';
+		file_mode_string[ 7 ]  = '-';
+		file_mode_string[ 10 ] = '-';
+	}
+	/* Colums in a Sleuthkit 3.x and later bodyfile
+	 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
+	 */
+	fprintf(
+	 info_handle->bodyfile_stream,
+	 "0|" );
+
+	if( path != NULL )
+	{
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 "%" PRIs_SYSTEM "",
+		 path );
+	}
+	if( file_entry_name != NULL )
+	{
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 "%" PRIs_SYSTEM "",
+		 file_entry_name );
+	}
+	if( ( attribute_name != NULL )
+         && ( ( attribute_name_size != 5 )
+	  ||  ( narrow_string_compare(
+	       attribute_name,
+	       "$I30",
+	       4 ) != 0 ) ) )
+	{
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 ":%" PRIs_SYSTEM "",
+		 attribute_name );
+	}
+/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
+/* TODO determine $INDEX_ROOT attribute address */
+
+	fprintf(
+	 info_handle->bodyfile_stream,
+	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+	 file_reference & 0xffffffffffffUL,
+	 file_mode_string,
+	 owner_identifier,
+	 group_identifier,
+	 size,
+	 (double) ( access_time - 116444736000000000L ) / 10000000,
+	 (double) ( modification_time - 116444736000000000L ) / 10000000,
+	 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
+	 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+
+	return( 1 );
+}
+
+/* Prints a file entry value to a bodyfile
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int info_handle_bodyfile_file_entry_value_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_data_stream_t *alternate_data_stream,
+     const system_character_t *path,
+     const system_character_t *file_entry_name,
+     const system_character_t *data_stream_name,
+     libcerror_error_t **error )
+{
+	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+
+	static char *function            = "info_handle_bodyfile_file_entry_value_fprint";
+	size64_t size                    = 0;
+	uint64_t access_time             = 0;
+	uint64_t creation_time           = 0;
+	uint64_t entry_modification_time = 0;
+	uint64_t file_reference          = 0;
+	uint64_t modification_time       = 0;
+	uint32_t file_attribute_flags    = 0;
+	uint32_t group_identifier        = 0;
+	uint32_t owner_identifier        = 0;
+	int result                       = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_file_reference(
+	     file_entry,
+	     &file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_creation_time(
+	     file_entry,
+	     &creation_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_modification_time(
+	     file_entry,
+	     &modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_access_time(
+	     file_entry,
+	     &access_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_entry_modification_time(
+	     file_entry,
+	     &entry_modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_file_attribute_flags(
+	     file_entry,
+	     &file_attribute_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		return( -1 );
+	}
+	if( alternate_data_stream != NULL )
+	{
+		if( libfsntfs_data_stream_get_size(
+		     alternate_data_stream,
+		     &size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( libfsntfs_file_entry_get_size(
+		     file_entry,
+		     &size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	result = libfsntfs_file_entry_has_directory_entries_index(
+		  file_entry,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has directory entries index.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
 	{
 		file_mode_string[ 0 ] = 'd';
 		file_mode_string[ 2 ] = 'd';
@@ -5020,14 +5259,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 ":%" PRIs_SYSTEM "",
 		 data_stream_name );
 	}
-/* TODO determine owner and group */
-
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
-/* TODO determine $DATA attribute address */
+/* TODO determine $DATA or $INDEX_ROOT attribute address */
 
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 "|%" PRIu64 "-128-1|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
 	 file_reference & 0xffffffffffffUL,
 	 file_mode_string,
 	 owner_identifier,
@@ -5041,128 +5278,6 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	return( 1 );
 }
 
-/* Prints a file entry to a bodyfile
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int info_handle_bodyfile_file_entry_fprint(
-     info_handle_t *info_handle,
-     libfsntfs_file_entry_t *file_entry,
-     const system_character_t *path,
-     const system_character_t *file_entry_name,
-     const system_character_t *data_stream_name,
-     libcerror_error_t **error )
-{
-	libfsntfs_attribute_t *attribute = NULL;
-	static char *function            = "info_handle_bodyfile_file_entry_fprint";
-	int name_attribute_index         = 0;
-	int result                       = 0;
-
-	if( info_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid info handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( info_handle_bodyfile_file_entry_value_fprint(
-	     info_handle,
-	     file_entry,
-	     path,
-	     file_entry_name,
-	     data_stream_name,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print file entry.",
-		 function );
-
-		goto on_error;
-	}
-	result = libfsntfs_file_entry_get_name_attribute_index(
-	          file_entry,
-	          &name_attribute_index,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name attribute index.",
-		 function );
-
-		goto on_error;
-	}
-	else if( result != 0 )
-	{
-		if( libfsntfs_file_entry_get_attribute_by_index(
-		     file_entry,
-		     name_attribute_index,
-		     &attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve $FILE_NAME attribute: %d.",
-			 function,
-			 name_attribute_index );
-
-			goto on_error;
-		}
-		if( info_handle_bodyfile_file_name_attribute_fprint(
-		     info_handle,
-		     file_entry,
-		     attribute,
-		     path,
-		     file_entry_name,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print $FILE_NAME attribute.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_free(
-		     &attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free attribute: %d.",
-			 function,
-			 name_attribute_index );
-
-			goto on_error;
-		}
-	}
-	return( 1 );
-
-on_error:
-	if( attribute != NULL )
-	{
-		libfsntfs_attribute_free(
-		 &attribute,
-		 NULL );
-	}
-	return( -1 );
-}
-
 /* Prints file entry information as part of the file system hierarchy
  * Returns 1 if successful or -1 on error
  */
@@ -5172,20 +5287,27 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
      const system_character_t *path,
      libcerror_error_t **error )
 {
+	libfsntfs_attribute_t *attribute               = NULL;
 	libfsntfs_data_stream_t *alternate_data_stream = NULL;
 	libfsntfs_file_entry_t *sub_file_entry         = NULL;
+	system_character_t *attribute_name             = NULL;
 	system_character_t *data_stream_name           = NULL;
 	system_character_t *file_entry_name            = NULL;
 	system_character_t *sub_path                   = NULL;
 	static char *function                          = "info_handle_file_system_hierarchy_fprint_file_entry";
+	size_t attribute_name_size                     = 0;
 	size_t data_stream_name_size                   = 0;
 	size_t file_entry_name_size                    = 0;
 	size_t path_length                             = 0;
 	size_t sub_path_size                           = 0;
+	uint32_t attribute_type                        = 0;
 	int alternate_data_stream_index                = 0;
+	int attribute_index                            = 0;
 	int has_default_data_stream                    = 0;
-	int has_directory_entries_index                = 0;
+	int has_index_root_attributes                  = 0;
+	int name_attribute_index                       = 0;
 	int number_of_alternate_data_streams           = 0;
+	int number_of_attributes                       = 0;
 	int number_of_sub_file_entries                 = 0;
 	int result                                     = 0;
 	int sub_file_entry_index                       = 0;
@@ -5229,23 +5351,6 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 	}
 	has_default_data_stream = result;
 
-	result = libfsntfs_file_entry_has_directory_entries_index(
-		  file_entry,
-		  error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if file entry has directory entries index.",
-		 function );
-
-		goto on_error;
-	}
-	has_directory_entries_index = result;
-
 	if( libfsntfs_file_entry_get_number_of_alternate_data_streams(
 	     file_entry,
 	     &number_of_alternate_data_streams,
@@ -5256,20 +5361,6 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve number of alternate data streams.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_file_entry_get_number_of_sub_file_entries(
-	     file_entry,
-	     &number_of_sub_file_entries,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of sub file entries.",
 		 function );
 
 		goto on_error;
@@ -5340,17 +5431,210 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 
 			goto on_error;
 		}
-		/* Do not print the name of files that have an ADS but no default data stream.
+		if( libfsntfs_file_entry_get_number_of_attributes(
+		     file_entry,
+		     &number_of_attributes,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of attributes.",
+			 function );
+
+			goto on_error;
+		}
+		for( attribute_index = 0;
+		     attribute_index < number_of_attributes;
+		     attribute_index++ )
+		{
+			if( libfsntfs_file_entry_get_attribute_by_index(
+			     file_entry,
+			     attribute_index,
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute: %d.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+			if( libfsntfs_attribute_get_type(
+			     attribute,
+			     &attribute_type,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve attribute type.",
+				 function );
+
+				goto on_error;
+			}
+			if( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT )
+			{
+				/* Mimic Sleuthkit behavior printing indexes
+				 */
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+				result = libfsntfs_attribute_get_utf16_name_size(
+				          attribute,
+				          &attribute_name_size,
+				          error );
+#else
+				result = libfsntfs_attribute_get_utf8_name_size(
+				          attribute,
+				          &attribute_name_size,
+				          error );
+#endif
+				if( result != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve attribute name string size.",
+					 function );
+
+					goto on_error;
+				}
+				if( attribute_name_size > 0 )
+				{
+					attribute_name = system_string_allocate(
+					                  attribute_name_size );
+
+					if( attribute_name == NULL )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_MEMORY,
+						 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+						 "%s: unable to create name string.",
+						 function );
+
+						goto on_error;
+					}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+					result = libfsntfs_attribute_get_utf16_name(
+					          attribute,
+					          (uint16_t *) attribute_name,
+					          attribute_name_size,
+					          error );
+#else
+					result = libfsntfs_attribute_get_utf8_name(
+					          attribute,
+					          (uint8_t *) attribute_name,
+					          attribute_name_size,
+					          error );
+#endif
+					if( result != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve attribute name string.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				if( info_handle->bodyfile_stream != NULL )
+				{
+					if( info_handle_bodyfile_index_root_attribute_fprint(
+					     info_handle,
+					     file_entry,
+					     attribute,
+					     path,
+					     file_entry_name,
+					     attribute_name,
+					     attribute_name_size,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+						 "%s: unable to print file entry.",
+						 function );
+
+						goto on_error;
+					}
+				}
+				else
+				{
+					fprintf(
+					 info_handle->notify_stream,
+					 "%" PRIs_SYSTEM "",
+					 path );
+
+					if( file_entry_name != NULL )
+					{
+						fprintf(
+						 info_handle->notify_stream,
+						 "%" PRIs_SYSTEM "",
+						 file_entry_name );
+					}
+					if( ( attribute_name != NULL )
+					 && ( ( attribute_name_size != 5 )
+					  ||  ( narrow_string_compare(
+					       attribute_name,
+					       "$I30",
+					       4 ) != 0 ) ) )
+					{
+						fprintf(
+						 info_handle->bodyfile_stream,
+						 ":%" PRIs_SYSTEM "",
+						 attribute_name );
+					}
+					fprintf(
+					 info_handle->notify_stream,
+					 "\n" );
+				}
+				if( attribute_name != NULL )
+				{
+					memory_free(
+					 attribute_name );
+
+					attribute_name = NULL;
+				}
+				has_index_root_attributes = 1;
+			}
+			if( libfsntfs_attribute_free(
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute: %d.",
+				 function,
+				 attribute_index );
+
+				goto on_error;
+			}
+		}
+		/* Do not print the name of file entries that have an ADS but no default data stream
+		 * and file entries that have $INDEX_ROOT attributes.
 		 */
-		if( ( has_default_data_stream != 0 )
-		 || ( has_directory_entries_index != 0 )
-		 || ( number_of_alternate_data_streams == 0 ) )
+		if( ( has_index_root_attributes == 0 )
+		 && ( ( has_default_data_stream != 0 )
+		  ||  ( number_of_alternate_data_streams == 0 ) ) )
 		{
 			if( info_handle->bodyfile_stream != NULL )
 			{
-				if( info_handle_bodyfile_file_entry_fprint(
+				if( info_handle_bodyfile_file_entry_value_fprint(
 				     info_handle,
 				     file_entry,
+				     NULL,
 				     path,
 				     file_entry_name,
 				     NULL,
@@ -5472,9 +5756,10 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				}
 				if( info_handle->bodyfile_stream != NULL )
 				{
-					if( info_handle_bodyfile_file_entry_fprint(
+					if( info_handle_bodyfile_file_entry_value_fprint(
 					     info_handle,
 					     file_entry,
+					     alternate_data_stream,
 					     path,
 					     file_entry_name,
 					     data_stream_name,
@@ -5508,12 +5793,11 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 					fprintf(
 					 info_handle->notify_stream,
 					 "\n" );
-
-					memory_free(
-					 data_stream_name );
-
-					data_stream_name = NULL;
 				}
+				memory_free(
+				 data_stream_name );
+
+				data_stream_name = NULL;
 			}
 			if( libfsntfs_data_stream_free(
 			     &alternate_data_stream,
@@ -5530,6 +5814,110 @@ int info_handle_file_system_hierarchy_fprint_file_entry(
 				goto on_error;
 			}
 		}
+	}
+	else if( info_handle->bodyfile_stream != NULL )
+	{
+		if( info_handle_bodyfile_file_entry_value_fprint(
+		     info_handle,
+		     file_entry,
+		     NULL,
+		     path,
+		     NULL,
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( info_handle->bodyfile_stream != NULL )
+	{
+		result = libfsntfs_file_entry_get_name_attribute_index(
+		          file_entry,
+		          &name_attribute_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve name attribute index.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			if( libfsntfs_file_entry_get_attribute_by_index(
+			     file_entry,
+			     name_attribute_index,
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve $FILE_NAME attribute: %d.",
+				 function,
+				 name_attribute_index );
+
+				goto on_error;
+			}
+			if( info_handle_bodyfile_file_name_attribute_fprint(
+			     info_handle,
+			     file_entry,
+			     attribute,
+			     path,
+			     file_entry_name,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print $FILE_NAME attribute.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfsntfs_attribute_free(
+			     &attribute,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free attribute: %d.",
+				 function,
+				 name_attribute_index );
+
+				goto on_error;
+			}
+		}
+	}
+	if( libfsntfs_file_entry_get_number_of_sub_file_entries(
+	     file_entry,
+	     &number_of_sub_file_entries,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sub file entries.",
+		 function );
+
+		goto on_error;
 	}
 	if( number_of_sub_file_entries > 0 )
 	{
@@ -5667,6 +6055,12 @@ on_error:
 		memory_free(
 		 sub_path );
 	}
+	if( attribute != NULL )
+	{
+		libfsntfs_attribute_free(
+		 &attribute,
+		 NULL );
+	}
 	if( data_stream_name != NULL )
 	{
 		memory_free(
@@ -5677,6 +6071,11 @@ on_error:
 		libfsntfs_data_stream_free(
 		 &alternate_data_stream,
 		 NULL );
+	}
+	if( attribute_name != NULL )
+	{
+		memory_free(
+		 attribute_name );
 	}
 	if( file_entry_name != NULL )
 	{
@@ -5794,6 +6193,7 @@ int info_handle_mft_entry_fprint(
 			if( info_handle_bodyfile_file_entry_value_fprint(
 			     info_handle,
 			     file_entry,
+			     NULL,
 			     NULL,
 			     NULL,
 			     NULL,
