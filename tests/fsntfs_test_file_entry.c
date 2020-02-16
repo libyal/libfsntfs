@@ -3938,11 +3938,10 @@ on_error:
 int fsntfs_test_file_entry_get_name_attribute_index(
      libfsntfs_file_entry_t *file_entry )
 {
-	libcerror_error_t *error                     = NULL;
-	libfsntfs_directory_entry_t *directory_entry = NULL;
-	libfsntfs_mft_entry_t *mft_entry             = NULL;
-	int attribute_index                          = 0;
-	int result                                   = 0;
+	libcerror_error_t *error         = NULL;
+	libfsntfs_mft_entry_t *mft_entry = NULL;
+	int attribute_index              = 0;
+	int result                       = 0;
 
 	/* Test regular cases
 	 */
