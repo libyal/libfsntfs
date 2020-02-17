@@ -718,22 +718,19 @@ int libfsntfs_file_system_read_mft(
 
 		goto on_error;
 	}
-	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) != 0 )
+	if( libcdata_btree_initialize(
+	     &( file_system->path_hints_tree ),
+	     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
+	     error ) != 1 )
 	{
-		if( libcdata_btree_initialize(
-		     &( file_system->path_hints_tree ),
-		     LIBFSNTFS_INDEX_TREE_MAXIMUM_NUMBER_OF_SUB_NODES,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create path hints B-tree.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create path hints B-tree.",
+		 function );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
