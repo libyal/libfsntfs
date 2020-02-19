@@ -183,13 +183,6 @@ int info_handle_file_entry_value_fprint(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );
 
-int info_handle_bodyfile_attribute_fprint(
-     info_handle_t *info_handle,
-     libfsntfs_file_entry_t *file_entry,
-     libfsntfs_attribute_t *attribute,
-     int attribute_index,
-     libcerror_error_t **error );
-
 int info_handle_bodyfile_file_name_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
@@ -215,6 +208,19 @@ int info_handle_bodyfile_file_entry_value_fprint(
      const system_character_t *path,
      const system_character_t *file_entry_name,
      const system_character_t *data_stream_name,
+     libcerror_error_t **error );
+
+int info_handle_bodyfile_mft_entry_fprint(
+     info_handle_t *info_handle,
+     uint64_t mft_entry_index,
+     libcerror_error_t **error );
+
+int info_handle_file_entry_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_attribute_t *file_name_attribute,
+     const system_character_t *path,
+     const system_character_t *file_entry_name,
      libcerror_error_t **error );
 
 int info_handle_file_system_hierarchy_fprint_file_entry(
