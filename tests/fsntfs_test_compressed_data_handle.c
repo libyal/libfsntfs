@@ -322,6 +322,8 @@ int fsntfs_test_compressed_data_handle_initialize(
 	 "error",
 	 error );
 
+	compressed_data_stream = NULL;
+
 	result = libfsntfs_compressed_data_handle_free(
 	          &compressed_data_handle,
 	          &error );
@@ -334,6 +336,27 @@ int fsntfs_test_compressed_data_handle_initialize(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "compressed_data_handle",
 	 compressed_data_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_cluster_block_stream_initialize_from_data(
+	          &compressed_data_stream,
+	          fsntfs_test_compressed_data_handle_lzxpress_huffman_compressed_data1,
+	          3414,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "compressed_data_stream",
+	 compressed_data_stream );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -444,6 +467,8 @@ int fsntfs_test_compressed_data_handle_initialize(
 
 			if( compressed_data_handle != NULL )
 			{
+				compressed_data_handle->compressed_data_stream = NULL;
+
 				libfsntfs_compressed_data_handle_free(
 				 &compressed_data_handle,
 				 NULL );
@@ -489,6 +514,8 @@ int fsntfs_test_compressed_data_handle_initialize(
 
 			if( compressed_data_handle != NULL )
 			{
+				compressed_data_handle->compressed_data_stream = NULL;
+
 				libfsntfs_compressed_data_handle_free(
 				 &compressed_data_handle,
 				 NULL );
@@ -664,6 +691,8 @@ int fsntfs_test_compressed_data_handle_get_compressed_block_offsets(
 	 "error",
 	 error );
 
+	compressed_data_stream = NULL;
+
 	/* Test regular cases
 	 */
 	result = libfsntfs_compressed_data_handle_get_compressed_block_offsets(
@@ -713,23 +742,6 @@ int fsntfs_test_compressed_data_handle_get_compressed_block_offsets(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "compressed_data_handle",
 	 compressed_data_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfdata_stream_free(
-	          &compressed_data_stream,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "compressed_data_stream",
-	 compressed_data_stream );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -816,6 +828,8 @@ int fsntfs_test_compressed_data_handle_read_segment_data(
 	 "error",
 	 error );
 
+	compressed_data_stream = NULL;
+
 	/* Test regular cases
 	 */
 	read_count = libfsntfs_compressed_data_handle_read_segment_data(
@@ -828,8 +842,6 @@ int fsntfs_test_compressed_data_handle_read_segment_data(
 	              0,
 	              0,
 	              &error );
-
-FSNTFS_TEST_FPRINT_ERROR( error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT64(
 	 "read_count",
@@ -963,23 +975,6 @@ FSNTFS_TEST_FPRINT_ERROR( error );
 	 "error",
 	 error );
 
-	result = libfdata_stream_free(
-	          &compressed_data_stream,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "compressed_data_stream",
-	 compressed_data_stream );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 	return( 1 );
 
 on_error:
@@ -1055,6 +1050,8 @@ int fsntfs_test_compressed_data_handle_seek_segment_offset(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+	compressed_data_stream = NULL;
 
 	/* Test regular cases
 	 */
@@ -1151,23 +1148,6 @@ int fsntfs_test_compressed_data_handle_seek_segment_offset(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "compressed_data_handle",
 	 compressed_data_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	result = libfdata_stream_free(
-	          &compressed_data_stream,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "compressed_data_stream",
-	 compressed_data_stream );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

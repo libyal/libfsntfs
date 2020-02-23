@@ -1,6 +1,8 @@
 TODO
-* attribute list expose list data MFT entries in API
-* fsntfsinfo for list attributes print MFT entry
+* test if format version 1.2 is supported and updated README
+
+* refactor $I30 index to file entry
+** refactor libfsntfs_mft_entry_has_directory_entries_index
 
 * Ntfs compressed stream add uncompressed size check
 * add raw (no valid size) data stream support
@@ -20,6 +22,7 @@ TODO
 
 * MFT entry
 ** preserve attribute list data MFT entries?
+** libfsntfs_attribute add function to indicate partial attribute (has attribute_list_entry but no mft_attribute)
 
 * fsntfsinfo complete bodyfile support
 ** fix libfsntfs_file_entry_get_security_descriptor_size: unable to retrieve security descriptor from index for identifier: 0.
@@ -34,9 +37,6 @@ TODO
 
 * add debug compare of long and short names
 
-* refactor $I30 index to file entry
-** refactor libfsntfs_mft_entry_has_directory_entries_index
-
 * refactor index to better handle get entry by identifier
 ** make index value cache a passthrough for index node cache
 ** use tree for get entry by filename
@@ -50,10 +50,6 @@ TODO
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 
 * libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
-
-* create directory type and wrap directory_entries_tree
-
-* libfsntfs_attribute add function to indicate partial attribute (has attribute_list_entry but no mft_attribute)
 
 * Check if mft_entry should be cloned before passing to
   libfsntfs_file_entry_initialize in case it is cached out
@@ -70,40 +66,17 @@ TODO
 * enforce LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY when trying to read data runs
 * fix or remove TODO_CASE_INSENSITIVE
 
-* libfsntfs_volume_get_root_directory return 0 if MFT entry 5 does not exists
-
-* create directory type and wrap directory_entries_tree
-
-* Check if mft_entry should be cloned before passing to
-  libfsntfs_file_entry_initialize in case it is cached out
-  otherwise remove it from file_entry
-
-* tests: pass mft_metadata_file different input files
-* look into handling directories with high number of entries
-* libfsntfs/pyfsntfs attribute
-  - expose raw attribute data?
-* USN change journal
-  - add support for values in $Max
-* resident data
-  - handle valid data size
 * compressed data
   - handle decompression errors e.g.
     compression tuple offset value out of bounds.
   - have means to map sparse ranges outside compressed blocks
   - handle valid data size
-* make get by path/name functions case insensitive
-  - determine if NTFS really is case insensitive and make appropriate changes
-  - maybe have a flag or different functions to control case in compare
 * create fsntfsexport tool to export file entry data
 * handle pre 3.1 attribute names?
 * check file entry life times
 * set file entry name, if get by index and number of filenames is 1
 
-* volume cache directory entries trees ?
 * cached indexes?
-* handle cached out MFT entries
-  - copy directory entries in file entry
-  - copy directory index in file entry
 * data runs block
   - add a check to see if data run sizes add up
 * volume
@@ -140,8 +113,6 @@ TODO
 * change MFT entry flags value checks to named definitions
 * attribute data parsing
   - add SSIZE_MAX check for attribute->data_size before (size_t) cast
-* move directory entry btree into index ?
-* merge i30_index and alternate_index_array
 
 * cached approach of reading attributes ?
 

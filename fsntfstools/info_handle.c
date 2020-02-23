@@ -5358,184 +5358,182 @@ int info_handle_bodyfile_mft_entry_fprint(
 
 		goto on_error;
 	}
-	else if( is_empty != 0 )
+	else if( is_empty == 0 )
 	{
-		return( 1 );
-	}
-	if( libfsntfs_file_entry_get_base_record_file_reference(
-	     file_entry,
-	     &base_record_file_reference,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve base record file reference.",
-		 function );
-
-		goto on_error;
-	}
-	if( base_record_file_reference != 0 )
-	{
-		return( 1 );
-	}
-	if( libfsntfs_file_entry_get_number_of_attributes(
-	     file_entry,
-	     &number_of_attributes,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of attributes.",
-		 function );
-
-		goto on_error;
-	}
-	for( attribute_index = 0;
-	     attribute_index < number_of_attributes;
-	     attribute_index++ )
-	{
-		if( libfsntfs_file_entry_get_attribute_by_index(
+		if( libfsntfs_file_entry_get_base_record_file_reference(
 		     file_entry,
-		     attribute_index,
-		     &attribute,
+		     &base_record_file_reference,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute: %d.",
-			 function,
-			 attribute_index );
-
-			goto on_error;
-		}
-		if( libfsntfs_attribute_get_type(
-		     attribute,
-		     &attribute_type,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve attribute type.",
+			 "%s: unable to retrieve base record file reference.",
 			 function );
 
 			goto on_error;
 		}
-		if( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+		if( base_record_file_reference == 0 )
 		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libfsntfs_file_entry_get_utf16_path_hint_size(
-			          file_entry,
-			          attribute_index,
-			          &path_hint_size,
-			          error );
-#else
-			result = libfsntfs_file_entry_get_utf8_path_hint_size(
-			          file_entry,
-			          attribute_index,
-			          &path_hint_size,
-			          error );
-#endif
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve path hint string size.",
-				 function );
-
-				goto on_error;
-			}
-			if( ( result != 0 )
-			 && ( path_hint_size > 0 ) )
-			{
-				path_hint = system_string_allocate(
-				             path_hint_size );
-
-				if( path_hint == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_MEMORY,
-					 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create path hint string.",
-					 function );
-
-					goto on_error;
-				}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libfsntfs_file_entry_get_utf16_path_hint(
-				          file_entry,
-				          attribute_index,
-				          (uint16_t *) path_hint,
-				          path_hint_size,
-				          error );
-#else
-				result = libfsntfs_file_entry_get_utf8_path_hint(
-				          file_entry,
-				          attribute_index,
-				          (uint8_t *) path_hint,
-				          path_hint_size,
-				          error );
-#endif
-				if( result != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve path hint string.",
-					 function );
-
-					goto on_error;
-				}
-			}
-			if( info_handle_file_entry_fprint(
-			     info_handle,
+			if( libfsntfs_file_entry_get_number_of_attributes(
 			     file_entry,
-			     attribute,
-			     path_hint,
-			     NULL,
+			     &number_of_attributes,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print file entry.",
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve number of attributes.",
 				 function );
 
 				goto on_error;
 			}
-			if( path_hint != NULL )
+			for( attribute_index = 0;
+			     attribute_index < number_of_attributes;
+			     attribute_index++ )
 			{
-				memory_free(
-				 path_hint );
+				if( libfsntfs_file_entry_get_attribute_by_index(
+				     file_entry,
+				     attribute_index,
+				     &attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve attribute: %d.",
+					 function,
+					 attribute_index );
 
-				path_hint = NULL;
+					goto on_error;
+				}
+				if( libfsntfs_attribute_get_type(
+				     attribute,
+				     &attribute_type,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve attribute type.",
+					 function );
+
+					goto on_error;
+				}
+				if( attribute_type == LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME )
+				{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+					result = libfsntfs_file_entry_get_utf16_path_hint_size(
+					          file_entry,
+					          attribute_index,
+					          &path_hint_size,
+					          error );
+#else
+					result = libfsntfs_file_entry_get_utf8_path_hint_size(
+					          file_entry,
+					          attribute_index,
+					          &path_hint_size,
+					          error );
+#endif
+					if( result == -1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+						 "%s: unable to retrieve path hint string size.",
+						 function );
+
+						goto on_error;
+					}
+					if( ( result != 0 )
+					 && ( path_hint_size > 0 ) )
+					{
+						path_hint = system_string_allocate(
+						             path_hint_size );
+
+						if( path_hint == NULL )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_MEMORY,
+							 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+							 "%s: unable to create path hint string.",
+							 function );
+
+							goto on_error;
+						}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+						result = libfsntfs_file_entry_get_utf16_path_hint(
+						          file_entry,
+						          attribute_index,
+						          (uint16_t *) path_hint,
+						          path_hint_size,
+						          error );
+#else
+						result = libfsntfs_file_entry_get_utf8_path_hint(
+						          file_entry,
+						          attribute_index,
+						          (uint8_t *) path_hint,
+						          path_hint_size,
+						          error );
+#endif
+						if( result != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+							 "%s: unable to retrieve path hint string.",
+							 function );
+
+							goto on_error;
+						}
+					}
+					if( info_handle_file_entry_fprint(
+					     info_handle,
+					     file_entry,
+					     attribute,
+					     path_hint,
+					     NULL,
+					     error ) != 1 )
+					{
+						libcerror_error_set(
+						 error,
+						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+						 "%s: unable to print file entry.",
+						 function );
+
+						goto on_error;
+					}
+					if( path_hint != NULL )
+					{
+						memory_free(
+						 path_hint );
+
+						path_hint = NULL;
+					}
+				}
+				if( libfsntfs_attribute_free(
+				     &attribute,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+					 "%s: unable to free attribute: %d.",
+					 function,
+					 attribute_index );
+
+					goto on_error;
+				}
 			}
-		}
-		if( libfsntfs_attribute_free(
-		     &attribute,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free attribute: %d.",
-			 function,
-			 attribute_index );
-
-			goto on_error;
 		}
 	}
 	if( libfsntfs_file_entry_free(
@@ -5813,7 +5811,7 @@ int info_handle_file_entry_fprint(
 				       4 ) != 0 ) ) )
 				{
 					fprintf(
-					 info_handle->bodyfile_stream,
+					 info_handle->notify_stream,
 					 ":%" PRIs_SYSTEM "",
 					 attribute_name );
 				}

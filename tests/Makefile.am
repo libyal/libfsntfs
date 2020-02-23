@@ -27,12 +27,14 @@ endif
 TESTS = \
 	test_library.sh \
 	test_fsntfsinfo.sh \
+	test_fsntfsinfo_bodyfile.sh \
 	$(TESTS_PYFSNTFS)
 
 check_SCRIPTS = \
 	pyfsntfs_test_support.py \
 	pyfsntfs_test_volume.py \
 	test_fsntfsinfo.sh \
+	test_fsntfsinfo_bodyfile.sh \
 	test_library.sh \
 	test_manpage.sh \
 	test_python_module.sh \

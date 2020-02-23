@@ -2255,14 +2255,13 @@ int libfsntfs_directory_entries_tree_read_element_data(
 			}
 		}
 	}
-/* TODO remove free function after pinning to libfcache >= 20191115 */
 	if( libfdata_list_element_set_element_value(
 	     element,
 	     (intptr_t *) file_io_handle,
 	     cache,
 	     (intptr_t *) directory_entry,
 	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_directory_entry_free,
-	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_NON_MANAGED,
+	     LIBFDATA_LIST_ELEMENT_VALUE_FLAG_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

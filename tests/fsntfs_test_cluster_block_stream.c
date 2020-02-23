@@ -930,6 +930,8 @@ int fsntfs_test_cluster_block_stream_initialize_from_compressed_stream(
 	 "error",
 	 error );
 
+	compressed_data_stream = NULL;
+
 	/* Clean up
 	 */
 	result = libfdata_stream_free(
@@ -944,6 +946,23 @@ int fsntfs_test_cluster_block_stream_initialize_from_compressed_stream(
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "cluster_block_stream",
 	 cluster_block_stream );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libfsntfs_cluster_block_stream_initialize_from_data(
+	          &compressed_data_stream,
+	          buffer,
+	          64,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

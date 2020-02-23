@@ -30,6 +30,7 @@
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libfdata.h"
 #include "libfsntfs_unused.h"
 
 /* Creates compressed data handle
@@ -238,6 +239,12 @@ int libfsntfs_compressed_data_handle_free(
 		{
 			memory_free(
 			 ( *data_handle )->compressed_block_offsets );
+		}
+		if( ( *data_handle )->compressed_data_stream != NULL )
+		{
+			libfdata_stream_free(
+			 &( ( *data_handle )->compressed_data_stream ),
+			 NULL );
 		}
 		memory_free(
 		 *data_handle );
