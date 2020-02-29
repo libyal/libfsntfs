@@ -161,6 +161,8 @@ install:
 - cmd: git clone https://github.com/codecov/codecov-bash.git ..\codecov-bash
 - cmd: if [%BUILD_ENVIRONMENT%]==[msbuild] (
     git clone https://github.com/libyal/vstools.git ..\vstools )
+- ps: If (($env:BUILD_ENVIRONMENT -eq "msbuild") -And (Test-Path ".\synctestdata.ps1")) {
+    .\synctestdata.ps1 }
 - ps: If ($env:BUILD_ENVIRONMENT -eq "msbuild") {
     If (($env:TARGET -eq "vs2017") -Or ($env:TARGET -eq "vs2019")) {
       .\syncdokan.ps1 }
