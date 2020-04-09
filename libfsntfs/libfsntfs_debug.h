@@ -55,8 +55,8 @@ void libfsntfs_debug_print_reparse_point_tag(
 const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );
 
-const char *libfsntfs_debug_print_file_name_attribute_namespace(
-             uint8_t namespace );
+const char *libfsntfs_debug_print_file_name_attribute_name_space(
+             uint8_t name_space );
 
 const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );

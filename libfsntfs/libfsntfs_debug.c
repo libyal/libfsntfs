@@ -371,23 +371,23 @@ const char *libfsntfs_debug_print_collation_type(
 	return( "Unknown" );
 }
 
-/* Prints the file name attribute namespace
+/* Prints the file name attribute name space
  */
-const char *libfsntfs_debug_print_file_name_attribute_namespace(
-             uint8_t namespace )
+const char *libfsntfs_debug_print_file_name_attribute_name_space(
+             uint8_t name_space )
 {
-	switch( namespace )
+	switch( name_space )
 	{
-		case LIBFSNTFS_FILE_NAME_NAMESPACE_POSIX:
+		case LIBFSNTFS_FILE_NAME_SPACE_POSIX:
 			return( "POSIX" );
 
-		case LIBFSNTFS_FILE_NAME_NAMESPACE_WINDOWS:
+		case LIBFSNTFS_FILE_NAME_SPACE_WINDOWS:
 			return( "Windows" );
 
-		case LIBFSNTFS_FILE_NAME_NAMESPACE_DOS:
+		case LIBFSNTFS_FILE_NAME_SPACE_DOS:
 			return( "DOS" );
 
-		case LIBFSNTFS_FILE_NAME_NAMESPACE_DOS_WINDOWS:
+		case LIBFSNTFS_FILE_NAME_SPACE_DOS_WINDOWS:
 			return( "DOS and Windows" );
 	}
 	return( "UNKNOWN" );

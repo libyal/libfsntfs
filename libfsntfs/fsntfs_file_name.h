@@ -88,10 +88,10 @@ struct fsntfs_file_name
 	 */
 	uint8_t name_size;
 
-	/* The namespace
+	/* The name space
 	 * Consists of 1 byte
 	 */
-	uint8_t namespace;
+	uint8_t name_space;
 };
 
 #if defined( __cplusplus )

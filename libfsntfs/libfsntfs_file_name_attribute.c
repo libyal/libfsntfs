@@ -433,16 +433,16 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
 	return( 1 );
 }
 
-/* Retrieves the namespace
+/* Retrieves the name space
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_file_name_attribute_get_namespace(
+int libfsntfs_file_name_attribute_get_name_space(
      libfsntfs_attribute_t *attribute,
-     uint8_t *namespace,
+     uint8_t *name_space,
      libcerror_error_t **error )
 {
 	libfsntfs_internal_attribute_t *internal_attribute = NULL;
-	static char *function                              = "libfsntfs_file_name_attribute_get_namespace";
+	static char *function                              = "libfsntfs_file_name_attribute_get_name_space";
 	uint32_t attribute_type                            = 0;
 
 	if( attribute == NULL )
@@ -483,16 +483,16 @@ int libfsntfs_file_name_attribute_get_namespace(
 
 		return( -1 );
 	}
-	if( libfsntfs_file_name_values_get_namespace(
+	if( libfsntfs_file_name_values_get_name_space(
 	     (libfsntfs_file_name_values_t *) internal_attribute->value,
-	     namespace,
+	     name_space,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve namespace.",
+		 "%s: unable to retrieve name space.",
 		 function );
 
 		return( -1 );

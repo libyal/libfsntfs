@@ -187,7 +187,7 @@ The following metadata files are predefined and use a fixed MFT entry index.
 Last used in NTFS version 1.2
 | 9 | $Secure | Security and access control information +
 Introduced in NTFS version 3.0
-| 10 | $UpCase | Table of uppercase characters used for ensuring case insensitivity in Windows and DOS namespaces.
+| 10 | $UpCase | Table of uppercase characters used for ensuring case insensitivity in Windows and DOS name spaces.
 | 11 | $Extend | A directory containing extended metadata files
 | 12-15 | | [yellow-background]*Unknown (Reserved)* +
 Marked as in use but empty
@@ -1011,8 +1011,8 @@ An MFT attribute can contain multiple file name attributes, e.g. for a separate
 (long) name and short name.
 
 In several cases on a Vista NTFS volume the MFT entry contained both a DOS &
-Windows and POSIX namespace name. However the directory entry index ($I30) of
-the parent directory only contained the DOS & Windows name.
+Windows and POSIX name space `$FILE_NAME` attribute. However the directory entry
+index (`$I30`) of the parent directory only contained the DOS & Windows name.
 
 In case of a hard link the MFT entry will contain additional file name
 attributes with the parent file reference of each hard link.
@@ -1579,15 +1579,15 @@ The index value data seems to contain remnant data.
 
 [NOTE]
 Both the short and long names of the same file have a separate index value. The
-short name uses the DOS namespace and the long name the WINDOWS namespace.
+short name uses the DOS name space and the long name the WINDOWS name space.
 
 [yellow-background]*Index values with a single name use either the POSIX or
-DOS_WINDOWS namespace?*
+DOS_WINDOWS name space?*
 
 A hard link to a file in the same directory will also have a separate index
 value.
 
-[yellow-background]*Does the hard link always has POSIX namespace?*
+[yellow-background]*Does the hard link always has POSIX name space?*
 
 ==== Security descriptor hash index value
 

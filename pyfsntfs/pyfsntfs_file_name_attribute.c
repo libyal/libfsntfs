@@ -110,12 +110,12 @@ PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
 	  "\n"
 	  "Returns the file attribute flags." },
 
-	{ "get_namespace",
-	  (PyCFunction) pyfsntfs_file_name_attribute_get_namespace,
+	{ "get_name_space",
+	  (PyCFunction) pyfsntfs_file_name_attribute_get_name_space,
 	  METH_NOARGS,
-	  "get_namespace() -> Integer\n"
+	  "get_name_space() -> Integer\n"
 	  "\n"
-	  "Returns the namespace." },
+	  "Returns the name space." },
 
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_file_name_attribute_get_name,
@@ -166,10 +166,10 @@ PyGetSetDef pyfsntfs_file_name_attribute_object_get_set_definitions[] = {
 	  "The file attribute flags.",
 	  NULL },
 
-	{ "namespace",
-	  (getter) pyfsntfs_file_name_attribute_get_namespace,
+	{ "name_space",
+	  (getter) pyfsntfs_file_name_attribute_get_name_space,
 	  (setter) 0,
-	  "The namespace.",
+	  "The name space.",
 	  NULL },
 
 	{ "name",
@@ -853,17 +853,17 @@ PyObject *pyfsntfs_file_name_attribute_get_file_attribute_flags(
 	return( integer_object );
 }
 
-/* Retrieves the namespace
+/* Retrieves the name space
  * Returns a Python object if successful or NULL on error
  */
-PyObject *pyfsntfs_file_name_attribute_get_namespace(
+PyObject *pyfsntfs_file_name_attribute_get_name_space(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
 	PyObject *integer_object = NULL;
 	libcerror_error_t *error = NULL;
-	static char *function    = "pyfsntfs_file_name_attribute_get_namespace";
-	uint8_t namespace        = 0;
+	static char *function    = "pyfsntfs_file_name_attribute_get_name_space";
+	uint8_t name_space       = 0;
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
@@ -879,9 +879,9 @@ PyObject *pyfsntfs_file_name_attribute_get_namespace(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libfsntfs_file_name_attribute_get_namespace(
+	result = libfsntfs_file_name_attribute_get_name_space(
 	          pyfsntfs_attribute->attribute,
-	          &namespace,
+	          &name_space,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -891,7 +891,7 @@ PyObject *pyfsntfs_file_name_attribute_get_namespace(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve namespace.",
+		 "%s: unable to retrieve name space.",
 		 function );
 
 		libcerror_error_free(
@@ -900,7 +900,7 @@ PyObject *pyfsntfs_file_name_attribute_get_namespace(
 		return( NULL );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) namespace );
+	                  (uint64_t) name_space );
 
 	return( integer_object );
 }

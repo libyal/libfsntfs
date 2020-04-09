@@ -60,9 +60,9 @@ struct libfsntfs_file_name_values
 	 */
 	uint32_t file_attribute_flags;
 
-	/* The namespace
+	/* The name space
 	 */
-	uint8_t namespace;
+	uint8_t name_space;
 
 	/* The UTF-16 little-endian formatted name
 	 */
@@ -133,9 +133,9 @@ int libfsntfs_file_name_values_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libcerror_error_t **error );
 
-int libfsntfs_file_name_values_get_namespace(
+int libfsntfs_file_name_values_get_name_space(
      libfsntfs_file_name_values_t *file_name_values,
-     uint8_t *namespace,
+     uint8_t *name_space,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_utf8_name_size(

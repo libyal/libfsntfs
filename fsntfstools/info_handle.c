@@ -2956,7 +2956,7 @@ int info_handle_file_name_attribute_fprint(
 	 value_32bit,
 	 info_handle->notify_stream );
 
-	if( libfsntfs_file_name_attribute_get_namespace(
+	if( libfsntfs_file_name_attribute_get_name_space(
 	     attribute,
 	     &value_8bit,
 	     error ) != 1 )
@@ -2965,14 +2965,14 @@ int info_handle_file_name_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve namespace.",
+		 "%s: unable to retrieve name space.",
 		 function );
 
 		goto on_error;
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tNamespace\t\t\t: " );
+	 "\tName space\t\t\t: " );
 
 	switch( value_8bit )
 	{

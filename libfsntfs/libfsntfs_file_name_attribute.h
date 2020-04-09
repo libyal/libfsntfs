@@ -69,9 +69,9 @@ int libfsntfs_file_name_attribute_get_file_attribute_flags(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
-int libfsntfs_file_name_attribute_get_namespace(
+int libfsntfs_file_name_attribute_get_name_space(
      libfsntfs_attribute_t *attribute,
-     uint8_t *namespace,
+     uint8_t *name_space,
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
