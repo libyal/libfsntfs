@@ -45,6 +45,7 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	fsntfs_test_attribute \
+	fsntfs_test_attribute_list_entry \
 	fsntfs_test_bitmap_values \
 	fsntfs_test_buffer_data_handle \
 	fsntfs_test_cluster_block \
@@ -90,6 +91,7 @@ check_PROGRAMS = \
 	fsntfs_test_notify \
 	fsntfs_test_object_identifier_values \
 	fsntfs_test_path_hint \
+	fsntfs_test_profiler \
 	fsntfs_test_reparse_point_attribute \
 	fsntfs_test_reparse_point_values \
 	fsntfs_test_sds_index_value \
@@ -120,6 +122,18 @@ fsntfs_test_attribute_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@ \
 	@PTHREAD_LIBADD@
+
+fsntfs_test_attribute_list_entry_SOURCES = \
+	fsntfs_test_attribute_list_entry.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_attribute_list_entry_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
 
 fsntfs_test_bitmap_values_SOURCES = \
 	fsntfs_test_bitmap_values.c \
@@ -818,6 +832,18 @@ fsntfs_test_path_hint_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_path_hint_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_profiler_SOURCES = \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_profiler.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_profiler_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

@@ -6,8 +6,8 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$Profiles = @("fsntfsinfo", "fsntfsinfo_fs", "fsntfsinfo_mft")
-$OptionsPerProfile = @("", "-H", "-Eall")
+$Profiles = @("fsntfsinfo_bodyfile_fs", "fsntfsinfo_bodyfile_mft")
+$OptionsPerProfile = @("-Bbodyfile -H", "-Bbodyfile -Eall")
 $OptionSets = "offset";
 
 $InputGlob = "*"
@@ -155,14 +155,12 @@ For ($ProfileIndex = 0; $ProfileIndex -le ($Profiles.length - 1); $ProfileIndex 
 				}
 				If (${Result} -eq ${ExitSuccess})
 				{
-					# Strip header with version.
-					(Get-Content ${TestLog} | Select-Object -Skip 2) | Set-Content ${TestLog}
+					$TestResults = "bodyfile"
+					$StoredTestResults = "..\${TestProfileDirectory}\${TestSetName}\${InputFileName}-bodyfile"
 
-					$StoredTestLog = "..\${TestProfileDirectory}\${TestSetName}\${TestLog}"
-
-					If (Test-Path -Path ${StoredTestLog} -PathType "Leaf")
+					If (Test-Path -Path ${StoredTestResults} -PathType "Leaf")
 					{
-						$Difference = Compare-Object -ReferenceObject (Get-Content -Path ${StoredTestLog}) -DifferenceObject (Get-Content -Path ${TestLog})
+						$Difference = Compare-Object -ReferenceObject (Get-Content -Path ${StoredTestResults}) -DifferenceObject (Get-Content -Path ${TestResults})
 
 						If (${Difference})
 						{
@@ -171,7 +169,7 @@ For ($ProfileIndex = 0; $ProfileIndex -le ($Profiles.length - 1); $ProfileIndex 
 					}
 					Else
 					{
-						Move-Item -Path ${TestLog} -Destination ${StoredTestLog}
+						Move-Item -Path ${TestResults} -Destination ${StoredTestResults}
 					}
 				}
 			}

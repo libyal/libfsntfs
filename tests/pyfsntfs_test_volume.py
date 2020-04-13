@@ -6,18 +6,18 @@
 #
 # Refer to AUTHORS for acknowledgements.
 #
-# This software is free software: you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# This software is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Lesser General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
 import os
@@ -93,16 +93,16 @@ class DataRangeFileObject(object):
     """
     if (self._range_offset < 0 or
         (self._range_size is not None and self._range_size < 0)):
-      raise IOError('Invalid data range.')
+      raise IOError("Invalid data range.")
 
     if self._current_offset < 0:
       raise IOError(
-          'Invalid current offset: {0:d} value less than zero.'.format(
+          "Invalid current offset: {0:d} value less than zero.".format(
               self._current_offset))
 
     if (self._range_size is not None and
         self._current_offset >= self._range_size):
-      return b''
+      return b""
 
     if size is None:
       size = self._range_size
@@ -131,7 +131,7 @@ class DataRangeFileObject(object):
     """
     if self._current_offset < 0:
       raise IOError(
-          'Invalid current offset: {0:d} value less than zero.'.format(
+          "Invalid current offset: {0:d} value less than zero.".format(
               self._current_offset))
 
     if whence == os.SEEK_CUR:
@@ -139,9 +139,9 @@ class DataRangeFileObject(object):
     elif whence == os.SEEK_END:
       offset += self._range_size
     elif whence != os.SEEK_SET:
-      raise IOError('Unsupported whence.')
+      raise IOError("Unsupported whence.")
     if offset < 0:
-      raise IOError('Invalid offset value less than zero.')
+      raise IOError("Invalid offset value less than zero.")
 
     self._current_offset = offset
 
@@ -158,10 +158,10 @@ class VolumeTypeTests(unittest.TestCase):
   def test_open(self):
     """Tests the open function."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
 
     if unittest.offset:
-      raise unittest.SkipTest('source defines offset')
+      raise unittest.SkipTest("source defines offset")
 
     fsntfs_volume = pyfsntfs.volume()
 
@@ -181,12 +181,15 @@ class VolumeTypeTests(unittest.TestCase):
   def test_open_file_object(self):
     """Tests the open_file_object function."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    if not os.path.isfile(unittest.source):
+      raise unittest.SkipTest("source not a regular file")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
-
-      fsntfs_volume = pyfsntfs.volume()
 
       fsntfs_volume.open_file_object(file_object)
 
@@ -195,17 +198,17 @@ class VolumeTypeTests(unittest.TestCase):
 
       fsntfs_volume.close()
 
-    # TODO: change IOError into TypeError
-    with self.assertRaises(IOError):
-      fsntfs_volume.open_file_object(None)
+      # TODO: change IOError into TypeError
+      with self.assertRaises(IOError):
+        fsntfs_volume.open_file_object(None)
 
-    with self.assertRaises(ValueError):
-      fsntfs_volume.open_file_object(file_object, mode="w")
+      with self.assertRaises(ValueError):
+        fsntfs_volume.open_file_object(file_object, mode="w")
 
   def test_close(self):
     """Tests the close function."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
 
     fsntfs_volume = pyfsntfs.volume()
 
@@ -215,10 +218,10 @@ class VolumeTypeTests(unittest.TestCase):
   def test_open_close(self):
     """Tests the open and close functions."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      return
 
     if unittest.offset:
-      raise unittest.SkipTest('source defines offset')
+      raise unittest.SkipTest("source defines offset")
 
     fsntfs_volume = pyfsntfs.volume()
 
@@ -230,25 +233,28 @@ class VolumeTypeTests(unittest.TestCase):
     fsntfs_volume.open(unittest.source)
     fsntfs_volume.close()
 
-    file_object = open(unittest.source, "rb")
+    if os.path.isfile(unittest.source):
+      with open(unittest.source, "rb") as file_object:
 
-    # Test open_file_object and close.
-    fsntfs_volume.open_file_object(file_object)
-    fsntfs_volume.close()
+        # Test open_file_object and close.
+        fsntfs_volume.open_file_object(file_object)
+        fsntfs_volume.close()
 
-    # Test open_file_object and close a second time to validate clean up on close.
-    fsntfs_volume.open_file_object(file_object)
-    fsntfs_volume.close()
+        # Test open_file_object and close a second time to validate clean up on close.
+        fsntfs_volume.open_file_object(file_object)
+        fsntfs_volume.close()
 
-    # Test open_file_object and close and dereferencing file_object.
-    fsntfs_volume.open_file_object(file_object)
-    del file_object
-    fsntfs_volume.close()
+        # Test open_file_object and close and dereferencing file_object.
+        fsntfs_volume.open_file_object(file_object)
+        del file_object
+        fsntfs_volume.close()
 
   def test_get_bytes_per_sector(self):
     """Tests the get_bytes_per_sector function and bytes_per_sector property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -266,7 +272,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_cluster_block_size(self):
     """Tests the get_cluster_block_size function and cluster_block_size property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -284,7 +292,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_mft_entry_size(self):
     """Tests the get_mft_entry_size function and mft_entry_size property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -302,7 +312,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_index_entry_size(self):
     """Tests the get_index_entry_size function and index_entry_size property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -320,7 +332,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_name(self):
     """Tests the get_name function and name property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -338,7 +352,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_serial_number(self):
     """Tests the get_serial_number function and serial_number property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -356,7 +372,9 @@ class VolumeTypeTests(unittest.TestCase):
   def test_get_number_of_file_entries(self):
     """Tests the get_number_of_file_entries function and number_of_file_entries property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -404,9 +422,11 @@ class VolumeTypeTests(unittest.TestCase):
       fsntfs_volume.close()
 
   def test_get_root_directory(self):
-    """Tests the get_root_directory function."""
+    """Tests the get_root_directory function and root_directory property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -420,9 +440,11 @@ class VolumeTypeTests(unittest.TestCase):
       fsntfs_volume.close()
 
   def test_get_usn_change_journal(self):
-    """Tests the get_usn_change_journal function."""
+    """Tests the get_usn_change_journal function and usn_change_journal property."""
     if not unittest.source:
-      raise unittest.SkipTest('missing source')
+      raise unittest.SkipTest("missing source")
+
+    fsntfs_volume = pyfsntfs.volume()
 
     with DataRangeFileObject(
         unittest.source, unittest.offset or 0, None) as file_object:
@@ -430,8 +452,7 @@ class VolumeTypeTests(unittest.TestCase):
       fsntfs_volume = pyfsntfs.volume()
       fsntfs_volume.open_file_object(file_object)
 
-      # Test invocation only.
-      fsntfs_volume.get_usn_change_journal()
+      _ = fsntfs_volume.get_usn_change_journal()
 
       fsntfs_volume.close()
 

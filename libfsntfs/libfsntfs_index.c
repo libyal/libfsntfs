@@ -1002,7 +1002,7 @@ int libfsntfs_index_get_sub_node(
 			 "%s: unable to retrieve index entry size.",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
 		if( libfsntfs_profiler_start_timing(
 		     index->io_handle->profiler,
