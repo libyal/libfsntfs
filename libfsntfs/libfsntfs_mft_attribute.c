@@ -515,6 +515,17 @@ int libfsntfs_mft_attribute_read_data(
 
 				goto on_error;
 			}
+			if( compression_unit_size > 31 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: compression unit size value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
 			/* The size is calculated as: 2 ^ value
 			 */
 			mft_attribute->compression_unit_size  = (size_t) 1 << compression_unit_size;
