@@ -163,6 +163,17 @@ int libfsntfs_cluster_block_vector_initialize(
 		}
 		if( attribute_data_vcn_size != 0xffffffffffffffffULL )
 		{
+			if( attribute_data_vcn_offset > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
 			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
 			{
 				libcerror_error_set(

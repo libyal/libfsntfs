@@ -39,13 +39,15 @@
 #include "pyfsntfs_unused.h"
 
 #if !defined( LIBFSNTFS_HAVE_BFIO )
+
 LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_open_file_io_handle(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libfsntfs_error_t **error );
-#endif
+
+#endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
 PyMethodDef pyfsntfs_mft_metadata_file_object_methods[] = {
 

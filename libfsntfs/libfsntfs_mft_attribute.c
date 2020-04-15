@@ -372,7 +372,8 @@ int libfsntfs_mft_attribute_read_data(
 
 	data_offset = sizeof( fsntfs_mft_attribute_header_t );
 
-	if( mft_attribute->size > data_size )
+	if( ( mft_attribute->size < sizeof( fsntfs_mft_attribute_header_t ) )
+	 || ( mft_attribute->size > data_size ) )
 	{
 		libcerror_error_set(
 		 error,

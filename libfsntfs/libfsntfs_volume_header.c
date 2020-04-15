@@ -67,7 +67,7 @@ int libfsntfs_volume_header_initialize(
 		return( -1 );
 	}
 	*volume_header = memory_allocate_structure(
-	                    libfsntfs_volume_header_t );
+	                  libfsntfs_volume_header_t );
 
 	if( *volume_header == NULL )
 	{
@@ -507,7 +507,10 @@ int libfsntfs_volume_header_read_data(
 		}
 		volume_header->mft_entry_size = 1 << volume_header->mft_entry_size;
 	}
-	if( (size_t) volume_header->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
+	/* Note that 128 MiB is an arbitrary selected upper limit here
+	 */
+	if( ( (size_t) volume_header->mft_entry_size < sizeof( fsntfs_mft_entry_header_t ) )
+	 || ( volume_header->mft_entry_size >= (uint32_t) ( 128 * 1024 * 1024 ) ) )
 	{
 		libcerror_error_set(
 		 error,

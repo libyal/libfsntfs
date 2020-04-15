@@ -555,6 +555,12 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 	return( 1 );
 
 on_error:
+	if( mft_attribute_list_entry != NULL )
+	{
+		libfsntfs_mft_attribute_list_entry_free(
+		 &mft_attribute_list_entry,
+		 NULL );
+	}
 	if( cluster_block_stream != NULL )
 	{
 		libfdata_stream_free(

@@ -593,6 +593,17 @@ int libfsntfs_file_name_values_read_data(
 	{
 		name_size *= 2;
 
+		if( (size_t) name_size > ( data_size - data_offset ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid name size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_file_name_values_set_name(
 		     file_name_values,
 		     &( data[ data_offset ] ),

@@ -26,7 +26,7 @@ then
 
 elif test ${TRAVIS_OS_NAME} = "osx";
 then
-        # Prevent from the 30 days autoclean being triggered on install.
+	# Prevent from the 30 days autoclean being triggered on install.
 	export HOMEBREW_NO_INSTALL_CLEANUP=1;
 
 	brew update;
