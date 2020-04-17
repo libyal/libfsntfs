@@ -528,7 +528,8 @@ int libfsntfs_mft_get_mft_entry_by_index(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_mft_get_mft_entry_by_index";
+	libfsntfs_mft_entry_t *safe_mft_entry = NULL;
+	static char *function                 = "libfsntfs_mft_get_mft_entry_by_index";
 
 	if( mft == NULL )
 	{
@@ -568,7 +569,7 @@ int libfsntfs_mft_get_mft_entry_by_index(
 	     (intptr_t *) file_io_handle,
 	     (libfdata_cache_t *) mft->mft_entry_cache,
 	     (int) mft_entry_index,
-	     (intptr_t **) mft_entry,
+	     (intptr_t **) &safe_mft_entry,
 	     0,
 	     error ) != 1 )
 	{
@@ -583,7 +584,7 @@ int libfsntfs_mft_get_mft_entry_by_index(
 		return( -1 );
 	}
 	if( libfsntfs_mft_entry_read_attributes(
-	     *mft_entry,
+	     safe_mft_entry,
 	     mft->io_handle,
 	     file_io_handle,
 	     mft->mft_entry_vector,
@@ -601,6 +602,8 @@ int libfsntfs_mft_get_mft_entry_by_index(
 
 		return( -1 );
 	}
+	*mft_entry = safe_mft_entry;
+
 	return( 1 );
 }
 
@@ -614,7 +617,8 @@ int libfsntfs_mft_get_mft_entry_by_index_no_cache(
      libfsntfs_mft_entry_t **mft_entry,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_mft_get_mft_entry_by_index_no_cache";
+	libfsntfs_mft_entry_t *safe_mft_entry = NULL;
+	static char *function                 = "libfsntfs_mft_get_mft_entry_by_index_no_cache";
 
 	if( mft == NULL )
 	{
@@ -654,7 +658,7 @@ int libfsntfs_mft_get_mft_entry_by_index_no_cache(
 	     (intptr_t *) file_io_handle,
 	     (libfdata_cache_t *) mft->single_mft_entry_cache,
 	     (int) mft_entry_index,
-	     (intptr_t **) mft_entry,
+	     (intptr_t **) &safe_mft_entry,
 	     LIBFDATA_READ_FLAG_IGNORE_CACHE,
 	     error ) != 1 )
 	{
@@ -669,7 +673,7 @@ int libfsntfs_mft_get_mft_entry_by_index_no_cache(
 		return( -1 );
 	}
 	if( libfsntfs_mft_entry_read_attributes(
-	     *mft_entry,
+	     safe_mft_entry,
 	     mft->io_handle,
 	     file_io_handle,
 	     mft->mft_entry_vector,
@@ -701,6 +705,8 @@ int libfsntfs_mft_get_mft_entry_by_index_no_cache(
 
 		return( -1 );
 	}
+	*mft_entry = safe_mft_entry;
+
 	return( 1 );
 }
 

@@ -417,19 +417,30 @@ int libfsntfs_mft_attribute_read_data(
 
 	if( ( mft_attribute->non_resident_flag & 0x01 ) == 0 )
 	{
-		if( data_offset > ( mft_attribute->size - sizeof( fsntfs_mft_attribute_resident_t ) ) )
+		if( data_size < ( data_offset + sizeof( fsntfs_mft_attribute_resident_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: unsupported data size value too small.",
+			 "%s: unsupported data size value too small\n",
+			 function );
+
+			return( -1 );
+		}
+		resident_data = &( data[ data_offset ] );
+
+		if( mft_attribute->size < ( data_offset + sizeof( fsntfs_mft_attribute_resident_t ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid MFT attribute size value out of bounds.",
 			 function );
 
 			goto on_error;
 		}
-		resident_data = &( data[ data_offset ] );
-
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -482,20 +493,19 @@ int libfsntfs_mft_attribute_read_data(
 	}
 	else
 	{
-		non_resident_data_size = sizeof( fsntfs_mft_attribute_non_resident_t );
-
-		if( data_offset > ( mft_attribute->size - non_resident_data_size ) )
+		if( data_size < ( data_offset + sizeof( fsntfs_mft_attribute_non_resident_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: unsupported data size value too small.",
+			 "%s: unsupported data size value too small\n",
 			 function );
 
-			goto on_error;
+			return( -1 );
 		}
-		non_resident_data = &( data[ data_offset ] );
+		non_resident_data      = &( data[ data_offset ] );
+		non_resident_data_size = sizeof( fsntfs_mft_attribute_non_resident_t );
 
 		byte_stream_copy_to_uint16_little_endian(
 		 ( (fsntfs_mft_attribute_non_resident_t *) non_resident_data )->compression_unit_size,
@@ -503,9 +513,7 @@ int libfsntfs_mft_attribute_read_data(
 
 		if( compression_unit_size != 0 )
 		{
-			non_resident_data_size = sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
-
-			if( data_size < non_resident_data_size )
+			if( data_size < ( data_offset + sizeof( fsntfs_mft_attribute_non_resident_compressed_t ) ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -516,6 +524,8 @@ int libfsntfs_mft_attribute_read_data(
 
 				goto on_error;
 			}
+			non_resident_data_size = sizeof( fsntfs_mft_attribute_non_resident_compressed_t );
+
 			if( compression_unit_size > 31 )
 			{
 				libcerror_error_set(
@@ -543,6 +553,17 @@ int libfsntfs_mft_attribute_read_data(
 			}
 #endif
 			mft_attribute->compression_unit_size = 16 * io_handle->cluster_block_size;
+		}
+		if( mft_attribute->size < ( data_offset + non_resident_data_size ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid MFT attribute size value out of bounds.",
+			 function );
+
+			goto on_error;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )

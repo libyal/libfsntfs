@@ -316,6 +316,18 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			data_run_offset = data_run->start_offset;
 			data_run_size   = data_run->size;
 
+			if( ( data_run_size / compression_unit_size ) > (size64_t) INT_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid data run: %d size value out of bounds.",
+				 function,
+				 data_run_index );
+
+				goto on_error;
+			}
 			while( data_run_size > 0 )
 			{
 				if( descriptor == NULL )
@@ -490,6 +502,17 @@ int libfsntfs_compression_unit_data_handle_initialize(
 		}
 		attribute_index++;
 	}
+	if( remaining_compression_unit_size != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid remaining compression unit size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
 	( *data_handle )->compression_unit_size = compression_unit_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -502,6 +525,12 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	return( 1 );
 
 on_error:
+	if( descriptor != NULL )
+	{
+		libfsntfs_compression_unit_descriptor_free(
+		 &descriptor,
+		 NULL );
+	}
 	if( *data_handle != NULL )
 	{
 		if( ( *data_handle )->descriptors_array != NULL )

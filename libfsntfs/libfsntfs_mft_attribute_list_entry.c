@@ -250,14 +250,14 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: type\t\t\t\t: 0x%08" PRIx32 " (%s)\n",
+		 "%s: type\t\t\t: 0x%08" PRIx32 " (%s)\n",
 		 function,
 		 attribute_list_entry->attribute_type,
 		 libfsntfs_debug_print_attribute_type(
 		  attribute_list_entry->attribute_type ) );
 
 		libcnotify_printf(
-		 "%s: size\t\t\t\t: %" PRIu16 "\n",
+		 "%s: size\t\t\t: %" PRIu16 "\n",
 		 function,
 		 attribute_list_entry->size );
 
@@ -267,7 +267,7 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 		 attribute_list_entry->name_size );
 
 		libcnotify_printf(
-		 "%s: name offset\t\t\t: %" PRIu8 "\n",
+		 "%s: name offset\t\t: %" PRIu8 "\n",
 		 function,
 		 name_offset );
 
@@ -283,7 +283,7 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 		 attribute_list_entry->file_reference >> 48 );
 
 		libcnotify_printf(
-		 "%s: identifier\t\t\t: %" PRIu16 "\n",
+		 "%s: identifier\t\t: %" PRIu16 "\n",
 		 function,
 		 attribute_list_entry->identifier );
 	}
@@ -291,7 +291,8 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 
 	data_offset = sizeof( fsntfs_mft_attribute_list_entry_header_t );
 
-	if( attribute_list_entry->size > data_size )
+	if( ( attribute_list_entry->size < sizeof( fsntfs_mft_attribute_list_entry_header_t ) )
+	 || ( attribute_list_entry->size > data_size ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -393,7 +394,7 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 		{
 			if( libfsntfs_debug_print_utf16_string_value(
 			     function,
-			     "name\t\t\t\t",
+			     "name\t\t\t",
 			     attribute_list_entry->name,
 			     (size_t) attribute_list_entry->name_size,
 			     LIBUNA_ENDIAN_LITTLE,
