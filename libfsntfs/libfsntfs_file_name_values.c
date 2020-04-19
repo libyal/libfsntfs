@@ -579,7 +579,7 @@ int libfsntfs_file_name_values_read_data(
 		 name_size );
 
 		libcnotify_printf(
-		 "%s: name space\t\t\t\t: %" PRIu8 " (%s)\n",
+		 "%s: name space\t\t\t: %" PRIu8 " (%s)\n",
 		 function,
 		 file_name_values->name_space,
 		 libfsntfs_debug_print_file_name_attribute_name_space(

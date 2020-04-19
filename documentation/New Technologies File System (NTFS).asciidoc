@@ -69,6 +69,7 @@ Switched to asccidoc format.
 | 0.0.18 | J.B. Metz | September 2019 | Additional information regarding Windows Overlay Filter (WOF) compressed data.
 | 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
 | 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $STANDARD_INFORMATION and $ATTRIBUTE_LIST attributes.
+| 0.0.21 | J.B. Metz | April 2020 | Additional information regarding compressed data runs.
 |===
 
 :numbered:
@@ -1656,7 +1657,7 @@ unit size.
 
 [NOTE]
 The sparse blocks data run can be stored in a subsequent attribute in an
-attribute chain.
+attribute chain and can be stored in multiple data runs.
 
 [yellow-background]*Does the sparse flag needs to be set for sparse compressed
 files?*
@@ -1691,7 +1692,7 @@ The upper 4 bits of the block size are used as flags.
 
 === LZNT1 compression method
 
-For more information about LZNT1 Huffman see:
+For more information about LZNT1 see:
 https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
 === Windows Overlay Filter (WOF) compressed data

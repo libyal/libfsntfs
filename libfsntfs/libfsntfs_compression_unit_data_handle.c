@@ -44,6 +44,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 {
 	libfsntfs_compression_unit_descriptor_t *descriptor = NULL;
 	libfsntfs_data_run_t *data_run                      = NULL;
+	libfsntfs_mft_attribute_t *safe_mft_attribute       = NULL;
 	static char *function                               = "libfsntfs_compression_unit_data_handle_initialize";
 	size64_t attribute_data_vcn_size                    = 0;
 	size64_t data_run_size                              = 0;
@@ -54,12 +55,15 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
 	off64_t data_run_offset                             = 0;
+	off64_t data_segment_offset                         = 0;
 	uint16_t data_flags                                 = 0;
 	int attribute_index                                 = 0;
 	int data_run_index                                  = 0;
 	int descriptor_index                                = 0;
 	int entry_index                                     = 0;
 	int number_of_data_runs                             = 0;
+	int total_data_run_index                            = 0;
+	int total_number_of_data_runs                       = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	char *data_segment_type                             = NULL;
@@ -207,10 +211,13 @@ int libfsntfs_compression_unit_data_handle_initialize(
 
 		goto on_error;
 	}
-	while( mft_attribute != NULL )
+	safe_mft_attribute = mft_attribute;
+	attribute_index    = 0;
+
+	while( safe_mft_attribute != NULL )
 	{
 		if( libfsntfs_mft_attribute_get_data_vcn_range(
-		     mft_attribute,
+		     safe_mft_attribute,
 		     (uint64_t *) &attribute_data_vcn_offset,
 		     (uint64_t *) &attribute_data_vcn_size,
 		     error ) != 1 )
@@ -268,7 +275,45 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
 		}
 		if( libfsntfs_mft_attribute_get_number_of_data_runs(
-		     mft_attribute,
+		     safe_mft_attribute,
+		     &number_of_data_runs,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of data runs.",
+			 function );
+
+			goto on_error;
+		}
+		total_number_of_data_runs += number_of_data_runs;
+
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     safe_mft_attribute,
+		     &safe_mft_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next MFT attribute: %d.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+		attribute_index++;
+	}
+	safe_mft_attribute = mft_attribute;
+	attribute_index    = 0;
+
+	while( safe_mft_attribute != NULL )
+	{
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     safe_mft_attribute,
 		     &number_of_data_runs,
 		     error ) != 1 )
 		{
@@ -286,7 +331,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 		     data_run_index++ )
 		{
 			if( libfsntfs_mft_attribute_get_data_run_by_index(
-			     mft_attribute,
+			     safe_mft_attribute,
 			     data_run_index,
 			     &data_run,
 			     error ) != 1 )
@@ -316,6 +361,30 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			data_run_offset = data_run->start_offset;
 			data_run_size   = data_run->size;
 
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+				{
+					data_segment_type = "sparse ";
+				}
+				else
+				{
+					data_segment_type = "";
+				}
+				libcnotify_printf(
+				 "%s: %sdata run: %d offset: 0x%08" PRIx64 ", size: %" PRIu64 ".\n",
+				 function,
+				 data_segment_type,
+				 data_run_index,
+				 data_run_offset,
+				 data_run_size );
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 			if( ( data_run_size / compression_unit_size ) > (size64_t) INT_MAX )
 			{
 				libcerror_error_set(
@@ -340,40 +409,33 @@ int libfsntfs_compression_unit_data_handle_initialize(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-						 "%s: unable to create compressed block descriptor.",
+						 "%s: unable to create compression unit descriptor.",
 						 function );
 
 						goto on_error;
 					}
 					descriptor->data_offset = data_offset;
 
+					data_segment_offset             = 0;
 					remaining_compression_unit_size = compression_unit_size;
 				}
-				if( ( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
-				 && ( remaining_compression_unit_size < compression_unit_size ) )
+				if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
 				{
-					/* A sparse data run marks the end of a compression unit and
-					 * should be at minimum the size of the remaining data in the compression unit
-					 */
-					if( data_run_size < (size64_t) remaining_compression_unit_size )
+					descriptor->data_range_flags = data_run->range_flags;
+				}
+				/* Sparse data runs mark the end of a compression unit and they
+				 * should be at minimum the size of the remaining data in the compression unit
+				 */
+				else if( remaining_compression_unit_size < compression_unit_size )
+				{
+					if( ( total_data_run_index == ( total_number_of_data_runs - 1 ) )
+					 && ( data_run_size < (size64_t) remaining_compression_unit_size ) )
 					{
-						if( data_run_index < ( number_of_data_runs - 1 ) )
-						{
-							libcerror_error_set(
-							 error,
-							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-							 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-							 "%s: invalid sparse data run: %d size value out of bounds.",
-							 function,
-							 data_run_index );
-
-							goto on_error;
-						}
 #if defined( HAVE_DEBUG_OUTPUT )
-						else if( libcnotify_verbose != 0 )
+						if( libcnotify_verbose != 0 )
 						{
 							libcnotify_printf(
-							 "%s: last sparse data run: %d size does not align with compression unit size.",
+							 "%s: last sparse data run: %d size does not align with compression unit size.\n",
 							 function,
 							 data_run_index );
 						}
@@ -381,10 +443,6 @@ int libfsntfs_compression_unit_data_handle_initialize(
 						remaining_compression_unit_size = 0;
 					}
 					descriptor->data_range_flags = LIBFDATA_RANGE_FLAG_IS_COMPRESSED;
-				}
-				else
-				{
-					descriptor->data_range_flags = data_run->range_flags;
 				}
 				if( data_run_size < remaining_compression_unit_size )
 				{
@@ -410,10 +468,11 @@ int libfsntfs_compression_unit_data_handle_initialize(
 					 function,
 					 descriptor_index,
 					 data_segment_type,
-					 data_run_offset,
+					 data_segment_offset,
 					 data_segment_size );
 				}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 				if( libfsntfs_compression_unit_descriptor_append_data_segment(
 				     descriptor,
 				     data_run_offset,
@@ -435,6 +494,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 				{
 					data_run_offset += data_segment_size;
 				}
+				data_segment_offset             += data_segment_size;
 				data_run_size                   -= data_segment_size;
 				remaining_compression_unit_size -= data_segment_size;
 
@@ -460,7 +520,8 @@ int libfsntfs_compression_unit_data_handle_initialize(
 							goto on_error;
 						}
 					}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 					if( libcdata_array_append_entry(
 					     ( *data_handle )->descriptors_array,
 					     &entry_index,
@@ -484,10 +545,11 @@ int libfsntfs_compression_unit_data_handle_initialize(
 					data_offset += compression_unit_size;
 				}
 			}
+			total_data_run_index++;
 		}
 		if( libfsntfs_mft_attribute_get_next_attribute(
-		     mft_attribute,
-		     &mft_attribute,
+		     safe_mft_attribute,
+		     &safe_mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
