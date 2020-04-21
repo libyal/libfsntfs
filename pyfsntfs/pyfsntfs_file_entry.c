@@ -2999,7 +2999,7 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 {
 	libcerror_error_t *error      = NULL;
 	PyObject *integer_object      = NULL;
-	static char *function         = "pyfsntfs_file_entry_get_file_file_entry_flags";
+	static char *function         = "pyfsntfs_file_entry_get_file_entry_flags";
 	uint32_t file_attribute_flags = 0;
 	int result                    = 0;
 
@@ -3023,7 +3023,7 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -3035,6 +3035,13 @@ PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  (uint64_t) file_attribute_flags );
