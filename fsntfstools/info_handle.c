@@ -1767,55 +1767,24 @@ int info_handle_attribute_fprint(
 	  attribute_type ),
 	 attribute_type );
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libfsntfs_attribute_get_utf16_name_size(
-	          attribute,
-	          &value_string_size,
-	          error );
-#else
-	result = libfsntfs_attribute_get_utf8_name_size(
-	          attribute,
-	          &value_string_size,
-	          error );
-#endif
-	if( result != 1 )
+	switch( attribute_type )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve name string size.",
-		 function );
+		case LIBFSNTFS_ATTRIBUTE_TYPE_BITMAP:
+		case LIBFSNTFS_ATTRIBUTE_TYPE_DATA:
+		case LIBFSNTFS_ATTRIBUTE_TYPE_FILE_NAME:
+		case LIBFSNTFS_ATTRIBUTE_TYPE_VOLUME_NAME:
+			break;
 
-		goto on_error;
-	}
-	if( value_string_size > 0 )
-	{
-		value_string = system_string_allocate(
-		                value_string_size );
-
-		if( value_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create name string.",
-			 function );
-
-			goto on_error;
-		}
+		default:
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfsntfs_attribute_get_utf16_name(
+		result = libfsntfs_attribute_get_utf16_name_size(
 		          attribute,
-		          (uint16_t *) value_string,
-		          value_string_size,
+		          &value_string_size,
 		          error );
 #else
-		result = libfsntfs_attribute_get_utf8_name(
+		result = libfsntfs_attribute_get_utf8_name_size(
 		          attribute,
-		          (uint8_t *) value_string,
-		          value_string_size,
+		          &value_string_size,
 		          error );
 #endif
 		if( result != 1 )
@@ -1824,20 +1793,62 @@ int info_handle_attribute_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve name string.",
+			 "%s: unable to retrieve name string size.",
 			 function );
 
 			goto on_error;
 		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "\tName\t\t\t\t: %" PRIs_SYSTEM "\n",
-		 value_string );
+		if( value_string_size > 0 )
+		{
+			value_string = system_string_allocate(
+			                value_string_size );
 
-		memory_free(
-		 value_string );
+			if( value_string == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create name string.",
+				 function );
 
-		value_string = NULL;
+				goto on_error;
+			}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libfsntfs_attribute_get_utf16_name(
+			          attribute,
+			          (uint16_t *) value_string,
+			          value_string_size,
+			          error );
+#else
+			result = libfsntfs_attribute_get_utf8_name(
+			          attribute,
+			          (uint8_t *) value_string,
+			          value_string_size,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve name string.",
+				 function );
+
+				goto on_error;
+			}
+			fprintf(
+			 info_handle->notify_stream,
+			 "\tName\t\t\t\t: %" PRIs_SYSTEM "\n",
+			 value_string );
+
+			memory_free(
+			 value_string );
+
+			value_string = NULL;
+		}
+		break;
 	}
 	switch( attribute_type )
 	{

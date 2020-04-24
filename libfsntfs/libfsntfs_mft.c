@@ -475,7 +475,7 @@ on_error:
 	{
 		libcdata_btree_free(
 		 &( mft->attribute_list_tree ),
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_list_entry_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_list_free,
 		 NULL );
 	}
 	return( -1 );

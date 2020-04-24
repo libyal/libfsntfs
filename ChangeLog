@@ -1,4 +1,7 @@
 TODO
+* fsntfsinfo: escape special characters
+* fsntfsmount: escape special characters
+
 * test if format version 1.2 is supported and updated README
 
 * refactor $I30 index to file entry
