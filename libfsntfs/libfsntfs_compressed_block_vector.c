@@ -320,11 +320,15 @@ int libfsntfs_compressed_block_vector_read_element_data(
 	{
 		compressed_block_data = compressed_block->data;
 	}
-	read_count = libfdata_stream_read_buffer(
+	/* Make sure to read from the start of the data stream
+	 * otherwise successive reads will fail
+	 */
+	read_count = libfdata_stream_read_buffer_at_offset(
 	              compression_unit_descriptor->data_stream,
 	              (intptr_t *) file_io_handle,
 	              compressed_block_data,
 	              compressed_block_size,
+	              0,
 	              0,
 	              error );
 
