@@ -232,7 +232,7 @@ int libfsntfs_compressed_block_data_handle_free(
 	return( result );
 }
 
-/* Reads data from the current offset into a compressed
+/* Reads data from the current offset into a compressed block
  * Callback for the data stream
  * Returns the number of bytes read or -1 on error
  */

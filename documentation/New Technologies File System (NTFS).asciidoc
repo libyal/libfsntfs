@@ -70,6 +70,7 @@ Switched to asccidoc format.
 | 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
 | 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $STANDARD_INFORMATION and $ATTRIBUTE_LIST attributes.
 | 0.0.21 | J.B. Metz | April 2020 | Additional information regarding compressed data runs.
+| 0.0.22 | J.B. Metz | May 2020 | Additional information regarding empty LZNT1 compressed block.
 |===
 
 :numbered:
@@ -1695,6 +1696,10 @@ The upper 4 bits of the block size are used as flags.
 For more information about LZNT1 see:
 https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
+[NOTE]
+If an LZNT1 compressed block is of size 0 the entire block is assumed to be
+filled with 0-byte values.
+
 === Windows Overlay Filter (WOF) compressed data
 
 A MFT entry that contains Windows Overlay Filter (WOF) compressed data has the
@@ -2722,6 +2727,51 @@ Attribute: 3
 ....
 
 [yellow-background]*TODO look into using $LogFile*
+
+=== LZNT1 compressed block with data size of 0
+
+Not sure if this is a corruption scenario or a data format edge case.
+
+A compression unit (index 30) consisting of the following data runs:
+
+....
+reading data run: 60.
+data run:
+00000000: 11 01 01                                           ...
+
+value sizes                               : 1, 1
+number of cluster blocks                  : 1 (size: 4096)
+cluster block number                      : 687143 (1) (offset: 0xa7c27000)
+
+reading data run: 61.
+data run:
+00000000: 01 0f                                              ..
+
+value sizes                               : 1, 0
+number of cluster blocks                  : 15 (size: 61440)
+cluster block number                      : 0 (0) (offset: 0x00000000)
+        Is sparse
+....
+
+Contains the following data:
+
+....
+a7c27000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+...
+a7c27ff0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+....
+
+This relates to an empty LZNT1 compressed block.
+
+....
+libfwnt_lznt1_decompress: compressed data offset	: 0 (0x00000000)
+libfwnt_lznt1_decompress: compression chunk header	: 0x0000
+libfwnt_lznt1_decompress: compressed chunk size		: 1
+libfwnt_lznt1_decompress: signature value		: 0
+libfwnt_lznt1_decompress: is compressed flag		: 0
+....
+
+It was observed that the entire block is filled with 0-byte values.
 
 == Notes
 

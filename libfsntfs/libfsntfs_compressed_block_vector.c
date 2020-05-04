@@ -368,6 +368,27 @@ int libfsntfs_compressed_block_vector_read_element_data(
 		 compressed_data );
 
 		compressed_data = NULL;
+
+		/* If the compressed block data size is 0 consider the block to be filled with 0-byte values
+		 */
+		if( compressed_block->data_size == 0 )
+		{
+			if( memory_set(
+			     compressed_block->data,
+			     0,
+			     compressed_block_size ) == NULL )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_MEMORY,
+				 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear volume header.",
+				 function );
+
+				goto on_error;
+			}
+			compressed_block->data_size = compressed_block_size;
+		}
 	}
 	if( libfdata_vector_set_element_value_by_index(
 	     vector,
