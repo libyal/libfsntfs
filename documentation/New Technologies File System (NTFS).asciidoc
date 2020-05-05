@@ -70,7 +70,7 @@ Switched to asccidoc format.
 | 0.0.19 | J.B. Metz | November 2019 | Additional information regarding short file names.
 | 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $STANDARD_INFORMATION and $ATTRIBUTE_LIST attributes.
 | 0.0.21 | J.B. Metz | April 2020 | Additional information regarding compressed data runs.
-| 0.0.22 | J.B. Metz | May 2020 | Additional information regarding empty LZNT1 compressed block.
+| 0.0.22 | J.B. Metz | May 2020 | Additional information regarding LZNT1 compressed block corruption scenarios.
 |===
 
 :numbered:
@@ -1696,9 +1696,7 @@ The upper 4 bits of the block size are used as flags.
 For more information about LZNT1 see:
 https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
-[NOTE]
-If an LZNT1 compressed block is of size 0 the entire block is assumed to be
-filled with 0-byte values.
+Also see section: <<corruption_scenarios,Corruption scenarios>>
 
 === Windows Overlay Filter (WOF) compressed data
 
@@ -2605,7 +2603,7 @@ _For now the latter is assumed._
 [yellow-background]*(copy from corresponding bit in MFT record)*
 |===
 
-== Corruption scenarios
+== [[corruption_scenarios]]Corruption scenarios
 
 === Data steam with inconsistent data flags
 
@@ -2764,14 +2762,66 @@ a7c27ff0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
 This relates to an empty LZNT1 compressed block.
 
 ....
-libfwnt_lznt1_decompress: compressed data offset	: 0 (0x00000000)
-libfwnt_lznt1_decompress: compression chunk header	: 0x0000
-libfwnt_lznt1_decompress: compressed chunk size		: 1
-libfwnt_lznt1_decompress: signature value		: 0
-libfwnt_lznt1_decompress: is compressed flag		: 0
+compressed data offset                    : 0 (0x00000000)
+compression chunk header                  : 0x0000
+compressed chunk size                     : 1
+signature value                           : 0
+is compressed flag                        : 0
 ....
 
-It was observed that the entire block is filled with 0-byte values.
+It was observed in 2 differnt NTFS implementations that the entire block is
+filled with 0-byte values.
+
+TODO: verify behavior of Windows NTFS implementation.
+
+=== Truncated LZNT1 compressed block
+
+Not sure if this is a corruption scenario or a data format edge case.
+
+A compression unit (index 0) consisting of the following data runs:
+
+....
+reading data run: 0.
+data run:
+00000000: 31 08 48 d8 01                                     1.H..
+
+value sizes                               : 1, 3
+number of cluster blocks                  : 8 (size: 32768)
+cluster block number                      : 120904 (120904) (offset: 0x1d848000)
+
+reading data run: 1.
+data run:
+00000000: 01 08                                              ..
+
+value sizes                               : 1, 0
+number of cluster blocks                  : 8 (size: 32768)
+cluster block number                      : 0 (0) (offset: 0x00000000)
+        Is sparse
+....
+
+Contains the following data:
+
+....
+1d848000  bd b7 50 44 46 50 00 01  00 01 00 40 e0 00 07 0b  |..PDFP.....@....|
+...
+1d84c000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+*
+1d84fff0  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+....
+
+This relates to a LZNT1 compressed block that appears to be truncated at offset
+16384 (0x00004000).
+
+....
+compressed data offset                    : 16384 (0x00004000)
+compression flag byte                     : 0x00
+....
+
+Different behavior was observed in 2 differnt NTFS implementations:
+* one implementation fills the compressed block with the uncompressed data it could read and the rest with with 0-byte values
+* another implementation seems to provide the data that was already in its buffer
+
+TODO: verify behavior of Windows NTFS implementation.
 
 == Notes
 
