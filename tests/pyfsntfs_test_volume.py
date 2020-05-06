@@ -41,7 +41,7 @@ class DataRangeFileObject(object):
     """
     super(DataRangeFileObject, self).__init__()
     self._current_offset = 0
-    self._file_object = open(unittest.source, "rb")
+    self._file_object = open(path, "rb")
     self._range_offset = range_offset
     self._range_size = range_size
 

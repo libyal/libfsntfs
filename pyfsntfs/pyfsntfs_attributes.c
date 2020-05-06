@@ -58,7 +58,7 @@ PyTypeObject pyfsntfs_attributes_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs._attributes",
+	"pyfsntfs.attributes",
 	/* tp_basicsize */
 	sizeof( pyfsntfs_attributes_t ),
 	/* tp_itemsize */

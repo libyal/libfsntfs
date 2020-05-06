@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs MFT metadata file
+ * Python object wrapper of libfsntfs_mft_metadata_file_t
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,8 +25,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_libbfio.h"
+#include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 
 #if defined( __cplusplus )
@@ -52,9 +52,6 @@ struct pyfsntfs_mft_metadata_file
 
 extern PyMethodDef pyfsntfs_mft_metadata_file_object_methods[];
 extern PyTypeObject pyfsntfs_mft_metadata_file_type_object;
-
-PyObject *pyfsntfs_mft_metadata_file_new(
-           void );
 
 int pyfsntfs_mft_metadata_file_init(
      pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file );
@@ -101,5 +98,5 @@ PyObject *pyfsntfs_mft_metadata_file_get_file_entries(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_MFT_METADATA_FILE_H ) */
 

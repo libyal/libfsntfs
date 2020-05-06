@@ -245,7 +245,7 @@ PyTypeObject pyfsntfs_data_stream_type_object = {
 	0
 };
 
-/* Creates a new pyfsntfs data stream object
+/* Creates a new data stream object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_data_stream_new(
@@ -264,6 +264,8 @@ PyObject *pyfsntfs_data_stream_new(
 
 		return( NULL );
 	}
+	/* PyObject_New does not invoke tp_init
+	 */
 	pyfsntfs_data_stream = PyObject_New(
 	                        struct pyfsntfs_data_stream,
 	                        &pyfsntfs_data_stream_type_object );
@@ -277,22 +279,14 @@ PyObject *pyfsntfs_data_stream_new(
 
 		goto on_error;
 	}
-	if( pyfsntfs_data_stream_init(
-	     pyfsntfs_data_stream ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize data stream.",
-		 function );
-
-		goto on_error;
-	}
 	pyfsntfs_data_stream->data_stream   = data_stream;
 	pyfsntfs_data_stream->parent_object = parent_object;
 
-	Py_IncRef(
-	 pyfsntfs_data_stream->parent_object );
-
+	if( pyfsntfs_data_stream->parent_object != NULL )
+	{
+		Py_IncRef(
+		 pyfsntfs_data_stream->parent_object );
+	}
 	return( (PyObject *) pyfsntfs_data_stream );
 
 on_error:
@@ -325,7 +319,12 @@ int pyfsntfs_data_stream_init(
 	 */
 	pyfsntfs_data_stream->data_stream = NULL;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of data stream not supported.",
+	 function );
+
+	return( -1 );
 }
 
 /* Frees a data stream object
@@ -333,8 +332,8 @@ int pyfsntfs_data_stream_init(
 void pyfsntfs_data_stream_free(
       pyfsntfs_data_stream_t *pyfsntfs_data_stream )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyfsntfs_data_stream_free";
 	int result                  = 0;
 
@@ -383,7 +382,7 @@ void pyfsntfs_data_stream_free(
 			pyfsntfs_error_raise(
 			 error,
 			 PyExc_MemoryError,
-			 "%s: unable to free data stream.",
+			 "%s: unable to free libfsntfs data stream.",
 			 function );
 
 			libcerror_error_free(

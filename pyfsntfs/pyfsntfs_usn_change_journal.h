@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs USN change journal
+ * ython object wrapper of libfsntfs_usn_change_journal_t
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -44,9 +44,9 @@ struct pyfsntfs_usn_change_journal
 	 */
 	libfsntfs_usn_change_journal_t *usn_change_journal;
 
-	/* The volume object
+	/* The parent object
 	 */
-	PyObject *volume_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyfsntfs_usn_change_journal_object_methods[];
@@ -54,7 +54,7 @@ extern PyTypeObject pyfsntfs_usn_change_journal_type_object;
 
 PyObject *pyfsntfs_usn_change_journal_new(
            libfsntfs_usn_change_journal_t *usn_change_journal,
-           PyObject *volume_object );
+           PyObject *parent_object );
 
 int pyfsntfs_usn_change_journal_init(
      pyfsntfs_usn_change_journal_t *pyfsntfs_usn_change_journal );
@@ -74,5 +74,5 @@ PyObject *pyfsntfs_usn_change_journal_read_usn_record(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_USN_CHANGE_JOURNAL_H ) */
 

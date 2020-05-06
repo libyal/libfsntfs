@@ -59,7 +59,7 @@ PyTypeObject pyfsntfs_file_entries_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs._file_entries",
+	"pyfsntfs.file_entries",
 	/* tp_basicsize */
 	sizeof( pyfsntfs_file_entries_t ),
 	/* tp_itemsize */

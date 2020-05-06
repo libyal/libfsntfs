@@ -169,7 +169,7 @@ PyTypeObject pyfsntfs_attribute_type_object = {
 	0
 };
 
-/* Creates a new pyfsntfs attribute object
+/* Creates a new attribute object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_attribute_new(
@@ -207,9 +207,11 @@ PyObject *pyfsntfs_attribute_new(
 	pyfsntfs_attribute->attribute     = attribute;
 	pyfsntfs_attribute->parent_object = parent_object;
 
-	Py_IncRef(
-	 pyfsntfs_attribute->parent_object );
-
+	if( pyfsntfs_attribute->parent_object != NULL )
+	{
+		Py_IncRef(
+		 pyfsntfs_attribute->parent_object );
+	}
 	return( (PyObject *) pyfsntfs_attribute );
 
 on_error:
@@ -305,7 +307,7 @@ void pyfsntfs_attribute_free(
 			pyfsntfs_error_raise(
 			 error,
 			 PyExc_MemoryError,
-			 "%s: unable to free attribute.",
+			 "%s: unable to free libfsntfs attribute.",
 			 function );
 
 			libcerror_error_free(

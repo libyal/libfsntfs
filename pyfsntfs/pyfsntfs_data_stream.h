@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs data stream
+ * Python object wrapper of libfsntfs_data_stream_t
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
 
@@ -107,5 +106,5 @@ PyObject *pyfsntfs_data_stream_get_extent(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYFSNTFS_DATA_STREAM_H ) */
 

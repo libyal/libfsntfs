@@ -58,7 +58,7 @@ PyTypeObject pyfsntfs_data_streams_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyfsntfs._data_streams",
+	"pyfsntfs.data_streams",
 	/* tp_basicsize */
 	sizeof( pyfsntfs_data_streams_t ),
 	/* tp_itemsize */

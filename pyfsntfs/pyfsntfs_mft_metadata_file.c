@@ -222,57 +222,14 @@ PyTypeObject pyfsntfs_mft_metadata_file_type_object = {
 	0
 };
 
-/* Creates a new MFT metadata file object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_mft_metadata_file_new(
-           void )
-{
-	pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file = NULL;
-	static char *function                                    = "pyfsntfs_mft_metadata_file_new";
-
-	pyfsntfs_mft_metadata_file = PyObject_New(
-	                              struct pyfsntfs_mft_metadata_file,
-	                              &pyfsntfs_mft_metadata_file_type_object );
-
-	if( pyfsntfs_mft_metadata_file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize MFT metadata file.",
-		 function );
-
-		goto on_error;
-	}
-	if( pyfsntfs_mft_metadata_file_init(
-	     pyfsntfs_mft_metadata_file ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize MFT metadata file.",
-		 function );
-
-		goto on_error;
-	}
-	return( (PyObject *) pyfsntfs_mft_metadata_file );
-
-on_error:
-	if( pyfsntfs_mft_metadata_file != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) pyfsntfs_mft_metadata_file );
-	}
-	return( NULL );
-}
-
 /* Intializes a MFT metadata file object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_mft_metadata_file_init(
      pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file )
 {
-	static char *function    = "pyfsntfs_mft_metadata_file_init";
 	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_mft_metadata_file_init";
 
 	if( pyfsntfs_mft_metadata_file == NULL )
 	{
@@ -283,6 +240,8 @@ int pyfsntfs_mft_metadata_file_init(
 
 		return( -1 );
 	}
+	/* Make sure libfsntfs MFT metadata file is set to NULL
+	 */
 	pyfsntfs_mft_metadata_file->mft_metadata_file = NULL;
 	pyfsntfs_mft_metadata_file->file_io_handle    = NULL;
 
@@ -309,8 +268,8 @@ int pyfsntfs_mft_metadata_file_init(
 void pyfsntfs_mft_metadata_file_free(
       pyfsntfs_mft_metadata_file_t *pyfsntfs_mft_metadata_file )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyfsntfs_mft_metadata_file_free";
 	int result                  = 0;
 
@@ -319,15 +278,6 @@ void pyfsntfs_mft_metadata_file_free(
 		PyErr_Format(
 		 PyExc_ValueError,
 		 "%s: invalid MFT metadata file.",
-		 function );
-
-		return;
-	}
-	if( pyfsntfs_mft_metadata_file->mft_metadata_file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid MFT metadata file - missing libfsntfs MFT metadata file.",
 		 function );
 
 		return;
@@ -353,24 +303,27 @@ void pyfsntfs_mft_metadata_file_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_mft_metadata_file_free(
-	          &( pyfsntfs_mft_metadata_file->mft_metadata_file ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyfsntfs_mft_metadata_file->mft_metadata_file != NULL )
 	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_MemoryError,
-		 "%s: unable to free libfsntfs MFT metadata file.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libfsntfs_mft_metadata_file_free(
+		          &( pyfsntfs_mft_metadata_file->mft_metadata_file ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libfsntfs MFT metadata file.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyfsntfs_mft_metadata_file );

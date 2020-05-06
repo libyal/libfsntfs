@@ -361,6 +361,17 @@ ssize_t libfsntfs_index_value_read(
 
 			goto on_error;
 		}
+		if( data_offset > ( data_size - index_value->key_data_size ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: data size value too small.",
+			 function );
+
+			goto on_error;
+		}
 		if( memory_copy(
 		     index_value->key_data,
 		     &( data[ data_offset ] ),
@@ -427,6 +438,17 @@ ssize_t libfsntfs_index_value_read(
 		}
 		index_value->value_data_size = remaining_size;
 
+		if( data_offset > ( data_size - index_value->value_data_size ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: data size value too small.",
+			 function );
+
+			goto on_error;
+		}
 		if( memory_copy(
 		     index_value->value_data,
 		     &( data[ data_offset ] ),
@@ -472,6 +494,17 @@ ssize_t libfsntfs_index_value_read(
 			 0 );
 		}
 #endif
+		if( data_offset > ( data_size - 4 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: data size value too small.",
+			 function );
+
+			goto on_error;
+		}
 		byte_stream_copy_to_uint32_little_endian(
 		 &( data[ data_offset ] ),
 		 index_value->sub_node_vcn );

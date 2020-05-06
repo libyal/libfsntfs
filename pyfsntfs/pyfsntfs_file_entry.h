@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs file entry
+ * Python object wrapper of libfsntfs_file_entry_t
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *

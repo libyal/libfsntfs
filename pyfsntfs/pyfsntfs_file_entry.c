@@ -1,5 +1,5 @@
 /*
- * Python object definition of the libfsntfs file entry
+ * Python object wrapper of libfsntfs_file_entry_t
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -23,7 +23,7 @@
 #include <narrow_string.h>
 #include <types.h>
 
-#if defined( HAVE_STDLIB_H )
+#if defined( HAVE_STDLIB_H ) || defined( HAVE_WINAPI )
 #include <stdlib.h>
 #endif
 
@@ -592,7 +592,7 @@ PyTypeObject pyfsntfs_file_entry_type_object = {
 	0
 };
 
-/* Creates a new pyfsntfs file entry object
+/* Creates a new file entry object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_new(
@@ -611,6 +611,8 @@ PyObject *pyfsntfs_file_entry_new(
 
 		return( NULL );
 	}
+	/* PyObject_New does not invoke tp_init
+	 */
 	pyfsntfs_file_entry = PyObject_New(
 	                       struct pyfsntfs_file_entry,
 	                       &pyfsntfs_file_entry_type_object );
@@ -624,22 +626,14 @@ PyObject *pyfsntfs_file_entry_new(
 
 		goto on_error;
 	}
-	if( pyfsntfs_file_entry_init(
-	     pyfsntfs_file_entry ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file entry.",
-		 function );
-
-		goto on_error;
-	}
 	pyfsntfs_file_entry->file_entry    = file_entry;
 	pyfsntfs_file_entry->parent_object = parent_object;
 
-	Py_IncRef(
-	 pyfsntfs_file_entry->parent_object );
-
+	if( pyfsntfs_file_entry->parent_object != NULL )
+	{
+		Py_IncRef(
+		 pyfsntfs_file_entry->parent_object );
+	}
 	return( (PyObject *) pyfsntfs_file_entry );
 
 on_error:
@@ -672,7 +666,12 @@ int pyfsntfs_file_entry_init(
 	 */
 	pyfsntfs_file_entry->file_entry = NULL;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of file entry not supported.",
+	 function );
+
+	return( -1 );
 }
 
 /* Frees a file entry object
@@ -680,8 +679,8 @@ int pyfsntfs_file_entry_init(
 void pyfsntfs_file_entry_free(
       pyfsntfs_file_entry_t *pyfsntfs_file_entry )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyfsntfs_file_entry_free";
 	int result                  = 0;
 
@@ -730,7 +729,7 @@ void pyfsntfs_file_entry_free(
 			pyfsntfs_error_raise(
 			 error,
 			 PyExc_MemoryError,
-			 "%s: unable to free file entry.",
+			 "%s: unable to free libfsntfs file entry.",
 			 function );
 
 			libcerror_error_free(
