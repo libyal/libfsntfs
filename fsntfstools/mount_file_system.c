@@ -792,6 +792,7 @@ on_error:
 	}
 	return( -1 );
 }
+
 /* Retrieves the file entry of a specific path
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
