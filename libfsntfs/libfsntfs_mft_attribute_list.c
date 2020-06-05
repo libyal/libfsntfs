@@ -467,6 +467,20 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
+		if( memory_set(
+		     data,
+		     0,
+		     sizeof( fsntfs_mft_attribute_list_entry_header_t ) + 256 ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear data.",
+			 function );
+
+			goto on_error;
+		}
 		read_count = libfdata_stream_read_buffer(
 		              cluster_block_stream,
 		              (intptr_t *) file_io_handle,
