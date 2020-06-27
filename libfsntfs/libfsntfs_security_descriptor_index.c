@@ -372,7 +372,9 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 	size_t security_descriptor_data_size                                         = 0;
 	ssize_t read_count                                                           = 0;
 	off64_t index_entry_offset                                                   = 0;
+	int compare_result                                                           = 0;
 	int index_value_entry                                                        = 0;
+	int is_allocated                                                             = 0;
 	int number_of_index_values                                                   = 0;
 	int result                                                                   = 0;
 
@@ -470,6 +472,42 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		{
 			break;
 		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		{
+			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: node index value: %d sub node VCN value out of bounds.",
+				 function,
+				 index_value_entry );
+
+				goto on_error;
+			}
+			is_allocated = libfsntfs_index_sub_node_is_allocated(
+			                security_descriptor_index->sii_index,
+			                (int) index_value->sub_node_vcn,
+			                error );
+
+			if( is_allocated == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if sub node with VCN: %d is allocated.",
+				 function,
+				 (int) index_value->sub_node_vcn );
+
+				goto on_error;
+			}
+			else if( is_allocated == 0 )
+			{
+				continue;
+			}
+		}
 		if( libfsntfs_security_descriptor_index_value_initialize(
 		     &security_descriptor_index_value,
 		     error ) != 1 )
@@ -500,17 +538,17 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		}
 		if( security_descriptor_identifier < security_descriptor_index_value->identifier )
 		{
-			result = LIBCDATA_COMPARE_LESS;
+			compare_result = LIBCDATA_COMPARE_LESS;
 		}
 		else if( security_descriptor_identifier > security_descriptor_index_value->identifier )
 		{
-			result = LIBCDATA_COMPARE_GREATER;
+			compare_result = LIBCDATA_COMPARE_GREATER;
 		}
 		else
 		{
-			result = LIBCDATA_COMPARE_EQUAL;
+			compare_result = LIBCDATA_COMPARE_EQUAL;
 		}
-		if( result != LIBCDATA_COMPARE_EQUAL )
+		if( compare_result != LIBCDATA_COMPARE_EQUAL )
 		{
 			if( libfsntfs_security_descriptor_index_value_free(
 			     &security_descriptor_index_value,
@@ -526,19 +564,19 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 				goto on_error;
 			}
 		}
-		if( result == LIBCDATA_COMPARE_LESS )
+		if( compare_result == LIBCDATA_COMPARE_LESS )
 		{
 			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 			{
 				break;
 			}
 		}
-		else if( result == LIBCDATA_COMPARE_EQUAL )
+		else if( compare_result == LIBCDATA_COMPARE_EQUAL )
 		{
 			break;
 		}
 	}
-	if( result == LIBCDATA_COMPARE_EQUAL )
+	if( compare_result == LIBCDATA_COMPARE_EQUAL )
 	{
 		if( security_descriptor_index_value->data_size < (size64_t) ( sizeof( fsntfs_secure_index_value_t ) + 20 ) )
 		{
@@ -616,6 +654,19 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		}
 		security_descriptor_data_size = (size_t) ( security_descriptor_index_value->data_size - sizeof( fsntfs_secure_index_value_t ) );
 
+		if( ( security_descriptor_data_size == 0 )
+		 || ( security_descriptor_data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid security descriptor values data value out of bounds.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
 		safe_security_descriptor_values->data = memory_allocate(
 		                                         sizeof( uint8_t ) * security_descriptor_data_size );
 
@@ -685,18 +736,6 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 	}
 	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
-		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: node index value: %d sub node VCN value out of bounds.",
-			 function,
-			 index_value_entry );
-
-			goto on_error;
-		}
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * security_descriptor_index->sii_index->io_handle->cluster_block_size );
 
 		if( libfsntfs_index_get_sub_node(
@@ -741,10 +780,6 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 
 			goto on_error;
 		}
-	}
-	else
-	{
-		result = 0;
 	}
 	return( result );
 

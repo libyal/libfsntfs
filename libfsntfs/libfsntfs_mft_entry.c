@@ -716,12 +716,8 @@ int libfsntfs_mft_entry_read_file_io_handle(
 
 		return( -1 );
 	}
-#if ( SIZEOF_SIZE_T <= 4 )
 	if( ( (size_t) mft_entry_size <= 42 )
-	 || ( (size_t) mft_entry_size > (size_t) SSIZE_MAX ) )
-#else
-	if( (size_t) mft_entry_size <= 42 )
-#endif
+	 || ( (size_t) mft_entry_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,

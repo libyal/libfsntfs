@@ -599,7 +599,7 @@ int libfsntfs_debug_print_utf16_string_value(
 	 || ( byte_stream_size == 0 ) )
 	{
 		libcnotify_printf(
-		 "%s: %s: \n",
+		 "%s: %s:\n",
 		 function_name,
 		 value_name );
 
@@ -693,7 +693,6 @@ int libfsntfs_debug_print_utf16_string_value(
 		}
 		libcnotify_printf(
 		 " %s",
-		 value_name,
 		 string );
 
 		memory_free(

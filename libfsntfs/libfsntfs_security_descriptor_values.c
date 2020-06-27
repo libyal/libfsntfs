@@ -310,26 +310,15 @@ int libfsntfs_security_descriptor_values_read_buffer(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	if( data_size < 20 )
+	if( ( data_size < 20 )
+	 || ( data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported security descriptor data size: %" PRIzd "\n",
-		 function,
-		 data_size );
+		 "%s: invalid security descriptor data size value out of bounds.",
+		 function );
 
 		goto on_error;
 	}
@@ -442,26 +431,15 @@ int libfsntfs_security_descriptor_values_read_stream(
 
 		goto on_error;
 	}
-	if( data_size > (size64_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid data size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	if( data_size < 20 )
+	if( ( data_size < 20 )
+	 || ( data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported security descriptor data size: %" PRIzd "\n",
-		 function,
-		 data_size );
+		 "%s: invalid security descriptor data size value out of bounds.",
+		 function );
 
 		goto on_error;
 	}

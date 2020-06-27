@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_bitmap_values.h"
 #include "libfsntfs_index_node.h"
 #include "libfsntfs_index_root_header.h"
 #include "libfsntfs_index_value.h"
@@ -75,6 +76,10 @@ struct libfsntfs_index
 	/* The index node cache
 	 */
 	libfcache_cache_t *index_node_cache;
+
+	/* The bitmap values
+	 */
+	libfsntfs_bitmap_values_t *bitmap_values;
 };
 
 int libfsntfs_index_initialize(
@@ -120,6 +125,11 @@ int libfsntfs_index_get_attribute_type(
 int libfsntfs_index_get_collation_type(
      libfsntfs_index_t *index,
      uint32_t *collation_type,
+     libcerror_error_t **error );
+
+int libfsntfs_index_sub_node_is_allocated(
+     libfsntfs_index_t *index,
+     int sub_node_vcn,
      libcerror_error_t **error );
 
 int libfsntfs_index_get_sub_node(

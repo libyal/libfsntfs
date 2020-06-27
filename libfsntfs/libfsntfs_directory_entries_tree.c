@@ -490,6 +490,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 	off64_t index_entry_offset           = 0;
 	uint32_t index_value_flags           = 0;
 	int index_value_entry                = 0;
+	int is_allocated                     = 0;
 	int number_of_index_values           = 0;
 	int result                           = 0;
 
@@ -616,6 +617,27 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 				 index_value_entry );
 
 				goto on_error;
+			}
+			is_allocated = libfsntfs_index_sub_node_is_allocated(
+			                directory_entries_tree->i30_index,
+			                (int) index_value->sub_node_vcn,
+			                error );
+
+			if( is_allocated == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if sub node with VCN: %d is allocated.",
+				 function,
+				 (int) index_value->sub_node_vcn );
+
+				goto on_error;
+			}
+			else if( is_allocated == 0 )
+			{
+				continue;
 			}
 			index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
@@ -1161,7 +1183,9 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 	libfsntfs_index_value_t *index_value                  = NULL;
 	static char *function                                 = "libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name";
 	off64_t index_entry_offset                            = 0;
+	int compare_result                                    = 0;
 	int index_value_entry                                 = 0;
+	int is_allocated                                      = 0;
 	int number_of_index_values                            = 0;
 	int result                                            = 0;
 
@@ -1273,6 +1297,42 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		{
 			break;
 		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		{
+			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: node index value: %d sub node VCN value out of bounds.",
+				 function,
+				 index_value_entry );
+
+				goto on_error;
+			}
+			is_allocated = libfsntfs_index_sub_node_is_allocated(
+			                directory_entries_tree->i30_index,
+			                (int) index_value->sub_node_vcn,
+			                error );
+
+			if( is_allocated == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if sub node with VCN: %d is allocated.",
+				 function,
+				 (int) index_value->sub_node_vcn );
+
+				goto on_error;
+			}
+			else if( is_allocated == 0 )
+			{
+				continue;
+			}
+		}
 		if( libfsntfs_file_name_values_initialize(
 		     &file_name_values,
 		     error ) != 1 )
@@ -1301,15 +1361,15 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 			goto on_error;
 		}
-		result = libfsntfs_name_compare_with_utf8_string(
-		          file_name_values->name,
-		          file_name_values->name_size,
-		          utf8_string,
-		          utf8_string_length,
-		          directory_entries_tree->use_case_folding,
-		          error );
+		compare_result = libfsntfs_name_compare_with_utf8_string(
+		                  file_name_values->name,
+		                  file_name_values->name_size,
+		                  utf8_string,
+		                  utf8_string_length,
+		                  directory_entries_tree->use_case_folding,
+		                  error );
 
-		if( result == -1 )
+		if( compare_result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1320,7 +1380,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 			goto on_error;
 		}
-		if( result != LIBUNA_COMPARE_EQUAL )
+		if( compare_result != LIBUNA_COMPARE_EQUAL )
 		{
 			if( libfsntfs_file_name_values_free(
 			     &file_name_values,
@@ -1336,19 +1396,19 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 				goto on_error;
 			}
 		}
-		if( result == LIBUNA_COMPARE_LESS )
+		if( compare_result == LIBUNA_COMPARE_LESS )
 		{
 			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 			{
 				break;
 			}
 		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
+		else if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}
 	}
-	if( result == LIBUNA_COMPARE_EQUAL )
+	if( compare_result == LIBUNA_COMPARE_EQUAL )
 	{
 		if( libfsntfs_directory_entry_initialize(
 		     &safe_directory_entry,
@@ -1425,18 +1485,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 	}
 	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
-		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: node index value: %d sub node VCN value out of bounds.",
-			 function,
-			 index_value_entry );
-
-			goto on_error;
-		}
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
 		if( libfsntfs_index_get_sub_node(
@@ -1482,10 +1530,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 			goto on_error;
 		}
-	}
-	else
-	{
-		result = 0;
 	}
 	return( result );
 
@@ -1588,7 +1632,9 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 	libfsntfs_index_value_t *index_value                  = NULL;
 	static char *function                                 = "libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name";
 	off64_t index_entry_offset                            = 0;
+	int compare_result                                    = 0;
 	int index_value_entry                                 = 0;
+	int is_allocated                                      = 0;
 	int number_of_index_values                            = 0;
 	int result                                            = 0;
 
@@ -1700,6 +1746,42 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		{
 			break;
 		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		{
+			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: node index value: %d sub node VCN value out of bounds.",
+				 function,
+				 index_value_entry );
+
+				goto on_error;
+			}
+			is_allocated = libfsntfs_index_sub_node_is_allocated(
+			                directory_entries_tree->i30_index,
+			                (int) index_value->sub_node_vcn,
+			                error );
+
+			if( is_allocated == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if sub node with VCN: %d is allocated.",
+				 function,
+				 (int) index_value->sub_node_vcn );
+
+				goto on_error;
+			}
+			else if( is_allocated == 0 )
+			{
+				continue;
+			}
+		}
 		if( libfsntfs_file_name_values_initialize(
 		     &file_name_values,
 		     error ) != 1 )
@@ -1728,15 +1810,15 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 			goto on_error;
 		}
-		result = libfsntfs_name_compare_with_utf16_string(
-		          file_name_values->name,
-		          file_name_values->name_size,
-		          utf16_string,
-		          utf16_string_length,
-		          directory_entries_tree->use_case_folding,
-		          error );
+		compare_result = libfsntfs_name_compare_with_utf16_string(
+		                  file_name_values->name,
+		                  file_name_values->name_size,
+		                  utf16_string,
+		                  utf16_string_length,
+		                  directory_entries_tree->use_case_folding,
+		                  error );
 
-		if( result == -1 )
+		if( compare_result == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1747,7 +1829,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 			goto on_error;
 		}
-		if( result != LIBUNA_COMPARE_EQUAL )
+		if( compare_result != LIBUNA_COMPARE_EQUAL )
 		{
 			if( libfsntfs_file_name_values_free(
 			     &file_name_values,
@@ -1763,19 +1845,19 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 				goto on_error;
 			}
 		}
-		if( result == LIBUNA_COMPARE_LESS )
+		if( compare_result == LIBUNA_COMPARE_LESS )
 		{
 			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 			{
 				break;
 			}
 		}
-		else if( result == LIBUNA_COMPARE_EQUAL )
+		else if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}
 	}
-	if( result == LIBUNA_COMPARE_EQUAL )
+	if( compare_result == LIBUNA_COMPARE_EQUAL )
 	{
 		if( libfsntfs_directory_entry_initialize(
 		     &safe_directory_entry,
@@ -1852,18 +1934,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 	}
 	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 	{
-		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: node index value: %d sub node VCN value out of bounds.",
-			 function,
-			 index_value_entry );
-
-			goto on_error;
-		}
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
 		if( libfsntfs_index_get_sub_node(
@@ -1909,10 +1979,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 			goto on_error;
 		}
-	}
-	else
-	{
-		result = 0;
 	}
 	return( result );
 
@@ -2019,6 +2085,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	off64_t sub_node_vcn                                  = 0;
 	uint32_t index_entry_size                             = 0;
 	int index_value_entry                                 = 0;
+	int is_allocated                                      = 0;
 	int result                                            = 0;
 
 	LIBFSNTFS_UNREFERENCED_PARAMETER( element_size )
@@ -2124,6 +2191,35 @@ int libfsntfs_directory_entries_tree_read_element_data(
 		sub_node_vcn       = index_value_offset / index_entry_size;
 		index_entry_offset = (off64_t) ( sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
+		is_allocated = libfsntfs_index_sub_node_is_allocated(
+		                directory_entries_tree->i30_index,
+		                (int) sub_node_vcn,
+		                error );
+
+		if( is_allocated == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if sub node with VCN: %d is allocated.",
+			 function,
+			 (int) sub_node_vcn );
+
+			goto on_error;
+		}
+		else if( is_allocated == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unsupported unallocated sub node with VCN: %d.",
+			 function,
+			 (int) sub_node_vcn );
+
+			goto on_error;
+		}
 		if( libfsntfs_index_get_sub_node(
 		     directory_entries_tree->i30_index,
 		     file_io_handle,

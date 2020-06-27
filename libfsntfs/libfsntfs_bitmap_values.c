@@ -28,6 +28,7 @@
 #include "libfsntfs_cluster_block_vector.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libfcache.h"
@@ -91,6 +92,24 @@ int libfsntfs_bitmap_values_initialize(
 		 "%s: unable to clear bitmap values.",
 		 function );
 
+		memory_free(
+		 *bitmap_values );
+
+		*bitmap_values = NULL;
+
+		return( -1 );
+	}
+	if( libcdata_range_list_initialize(
+	     &( ( *bitmap_values )->allocated_block_list ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create allocated block list.",
+		 function );
+
 		goto on_error;
 	}
 	return( 1 );
@@ -129,6 +148,20 @@ int libfsntfs_bitmap_values_free(
 	}
 	if( *bitmap_values != NULL )
 	{
+		if( libcdata_range_list_free(
+		     &( ( *bitmap_values )->allocated_block_list ),
+		     NULL,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free allocated data block list.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 *bitmap_values );
 
@@ -142,20 +175,21 @@ int libfsntfs_bitmap_values_free(
  */
 int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	static char *function             = "libfsntfs_bitmap_values_read_data";
+	size64_t allocated_range_size     = 0;
 	size_t data_offset                = 0;
+	off64_t allocated_range_offset    = 0;
 	uint8_t bit_index                 = 0;
 	uint8_t byte_value                = 0;
 	uint8_t in_allocated_range        = 0;
 	int allocated_element_index       = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
 	int first_allocated_element_index = 0;
-#endif
+	int result                        = 0;
 
 	if( bitmap_values == NULL )
 	{
@@ -164,6 +198,17 @@ int libfsntfs_bitmap_values_read_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid bitmap values.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -217,13 +262,14 @@ int libfsntfs_bitmap_values_read_data(
 				if( ( byte_value & 0x01 ) != 0 )
 				{
 					in_allocated_range            = 1;
-#if defined( HAVE_DEBUG_OUTPUT )
 					first_allocated_element_index = allocated_element_index;
-#endif
 				}
 			}
 			else if( ( byte_value & 0x01 ) == 0 )
 			{
+				allocated_range_offset = (off64_t) first_allocated_element_index * io_handle->cluster_block_size;
+				allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * io_handle->cluster_block_size;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
@@ -237,13 +283,39 @@ int libfsntfs_bitmap_values_read_data(
 					else
 					{
 						libcnotify_printf(
-						 "%s: allocated element\t\t\t: %d - %d\n",
+						 "%s: allocated elements\t\t\t: %d - %d\n",
 						 function,
 						 first_allocated_element_index,
 						 allocated_element_index - 1 );
 					}
+					libcnotify_printf(
+					 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
+					 function,
+					 allocated_range_offset,
+					 allocated_range_size );
 				}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+				result = libcdata_range_list_insert_range(
+				          bitmap_values->allocated_block_list,
+				          allocated_range_offset,
+				          allocated_range_size,
+				          NULL,
+				          NULL,
+				          NULL,
+				          error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append allocated block range to list.",
+					 function );
+
+					return( -1 );
+				}
 				in_allocated_range = 0;
 			}
 			byte_value >>= 1;
@@ -253,6 +325,9 @@ int libfsntfs_bitmap_values_read_data(
 	}
 	if( in_allocated_range != 0 )
 	{
+		allocated_range_offset = (off64_t) first_allocated_element_index * io_handle->cluster_block_size;
+		allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * io_handle->cluster_block_size;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -266,13 +341,39 @@ int libfsntfs_bitmap_values_read_data(
 			else
 			{
 				libcnotify_printf(
-				 "%s: allocated element\t\t\t: %d - %d\n",
+				 "%s: allocated elements\t\t\t: %d - %d\n",
 				 function,
 				 first_allocated_element_index,
 				 allocated_element_index - 1 );
 			}
+			libcnotify_printf(
+			 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
+			 function,
+			 allocated_range_offset,
+			 allocated_range_size );
 		}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+		result = libcdata_range_list_insert_range(
+		          bitmap_values->allocated_block_list,
+		          allocated_range_offset,
+		          allocated_range_size,
+		          NULL,
+		          NULL,
+		          NULL,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append allocated block range to list.",
+			 function );
+
+			return( -1 );
+		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -376,6 +477,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 		}
 		if( libfsntfs_bitmap_values_read_data(
 		     bitmap_values,
+		     io_handle,
 		     data,
 		     data_size,
 		     error ) != 1 )
@@ -484,6 +586,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 			}
 			if( libfsntfs_bitmap_values_read_data(
 			     bitmap_values,
+			     io_handle,
 			     cluster_block->data,
 			     cluster_block->data_size,
 			     error ) != 1 )

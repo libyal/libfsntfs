@@ -27,6 +27,7 @@
 
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
+#include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_mft_attribute.h"
 
@@ -38,9 +39,9 @@ typedef struct libfsntfs_bitmap_values libfsntfs_bitmap_values_t;
 
 struct libfsntfs_bitmap_values
 {
-	/* Dummy value
+	/* The allocated block (range) list
 	 */
-	int dummy;
+	libcdata_range_list_t *allocated_block_list;
 };
 
 int libfsntfs_bitmap_values_initialize(
@@ -53,6 +54,7 @@ int libfsntfs_bitmap_values_free(
 
 int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
+     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );

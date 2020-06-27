@@ -290,13 +290,14 @@ int libfsntfs_file_name_values_set_name(
 
 		return( -1 );
 	}
-	if( utf16_stream_size > (size_t) SSIZE_MAX )
+	if( ( utf16_stream_size == 0 )
+	 || ( utf16_stream_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-16 stream size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid UTF-16 stream size value out of bounds.",
 		 function );
 
 		return( -1 );

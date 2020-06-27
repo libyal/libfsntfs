@@ -62,7 +62,7 @@ int libfsntfs_cluster_block_initialize(
 		return( -1 );
 	}
 	if( ( data_size == 0 )
-	 || ( data_size > (size_t) SSIZE_MAX ) )
+	 || ( data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,

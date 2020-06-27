@@ -390,7 +390,7 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		 data_handle->number_of_compressed_blocks );
 	}
 #endif
-	if( (size_t) data_handle->number_of_compressed_blocks > ( (size_t) ( SSIZE_MAX / chunk_offset_data_size ) - 1 ) )
+	if( (size_t) data_handle->number_of_compressed_blocks > ( (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE / chunk_offset_data_size ) - 1 ) )
 	{
 		libcerror_error_set(
 		 error,

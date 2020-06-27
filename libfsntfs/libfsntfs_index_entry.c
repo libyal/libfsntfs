@@ -203,7 +203,8 @@ int libfsntfs_index_entry_read_file_io_handle(
 
 		return( -1 );
 	}
-	if( index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t ) ) )
+	if( ( index_entry_size < ( sizeof( fsntfs_index_entry_header_t ) + sizeof( fsntfs_index_node_header_t ) ) )
+	 || ( index_entry_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,

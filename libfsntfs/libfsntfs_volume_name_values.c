@@ -191,7 +191,7 @@ int libfsntfs_volume_name_values_read_data(
 			goto on_error;
 		}
 	}
-	if( data_size > (size_t) SSIZE_MAX )
+	if( data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE )
 	{
 		libcerror_error_set(
 		 error,

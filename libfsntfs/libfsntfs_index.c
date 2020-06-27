@@ -104,7 +104,7 @@ int libfsntfs_index_initialize(
 		return( -1 );
 	}
 	if( ( name_size <= 1 )
-	 || ( name_size > (size_t) SSIZE_MAX ) )
+	 || ( name_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -281,6 +281,22 @@ int libfsntfs_index_free(
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free index node cache.",
+				 function );
+
+				result = -1;
+			}
+		}
+		if( ( *index )->bitmap_values != NULL )
+		{
+			if( libfsntfs_bitmap_values_free(
+			     &( ( *index )->bitmap_values ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free bitmap values.",
 				 function );
 
 				result = -1;
@@ -470,8 +486,6 @@ int libfsntfs_index_read(
 
 		goto on_error;
 	}
-/* TODO add support for bitmap ? */
-#if defined( HAVE_DEBUG_OUTPUT )
 	/* The index does not necessarily have a $BITMAP attribute
 	 */
 	if( bitmap_attribute != NULL )
@@ -493,7 +507,6 @@ int libfsntfs_index_read(
 			goto on_error;
 		}
 	}
-#endif
 	/* The index does not necessarily have an $INDEX_ALLOCATION attribute
 	 */
 	if( index_allocation_attribute != NULL )
@@ -731,7 +744,8 @@ int libfsntfs_index_read_root(
 			 0 );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 
 on_error:
@@ -760,8 +774,7 @@ int libfsntfs_index_read_bitmap(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	libfsntfs_bitmap_values_t *bitmap_values = NULL;
-	static char *function                    = "libfsntfs_index_read_bitmap";
+	static char *function = "libfsntfs_index_read_bitmap";
 
 	if( index == NULL )
 	{
@@ -775,7 +788,7 @@ int libfsntfs_index_read_bitmap(
 		return( -1 );
 	}
 	if( libfsntfs_bitmap_values_initialize(
-	     &bitmap_values,
+	     &( index->bitmap_values ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -788,7 +801,7 @@ int libfsntfs_index_read_bitmap(
 		goto on_error;
 	}
 	if( libfsntfs_bitmap_values_read_from_mft_attribute(
-	     bitmap_values,
+	     index->bitmap_values,
 	     bitmap_attribute,
 	     index->io_handle,
 	     file_io_handle,
@@ -804,28 +817,13 @@ int libfsntfs_index_read_bitmap(
 
 		goto on_error;
 	}
-/* TODO get a range list from the bitmap values */
-
-	if( libfsntfs_bitmap_values_free(
-	     &bitmap_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free bitmap values.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
 
 on_error:
-	if( bitmap_values != NULL )
+	if( index->bitmap_values != NULL )
 	{
 		libfsntfs_bitmap_values_free(
-		 &bitmap_values,
+		 &( index->bitmap_values ),
 		 NULL );
 	}
 	return( -1 );
@@ -945,7 +943,75 @@ int libfsntfs_index_get_collation_type(
 	return( 1 );
 }
 
-/* Retrieves an index node
+/* Determines if a sub node is allocated
+ * Returns 1 if allocated, 0 if not or -1 on error
+ */
+int libfsntfs_index_sub_node_is_allocated(
+     libfsntfs_index_t *index,
+     int sub_node_vcn,
+     libcerror_error_t **error )
+{
+	static char *function       = "libfsntfs_index_sub_node_is_allocated";
+	off64_t sub_node_vcn_offset = 0;
+	int result                  = 0;
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	if( index->bitmap_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index - missing bitmap values.",
+		 function );
+
+		return( -1 );
+	}
+	if( index->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	sub_node_vcn_offset = (off64_t) sub_node_vcn * index->io_handle->cluster_block_size;
+
+	result = libcdata_range_list_range_is_present(
+	          index->bitmap_values->allocated_block_list,
+	          sub_node_vcn_offset,
+	          index->io_handle->cluster_block_size,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if range of sub node with VCN: %d is allocated.",
+		 function,
+		 sub_node_vcn );
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Retrieves a sub index node
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_index_get_sub_node(

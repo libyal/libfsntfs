@@ -241,7 +241,8 @@ int libfsntfs_reparse_point_values_read_data(
 	if( reparse_point_values->reparse_data_size > 0 )
 	{
 		if( ( sizeof( fsntfs_reparse_point_t ) > data_size )
-		 || ( (size_t) reparse_point_values->reparse_data_size > ( data_size - sizeof( fsntfs_reparse_point_t ) ) ) )
+		 || ( (size_t) reparse_point_values->reparse_data_size > ( data_size - sizeof( fsntfs_reparse_point_t ) ) )
+		 || ( (size_t) reparse_point_values->reparse_data_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 		{
 			libcerror_error_set(
 			 error,
