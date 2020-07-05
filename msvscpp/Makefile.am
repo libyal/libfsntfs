@@ -55,6 +55,9 @@ MSVSCPP_FILES = \
 	fsntfs_test_security_descriptor_values/fsntfs_test_security_descriptor_values.vcproj \
 	fsntfs_test_standard_information_values/fsntfs_test_standard_information_values.vcproj \
 	fsntfs_test_support/fsntfs_test_support.vcproj \
+	fsntfs_test_tools_info_handle/fsntfs_test_tools_info_handle.vcproj \
+	fsntfs_test_tools_output/fsntfs_test_tools_output.vcproj \
+	fsntfs_test_tools_signal/fsntfs_test_tools_signal.vcproj \
 	fsntfs_test_txf_data_values/fsntfs_test_txf_data_values.vcproj \
 	fsntfs_test_usn_change_journal/fsntfs_test_usn_change_journal.vcproj \
 	fsntfs_test_volume/fsntfs_test_volume.vcproj \

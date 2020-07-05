@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_mft_entry"
-	ProjectGUID="{59700D23-BA81-4639-8F02-3F609FAB22EF}"
-	RootNamespace="fsntfs_test_mft_entry"
+	Name="fsntfs_test_tools_signal"
+	ProjectGUID="{DC6AD8F6-542A-48AC-8960-E62927C907FB}"
+	RootNamespace="fsntfs_test_tools_signal"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,15 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_functions.c"
+				RelativePath="..\..\fsntfstools\fsntfstools_signal.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_mft_entry.c"
+				RelativePath="..\..\tests\fsntfs_test_tools_signal.c"
 				>
 			</File>
 		</Filter>
@@ -194,11 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_functions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_libbfio.h"
+				RelativePath="..\..\fsntfstools\fsntfstools_signal.h"
 				>
 			</File>
 			<File
@@ -206,15 +198,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_libfsntfs.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.h"
 				>
 			</File>
 			<File

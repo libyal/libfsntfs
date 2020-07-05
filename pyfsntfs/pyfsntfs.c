@@ -443,19 +443,47 @@ PyObject *pyfsntfs_open_new_volume(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *pyfsntfs_volume = NULL;
+	pyfsntfs_volume_t *pyfsntfs_volume = NULL;
+	static char *function              = "pyfsntfs_open_new_volume";
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( self )
 
-	pyfsntfs_volume_init(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume );
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyfsntfs_volume = PyObject_New(
+	                   struct pyfsntfs_volume,
+	                   &pyfsntfs_volume_type_object );
 
-	pyfsntfs_volume_open(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create volume.",
+		 function );
 
-	return( pyfsntfs_volume );
+		goto on_error;
+	}
+	if( pyfsntfs_volume_init(
+	     pyfsntfs_volume ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyfsntfs_volume_open(
+	     pyfsntfs_volume,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyfsntfs_volume );
+
+on_error:
+	if( pyfsntfs_volume != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyfsntfs_volume );
+	}
+	return( NULL );
 }
 
 /* Creates a new volume object and opens it using a file-like object
@@ -466,19 +494,47 @@ PyObject *pyfsntfs_open_new_volume_with_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *pyfsntfs_volume = NULL;
+	pyfsntfs_volume_t *pyfsntfs_volume = NULL;
+	static char *function              = "pyfsntfs_open_new_volume_with_file_object";
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( self )
 
-	pyfsntfs_volume_init(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume );
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyfsntfs_volume = PyObject_New(
+	                   struct pyfsntfs_volume,
+	                   &pyfsntfs_volume_type_object );
 
-	pyfsntfs_volume_open_file_object(
-	 (pyfsntfs_volume_t *) pyfsntfs_volume,
-	 arguments,
-	 keywords );
+	if( pyfsntfs_volume == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create volume.",
+		 function );
 
-	return( pyfsntfs_volume );
+		goto on_error;
+	}
+	if( pyfsntfs_volume_init(
+	     pyfsntfs_volume ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyfsntfs_volume_open_file_object(
+	     pyfsntfs_volume,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyfsntfs_volume );
+
+on_error:
+	if( pyfsntfs_volume != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyfsntfs_volume );
+	}
+	return( NULL );
 }
 
 #if PY_MAJOR_VERSION >= 3

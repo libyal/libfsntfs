@@ -19,6 +19,9 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import argparse
+import os
+import sys
 import unittest
 
 import pyfsntfs
@@ -30,10 +33,19 @@ class SupportFunctionsTests(unittest.TestCase):
   def test_get_version(self):
     """Tests the get_version function."""
     version = pyfsntfs.get_version()
-
-    # TODO: check version.
-    # self.assertEqual(version, "00000000")
+    self.assertIsNotNone(version)
 
 
 if __name__ == "__main__":
-  unittest.main(verbosity=2)
+  argument_parser = argparse.ArgumentParser()
+
+  argument_parser.add_argument(
+      "source", nargs="?", action="store", metavar="PATH",
+      default=None, help="path of the source file.")
+
+  options, unknown_options = argument_parser.parse_known_args()
+  unknown_options.insert(0, sys.argv[0])
+
+  setattr(unittest, "source", options.source)
+
+  unittest.main(argv=unknown_options, verbosity=2)

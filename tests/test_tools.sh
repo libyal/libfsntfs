@@ -1,5 +1,5 @@
 #!/bin/bash
-# Tests Python module functions and types.
+# Tests tools functions and types.
 #
 # Version: 20200705
 
@@ -7,32 +7,42 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-TEST_FUNCTIONS="support";
-TEST_FUNCTIONS_WITH_INPUT="volume";
+TOOLS_TESTS="info_handle output signal";
+TOOLS_TESTS_WITH_INPUT="";
 OPTION_SETS="offset";
 
-TEST_TOOL_DIRECTORY=".";
 INPUT_GLOB="*";
 
-test_python_function()
+run_test()
 {
-	local TEST_FUNCTION=$1;
+	local TEST_NAME=$1;
 
-	local TEST_DESCRIPTION="Testing Python-bindings functions: ${TEST_FUNCTION}";
-	local TEST_SCRIPT="${TEST_TOOL_DIRECTORY}/pyfsntfs_test_${TEST_FUNCTION}.py";
+	local TEST_DESCRIPTION="Testing: ${TEST_NAME}";
+	local TEST_EXECUTABLE="./fsntfs_test_tools_${TEST_NAME}";
 
-	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_SCRIPT}";
+	if ! test -x "${TEST_EXECUTABLE}";
+	then
+		TEST_EXECUTABLE="${TEST_EXECUTABLE}.exe";
+	fi
+
+	# TODO: add support for TEST_PROFILE and OPTION_SETS?
+	run_test_with_arguments "${TEST_DESCRIPTION}" "${TEST_EXECUTABLE}";
 	local RESULT=$?;
 
 	return ${RESULT};
 }
 
-test_python_function_with_input()
+run_test_with_input()
 {
-	local TEST_FUNCTION=$1;
+	local TEST_NAME=$1;
 
-	local TEST_DESCRIPTION="Testing Python-bindings functions: ${TEST_FUNCTION}";
-	local TEST_SCRIPT="${TEST_TOOL_DIRECTORY}/pyfsntfs_test_${TEST_FUNCTION}.py";
+	local TEST_DESCRIPTION="Testing: ${TEST_NAME}";
+	local TEST_EXECUTABLE="./fsntfs_test_tools_${TEST_NAME}";
+
+	if ! test -x "${TEST_EXECUTABLE}";
+	then
+		TEST_EXECUTABLE="${TEST_EXECUTABLE}.exe";
+	fi
 
 	if ! test -d "input";
 	then
@@ -49,7 +59,7 @@ test_python_function_with_input()
 		return ${EXIT_IGNORE};
 	fi
 
-	local TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "pyfsntfs");
+	local TEST_PROFILE_DIRECTORY=$(get_test_profile_directory "input" "fsntfstools");
 
 	local IGNORE_LIST=$(read_ignore_list "${TEST_PROFILE_DIRECTORY}");
 
@@ -70,7 +80,7 @@ test_python_function_with_input()
 
 		local OLDIFS=${IFS};
 
-		# IFS="\n"; is not supported by all platforms.
+		# IFS="\n" is not supported by all platforms.
 		IFS="
 ";
 
@@ -78,7 +88,12 @@ test_python_function_with_input()
 		then
 			for INPUT_FILE in `cat ${TEST_SET_DIRECTORY}/files | sed "s?^?${TEST_SET_INPUT_DIRECTORY}/?"`;
 			do
-				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "${TEST_DESCRIPTION}" "default" "${OPTION_SETS}" "${TEST_SCRIPT}" "${INPUT_FILE}";
+				if test "${OSTYPE}" = "msys";
+				then
+					# A test executable built with MinGW expects a Windows path.
+					INPUT_FILE=`echo ${INPUT_FILE} | sed 's?/?\\\\?g'`;
+				fi
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "${TEST_DESCRIPTION}" "default" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}";
 				RESULT=$?;
 
 				if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -89,7 +104,12 @@ test_python_function_with_input()
 		else
 			for INPUT_FILE in `ls -1d ${TEST_SET_INPUT_DIRECTORY}/${INPUT_GLOB}`;
 			do
-				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "${TEST_DESCRIPTION}" "default" "${OPTION_SETS}" "${TEST_SCRIPT}" "${INPUT_FILE}";
+				if test "${OSTYPE}" = "msys";
+				then
+					# A test executable built with MinGW expects a Windows path.
+					INPUT_FILE=`echo ${INPUT_FILE} | sed 's?/?\\\\?g'`;
+				fi
+				run_test_on_input_file_with_options "${TEST_SET_DIRECTORY}" "${TEST_DESCRIPTION}" "default" "${OPTION_SETS}" "${TEST_EXECUTABLE}" "${INPUT_FILE}";
 				RESULT=$?;
 
 				if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -109,7 +129,7 @@ test_python_function_with_input()
 	return ${RESULT};
 }
 
-if test -n "${SKIP_PYTHON_TESTS}";
+if test -n "${SKIP_TOOLS_TESTS}";
 then
 	exit ${EXIT_IGNORE};
 fi
@@ -132,9 +152,9 @@ source ${TEST_RUNNER};
 
 RESULT=${EXIT_IGNORE};
 
-for TEST_FUNCTION in ${TEST_FUNCTIONS};
+for TEST_NAME in ${TOOLS_TESTS};
 do
-	test_python_function "${TEST_FUNCTION}";
+	run_test "${TEST_NAME}";
 	RESULT=$?;
 
 	if test ${RESULT} -ne ${EXIT_SUCCESS};
@@ -148,14 +168,14 @@ then
 	exit ${RESULT};
 fi
 
-for TEST_FUNCTION in ${TEST_FUNCTIONS_WITH_INPUT};
+for TEST_NAME in ${TOOLS_TESTS_WITH_INPUT};
 do
 	if test -d "input";
 	then
-		test_python_function_with_input "${TEST_FUNCTION}";
+		run_test_with_input "${TEST_NAME}";
 		RESULT=$?;
 	else
-		test_python_function "${TEST_FUNCTION}";
+		run_test "${TEST_NAME}";
 		RESULT=$?;
 	fi
 

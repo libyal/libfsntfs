@@ -198,8 +198,7 @@ class VolumeTypeTests(unittest.TestCase):
 
       fsntfs_volume.close()
 
-      # TODO: change IOError into TypeError
-      with self.assertRaises(IOError):
+      with self.assertRaises(TypeError):
         fsntfs_volume.open_file_object(None)
 
       with self.assertRaises(ValueError):

@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
@@ -15,6 +17,7 @@ AM_CPPFLAGS = \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
 	@LIBFGUID_CPPFLAGS@ \
+	@LIBFUSN_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
@@ -26,6 +29,7 @@ endif
 
 TESTS = \
 	test_library.sh \
+	test_tools.sh \
 	test_fsntfsinfo.sh \
 	test_fsntfsinfo_bodyfile.sh \
 	$(TESTS_PYFSNTFS)
@@ -38,7 +42,8 @@ check_SCRIPTS = \
 	test_library.sh \
 	test_manpage.sh \
 	test_python_module.sh \
-	test_runner.sh
+	test_runner.sh \
+	test_tools.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
@@ -100,6 +105,9 @@ check_PROGRAMS = \
 	fsntfs_test_security_descriptor_values \
 	fsntfs_test_standard_information_values \
 	fsntfs_test_support \
+	fsntfs_test_tools_info_handle \
+	fsntfs_test_tools_output \
+	fsntfs_test_tools_signal \
 	fsntfs_test_txf_data_values \
 	fsntfs_test_usn_change_journal \
 	fsntfs_test_volume \
@@ -966,6 +974,51 @@ fsntfs_test_support_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_tools_info_handle_SOURCES = \
+	../fsntfstools/info_handle.c ../fsntfstools/info_handle.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_tools_info_handle.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_info_handle_LDADD = \
+	@LIBFWNT_LIBADD@ \
+	@LIBFUSN_LIBADD@ \
+	@LIBFGUID_LIBADD@ \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_tools_output_SOURCES = \
+	../fsntfstools/fsntfstools_output.c ../fsntfstools/fsntfstools_output.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_output.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_output_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_tools_signal_SOURCES = \
+	../fsntfstools/fsntfstools_signal.c ../fsntfstools/fsntfstools_signal.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_signal.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_signal_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
