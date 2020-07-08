@@ -1,4 +1,4 @@
-.Dd April  9, 2020
+.Dd July  8, 2020
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -246,6 +246,24 @@ Attribute functions
 $ATTRIBUTE_LIST attribute functions
 .Ft int
 .Fn libfsntfs_attribute_list_attribute_get_number_of_entries "libfsntfs_attribute_t *attribute" "int *number_of_entries" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_attribute_get_entry_by_index "libfsntfs_attribute_t *attribute" "int entry_index" "libfsntfs_attribute_list_entry_t **entry" "libfsntfs_error_t **error"
+.Pp
+Attribute list entry functions
+.Ft int
+.Fn libfsntfs_attribute_list_entry_free "libfsntfs_attribute_list_entry_t **attribute_list_entry" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_attribute_type "libfsntfs_attribute_list_entry_t *attribute_list_entry" "uint32_t *attribute_type" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_file_reference "libfsntfs_attribute_list_entry_t *attribute_list_entry" "uint64_t *file_reference" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_utf8_name_size "libfsntfs_attribute_list_entry_t *attribute_list_entry" "size_t *utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_utf8_name "libfsntfs_attribute_list_entry_t *attribute_list_entry" "uint8_t *utf8_string" "size_t utf8_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_utf16_name_size "libfsntfs_attribute_list_entry_t *attribute_list_entry" "size_t *utf16_string_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_list_entry_get_utf16_name "libfsntfs_attribute_list_entry_t *attribute_list_entry" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Pp
 $FILE_NAME attribute functions
 .Ft int
@@ -270,6 +288,16 @@ $FILE_NAME attribute functions
 .Fn libfsntfs_file_name_attribute_get_utf16_name_size "libfsntfs_attribute_t *attribute" "size_t *utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_file_name_attribute_get_utf16_name "libfsntfs_attribute_t *attribute" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
+.Pp
+$OBJECT_ID attribute functions
+.Ft int
+.Fn libfsntfs_object_identifier_attribute_get_droid_file_identifier "libfsntfs_attribute_t *attribute" "uint8_t *guid" "size_t size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_object_identifier_attribute_get_birth_droid_volume_identifier "libfsntfs_attribute_t *attribute" "uint8_t *guid" "size_t size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_object_identifier_attribute_get_birth_droid_file_identifier "libfsntfs_attribute_t *attribute" "uint8_t *guid" "size_t size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_object_identifier_attribute_get_birth_droid_domain_identifier "libfsntfs_attribute_t *attribute" "uint8_t *guid" "size_t size" "libfsntfs_error_t **error"
 .Pp
 $REPARSE_POINT attribute functions
 .Ft int
