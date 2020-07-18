@@ -1,5 +1,5 @@
 /*
- * Date and time functions
+ * The libfsntfs header wrapper
  *
  * Copyright (C) 2010-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,36 +19,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYFSNTFS_DATETIME_H )
-#define _PYFSNTFS_DATETIME_H
+#if !defined( _OSSFUZZ_LIBFSNTFS_H )
+#define _OSSFUZZ_LIBFSNTFS_H
 
 #include <common.h>
-#include <types.h>
 
-#include "pyfsntfs_python.h"
+#include <libfsntfs.h>
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-PyObject *pyfsntfs_datetime_new_from_fat_date_time(
-           uint32_t fat_date_time );
-
-PyObject *pyfsntfs_datetime_new_from_filetime(
-           uint64_t filetime );
-
-PyObject *pyfsntfs_datetime_new_from_floatingtime(
-           uint64_t floatingtime );
-
-PyObject *pyfsntfs_datetime_new_from_posix_time(
-           uint32_t posix_time );
-
-PyObject *pyfsntfs_datetime_new_from_posix_time_in_micro_seconds(
-           int64_t posix_time );
-
-#if defined( __cplusplus )
-}
-#endif
-
-#endif /* !defined( _PYFSNTFS_DATETIME_H ) */
+#endif /* !defined( _OSSFUZZ_LIBFSNTFS_H ) */
 
