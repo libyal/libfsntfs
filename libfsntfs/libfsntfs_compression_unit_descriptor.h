@@ -38,13 +38,21 @@ typedef struct libfsntfs_compression_unit_descriptor libfsntfs_compression_unit_
 
 struct libfsntfs_compression_unit_descriptor
 {
+	/* The data run offset
+	 */
+	off64_t data_run_offset;
+
 	/* The data offset
 	 */
 	off64_t data_offset;
 
 	/* The data size
 	 */
-	size_t data_size;
+	size64_t data_size;
+
+	/* The compression unit size
+	 */
+	size64_t compression_unit_size;
 
 	/* The data range flags
 	 */

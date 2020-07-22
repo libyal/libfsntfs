@@ -261,7 +261,7 @@ int libfsntfs_compression_unit_descriptor_print(
 
 		return( -1 );
 	}
-	if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
+	if( ( compression_unit_descriptor->data_range_flags & LIBFDATA_RANGE_FLAG_IS_COMPRESSED ) != 0 )
 	{
 		compression_unit_data_type = "compressed";
 	}
@@ -274,7 +274,7 @@ int libfsntfs_compression_unit_descriptor_print(
 		compression_unit_data_type = "uncompressed";
 	}
 	libcnotify_printf(
-	 "%s: %" PRIzd " blocks %s compression unit: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+	 "%s: %" PRIu64 " blocks %s compression unit: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 	 function,
 	 compression_unit_descriptor->data_size / io_handle->cluster_block_size,
 	 compression_unit_data_type,

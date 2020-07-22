@@ -634,6 +634,7 @@ identifier				: 4
 |===
 | Value | Identifier | Description
 | 0x0001 | | Is compressed
+| | |
 | 0x00ff | ATTRIBUTE_FLAG_COMPRESSION_MASK |
 | | |
 | 0x4000 | ATTRIBUTE_FLAG_ENCRYPTED | Is encrypted

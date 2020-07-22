@@ -198,7 +198,7 @@ int libfsntfs_volume_header_read_data(
 		libcnotify_print_data(
 		 data,
 		 sizeof( fsntfs_volume_header_t ),
-		 0 );
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	if( memory_compare(
@@ -395,7 +395,8 @@ int libfsntfs_volume_header_read_data(
 		libcnotify_printf(
 		 "\n" );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( ( volume_header->bytes_per_sector != 256 )
 	 && ( volume_header->bytes_per_sector != 512 )
 	 && ( volume_header->bytes_per_sector != 1024 )

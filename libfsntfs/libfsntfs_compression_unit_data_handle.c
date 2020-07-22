@@ -50,7 +50,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	size64_t data_run_size                              = 0;
 	size64_t data_segment_size                          = 0;
 	size_t compression_unit_size                        = 0;
-	size_t remaining_compression_unit_size              = 0;
+	size64_t remaining_compression_unit_size            = 0;
 	off64_t attribute_data_vcn_offset                   = 0;
 	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
@@ -396,18 +396,6 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-			if( ( data_run_size / compression_unit_size ) > (size64_t) INT_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid data run: %d size value out of bounds.",
-				 function,
-				 data_run_index );
-
-				goto on_error;
-			}
 			while( data_run_size > 0 )
 			{
 				if( descriptor == NULL )
@@ -425,10 +413,29 @@ int libfsntfs_compression_unit_data_handle_initialize(
 
 						goto on_error;
 					}
-					descriptor->data_offset = data_offset;
+					descriptor->data_run_offset = data_run_offset;
+					descriptor->data_offset     = data_offset;
 
-					data_segment_offset             = 0;
-					remaining_compression_unit_size = compression_unit_size;
+					data_segment_offset = 0;
+
+					if( data_run_size <= compression_unit_size )
+					{
+						descriptor->compression_unit_size = compression_unit_size;
+					}
+					else
+					{
+						descriptor->compression_unit_size = ( data_run_size / compression_unit_size ) * compression_unit_size;
+#if defined( HAVE_DEBUG_OUTPUT )
+						if( libcnotify_verbose != 0 )
+						{
+							libcnotify_printf(
+							 "%s: uncompressed data run size: %" PRIu64 "\n",
+							 function,
+							 descriptor->compression_unit_size );
+						}
+#endif
+					}
+					remaining_compression_unit_size = descriptor->compression_unit_size;
 				}
 				if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
 				{
@@ -461,7 +468,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 				}
 				else
 				{
-					data_segment_size = (size64_t) remaining_compression_unit_size;
+					data_segment_size = remaining_compression_unit_size;
 				}
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -549,11 +556,11 @@ int libfsntfs_compression_unit_data_handle_initialize(
 
 						goto on_error;
 					}
+					data_offset += descriptor->compression_unit_size;
+
 					descriptor = NULL;
 
 					descriptor_index++;
-
-					data_offset += compression_unit_size;
 				}
 			}
 			total_data_run_index++;

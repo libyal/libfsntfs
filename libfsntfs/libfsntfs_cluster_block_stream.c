@@ -206,7 +206,7 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve valid data size",
+		 "%s: unable to retrieve valid data size.",
 		 function );
 
 		goto on_error;
@@ -505,7 +505,7 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_data_runs(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve valid data size",
+		 "%s: unable to retrieve valid data size.",
 		 function );
 
 		goto on_error;
@@ -649,7 +649,7 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size",
+		 "%s: unable to retrieve data size.",
 		 function );
 
 		goto on_error;
@@ -663,7 +663,7 @@ int libfsntfs_cluster_block_stream_initialize_from_compressed_stream(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve valid data size",
+		 "%s: unable to retrieve valid data size.",
 		 function );
 
 		goto on_error;
@@ -819,7 +819,7 @@ int libfsntfs_cluster_block_stream_initialize(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data size",
+		 "%s: unable to retrieve data size.",
 		 function );
 
 		goto on_error;

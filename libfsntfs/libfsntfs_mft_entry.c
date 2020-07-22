@@ -1060,8 +1060,6 @@ int libfsntfs_mft_entry_read_attributes_data(
 	return( 1 );
 
 on_error:
-	mft_entry->list_attribute = NULL;
-
 	if( mft_attribute != NULL )
 	{
 		libfsntfs_mft_attribute_free(
@@ -1072,6 +1070,16 @@ on_error:
 	 mft_entry->attributes_array,
 	 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
 	 NULL );
+
+	mft_entry->file_name_attribute_index            = -1;
+	mft_entry->reparse_point_attribute_index        = -1;
+	mft_entry->security_descriptor_attribute_index  = -1;
+	mft_entry->standard_information_attribute_index = -1;
+	mft_entry->volume_information_attribute_index   = -1;
+	mft_entry->volume_name_attribute_index          = -1;
+	mft_entry->list_attribute                       = NULL;
+	mft_entry->data_attribute                       = NULL;
+	mft_entry->wof_compressed_data_attribute        = NULL;
 
 	return( -1 );
 }
@@ -1621,6 +1629,32 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 			return( -1 );
 		}
 	}
+	/* Reset data_mft_entry to the state before libfsntfs_mft_entry_read_attributes_data
+	 */
+	if( libcdata_array_empty(
+	     data_mft_entry->attributes_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty data MFT entry attributes array.",
+		 function );
+
+		return( -1 );
+	}
+	data_mft_entry->file_name_attribute_index            = -1;
+	data_mft_entry->reparse_point_attribute_index        = -1;
+	data_mft_entry->security_descriptor_attribute_index  = -1;
+	data_mft_entry->standard_information_attribute_index = -1;
+	data_mft_entry->volume_information_attribute_index   = -1;
+	data_mft_entry->volume_name_attribute_index          = -1;
+	data_mft_entry->list_attribute                       = NULL;
+	data_mft_entry->data_attribute                       = NULL;
+	data_mft_entry->wof_compressed_data_attribute        = NULL;
+
 	return( 1 );
 }
 

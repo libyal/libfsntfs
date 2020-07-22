@@ -176,9 +176,9 @@ int libfsntfs_compressed_block_vector_initialize(
 		if( libfdata_vector_append_segment(
 		     safe_compressed_block_vector,
 		     &segment_index,
-		     0,
+		     descriptor_index,
 		     descriptor->data_offset,
-		     data_handle->compression_unit_size,
+		     descriptor->compression_unit_size,
 		     descriptor->data_range_flags,
 		     error ) != 1 )
 		{
@@ -188,7 +188,7 @@ int libfsntfs_compressed_block_vector_initialize(
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
 			 "%s: unable to append compression unit: %d segment to compressed block vector.",
 			 function,
-			 descriptor );
+			 descriptor_index );
 
 			data_handle = NULL;
 
@@ -225,8 +225,8 @@ int libfsntfs_compressed_block_vector_read_element_data(
      libfdata_vector_t *vector,
      libfdata_cache_t *cache,
      int element_index,
-     int element_data_file_index LIBFSNTFS_ATTRIBUTE_UNUSED,
-     off64_t element_data_offset LIBFSNTFS_ATTRIBUTE_UNUSED,
+     int element_data_file_index,
+     off64_t element_data_offset,
      size64_t compressed_block_size,
      uint32_t range_flags,
      uint8_t read_flags LIBFSNTFS_ATTRIBUTE_UNUSED,
@@ -236,12 +236,12 @@ int libfsntfs_compressed_block_vector_read_element_data(
 	libfsntfs_compression_unit_descriptor_t *compression_unit_descriptor = NULL;
 	uint8_t *compressed_block_data                                       = NULL;
 	uint8_t *compressed_data                                             = NULL;
+	const char *block_type                                               = NULL;
 	static char *function                                                = "libfsntfs_compressed_block_vector_read_element_data";
 	ssize_t read_count                                                   = 0;
+	off64_t data_stream_offset                                           = 0;
 	int result                                                           = 0;
 
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_file_index )
-	LIBFSNTFS_UNREFERENCED_PARAMETER( element_data_offset )
 	LIBFSNTFS_UNREFERENCED_PARAMETER( read_flags )
 
 	if( ( compressed_block_size == 0 )
@@ -258,7 +258,7 @@ int libfsntfs_compressed_block_vector_read_element_data(
 	}
 	if( libfsntfs_compression_unit_data_handle_get_descriptor_by_index(
 	     data_handle,
-	     element_index,
+	     element_data_file_index,
 	     &compression_unit_descriptor,
 	     error ) != 1 )
 	{
@@ -266,13 +266,24 @@ int libfsntfs_compressed_block_vector_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve compressed block descriptor: %d.",
+		 "%s: unable to retrieve compression unit descriptor: %d.",
 		 function,
-		 element_index );
+		 element_data_file_index );
 
 		goto on_error;
 	}
-/* TODO check compression_unit_descriptor == NULL */
+	if( compression_unit_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing compression unit descriptor: %d.",
+		 function,
+		 element_data_file_index );
+
+		goto on_error;
+	}
 	if( libfsntfs_compressed_block_initialize(
 	     &compressed_block,
 	     compressed_block_size,
@@ -315,20 +326,27 @@ int libfsntfs_compressed_block_vector_read_element_data(
 			goto on_error;
 		}
 		compressed_block_data = compressed_data;
+
+		/* Make sure to read from the start of the data stream
+		 * otherwise successive reads will fail
+		 */
+		data_stream_offset = 0;
+
+		block_type = "compressed";
 	}
 	else
 	{
 		compressed_block_data = compressed_block->data;
+		data_stream_offset    = element_data_offset - compression_unit_descriptor->data_offset;
+
+		block_type = "uncompressed";
 	}
-	/* Make sure to read from the start of the data stream
-	 * otherwise successive reads will fail
-	 */
 	read_count = libfdata_stream_read_buffer_at_offset(
 	              compression_unit_descriptor->data_stream,
 	              (intptr_t *) file_io_handle,
 	              compressed_block_data,
 	              compressed_block_size,
-	              0,
+	              data_stream_offset,
 	              0,
 	              error );
 
@@ -338,8 +356,11 @@ int libfsntfs_compressed_block_vector_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read compressed block.",
-		 function );
+		 "%s: unable to read %s block at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 block_type,
+		 data_stream_offset,
+		 data_stream_offset );
 
 		goto on_error;
 	}
