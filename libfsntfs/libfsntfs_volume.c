@@ -1218,7 +1218,6 @@ int libfsntfs_internal_volume_open_read(
 		libcnotify_printf(
 		 "Reading MFT entry: 6 ($Bitmap):\n" );
 	}
-#endif
 	if( libfsntfs_file_system_read_bitmap(
 	     internal_volume->file_system,
 	     internal_volume->io_handle,
@@ -1234,7 +1233,6 @@ int libfsntfs_internal_volume_open_read(
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
