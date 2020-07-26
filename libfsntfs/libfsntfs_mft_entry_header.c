@@ -135,7 +135,7 @@ int libfsntfs_mft_entry_header_free(
 }
 
 /* Reads the MFT entry header
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if FILE signature is not present or -1 on error
  */
 int libfsntfs_mft_entry_header_read_data(
      libfsntfs_mft_entry_header_t *mft_entry_header,
@@ -226,7 +226,7 @@ int libfsntfs_mft_entry_header_read_data(
 	{
 		mft_entry_header->is_bad = 1;
 
-		return( 1 );
+		return( 0 );
 	}
 	mft_entry_header->is_bad = 0;
 
@@ -235,14 +235,7 @@ int libfsntfs_mft_entry_header_read_data(
 	     "FILE",
 	     4 ) != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid MFT entry signature.",
-		 function );
-
-		return( -1 );
+		return( 0 );
 	}
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->number_of_fixup_values,

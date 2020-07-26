@@ -481,11 +481,13 @@ int libfsntfs_mft_entry_read_data(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_entry_header_read_data(
-	     mft_entry->header,
-	     data,
-	     data_size,
-	     error ) != 1 )
+	result = libfsntfs_mft_entry_header_read_data(
+	          mft_entry->header,
+	          data,
+	          data_size,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -496,11 +498,12 @@ int libfsntfs_mft_entry_read_data(
 
 		goto on_error;
 	}
-	if( mft_entry->header->is_bad != 0 )
+	else if( result == 0 )
 	{
+		/* Note that an empty MFT data can contain arbitrary data
+		 */
 		mft_entry->is_empty = 1;
 
-/* TODO do empty block check on the remainder of the MFT entry? */
 		return( 0 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1448,15 +1451,15 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
      uint64_t file_reference,
      libcerror_error_t **error )
 {
-	libfsntfs_mft_attribute_t *mft_attribute = NULL;
-	libfsntfs_mft_entry_t *data_mft_entry    = NULL;
-	static char *function                    = "libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index";
-	uint64_t attribute_list_data_mft_entry   = 0;
-	uint64_t base_record_file_reference      = 0;
-	uint16_t sequence_number                 = 0;
-	int attribute_index                      = 0;
-	int entry_index                          = 0;
-	int number_of_attributes                 = 0;
+	libfsntfs_mft_attribute_t *data_mft_attribute = NULL;
+	libfsntfs_mft_attribute_t *mft_attribute      = NULL;
+	libfsntfs_mft_entry_t *data_mft_entry         = NULL;
+	static char *function                         = "libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index";
+	uint64_t attribute_list_data_mft_entry        = 0;
+	uint64_t base_record_file_reference           = 0;
+	int attribute_index                           = 0;
+	int entry_index                               = 0;
+	int number_of_attributes                      = 0;
 
 	if( mft_entry == NULL )
 	{
@@ -1470,7 +1473,6 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 		return( -1 );
 	}
 	attribute_list_data_mft_entry = file_reference & 0xffffffffffffUL;
-	sequence_number               = (uint16_t) ( file_reference >> 48 );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1479,7 +1481,7 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 		 "%s: reading data file reference: %" PRIu64 "-%" PRIu16 "\n",
 		 function,
 		 attribute_list_data_mft_entry,
-		 sequence_number );
+		 (uint16_t) ( file_reference >> 48 ) );
 		libcnotify_printf(
 		 "\n" );
 	}
@@ -1575,39 +1577,38 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 
 			return( -1 );
 		}
-		if( libcdata_array_set_entry_by_index(
-		     data_mft_entry->attributes_array,
-		     attribute_index,
-		     NULL,
+		if( libfsntfs_mft_attribute_clone(
+		     &data_mft_attribute,
+		     mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set attribute: %d in list MFT entry.",
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to clone MFT attribute: %d.",
 			 function,
 			 attribute_index );
 
 			return( -1 );
 		}
-		/* mft_entry->attributes_array takes over management of mft_attribute
+		/* mft_entry->attributes_array takes over management of data_mft_attribute
 		 */
 		if( libcdata_array_append_entry(
 		     mft_entry->attributes_array,
 		     &entry_index,
-		     (intptr_t *) mft_attribute,
+		     (intptr_t *) data_mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append attribute to array.",
+			 "%s: unable to append MFT attribute to array.",
 			 function );
 
 			libfsntfs_mft_attribute_free(
-			 &mft_attribute,
+			 &data_mft_attribute,
 			 NULL );
 
 			return( -1 );
@@ -1615,7 +1616,7 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 		if( libfsntfs_mft_entry_set_attribute_helper_values(
 		     mft_entry,
 		     entry_index,
-		     mft_attribute,
+		     data_mft_attribute,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1628,33 +1629,8 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 
 			return( -1 );
 		}
+		data_mft_attribute = NULL;
 	}
-	/* Reset data_mft_entry to the state before libfsntfs_mft_entry_read_attributes_data
-	 */
-	if( libcdata_array_empty(
-	     data_mft_entry->attributes_array,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_mft_attribute_free,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to empty data MFT entry attributes array.",
-		 function );
-
-		return( -1 );
-	}
-	data_mft_entry->file_name_attribute_index            = -1;
-	data_mft_entry->reparse_point_attribute_index        = -1;
-	data_mft_entry->security_descriptor_attribute_index  = -1;
-	data_mft_entry->standard_information_attribute_index = -1;
-	data_mft_entry->volume_information_attribute_index   = -1;
-	data_mft_entry->volume_name_attribute_index          = -1;
-	data_mft_entry->list_attribute                       = NULL;
-	data_mft_entry->data_attribute                       = NULL;
-	data_mft_entry->wof_compressed_data_attribute        = NULL;
-
 	return( 1 );
 }
 

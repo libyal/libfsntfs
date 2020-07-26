@@ -168,6 +168,180 @@ int libfsntfs_mft_attribute_free(
 	return( result );
 }
 
+/* Clones a MFT attribute
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_clone(
+     libfsntfs_mft_attribute_t **destination_mft_attribute,
+     libfsntfs_mft_attribute_t *source_mft_attribute,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_clone";
+
+	if( destination_mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_mft_attribute != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination MFT attribute value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_mft_attribute == NULL )
+	{
+		*destination_mft_attribute = source_mft_attribute;
+
+		return( 1 );
+	}
+	*destination_mft_attribute = memory_allocate_structure(
+	                              libfsntfs_mft_attribute_t );
+
+	if( *destination_mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destnation MFT attribute.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_mft_attribute,
+	     source_mft_attribute,
+	     sizeof( libfsntfs_mft_attribute_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to copy source MFT attribute to destination.",
+		 function );
+
+		goto on_error;
+	}
+	( *destination_mft_attribute )->name            = NULL;
+	( *destination_mft_attribute )->data            = NULL;
+	( *destination_mft_attribute )->data_runs_array = NULL;
+	( *destination_mft_attribute )->next_attribute  = NULL;
+
+	if( source_mft_attribute->name != NULL )
+	{
+		( *destination_mft_attribute )->name = (uint8_t *) memory_allocate(
+		                                                    source_mft_attribute->name_size );
+
+		if( ( *destination_mft_attribute )->name == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination name.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_mft_attribute )->name,
+		     source_mft_attribute->name,
+		     source_mft_attribute->name_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source name to destination.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_mft_attribute )->name_size = source_mft_attribute->name_size;
+	}
+	if( source_mft_attribute->data != NULL )
+	{
+		( *destination_mft_attribute )->data = (uint8_t *) memory_allocate(
+		                                                    source_mft_attribute->data_size );
+
+		if( ( *destination_mft_attribute )->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create destination data.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_mft_attribute )->data,
+		     source_mft_attribute->data,
+		     source_mft_attribute->data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy source data to destination.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_mft_attribute )->data_size = source_mft_attribute->data_size;
+	}
+	if( libcdata_array_clone(
+	     &( ( *destination_mft_attribute )->data_runs_array ),
+	     source_mft_attribute->data_runs_array,
+	     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_run_free,
+	     (int (*)(intptr_t **, intptr_t *, libcerror_error_t **)) &libfsntfs_data_run_clone,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone data runs array.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_mft_attribute != NULL )
+	{
+		if( ( *destination_mft_attribute )->data != NULL )
+		{
+			memory_free(
+			 ( *destination_mft_attribute )->data );
+		}
+		if( ( *destination_mft_attribute )->data != NULL )
+		{
+			memory_free(
+			 ( *destination_mft_attribute )->data );
+		}
+		memory_free(
+		 *destination_mft_attribute );
+
+		*destination_mft_attribute = NULL;
+	}
+	return( -1 );
+}
+
 /* Reads the MFT attribute
  * Returns 1 if successful or -1 on error
  */

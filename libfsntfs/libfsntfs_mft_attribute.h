@@ -115,6 +115,11 @@ int libfsntfs_mft_attribute_free(
      libfsntfs_mft_attribute_t **mft_attribute,
      libcerror_error_t **error );
 
+int libfsntfs_mft_attribute_clone(
+     libfsntfs_mft_attribute_t **destination_mft_attribute,
+     libfsntfs_mft_attribute_t *source_mft_attribute,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_attribute_read_data(
      libfsntfs_mft_attribute_t *mft_attribute,
      libfsntfs_io_handle_t *io_handle,

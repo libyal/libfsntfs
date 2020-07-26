@@ -61,6 +61,11 @@ int libfsntfs_data_run_free(
      libfsntfs_data_run_t **data_run,
      libcerror_error_t **error );
 
+int libfsntfs_data_run_clone(
+     libfsntfs_data_run_t **destination_data_run,
+     libfsntfs_data_run_t *source_data_run,
+     libcerror_error_t **error );
+
 ssize_t libfsntfs_data_run_read_data(
          libfsntfs_data_run_t *data_run,
          libfsntfs_io_handle_t *io_handle,

@@ -831,6 +831,79 @@ int fsntfs_test_mft_entry_read_data(
 	 "error",
 	 error );
 
+	/* Test where signature is invalid
+	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( mft_entry_data[ 0 ] ),
+	 0xffffffffUL );
+
+	result = libfsntfs_mft_entry_read_data(
+	          mft_entry,
+	          mft_entry_data,
+	          1024,
+	          0,
+	          &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( mft_entry_data[ 0 ] ),
+	 0x454c4946UL );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Clean up
+	 */
+	result = libfsntfs_mft_entry_free(
+	          &mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	memcpy_result = memory_copy(
+	                 mft_entry_data,
+	                 fsntfs_test_mft_entry_data1,
+	                 sizeof( uint8_t ) * 1024 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "memcpy_result",
+	 memcpy_result );
+
+	result = libfsntfs_mft_entry_initialize(
+	          &mft_entry,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "mft_entry",
+	 mft_entry );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Test error cases
 	 */
 	result = libfsntfs_mft_entry_read_data(
@@ -964,35 +1037,6 @@ int fsntfs_test_mft_entry_read_data(
 		 &error );
 	}
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) */
-
-	/* Test error case where signature is invalid
-	 */
-	byte_stream_copy_from_uint32_little_endian(
-	 &( mft_entry_data[ 0 ] ),
-	 0xffffffffUL );
-
-	result = libfsntfs_mft_entry_read_data(
-	          mft_entry,
-	          mft_entry_data,
-	          1024,
-	          0,
-	          &error );
-
-	byte_stream_copy_from_uint32_little_endian(
-	 &( mft_entry_data[ 0 ] ),
-	 0x454c4946UL );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
 
 	/* Clean up
 	 */

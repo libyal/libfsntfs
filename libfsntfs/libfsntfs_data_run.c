@@ -137,6 +137,85 @@ int libfsntfs_data_run_free(
 	return( 1 );
 }
 
+/* Clones a data run
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_data_run_clone(
+     libfsntfs_data_run_t **destination_data_run,
+     libfsntfs_data_run_t *source_data_run,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_data_run_clone";
+
+	if( destination_data_run == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data run.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_data_run != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid destination data run value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_data_run == NULL )
+	{
+		*destination_data_run = source_data_run;
+
+		return( 1 );
+	}
+	*destination_data_run = memory_allocate_structure(
+	                         libfsntfs_data_run_t );
+
+	if( *destination_data_run == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create destnation data run.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     *destination_data_run,
+	     source_data_run,
+	     sizeof( libfsntfs_data_run_t ) ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to copy source data run to destination.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( *destination_data_run != NULL )
+	{
+		memory_free(
+		 *destination_data_run );
+
+		*destination_data_run = NULL;
+	}
+	return( -1 );
+}
+
 /* Reads the data run
  * Returns 1 if successful or -1 on error
  */

@@ -371,7 +371,7 @@ int fsntfs_test_mft_entry_header_read_data(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 1 );
+	 0 );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "mft_entry_header->is_bad",
@@ -475,14 +475,11 @@ int fsntfs_test_mft_entry_header_read_data(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 0 );
 
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	libcerror_error_free(
-	 &error );
 
 	/* Clean up
 	 */
