@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libfsntfs_directory_entry.h"
 #include "libfsntfs_extern.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"

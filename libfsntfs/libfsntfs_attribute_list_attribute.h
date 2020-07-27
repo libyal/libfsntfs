@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_extern.h"
+#include "libfsntfs_libcerror.h"
 #include "libfsntfs_types.h"
 
 #if defined( __cplusplus )
