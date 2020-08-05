@@ -7,8 +7,8 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-PROFILES=("fsntfsinfo" "fsntfsinfo_fs" "fsntfsinfo_mft");
-OPTIONS_PER_PROFILE=("" "-H" "-Eall");
+PROFILES=("fsntfsinfo" "fsntfsinfo_fs" "fsntfsinfo_mft" "fsntfsinfo_usn");
+OPTIONS_PER_PROFILE=("" "-H" "-Eall" "-U");
 OPTION_SETS="offset";
 
 INPUT_GLOB="*";

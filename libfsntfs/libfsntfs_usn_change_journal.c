@@ -28,6 +28,7 @@
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_libcerror.h"
+#include "libfsntfs_libcnotify.h"
 #include "libfsntfs_libcthreads.h"
 #include "libfsntfs_mft_attribute.h"
 #include "libfsntfs_types.h"
@@ -140,7 +141,7 @@ int libfsntfs_usn_change_journal_initialize(
 		 "%s: unable to create $J data stream.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfdata_stream_get_size(
 	     internal_usn_change_journal->data_stream,
@@ -285,6 +286,7 @@ int libfsntfs_usn_change_journal_free(
 		}
 		memory_free(
 		 internal_usn_change_journal->journal_block_data );
+
 		memory_free(
 		 internal_usn_change_journal );
 	}
@@ -362,7 +364,8 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 	}
 	internal_usn_change_journal = (libfsntfs_internal_usn_change_journal_t *) usn_change_journal;
 
-	if( internal_usn_change_journal->journal_block_size < 60 )
+	if( ( internal_usn_change_journal->journal_block_size < 60 )
+	 || ( internal_usn_change_journal->journal_block_size > MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -401,17 +404,30 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 	}
 	while( usn_record_size == 0 )
 	{
-		while( ( ( internal_usn_change_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
-		    || ( ( internal_usn_change_journal->journal_block_offset >= ( internal_usn_change_journal->journal_block_size - 60 ) )
-		     &&  ( (size64_t) internal_usn_change_journal->extent_offset >= internal_usn_change_journal->extent_size ) ) )
+		if( internal_usn_change_journal->data_offset == 0 )
 		{
-			internal_usn_change_journal->extent_index += 1;
+			read_journal_block = 1;
+		}
+		else if( internal_usn_change_journal->journal_block_offset >= ( internal_usn_change_journal->journal_block_size - 60 ) )
+		{
+			/* Get the next journal block
+			 */
+			internal_usn_change_journal->extent_offset += internal_usn_change_journal->journal_block_size;
+
+			read_journal_block = 1;
+		}
+		while( ( ( internal_usn_change_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
+		    || ( (size64_t) internal_usn_change_journal->extent_offset >= internal_usn_change_journal->extent_size ) )
+		{
+			/* Get the next non-sparse extent
+			 */
+			internal_usn_change_journal->extent_start_offset += internal_usn_change_journal->extent_size;
+			internal_usn_change_journal->extent_index        += 1;
 
 			if( internal_usn_change_journal->extent_index >= internal_usn_change_journal->number_of_extents )
 			{
 				return( 0 );
 			}
-/* TODO make sure internal values are reset on error */
 			if( libfdata_stream_get_segment_by_index(
 			     internal_usn_change_journal->data_stream,
 			     internal_usn_change_journal->extent_index,
@@ -431,35 +447,35 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 
 				return( -1 );
 			}
+			internal_usn_change_journal->extent_offset = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: $J data stream extent: %d segment offset\t: 0x%08" PRIx64 "\n",
+				 function,
+				 internal_usn_change_journal->extent_index,
+				 segment_offset );
+
+				libcnotify_printf(
+				 "%s: $J data stream extent: %d size\t: %" PRIu64 "\n",
+				 function,
+				 internal_usn_change_journal->extent_index,
+				 internal_usn_change_journal->extent_size );
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif
 			if( ( internal_usn_change_journal->extent_flags & LIBFSNTFS_EXTENT_FLAG_IS_SPARSE ) != 0 )
 			{
 				internal_usn_change_journal->data_offset += internal_usn_change_journal->extent_size;
 			}
 			else
 			{
-				if( libfdata_stream_seek_offset(
-				     internal_usn_change_journal->data_stream,
-				     internal_usn_change_journal->extent_offset,
-				     SEEK_SET,
-				     error ) == -1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_IO,
-					 LIBCERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: 0x%08" PRIx64 " in $J data stream.",
-					 function,
-					 internal_usn_change_journal->extent_offset );
-
-					return( -1 );
-				}
 				read_journal_block = 1;
 			}
-		}
-		if( ( internal_usn_change_journal->journal_block_offset == 0 )
-		 || ( internal_usn_change_journal->journal_block_offset >= ( internal_usn_change_journal->journal_block_size - 60 ) ) )
-		{
-			read_journal_block = 1;
 		}
 		if( read_journal_block != 0 )
 		{
@@ -471,6 +487,23 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 				 "%s: invalid USN change journal - extent data offset value out of bounds.",
 				 function );
+
+				return( -1 );
+			}
+			if( libfdata_stream_seek_offset(
+			     internal_usn_change_journal->data_stream,
+			     internal_usn_change_journal->extent_start_offset + internal_usn_change_journal->extent_offset,
+			     SEEK_SET,
+			     error ) == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to seek offset: %" PRIi64 " (0x%08" PRIx64 ") in $J data stream.",
+				 function,
+				 internal_usn_change_journal->extent_start_offset + internal_usn_change_journal->extent_offset,
+				 internal_usn_change_journal->extent_start_offset + internal_usn_change_journal->extent_offset );
 
 				return( -1 );
 			}
@@ -513,16 +546,25 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 
 				return( -1 );
 			}
-			internal_usn_change_journal->extent_offset       += read_count;
 			internal_usn_change_journal->journal_block_offset = 0;
-
-/* TODO do an empty block check
-			if( buffer[ 0 ] == 0 )
-			{
-				continue;
-			}
-*/
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: journal block offset\t: %" PRIzd "\n",
+			 function,
+			 internal_usn_change_journal->journal_block_offset );
+
+			libcnotify_printf(
+			 "%s: journal block size\t: %" PRIu64 "\n",
+			 function,
+			 internal_usn_change_journal->journal_block_size );
+
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
 		if( internal_usn_change_journal->journal_block_offset >= ( internal_usn_change_journal->journal_block_size - 60 ) )
 		{
 			libcerror_error_set(
@@ -534,6 +576,18 @@ ssize_t libfsntfs_usn_change_journal_read_usn_record(
 
 			return( -1 );
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: USN change journal record header data:\n",
+			 function );
+			libcnotify_print_data(
+			 &( internal_usn_change_journal->journal_block_data[ internal_usn_change_journal->journal_block_offset ] ),
+			 60,
+			 0 );
+		}
+#endif
 		byte_stream_copy_to_uint32_little_endian(
 		 &( internal_usn_change_journal->journal_block_data[ internal_usn_change_journal->journal_block_offset ] ),
 		 usn_record_size );

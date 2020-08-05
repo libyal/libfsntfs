@@ -70,6 +70,10 @@ struct libfsntfs_internal_usn_change_journal
 	 */
 	int extent_index;
 
+	/* The extent start offset
+	 */
+	off64_t extent_start_offset;
+
 	/* The extent offset
 	 */
 	off64_t extent_offset;
@@ -92,7 +96,7 @@ struct libfsntfs_internal_usn_change_journal
 
 	/* The journal block size
 	 */
-	size64_t journal_block_size;
+	size_t journal_block_size;
 };
 
 int libfsntfs_usn_change_journal_initialize(

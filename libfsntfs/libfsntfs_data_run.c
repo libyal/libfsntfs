@@ -377,8 +377,8 @@ ssize_t libfsntfs_data_run_read_data(
 		     value_index > 0;
 		     value_index-- )
 		{
-			cluster_block_number <<= 8;
-			cluster_block_number  |= data[ data_offset + value_index - 1 ];
+			cluster_block_number  = (int64_t) ( (uint64_t) cluster_block_number << 8 );
+			cluster_block_number |= data[ data_offset + value_index - 1 ];
 		}
 		data_offset += cluster_block_value_size;
 

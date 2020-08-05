@@ -6,8 +6,8 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$Profiles = @("fsntfsinfo", "fsntfsinfo_fs", "fsntfsinfo_mft")
-$OptionsPerProfile = @("", "-H", "-Eall")
+$Profiles = @("fsntfsinfo", "fsntfsinfo_fs", "fsntfsinfo_mft", "fsntfsinfo_usn")
+$OptionsPerProfile = @("", "-H", "-Eall", "-U")
 $OptionSets = "offset";
 
 $InputGlob = "*"

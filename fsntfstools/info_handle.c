@@ -4539,7 +4539,6 @@ int info_handle_file_entry_value_fprint(
 	static char *function                = "info_handle_file_entry_value_fprint";
 	size64_t size                        = 0;
 	size_t file_entry_name_size          = 0;
-	size_t security_descriptor_data_size = 0;
 	uint64_t access_time                 = 0;
 	uint64_t creation_time               = 0;
 	uint64_t entry_modification_time     = 0;
@@ -4548,6 +4547,10 @@ int info_handle_file_entry_value_fprint(
 	uint64_t parent_file_reference       = 0;
 	uint32_t file_attribute_flags        = 0;
 	int result                           = 0;
+
+#ifdef TODO
+	size_t security_descriptor_data_size = 0;
+#endif
 
 	if( info_handle == NULL )
 	{
@@ -4953,6 +4956,203 @@ on_error:
 	return( -1 );
 }
 
+/* Prints a file entry or data stream name to a bodyfile
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_bodyfile_name_value_fprint(
+     info_handle_t *info_handle,
+     const system_character_t *value_string,
+     size_t value_string_length,
+     libcerror_error_t **error )
+{
+	system_character_t *escaped_value_string     = NULL;
+	static char *function                        = "info_handle_bodyfile_name_value_fprint";
+	libuna_unicode_character_t unicode_character = 0;
+	size_t escaped_value_string_index            = 0;
+	size_t escaped_value_string_size             = 0;
+	size_t value_string_index                    = 0;
+	int print_count                              = 0;
+	int result                                   = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value string.",
+		 function );
+
+		return( -1 );
+	}
+	/* To ensure normalization in the escaped string is handled correctly
+	 * it stored in a temporary variable. Note that there is a worst-case of
+	 * a 1 to 4 ratio for each escaped character.
+	 */
+	if( value_string_length > (size_t) ( ( SSIZE_MAX - 1 ) / ( sizeof( system_character_t ) * 4 ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid value string length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	escaped_value_string_size = ( value_string_length * 4 ) + 1;
+
+	escaped_value_string = (system_character_t *) memory_allocate(
+	                                               sizeof( system_character_t ) * escaped_value_string_size );
+
+	if( escaped_value_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create escaped value string.",
+		 function );
+
+		goto on_error;
+	}
+	while( value_string_index < value_string_length )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libuna_unicode_character_copy_from_utf16(
+		          &unicode_character,
+		          (libuna_utf16_character_t *) value_string,
+		          value_string_length,
+		          &value_string_index,
+		          error );
+#else
+		result = libuna_unicode_character_copy_from_utf8(
+		          &unicode_character,
+		          (libuna_utf8_character_t *) value_string,
+		          value_string_length,
+		          &value_string_index,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+			 "%s: unable to copy Unicode character from value string.",
+			 function );
+
+			goto on_error;
+		}
+		/* Replace:
+		 *   values <= 0x1f and 0x7f by \x##
+		 */
+		if( ( unicode_character <= 0x1f )
+		 || ( unicode_character == 0x7f ) )
+		{
+			print_count = system_string_sprintf(
+			               &( escaped_value_string[ escaped_value_string_index ] ),
+			               escaped_value_string_size - escaped_value_string_index,
+			               "\\x%02" PRIx32 "",
+			               unicode_character );
+
+			if( print_count < 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+				 "%s: unable to copy escaped Unicode character to escaped value string.",
+				 function );
+
+				goto on_error;
+			}
+			escaped_value_string_index += print_count;
+		}
+		else if( ( unicode_character == '\\' )
+		      || ( unicode_character == '|' ) )
+		{
+			print_count = system_string_sprintf(
+			               &( escaped_value_string[ escaped_value_string_index ] ),
+			               escaped_value_string_size - escaped_value_string_index,
+			               "\\%c",
+			               unicode_character );
+
+			if( print_count < 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+				 "%s: unable to copy escaped Unicode character to escaped value string.",
+				 function );
+
+				goto on_error;
+			}
+			escaped_value_string_index += print_count;
+		}
+		else
+		{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+			result = libuna_unicode_character_copy_to_utf16(
+			          unicode_character,
+			          (libuna_utf16_character_t *) escaped_value_string,
+			          escaped_value_string_size,
+			          &escaped_value_string_index,
+			          error );
+#else
+			result = libuna_unicode_character_copy_to_utf8(
+			          unicode_character,
+			          (libuna_utf8_character_t *) escaped_value_string,
+			          escaped_value_string_size,
+			          &escaped_value_string_index,
+			          error );
+#endif
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBCERROR_CONVERSION_ERROR_INPUT_FAILED,
+				 "%s: unable to copy Unicode character to escaped value string.",
+				 function );
+
+				goto on_error;
+			}
+		}
+	}
+	escaped_value_string[ escaped_value_string_index ] = 0;
+
+	fprintf(
+	 info_handle->bodyfile_stream,
+	 "%" PRIs_SYSTEM "",
+	 escaped_value_string );
+
+	memory_free(
+	 escaped_value_string );
+
+	return( 1 );
+
+on_error:
+	if( escaped_value_string != NULL )
+	{
+		memory_free(
+		 escaped_value_string );
+	}
+	return( -1 );
+}
+
 /* Prints a $FILE_NAME attribute to a bodyfile
  * Returns 1 if successful, 0 if not or -1 on error
  */
@@ -4961,7 +5161,9 @@ int info_handle_bodyfile_file_name_attribute_fprint(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      libcerror_error_t **error )
 {
 	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
@@ -5128,17 +5330,39 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 
 	if( path != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 path );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     path,
+		     path_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print path string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( file_entry_name != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 file_entry_name );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     file_entry_name,
+		     file_entry_name_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $FILE_NAME attribute address */
@@ -5167,7 +5391,9 @@ int info_handle_bodyfile_index_root_attribute_fprint(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      const system_character_t *attribute_name,
      size_t attribute_name_size,
      libcerror_error_t **error )
@@ -5336,17 +5562,39 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 	if( path != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 path );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     path,
+		     path_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print path string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( file_entry_name != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 file_entry_name );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     file_entry_name,
+		     file_entry_name_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( ( attribute_name != NULL )
          && ( ( attribute_name_size != 5 )
@@ -5387,7 +5635,9 @@ int info_handle_bodyfile_file_entry_value_fprint(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_data_stream_t *alternate_data_stream,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      const system_character_t *data_stream_name,
      libcerror_error_t **error )
 {
@@ -5575,17 +5825,39 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 	if( path != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 path );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     path,
+		     path_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print path string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( file_entry_name != NULL )
 	{
-		fprintf(
-		 info_handle->bodyfile_stream,
-		 "%" PRIs_SYSTEM "",
-		 file_entry_name );
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     file_entry_name,
+		     file_entry_name_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( data_stream_name != NULL )
 	{
@@ -6119,7 +6391,9 @@ int info_handle_file_entry_fprint(
 				     file_entry,
 				     attribute,
 				     path,
+				     path_length,
 				     file_entry_name,
+				     file_entry_name_length,
 				     attribute_name,
 				     attribute_name_size,
 				     error ) != 1 )
@@ -6223,7 +6497,9 @@ int info_handle_file_entry_fprint(
 			     file_entry,
 			     NULL,
 			     path,
+			     path_length,
 			     file_entry_name,
+			     file_entry_name_length,
 			     NULL,
 			     error ) != 1 )
 			{
@@ -6369,7 +6645,9 @@ int info_handle_file_entry_fprint(
 				     file_entry,
 				     alternate_data_stream,
 				     path,
+				     path_length,
 				     file_entry_name,
+				     file_entry_name_length,
 				     data_stream_name,
 				     error ) != 1 )
 				{
@@ -6469,7 +6747,9 @@ int info_handle_file_entry_fprint(
 		     file_entry,
 		     file_name_attribute,
 		     path,
+		     path_length,
 		     file_entry_name,
+		     file_entry_name_length,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -8017,9 +8297,10 @@ int info_handle_usn_change_journal_fprint(
 	libfusn_record_t *usn_record                       = NULL;
 	uint8_t *buffer                                    = NULL;
 	static char *function                              = "info_handle_usn_change_journal_fprint";
-	size_t journal_block_size                          = 0x1000;
+	size_t journal_block_size                          = 0;
 	ssize_t read_count                                 = 0;
 	uint32_t usn_record_size                           = 0;
+	int result                                         = 0;
 
 	if( info_handle == NULL )
 	{
@@ -8036,27 +8317,12 @@ int info_handle_usn_change_journal_fprint(
 	 info_handle->notify_stream,
 	 "Windows NT File System information:\n\n" );
 
-	fprintf(
-	 info_handle->notify_stream,
-	 "USN change journal: \\$Extend\\$UsnJrnl\n\n" );
+	result = libfsntfs_volume_get_usn_change_journal(
+	          info_handle->input_volume,
+	          &usn_change_journal,
+	          error );
 
-/* TODO get journal block size from USN change journal */
-	if( ( journal_block_size == 0 )
-	 || ( journal_block_size > (size_t) SSIZE_MAX ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid journal block size value out of bounds.",
-		 function );
-
-		goto on_error;
-	}
-	if( libfsntfs_volume_get_usn_change_journal(
-	     info_handle->input_volume,
-	     &usn_change_journal,
-	     error ) != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -8067,6 +8333,33 @@ int info_handle_usn_change_journal_fprint(
 
 		goto on_error;
 	}
+	else if( result == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "USN change journal: N/A\n\n" );
+
+		return( 1 );
+	}
+/* TODO get journal block size from USN change journal */
+	journal_block_size = 0x1000;
+
+	if( ( journal_block_size == 0 )
+	 || ( journal_block_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid journal block size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "USN change journal: \\$Extend\\$UsnJrnl\n\n" );
+
 	buffer = (uint8_t *) memory_allocate(
 	                      sizeof( uint8_t ) * journal_block_size );
 

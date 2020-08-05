@@ -189,12 +189,20 @@ int info_handle_file_entry_value_fprint(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );
 
+int info_handle_bodyfile_name_value_fprint(
+     info_handle_t *info_handle,
+     const system_character_t *value_string,
+     size_t value_string_length,
+     libcerror_error_t **error );
+
 int info_handle_bodyfile_file_name_attribute_fprint(
      info_handle_t *info_handle,
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      libcerror_error_t **error );
 
 int info_handle_bodyfile_index_root_attribute_fprint(
@@ -202,7 +210,9 @@ int info_handle_bodyfile_index_root_attribute_fprint(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_attribute_t *attribute,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      const system_character_t *attribute_name,
      size_t attribute_name_size,
      libcerror_error_t **error );
@@ -212,7 +222,9 @@ int info_handle_bodyfile_file_entry_value_fprint(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_data_stream_t *alternate_data_stream,
      const system_character_t *path,
+     size_t path_length,
      const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
      const system_character_t *data_stream_name,
      libcerror_error_t **error );
 
