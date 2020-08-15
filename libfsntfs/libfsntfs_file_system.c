@@ -1545,7 +1545,7 @@ int libfsntfs_file_system_get_path_hint(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,

@@ -528,7 +528,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1234,7 +1234,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1683,7 +1683,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,

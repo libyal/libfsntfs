@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>libfsntfs</id>
+    <version>20200815</version>
+    <authors>Joachim Metz</authors>
+    <owners>joachimmetz</owners>
+    <licenseUrl>https://raw.githubusercontent.com/libyal/libfsntfs/master/COPYING.LESSER</licenseUrl>
+    <projectUrl>https://github.com/libyal/libfsntfs</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <title>libfsntfs</title>
+    <description>Library to access the Windows New Technology File System (NTFS) format</description>
+    <releaseNotes>Release of libfsntfs 20200815</releaseNotes>
+    <copyright>Copyright (C) 2010-2020</copyright>
+    <tags>native</tags>
+  </metadata>
+  <files>
+    <file src="include\*.h" target="lib\native\include\" />
+    <file src="include\libfsntfs\*.h" target="lib\native\include\libfsntfs\" />
+    <file src="msvscpp\Release\Win32\libfsntfs.dll" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\Win32\libfsntfs.lib" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\Win32\libfsntfs.pdb" target="lib\native\lib\Win32\" />
+    <file src="msvscpp\Release\x64\libfsntfs.dll" target="lib\native\lib\x64\" />
+    <file src="msvscpp\Release\x64\libfsntfs.lib" target="lib\native\lib\x64\" />
+    <file src="msvscpp\Release\x64\libfsntfs.pdb" target="lib\native\lib\x64\" />
+  </files>
+</package>

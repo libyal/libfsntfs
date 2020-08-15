@@ -486,7 +486,7 @@ int fsntfs_test_directory_entries_tree_read_from_index_node(
 	          directory_entries_tree,
 	          file_io_handle,
 	          index_node,
-	          LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH + 1,
+	          LIBFSNTFS_MAXIMUM_RECURSION_DEPTH + 1,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1067,7 +1067,7 @@ int fsntfs_test_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 	          name,
 	          4,
 	          &directory_entry,
-	          LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH + 1,
+	          LIBFSNTFS_MAXIMUM_RECURSION_DEPTH + 1,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1383,7 +1383,7 @@ int fsntfs_test_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 	          name,
 	          4,
 	          &directory_entry,
-	          LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH + 1,
+	          LIBFSNTFS_MAXIMUM_RECURSION_DEPTH + 1,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

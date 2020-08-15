@@ -423,7 +423,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		return( -1 );
 	}
 	if( ( recursion_depth < 0 )
-	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_INDEX_NODE_RECURSION_DEPTH ) )
+	 || ( recursion_depth > LIBFSNTFS_MAXIMUM_RECURSION_DEPTH ) )
 	{
 		libcerror_error_set(
 		 error,
