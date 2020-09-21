@@ -298,7 +298,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a data stream object
+/* Initializes a data stream object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_data_stream_init(

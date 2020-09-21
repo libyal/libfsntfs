@@ -214,7 +214,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a data streams sequence and iterator object
+/* Initializes a data streams sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_data_streams_init(

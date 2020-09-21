@@ -645,7 +645,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a file entry object
+/* Initializes a file entry object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_file_entry_init(
@@ -1456,36 +1456,6 @@ PyObject *pyfsntfs_file_entry_get_size(
 		PyErr_Format(
 		 PyExc_ValueError,
 		 "%s: invalid file entry.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_has_default_data_stream(
-	          pyfsntfs_file_entry->file_entry,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result == -1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to determine if file entry has default data stream.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	else if( result == 0 )
-	{
-		PyErr_Format(
-		 PyExc_IOError,
-		 "%s: missing default data stream.",
 		 function );
 
 		return( NULL );

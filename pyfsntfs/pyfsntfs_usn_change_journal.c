@@ -210,7 +210,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an USN change journal object
+/* Initializes an USN change journal object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_usn_change_journal_init(

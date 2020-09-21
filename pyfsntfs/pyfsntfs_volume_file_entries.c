@@ -224,7 +224,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a volume file entries object
+/* Initializes a volume file entries object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_volume_file_entries_init(

@@ -224,7 +224,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a MFT metadata file entries object
+/* Initializes a MFT metadata file entries object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_mft_metadata_file_entries_init(

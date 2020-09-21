@@ -222,7 +222,7 @@ PyTypeObject pyfsntfs_mft_metadata_file_type_object = {
 	0
 };
 
-/* Intializes a MFT metadata file object
+/* Initializes a MFT metadata file object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_mft_metadata_file_init(

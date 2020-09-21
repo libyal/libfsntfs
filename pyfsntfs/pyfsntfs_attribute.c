@@ -223,7 +223,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an attribute object
+/* Initializes an attribute object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_attribute_init(

@@ -424,7 +424,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an attribute types object
+/* Initializes an attribute types object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_attribute_types_init(

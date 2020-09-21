@@ -410,7 +410,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a file attribute flags object
+/* Initializes a file attribute flags object
  * Returns 0 if successful or -1 on error
  */
 int pyfsntfs_file_attribute_flags_init(

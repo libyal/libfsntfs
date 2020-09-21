@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>libfsntfs</id>
-    <version>20200815</version>
+    <version>20200921</version>
     <authors>Joachim Metz</authors>
     <owners>joachimmetz</owners>
     <licenseUrl>https://raw.githubusercontent.com/libyal/libfsntfs/master/COPYING.LESSER</licenseUrl>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>libfsntfs</title>
     <description>Library to access the Windows New Technology File System (NTFS) format</description>
-    <releaseNotes>Release of libfsntfs 20200815</releaseNotes>
+    <releaseNotes>Release of libfsntfs 20200921</releaseNotes>
     <copyright>Copyright (C) 2010-2020</copyright>
     <tags>native</tags>
   </metadata>
