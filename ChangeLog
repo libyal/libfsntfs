@@ -1,4 +1,5 @@
 TODO
+* get_file_entry_by_path determine unicode form
 * fsntfsinfo: print extents/data runs of $DATA stream?
 * fsntfsmount: escape control characters
 

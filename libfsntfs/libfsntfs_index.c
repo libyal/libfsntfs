@@ -572,6 +572,7 @@ int libfsntfs_index_read_root(
 	size_t data_offset        = 0;
 	size_t data_size          = 0;
 	uint32_t index_entry_size = 0;
+	int result                = 0;
 
 	if( index == NULL )
 	{
@@ -606,7 +607,33 @@ int libfsntfs_index_read_root(
 
 		return( -1 );
 	}
-	if( libfsntfs_mft_attribute_get_data(
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          index_root_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if index root attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident index root attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_resident_data(
 	     index_root_attribute,
 	     &data,
 	     &data_size,

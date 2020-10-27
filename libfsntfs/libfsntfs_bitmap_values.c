@@ -292,7 +292,7 @@ int libfsntfs_bitmap_values_read_data(
 					 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
 					 function,
 					 allocated_range_offset,
-					 allocated_range_size );
+					 allocated_range_offset + allocated_range_size );
 				}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
@@ -350,7 +350,7 @@ int libfsntfs_bitmap_values_read_data(
 			 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
 			 function,
 			 allocated_range_offset,
-			 allocated_range_size );
+			 allocated_range_offset + allocated_range_size );
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
@@ -460,7 +460,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_mft_attribute_get_data(
+		if( libfsntfs_mft_attribute_get_resident_data(
 		     mft_attribute,
 		     &data,
 		     &data_size,

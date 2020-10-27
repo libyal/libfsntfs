@@ -320,7 +320,7 @@ int libfsntfs_volume_information_values_read_from_mft_attribute(
 
 		return( 1 );
 	}
-	if( libfsntfs_mft_attribute_get_data(
+	if( libfsntfs_mft_attribute_get_resident_data(
 	     mft_attribute,
 	     &data,
 	     &data_size,

@@ -196,10 +196,10 @@ int libfsntfs_mft_attribute_get_compression_unit_size(
      size_t *compression_unit_size,
      libcerror_error_t **error );
 
-int libfsntfs_mft_attribute_get_data(
+int libfsntfs_mft_attribute_get_resident_data(
      libfsntfs_mft_attribute_t *mft_attribute,
-     uint8_t **data,
-     size_t *data_size,
+     uint8_t **resident_data,
+     size_t *resident_data_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_attribute_get_number_of_data_runs(

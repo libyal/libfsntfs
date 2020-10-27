@@ -1832,16 +1832,16 @@ int libfsntfs_mft_attribute_get_compression_unit_size(
 	return( 1 );
 }
 
-/* Retrieves the data
+/* Retrieves the resident data
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_mft_attribute_get_data(
+int libfsntfs_mft_attribute_get_resident_data(
      libfsntfs_mft_attribute_t *mft_attribute,
-     uint8_t **data,
-     size_t *data_size,
+     uint8_t **resident_data,
+     size_t *resident_data_size,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_mft_attribute_get_data";
+	static char *function = "libfsntfs_mft_attribute_get_resident_data";
 
 	if( mft_attribute == NULL )
 	{
@@ -1850,6 +1850,17 @@ int libfsntfs_mft_attribute_get_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( mft_attribute->non_resident_flag & 0x01 ) != 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: invalid MFT attribute - non-resident flag is set.",
 		 function );
 
 		return( -1 );
@@ -1865,30 +1876,30 @@ int libfsntfs_mft_attribute_get_data(
 
 		return( -1 );
 	}
-	if( data == NULL )
+	if( resident_data == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.",
+		 "%s: invalid resident data.",
 		 function );
 
 		return( -1 );
 	}
-	if( data_size == NULL )
+	if( resident_data_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data size.",
+		 "%s: invalid resident data size.",
 		 function );
 
 		return( -1 );
 	}
-	*data      = mft_attribute->data;
-	*data_size = (size_t) mft_attribute->data_size;
+	*resident_data      = mft_attribute->data;
+	*resident_data_size = (size_t) mft_attribute->data_size;
 
 	return( 1 );
 }

@@ -2000,10 +2000,10 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_mft_attribute_get_data function
+/* Tests the libfsntfs_mft_attribute_get_resident_data function
  * Returns 1 if successful or 0 if not
  */
-int fsntfs_test_mft_attribute_get_data(
+int fsntfs_test_mft_attribute_get_resident_data(
      libfsntfs_mft_attribute_t *mft_attribute )
 {
 	libcerror_error_t *error = NULL;
@@ -2013,7 +2013,7 @@ int fsntfs_test_mft_attribute_get_data(
 
 	/* Test regular cases
 	 */
-	result = libfsntfs_mft_attribute_get_data(
+	result = libfsntfs_mft_attribute_get_resident_data(
 	          mft_attribute,
 	          &data,
 	          &data_size,
@@ -2039,7 +2039,7 @@ int fsntfs_test_mft_attribute_get_data(
 
 	/* Test error cases
 	 */
-	result = libfsntfs_mft_attribute_get_data(
+	result = libfsntfs_mft_attribute_get_resident_data(
 	          NULL,
 	          &data,
 	          &data_size,
@@ -2057,7 +2057,7 @@ int fsntfs_test_mft_attribute_get_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_mft_attribute_get_data(
+	result = libfsntfs_mft_attribute_get_resident_data(
 	          mft_attribute,
 	          NULL,
 	          &data_size,
@@ -2075,7 +2075,7 @@ int fsntfs_test_mft_attribute_get_data(
 	libcerror_error_free(
 	 &error );
 
-	result = libfsntfs_mft_attribute_get_data(
+	result = libfsntfs_mft_attribute_get_resident_data(
 	          mft_attribute,
 	          &data,
 	          NULL,
@@ -2653,8 +2653,8 @@ int main(
 	 mft_attribute1 );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_mft_attribute_get_data",
-	 fsntfs_test_mft_attribute_get_data,
+	 "libfsntfs_mft_attribute_get_resident_data",
+	 fsntfs_test_mft_attribute_get_resident_data,
 	 mft_attribute1 );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

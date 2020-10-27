@@ -824,20 +824,38 @@ int libfsntfs_cluster_block_stream_initialize(
 
 		goto on_error;
 	}
-	if( libfsntfs_mft_attribute_get_data(
-	     mft_attribute,
-	     &resident_data,
-	     &resident_data_size,
-	     error ) != 1 )
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          mft_attribute,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve resident data from attribute.",
+		 "%s: unable to determine if attribute data is resident.",
 		 function );
 
 		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_mft_attribute_get_resident_data(
+		     mft_attribute,
+		     &resident_data,
+		     &resident_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve resident data from attribute.",
+			 function );
+
+			goto on_error;
+		}
 	}
 	if( libfsntfs_mft_attribute_get_data_flags(
 	     mft_attribute,

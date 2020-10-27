@@ -580,7 +580,7 @@ int libfsntfs_security_descriptor_values_read_from_mft_attribute(
 	}
 	else if( result != 0 )
 	{
-		if( libfsntfs_mft_attribute_get_data(
+		if( libfsntfs_mft_attribute_get_resident_data(
 		     mft_attribute,
 		     &data,
 		     &data_size,

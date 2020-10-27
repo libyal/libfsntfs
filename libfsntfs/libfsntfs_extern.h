@@ -30,7 +30,11 @@
 
 #include <libfsntfs/extern.h>
 
+#if defined( __CYGWIN__ )
+#define LIBFSNTFS_EXTERN_VARIABLE	extern
+#else
 #define LIBFSNTFS_EXTERN_VARIABLE	LIBFSNTFS_EXTERN
+#endif
 
 #else
 #define LIBFSNTFS_EXTERN		/* extern */
