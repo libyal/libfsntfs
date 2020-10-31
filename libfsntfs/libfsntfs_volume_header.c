@@ -566,7 +566,7 @@ int libfsntfs_volume_header_read_data(
 
 			return( -1 );
 		}
-		volume_header->index_entry_size = 1 << volume_header->index_entry_size;
+		volume_header->index_entry_size = (uint32_t) 1UL << volume_header->index_entry_size;
 	}
 	if( (size_t) volume_header->index_entry_size < sizeof( fsntfs_index_entry_header_t ) )
 	{
