@@ -64,6 +64,9 @@ const char *libfsntfs_debug_print_attribute_type(
 const char *libfsntfs_debug_print_collation_type(
              uint32_t collation_type );
 
+const char *libfsntfs_debug_print_compression_method(
+             uint32_t compression_method );
+
 int libfsntfs_debug_print_filetime_value(
      const char *function_name,
      const char *value_name,

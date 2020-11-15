@@ -371,6 +371,28 @@ const char *libfsntfs_debug_print_collation_type(
 	return( "Unknown" );
 }
 
+/* Prints the compression method
+ */
+const char *libfsntfs_debug_print_compression_method(
+             uint32_t compression_method )
+{
+	switch( compression_method )
+	{
+		case 0:
+			return( "XPRESS4K" );
+
+		case 1:
+			return( "LZX" );
+
+		case 2:
+			return( "XPRESS8K" );
+
+		case 3:
+			return( "XPRESS16K" );
+	}
+	return( "Unknown" );
+}
+
 /* Prints the file name attribute name space
  */
 const char *libfsntfs_debug_print_file_name_attribute_name_space(

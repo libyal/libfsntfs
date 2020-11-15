@@ -262,12 +262,13 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
+	uint8_t *chunk_offsets_data               = NULL;
 	static char *function                     = "libfsntfs_compressed_data_handle_get_compressed_block_offsets";
 	size64_t compressed_data_size             = 0;
 	size_t chunk_offset_data_size             = 0;
-	size_t segment_data_offset                = 0;
+	size_t chunk_offsets_data_size            = 0;
+	size_t data_offset                        = 0;
 	ssize_t read_count                        = 0;
-	off64_t offset                            = 0;
 	uint64_t compressed_block_index           = 0;
 	uint64_t compressed_block_offset          = 0;
 	uint64_t previous_compressed_block_offset = 0;
@@ -316,60 +317,89 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 	{
 		chunk_offset_data_size = 4;
 	}
-	offset = libfdata_stream_seek_offset(
-	          data_handle->compressed_data_stream,
-	          0,
-	          SEEK_SET,
-	          error );
+	chunk_offsets_data_size = data_handle->uncompressed_data_size / data_handle->compression_unit_size;
 
-	if( offset != 0 )
+	if( ( data_handle->uncompressed_data_size % data_handle->compression_unit_size ) != 0 )
+	{
+		chunk_offsets_data_size++;
+	}
+	if( chunk_offsets_data_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / chunk_offset_data_size ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset: 0 (0x00000000) in compressed data stream.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid number of chunk offsets data size value exceeds maximum allocation size.",
 		 function );
 
 		goto on_error;
 	}
+	chunk_offsets_data_size *= chunk_offset_data_size;
+
+	chunk_offsets_data = (uint8_t *) memory_allocate(
+	                                  sizeof( uint8_t ) * chunk_offsets_data_size );
+
+	if( chunk_offsets_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create chunk offsets data.",
+		 function );
+
+		goto on_error;
+	}
+	read_count = libfdata_stream_read_buffer_at_offset(
+	              data_handle->compressed_data_stream,
+	              (intptr_t *) file_io_handle,
+	              chunk_offsets_data,
+	              chunk_offsets_data_size,
+	              0,
+	              0,
+	              error );
+
+	if( read_count != (ssize_t) chunk_offsets_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read chunk offsets data from compressed data stream.",
+		 function );
+
+		goto on_error;
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: chunk offsets data:\n",
+			 function );
+			libcnotify_print_data(
+			 chunk_offsets_data,
+			 chunk_offsets_data_size,
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+		}
+#endif
+	previous_compressed_block_offset = chunk_offset_data_size;
+
 	compressed_block_index++;
 
-	for( segment_data_offset = 0;
-	     segment_data_offset < data_handle->compression_unit_size;
-	     segment_data_offset += chunk_offset_data_size )
+	for( data_offset = 0;
+	     data_offset < chunk_offsets_data_size;
+	     data_offset += chunk_offset_data_size )
 	{
-		previous_compressed_block_offset = compressed_block_offset;
-
-		read_count = libfdata_stream_read_buffer(
-		              data_handle->compressed_data_stream,
-		              (intptr_t *) file_io_handle,
-		              &( data_handle->compressed_segment_data[ segment_data_offset ] ),
-		              chunk_offset_data_size,
-		              0,
-		              error );
-
-		if( read_count != (ssize_t) chunk_offset_data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read buffer from compressed data stream.",
-			 function );
-
-			goto on_error;
-		}
 		if( chunk_offset_data_size == 8 )
 		{
 			byte_stream_copy_to_uint64_little_endian(
-			 &( data_handle->compressed_segment_data[ segment_data_offset ] ),
+			 &( chunk_offsets_data[ data_offset ] ),
 			 compressed_block_offset );
 		}
 		else
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 &( data_handle->compressed_segment_data[ segment_data_offset ] ),
+			 &( chunk_offsets_data[ data_offset ] ),
 			 compressed_block_offset );
 		}
 		if( ( compressed_block_offset <= previous_compressed_block_offset )
@@ -377,6 +407,8 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		{
 			break;
 		}
+		previous_compressed_block_offset = compressed_block_offset;
+
 		compressed_block_index++;
 	}
 	data_handle->number_of_compressed_blocks = compressed_block_index;
@@ -390,13 +422,13 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		 data_handle->number_of_compressed_blocks );
 	}
 #endif
-	if( (size_t) data_handle->number_of_compressed_blocks > ( (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE / chunk_offset_data_size ) - 1 ) )
+	if( (size_t) data_handle->number_of_compressed_blocks > ( (size_t) ( MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( uint64_t ) ) - 1 ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid number of compressed blocks value out of bounds.",
+		 "%s: invalid number of compressed blocks value exceeds maximum allocation size.",
 		 function );
 
 		goto on_error;
@@ -422,13 +454,13 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		 "%s: compressed block: % 2d offset\t: %" PRIzd " (0x%08" PRIzx ")\n",
 		 function,
 		 0,
-		 segment_data_offset,
-		 segment_data_offset );
+		 data_offset,
+		 data_offset );
 	}
 #endif
-	data_handle->compressed_block_offsets[ 0 ] = segment_data_offset;
+	data_handle->compressed_block_offsets[ 0 ] = data_offset;
 
-	segment_data_offset = 0;
+	data_offset = 0;
 
 	for( compressed_block_index = 1;
 	     compressed_block_index < data_handle->number_of_compressed_blocks;
@@ -437,26 +469,14 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		if( chunk_offset_data_size == 8 )
 		{
 			byte_stream_copy_to_uint64_little_endian(
-			 &( data_handle->compressed_segment_data[ segment_data_offset ] ),
+			 &( chunk_offsets_data[ data_offset ] ),
 			 compressed_block_offset );
 		}
 		else
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 &( data_handle->compressed_segment_data[ segment_data_offset ] ),
+			 &( chunk_offsets_data[ data_offset ] ),
 			 compressed_block_offset );
-		}
-		if( compressed_block_offset <= data_handle->compressed_block_offsets[ 0 ] )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid compressed block offset: %d value out of bounds.",
-			 function,
-			 compressed_block_index );
-
-			goto on_error;
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -469,7 +489,20 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 			 compressed_block_offset );
 		}
 #endif
-		segment_data_offset += chunk_offset_data_size;
+		if( ( compressed_block_offset == 0 )
+		 || ( compressed_block_offset >= ( (uint64_t) INT64_MAX - data_handle->compressed_block_offsets[ 0 ] ) ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid compressed block offset: %d value out of bounds.",
+			 function,
+			 compressed_block_index );
+
+			goto on_error;
+		}
+		data_offset += chunk_offset_data_size;
 
 		data_handle->compressed_block_offsets[ compressed_block_index ] = data_handle->compressed_block_offsets[ 0 ] + compressed_block_offset;
 	}
@@ -493,6 +526,9 @@ int libfsntfs_compressed_data_handle_get_compressed_block_offsets(
 		 "\n" );
 	}
 #endif
+	memory_free(
+	 chunk_offsets_data );
+
 	return( 1 );
 
 on_error:
@@ -502,6 +538,11 @@ on_error:
 		 data_handle->compressed_block_offsets );
 
 		data_handle->compressed_block_offsets = NULL;
+	}
+	if( chunk_offsets_data != NULL )
+	{
+		memory_free(
+		 chunk_offsets_data );
 	}
 	return( -1 );
 }
@@ -647,6 +688,20 @@ ssize_t libfsntfs_compressed_data_handle_read_segment_data(
 			{
 				read_buffer = data_handle->segment_data;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: compressed block: % 2" PRIu64 " offset\t: %" PRIu64 " (0x%08" PRIx64 ")\n",
+				 function,
+				 compressed_block_index,
+				 data_stream_offset,
+				 data_stream_offset );
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif
 			read_count = libfdata_stream_read_buffer_at_offset(
 			              data_handle->compressed_data_stream,
 			              (intptr_t *) file_io_handle,

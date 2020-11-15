@@ -316,9 +316,11 @@ int libfsntfs_reparse_point_values_read_data(
 			 value_32bit );
 
 			libcnotify_printf(
-			 "%s: compression method\t\t: %" PRIu32 "\n",
+			 "%s: compression method\t\t: %" PRIu32 " (%s)\n",
 			 function,
-			 reparse_point_values->compression_method );
+			 reparse_point_values->compression_method,
+			 libfsntfs_debug_print_compression_method(
+			  reparse_point_values->compression_method ) );
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
