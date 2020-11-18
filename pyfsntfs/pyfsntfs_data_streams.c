@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #endif
 
+#include "pyfsntfs_data_stream.h"
 #include "pyfsntfs_data_streams.h"
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"

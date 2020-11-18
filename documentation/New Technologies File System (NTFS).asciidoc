@@ -256,7 +256,7 @@ not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
 | 17 | 2 | 0 | Root directory entries +
 not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
-| 19 | 2 | | Total number of sectors (16-bit) +
+| 19 | 2 | | [yellow-background]*Unknown (Total number of sectors (16-bit))* +
 [yellow-background]*Used if the total of number of sectors fits in 16-bit?*
 | 21 | 1 | | Media descriptor +
 See section: <<media_descriptor,Media descriptor>>
@@ -269,7 +269,7 @@ Not used by NTFS `[MSDN]`
 Not used by NTFS `[MSDN]`
 | 28 | 4 | 0x3f | Number of hidden sectors +
 Not used by NTFS `[MSDN]`
-| 32 | 4 | 0x00 | Total number of sectors (32-bit) +
+| 32 | 4 | 0x00 | [yellow-background]*Unknown (Total number of sectors (32-bit))* +
 [yellow-background]*Used if the total of number of sectors fits in 32-bit?* +
 Not used by NTFS must be 0 `[MSDN]`
 4+| _NTFS version 8.0 BIOS parameter block (BPB) or extended BPB_ +

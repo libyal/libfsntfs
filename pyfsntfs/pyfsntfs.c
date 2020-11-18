@@ -79,14 +79,14 @@ PyMethodDef pyfsntfs_module_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "check_volume_signature(filename) -> Boolean\n"
 	  "\n"
-	  "Checks if a volume has a Windows New Technology File System (NTFS) signature." },
+	  "Checks if a volume has a Windows New Technology File System (NTFS) volume signature." },
 
 	{ "check_volume_signature_file_object",
 	  (PyCFunction) pyfsntfs_check_volume_signature_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "check_volume_signature_file_object(file_object) -> Boolean\n"
 	  "\n"
-	  "Checks if a volume has a Windows New Technology File System (NTFS) signature using a file-like object." },
+	  "Checks if a volume has a Windows New Technology File System (NTFS) volume signature using a file-like object." },
 
 	{ "open",
 	  (PyCFunction) pyfsntfs_open_new_volume,
@@ -139,7 +139,7 @@ PyObject *pyfsntfs_get_version(
 	         errors ) );
 }
 
-/* Checks if a volume has a Windows New Technology File System (NTFS) signature
+/* Checks if a volume has a Windows New Technology File System (NTFS) volume signature
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_check_volume_signature(
@@ -149,9 +149,9 @@ PyObject *pyfsntfs_check_volume_signature(
 {
 	PyObject *string_object      = NULL;
 	libcerror_error_t *error     = NULL;
+	const char *filename_narrow  = NULL;
 	static char *function        = "pyfsntfs_check_volume_signature";
 	static char *keyword_list[]  = { "filename", NULL };
-	const char *filename_narrow  = NULL;
 	int result                   = 0;
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -220,10 +220,10 @@ PyObject *pyfsntfs_check_volume_signature(
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -267,12 +267,12 @@ PyObject *pyfsntfs_check_volume_signature(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
@@ -289,10 +289,10 @@ PyObject *pyfsntfs_check_volume_signature(
 
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   string_object );
+		                   string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   string_object );
+		                   string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
@@ -335,7 +335,7 @@ PyObject *pyfsntfs_check_volume_signature(
 	return( NULL );
 }
 
-/* Checks if a volume has a Windows New Technology File System (NTFS) signature using a file-like object
+/* Checks if a volume has a Windows New Technology File System (NTFS) volume signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_check_volume_signature_file_object(
@@ -343,9 +343,9 @@ PyObject *pyfsntfs_check_volume_signature_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	libcerror_error_t *error         = NULL;
-	libbfio_handle_t *file_io_handle = NULL;
 	PyObject *file_object            = NULL;
+	libbfio_handle_t *file_io_handle = NULL;
+	libcerror_error_t *error         = NULL;
 	static char *function            = "pyfsntfs_check_volume_signature_file_object";
 	static char *keyword_list[]      = { "file_object", NULL };
 	int result                       = 0;
@@ -664,7 +664,7 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	 "_attributes",
+	 "attributes",
 	 (PyObject *) &pyfsntfs_attributes_type_object );
 
 	/* Setup the data stream type object
@@ -698,7 +698,7 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	 "_data_streams",
+	 "data_streams",
 	 (PyObject *) &pyfsntfs_data_streams_type_object );
 
 	/* Setup the file attribute flags type object
@@ -754,7 +754,7 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	 "_file_entries",
+	 "file_entries",
 	 (PyObject *) &pyfsntfs_file_entries_type_object );
 
 	/* Setup the $FILE_NAME attribute type object
@@ -805,7 +805,7 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	 "_mft_metadata_file_entries",
+	 "mft_metadata_file_entries",
 	 (PyObject *) &pyfsntfs_mft_metadata_file_entries_type_object );
 
 	/* Setup the $OBJECT_IDENTIFIER attribute type object
@@ -924,7 +924,7 @@ PyMODINIT_FUNC initpyfsntfs(
 
 	PyModule_AddObject(
 	 module,
-	 "_volume_file_entries",
+	 "volume_file_entries",
 	 (PyObject *) &pyfsntfs_volume_file_entries_type_object );
 
 	/* Setup the $VOLUME_INFORMATION attribute type object

@@ -1369,7 +1369,7 @@ int fsntfs_test_volume_header_get_volume_size(
 	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
 	 "volume_size",
 	 (uint64_t) volume_size,
-	 (uint64_t) 8224768 );
+	 (uint64_t) 8225280 );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

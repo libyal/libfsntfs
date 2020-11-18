@@ -24,10 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
-#include "libfsntfs_io_handle.h"
 #include "libfsntfs_volume_header.h"
 
 #include "fsntfs_index.h"
@@ -574,7 +574,7 @@ int libfsntfs_volume_header_read_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid MFT entry size: %" PRIu32 " value out of bounds.",
+		 "%s: invalid index entry size: %" PRIu32 " value out of bounds.",
 		 function,
 		 volume_header->index_entry_size );
 
@@ -592,6 +592,7 @@ int libfsntfs_volume_header_read_data(
 		return( -1 );
 	}
 	volume_header->volume_size *= volume_header->bytes_per_sector;
+	volume_header->volume_size += volume_header->bytes_per_sector;
 
 	volume_header->mft_offset = mft_cluster_block_number
 	                          * volume_header->cluster_block_size;
@@ -616,6 +617,11 @@ int libfsntfs_volume_header_read_data(
 		 "%s: calculated index entry size\t\t: %" PRIu32 "\n",
 		 function,
 		 volume_header->index_entry_size );
+
+		libcnotify_printf(
+		 "%s: calculated volume size\t\t: %" PRIu64 "\n",
+		 function,
+		 volume_header->volume_size );
 
 		libcnotify_printf(
 		 "%s: calculated MFT offset\t\t: 0x%08" PRIx64 "\n",
@@ -644,7 +650,7 @@ int libfsntfs_volume_header_read_file_io_handle(
      off64_t file_offset,
      libcerror_error_t **error )
 {
-	fsntfs_volume_header_t volume_header_data;
+	uint8_t volume_header_data[ sizeof( fsntfs_volume_header_t ) ];
 
 	static char *function = "libfsntfs_volume_header_read_file_io_handle";
 	ssize_t read_count    = 0;
