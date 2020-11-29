@@ -84,6 +84,7 @@ MSVSCPP_FILES = \
 	libfsntfs/libfsntfs.vcproj \
 	libfusn/libfusn.vcproj \
 	libfwnt/libfwnt.vcproj \
+	libhmac/libhmac.vcproj \
 	libuna/libuna.vcproj \
 	pyfsntfs/pyfsntfs.vcproj \
 	libfsntfs.sln

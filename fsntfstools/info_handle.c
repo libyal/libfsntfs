@@ -27,6 +27,7 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include "digest_hash.h"
 #include "fsntfstools_libbfio.h"
 #include "fsntfstools_libcerror.h"
 #include "fsntfstools_libclocale.h"
@@ -36,6 +37,7 @@
 #include "fsntfstools_libfwnt.h"
 #include "fsntfstools_libfsntfs.h"
 #include "fsntfstools_libfusn.h"
+#include "fsntfstools_libhmac.h"
 #include "fsntfstools_libuna.h"
 #include "info_handle.h"
 
@@ -62,6 +64,7 @@ int libfsntfs_mft_metadata_file_open_file_io_handle(
 
 #endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
+#define DIGEST_HASH_STRING_SIZE_MD5	33
 #define INFO_HANDLE_NOTIFY_STREAM	stdout
 
 /* Copies a string of a decimal value to a 64-bit value
@@ -392,6 +395,7 @@ const char *info_handle_get_attribute_type_description(
  */
 int info_handle_initialize(
      info_handle_t **info_handle,
+     uint8_t calculate_md5,
      libcerror_error_t **error )
 {
 	static char *function = "info_handle_initialize";
@@ -464,6 +468,7 @@ int info_handle_initialize(
 
 		goto on_error;
 	}
+	( *info_handle )->calculate_md5 = calculate_md5;
 	( *info_handle )->notify_stream = INFO_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
@@ -959,20 +964,24 @@ int info_handle_close_input(
 	return( 0 );
 }
 
-/* Prints a FILETIME value
+/* Calculates the MD5 of the contents of a file entry
  * Returns 1 if successful or -1 on error
  */
-int info_handle_filetime_value_fprint(
+int info_handle_file_entry_calculate_md5(
      info_handle_t *info_handle,
-     const char *value_name,
-     uint64_t value_64bit,
+     libfsntfs_file_entry_t *file_entry,
+     char *md5_string,
+     size_t md5_string_size,
      libcerror_error_t **error )
 {
-	system_character_t date_time_string[ 48 ];
+	uint8_t md5_hash[ LIBHMAC_MD5_HASH_SIZE ];
+	uint8_t read_buffer[ 4096 ];
 
-	libfdatetime_filetime_t *filetime = NULL;
-	static char *function             = "info_handle_filetime_value_fprint";
-	int result                        = 0;
+	libhmac_md5_context_t *md5_context = NULL;
+	static char *function              = "info_handle_file_entry_calculate_md5";
+	size64_t data_size                 = 0;
+	size_t read_size                   = 0;
+	ssize_t read_count                 = 0;
 
 	if( info_handle == NULL )
 	{
@@ -985,106 +994,142 @@ int info_handle_filetime_value_fprint(
 
 		return( -1 );
 	}
-	if( value_name == NULL )
+	if( libfsntfs_file_entry_get_size(
+	     file_entry,
+	     &data_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value name.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( value_64bit == 0 )
+	if( libfsntfs_file_entry_seek_offset(
+	     file_entry,
+	     0,
+	     SEEK_SET,
+	     error ) == -1 )
 	{
-		fprintf(
-		 info_handle->notify_stream,
-		 "%s: Not set (0)\n",
-		 value_name );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset: 0 in file entry.",
+		 function );
+
+		goto on_error;
 	}
-	else
+	if( libhmac_md5_initialize(
+	     &md5_context,
+	     error ) != 1 )
 	{
-		if( libfdatetime_filetime_initialize(
-		     &filetime,
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize MD5 context.",
+		 function );
+
+		goto on_error;
+	}
+	while( data_size > 0 )
+	{
+		read_size = 4096;
+
+		if( (size64_t) read_size > data_size )
+		{
+			read_size = (size_t) data_size;
+		}
+		read_count = libfsntfs_file_entry_read_buffer(
+		              file_entry,
+		              read_buffer,
+		              read_size,
+		              error );
+
+		if( read_count != (ssize_t) read_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read from file entry.",
+			 function );
+
+			goto on_error;
+		}
+		data_size -= read_size;
+
+		if( libhmac_md5_update(
+		     md5_context,
+		     read_buffer,
+		     read_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create FILETIME.",
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update MD5 hash.",
 			 function );
 
 			goto on_error;
 		}
-		if( libfdatetime_filetime_copy_from_64bit(
-		     filetime,
-		     value_64bit,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy 64-bit value to FILETIME.",
-			 function );
+	}
+	if( libhmac_md5_finalize(
+	     md5_context,
+	     md5_hash,
+	     LIBHMAC_MD5_HASH_SIZE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to finalize MD5 hash.",
+		 function );
 
-			goto on_error;
-		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-			  filetime,
-			  (uint16_t *) date_time_string,
-			  48,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-			  filetime,
-			  (uint8_t *) date_time_string,
-			  48,
-			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-			  error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy FILETIME to string.",
-			 function );
+		goto on_error;
+	}
+	if( libhmac_md5_free(
+	     &md5_context,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free MD5 context.",
+		 function );
 
-			goto on_error;
-		}
-		fprintf(
-		 info_handle->notify_stream,
-		 "%s: %" PRIs_SYSTEM " UTC\n",
-		 value_name,
-		 date_time_string );
+		goto on_error;
+	}
+	if( digest_hash_copy_to_string(
+	     md5_hash,
+	     LIBHMAC_MD5_HASH_SIZE,
+	     md5_string,
+	     md5_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set MD5 hash string.",
+		 function );
 
-		if( libfdatetime_filetime_free(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free FILETIME.",
-			 function );
-
-			goto on_error;
-		}
+		goto on_error;
 	}
 	return( 1 );
 
 on_error:
-	if( filetime != NULL )
+	if( md5_context != NULL )
 	{
-		libfdatetime_filetime_free(
-		 &filetime,
+		libhmac_md5_free(
+		 &md5_context,
 		 NULL );
 	}
 	return( -1 );
@@ -1261,6 +1306,137 @@ on_error:
 	{
 		memory_free(
 		 escaped_value_string );
+	}
+	return( -1 );
+}
+
+/* Prints a FILETIME value
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_filetime_value_fprint(
+     info_handle_t *info_handle,
+     const char *value_name,
+     uint64_t value_64bit,
+     libcerror_error_t **error )
+{
+	system_character_t date_time_string[ 48 ];
+
+	libfdatetime_filetime_t *filetime = NULL;
+	static char *function             = "info_handle_filetime_value_fprint";
+	int result                        = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value name.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_64bit == 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "%s: Not set (0)\n",
+		 value_name );
+	}
+	else
+	{
+		if( libfdatetime_filetime_initialize(
+		     &filetime,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create FILETIME.",
+			 function );
+
+			goto on_error;
+		}
+		if( libfdatetime_filetime_copy_from_64bit(
+		     filetime,
+		     value_64bit,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy 64-bit value to FILETIME.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfdatetime_filetime_copy_to_utf16_string(
+			  filetime,
+			  (uint16_t *) date_time_string,
+			  48,
+			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+			  error );
+#else
+		result = libfdatetime_filetime_copy_to_utf8_string(
+			  filetime,
+			  (uint8_t *) date_time_string,
+			  48,
+			  LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
+			  error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+			 "%s: unable to copy FILETIME to string.",
+			 function );
+
+			goto on_error;
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "%s: %" PRIs_SYSTEM " UTC\n",
+		 value_name,
+		 date_time_string );
+
+		if( libfdatetime_filetime_free(
+		     &filetime,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free FILETIME.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( filetime != NULL )
+	{
+		libfdatetime_filetime_free(
+		 &filetime,
+		 NULL );
 	}
 	return( -1 );
 }
@@ -5641,6 +5817,11 @@ int info_handle_bodyfile_file_entry_value_fprint(
      const system_character_t *data_stream_name,
      libcerror_error_t **error )
 {
+	char md5_string[ DIGEST_HASH_STRING_SIZE_MD5 ]    = {
+		'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+		'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+		0 };
+
 	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
 	static char *function            = "info_handle_bodyfile_file_entry_value_fprint";
@@ -5816,12 +5997,36 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		file_mode_string[ 7 ]  = '-';
 		file_mode_string[ 10 ] = '-';
 	}
+	if( info_handle->calculate_md5 == 0 )
+	{
+		md5_string[ 1 ] = 0;
+	}
+	else if( result == 0 )
+	{
+		if( info_handle_file_entry_calculate_md5(
+		     info_handle,
+		     file_entry,
+		     md5_string,
+		     DIGEST_HASH_STRING_SIZE_MD5,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retreive MD5 string.",
+			 function );
+
+			return( -1 );
+		}
+	}
 	/* Colums in a Sleuthkit 3.x and later bodyfile
 	 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
 	 */
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 "0|" );
+	 "%s|",
+	 md5_string );
 
 	if( path != NULL )
 	{

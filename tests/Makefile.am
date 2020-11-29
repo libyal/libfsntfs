@@ -19,6 +19,8 @@ AM_CPPFLAGS = \
 	@LIBFGUID_CPPFLAGS@ \
 	@LIBFUSN_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
+	@LIBHMAC_CPPFLAGS@ \
+	@LIBCRYPTO_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
@@ -978,6 +980,7 @@ fsntfs_test_support_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_tools_info_handle_SOURCES = \
+	../fsntfstools/digest_hash.c ../fsntfstools/digest_hash.h \
 	../fsntfstools/info_handle.c ../fsntfstools/info_handle.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_macros.h \
@@ -986,6 +989,9 @@ fsntfs_test_tools_info_handle_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_tools_info_handle_LDADD = \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@LIBFWNT_LIBADD@ \
 	@LIBFUSN_LIBADD@ \
 	@LIBFGUID_LIBADD@ \

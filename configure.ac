@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libfsntfs],
- [20201127],
+ [20201129],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -134,6 +134,9 @@ AS_IF(
 dnl Check if libfusn or required headers and functions are available
 AX_LIBFUSN_CHECK_ENABLE
 
+dnl Check if libhmac or required headers and functions are available
+AX_LIBHMAC_CHECK_ENABLE
+
 dnl Check if libfuse or required headers and functions are available
 AX_LIBFUSE_CHECK_ENABLE
 
@@ -159,7 +162,7 @@ AS_IF(
  ])
 
 AS_IF(
- [test "x$ac_cv_libfusn" = xyes || test "x$ac_cv_libfuse" != xno],
+ [test "x$ac_cv_libfusn" = xyes || test "x$ac_cv_libhmac" = xyes || test "x$ac_cv_libcrypto" != xno || test "x$ac_cv_libfuse" != xno],
  [AC_SUBST(
   [libfsntfs_spec_tools_build_requires],
   [BuildRequires:])
@@ -199,6 +202,7 @@ AC_CONFIG_FILES([pyfsntfs/Makefile])
 AC_CONFIG_FILES([pyfsntfs-python2/Makefile])
 AC_CONFIG_FILES([pyfsntfs-python3/Makefile])
 AC_CONFIG_FILES([libfusn/Makefile])
+AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([fsntfstools/Makefile])
 AC_CONFIG_FILES([po/Makefile.in])
 AC_CONFIG_FILES([po/Makevars])
@@ -242,6 +246,8 @@ Building:
    libfguid support:                            $ac_cv_libfguid
    libfwnt support:                             $ac_cv_libfwnt
    libfusn support:                             $ac_cv_libfusn
+   libhmac support:                             $ac_cv_libhmac
+   MD5 support:                                 $ac_cv_libhmac_md5
    FUSE support:                                $ac_cv_libfuse
 
 Features:

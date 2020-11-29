@@ -16,7 +16,10 @@ AM_CPPFLAGS = \
 	@LIBFGUID_CPPFLAGS@ \
 	@LIBFUSN_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
+	@LIBHMAC_CPPFLAGS@ \
+	@LIBCRYPTO_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
 AM_LDFLAGS = @STATIC_LDFLAGS@
@@ -26,6 +29,7 @@ bin_PROGRAMS = \
 	fsntfsmount
 
 fsntfsinfo_SOURCES = \
+	digest_hash.c digest_hash.h \
 	fsntfsinfo.c \
 	fsntfstools_getopt.c fsntfstools_getopt.h \
 	fsntfstools_i18n.h \
@@ -40,6 +44,7 @@ fsntfsinfo_SOURCES = \
 	fsntfstools_libfsntfs.h \
 	fsntfstools_libfusn.h \
 	fsntfstools_libfwnt.h \
+	fsntfstools_libhmac.h \
 	fsntfstools_libuna.h \
 	fsntfstools_output.c fsntfstools_output.h \
 	fsntfstools_signal.c fsntfstools_signal.h \
@@ -47,6 +52,9 @@ fsntfsinfo_SOURCES = \
 	info_handle.c info_handle.h
 
 fsntfsinfo_LDADD = \
+	@LIBHMAC_LIBADD@ \
+	@LIBCRYPTO_LIBADD@ \
+	@LIBDL_LIBADD@ \
 	@LIBFWNT_LIBADD@ \
 	@LIBFUSN_LIBADD@ \
 	@LIBFGUID_LIBADD@ \

@@ -214,4 +214,5 @@ stamp-h[1-9]
 /libfguid
 /libfusn
 /libfwnt
+/libhmac
 /libuna
