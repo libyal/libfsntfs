@@ -71,6 +71,7 @@ Switched to asccidoc format.
 | 0.0.20 | J.B. Metz | January 2020 | Additional information regarding $STANDARD_INFORMATION and $ATTRIBUTE_LIST attributes.
 | 0.0.21 | J.B. Metz | April 2020 | Additional information regarding compressed data runs.
 | 0.0.22 | J.B. Metz | May 2020 | Additional information regarding LZNT1 compressed block corruption scenarios.
+| 0.0.23 | J.B. Metz | December 2020 | Additional information regarding reparse point tag values.
 |===
 
 :numbered:
@@ -605,7 +606,7 @@ The size of the attribute including the 8 bytes of the attribute type and size
 0 => RESIDENT_FORM +
 1 => NONRESIDENT_FORM
 | 9 | 1 | | Name size (or name length) +
-Contains the number of characters with-out the end-of-string character
+Contains the number of characters without the end-of-string character
 | 10 | 2 | | Name offset +
 Contains an offset relative from the start of the MFT entry
 | 12 | 2 | | Attribute data flags +
@@ -729,7 +730,7 @@ The attribute name is variable of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | ... | | Name +
-Contains an UTF-16 little-endian without the end-of-string character
+Contains an UTF-16 little-endian without end-of-string character
 |===
 
 ==== Data runs
@@ -932,7 +933,7 @@ See section: <<attribute_types,The attribute types>>
 | 4 | 2 | | Size (or record length) +
 The size of the attribute including the 6 bytes of the attribute type and size
 | 6 | 1 | | Name size (or name length) +
-Contains the number of characters with-out the end-of-string character
+Contains the number of characters without the end-of-string character
 | 7 | 1 | | Name offset +
 Contains an offset relative from the start of the attribute list entry
 | 8 | 8 | | Data first (or lowest) VCN
@@ -956,7 +957,7 @@ The attribute name is variable of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | ... | | Name +
-Contains an UTF-16 little-endian without the end-of-string character
+Contains an UTF-16 little-endian without end-of-string character
 |===
 
 === [[file_name_attribute]]The file name attribute
@@ -990,7 +991,7 @@ See section: <<file_attribute_flags,File attribute flags>>
 | 60 | 4 | | Extended data +
 See below.
 | 64 | 1 | | Name string size +
-Contains the number of characters with-out the end-of-string character
+Contains the number of characters without the end-of-string character
 | 65 | 1 | | Namespace of the name string +
 | 66 | ... | | Name string
 Contains an UTF-16 little-endian without an end-of-string character
@@ -1340,7 +1341,7 @@ The attribute types are stored in the `$AttrDef` metadata file.
 |===
 | Offset | Size | Value | Description
 | 0 | 128 | | Attribute name +
-Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?* +
+Contains an UTF-16 little-endian [yellow-background]*with end-of-string character?* +
 [yellow-background]*The unused bytes are filled with 0-byte values*
 | 128 | 4 | | Attribute type (or type code)
 | 132 | 8 | | [yellow-background]*Unknown (empty values?)*
@@ -1736,9 +1737,9 @@ For more information about the compression methods see section
 
 == [[reparse_point]]The reparse point
 
-The reparse point is used to create file system-level links. Reparse data is stored in the reparse point attribute.
-
-The reparse point data (REPARSE_DATA_BUFFER) is variable of size and consists of:
+The reparse point is used to create file system-level links. Reparse data is
+stored in the reparse point attribute. The reparse point data
+(REPARSE_DATA_BUFFER) is variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1778,25 +1779,96 @@ Predefined reparse point tag values according to `[MSDN]`:
 | Value | Identifier | Description
 | 0x00000000 | IO_REPARSE_TAG_RESERVED_ZERO | [yellow-background]*Unknown (Reserved)*
 | 0x00000001 | IO_REPARSE_TAG_RESERVED_ONE | [yellow-background]*Unknown (Reserved)*
+| 0x00000002 | IO_REPARSE_TAG_RESERVED_TWO | [yellow-background]*Unknown (Reserved)*
 | | |
-| 0x80000005 | IO_REPARSE_TAG_DRIVER_EXTENDER | Used by Home server drive extender
+| 0x80000005 | IO_REPARSE_TAG_DRIVE_EXTENDER | Used by Home server drive extender
 | 0x80000006 | IO_REPARSE_TAG_HSM2 | Used by Hierarchical Storage Manager Product
 | 0x80000007 | IO_REPARSE_TAG_SIS | Used by single-instance storage (SIS) filter driver
-| | |
+| 0x80000008 | IO_REPARSE_TAG_WIM | Used by the WIM Mount filter
+| 0x80000009 | IO_REPARSE_TAG_CSV | Used by Clustered Shared Volumes (CSV) version 1
 | 0x8000000a | IO_REPARSE_TAG_DFS | Used by the Distributed File System (DFS)
 | 0x8000000b | IO_REPARSE_TAG_FILTER_MANAGER | Used by filter manager test harness
 | | |
 | 0x80000012 | IO_REPARSE_TAG_DFSR | Used by the Distributed File System (DFS)
-| | |
+| 0x80000013 | IO_REPARSE_TAG_DEDUP | Used by the Data Deduplication (Dedup)
 | 0x80000014 | IO_REPARSE_TAG_NFS | Used by the Network File System (NFS)
+| 0x80000015 | IO_REPARSE_TAG_FILE_PLACEHOLDER | Used by Windows Shell for placeholder files
+| 0x80000016 | IO_REPARSE_TAG_DFM | Used by Dynamic File filter
+| 0x80000017 | IO_REPARSE_TAG_WOF | Used by Windows Overlay Filter (WOF), for either WIMBoot or compression +
+See section: <<wof_reparse_data,Windows Overlay Filter (WOF) reparse data>>
+| 0x80000018 | IO_REPARSE_TAG_WCI | Used by Windows Container Isolation (WCI) +
+See section: <<wci_reparse_data,Windows Container Isolation (WCI) reparse data>>
 | | |
-| 0x80000017 | | Used by Windows Overlay Filter (WOF) compressed data
+| 0x8000001b | IO_REPARSE_TAG_APPEXECLINK | Used by Universal Windows Platform (UWP) packages to encode information that allows the application to be launched by CreateProcess
 | | |
-| 0xa0000003 | IO_REPARSE_TAG_MOUNT_POINT | Junction or mount point
+| 0x8000001e | IO_REPARSE_TAG_STORAGE_SYNC | Used by the Azure File Sync (AFS) filter
 | | |
-| 0xa000000c | IO_REPARSE_TAG_SYMLINK | Symbolic link
+| 0x80000020 | IO_REPARSE_TAG_UNHANDLED | Used by Windows Container Isolation (WCI)
+| 0x80000021 | IO_REPARSE_TAG_ONEDRIVE | [yellow-background]*Unknown (Not used)*
+| | |
+| 0x80000023 | IO_REPARSE_TAG_AF_UNIX | Used by the Windows Subsystem for Linux (WSL) to represent a UNIX domain socket
+| 0x80000024 | IO_REPARSE_TAG_LX_FIFO | Used by the Windows Subsystem for Linux (WSL) to represent a UNIX FIFO (named pipe)
+| 0x80000025 | IO_REPARSE_TAG_LX_CHR | Used by the Windows Subsystem for Linux (WSL) to represent a UNIX character special file
+| 0x80000036 | IO_REPARSE_TAG_LX_BLK | Used by the Windows Subsystem for Linux (WSL) to represent a UNIX block special file
+| | |
+| 0x9000001c | IO_REPARSE_TAG_PROJFS | Used by the Windows Projected File System filter, for files managed by a user mode provider such as VFS for Git
+| | |
+| 0x90001018 | IO_REPARSE_TAG_WCI_1 | Used by Windows Container Isolation (WCI)
+| | |
+| 0x9000101a | IO_REPARSE_TAG_CLOUD_1 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000201a | IO_REPARSE_TAG_CLOUD_2 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000301a | IO_REPARSE_TAG_CLOUD_3 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000401a | IO_REPARSE_TAG_CLOUD_4 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000501a | IO_REPARSE_TAG_CLOUD_5 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000601a | IO_REPARSE_TAG_CLOUD_6 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000701a | IO_REPARSE_TAG_CLOUD_7 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000801a | IO_REPARSE_TAG_CLOUD_8 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000901a | IO_REPARSE_TAG_CLOUD_9 | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000a01a | IO_REPARSE_TAG_CLOUD_A | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000b01a | IO_REPARSE_TAG_CLOUD_B | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000c01a | IO_REPARSE_TAG_CLOUD_C | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000d01a | IO_REPARSE_TAG_CLOUD_D | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000e01a | IO_REPARSE_TAG_CLOUD_E | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0x9000f01a | IO_REPARSE_TAG_CLOUD_F | Used by the Cloud Files filter, for files managed by a sync engine such as OneDrive
+| | |
+| 0xa0000003 | IO_REPARSE_TAG_MOUNT_POINT | Junction or mount point +
+See section: <<junction_reparse_data,Junction or mount point reparse data>>
+| | |
+| 0xa000000c | IO_REPARSE_TAG_SYMLINK | Symbolic link +
+See section: <<symbolic_link_reparse_data,Symbolic link reparse data>>
+| | |
+| 0xa0000010 | IO_REPARSE_TAG_IIS_CACHE | Used by Microsoft Internet Information Services (IIS) caching
+| | |
+| 0xa0000019 | IO_REPARSE_TAG_GLOBAL_REPARSE | Used by NPFS to indicate a named pipe symbolic link from a server silo into the host silo
+| 0xa000001a | IO_REPARSE_TAG_CLOUD | Used by the Cloud Files filter, for files managed by a sync engine such as Microsoft OneDrive
+| | |
+| 0xa000001d | IO_REPARSE_TAG_LX_SYMLINK | Used by the Windows Subsystem for Linux (WSL) to represent a UNIX symbolic link
+| | |
+| 0xa000001f | IO_REPARSE_TAG_WCI_TOMBSTONE | Used by Windows Container Isolation (WCI)
+| | |
+| 0xa0000022 | IO_REPARSE_TAG_PROJFS_TOMBSTONE | Used by the Windows Projected File System filter, for files managed by a user mode provider such as VFS for Git
+| | |
+| 0xa0000027 | IO_REPARSE_TAG_WCI_LINK | Used by Windows Container Isolation (WCI)
+| | |
+| 0xa0001027 | IO_REPARSE_TAG_WCI_LINK_1 | Used by Windows Container Isolation (WCI)
 | | |
 | 0xc0000004 | IO_REPARSE_TAG_HSM | Used by Hierarchical Storage Manager Product
+| | |
+| 0xc0000014 | IO_REPARSE_TAG_APPXSTRM | [yellow-background]*Unknown (Not used)*
 |===
 
 ==== Notes
@@ -1829,14 +1901,16 @@ Reserved according to `[MSDN]`
 | 0x2 | | Is alias (Name surrogate bit) +
 If this bit is set, the file or directory represents another named entity in the system.
 | 0x4 | | Is high-latency media +
-Reserved according to `[MSDN]` +
+Reserved according to `[MSDN]`
 | 0x8 | | Is native (Microsoft-bit) +
 [yellow-background]*Does this flag influence the reparse point GUID?*
 |===
 
-=== Junction or mount point reparse data
+=== [[junction_reparse_data]]Junction or mount point reparse data
 
-The junction or mount point reparse data is variable of size and consists of:
+A reparse point with tag IO_REPARSE_TAG_MOUNT_POINT (0xa0000003) contains
+junction or mount point reparse data. The junction or mount point reparse data
+is variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1864,9 +1938,11 @@ Contains an UTF-16 little-endian [yellow-background]*with the end-of-string char
 00000040: 6e 00 74 00 73 00 00 00                            n.t.s...
 ....
 
-=== Symbolic link reparse data
+=== [[symbolic_link_reparse_data]]Symbolic link reparse data
 
-The symbolic link reparse data is variable of size and consists of:
+A reparse point with tag IO_REPARSE_TAG_SYMLINK (0xa000000c0) contains symbolic
+link reparse data. The symbolic link reparse data is variable of size and
+consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1874,17 +1950,17 @@ The symbolic link reparse data is variable of size and consists of:
 | 0 | 2 | | Substitute name offset +
 The offset is relative from the start of the reparse name data
 | 2 | 2 | | Substitute name size +
-Value in bytes, the size of the end-of-string character is not included
+Value in bytes
 | 4 | 2 | | Print name offset +
 The offset is relative from the start of the reparse name data
 | 6 | 2 | | Print name size +
-Value in bytes, the size of the end-of-string character is not included
+Value in bytes
 | 8 | 4 | | Symbolic link flags
 4+| _Reparse name data_
 | 12 | ... | | Substitute name +
-Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian without end-of-string character
 | ... | ... | | Print name +
-Contains an UTF-16 little-endian [yellow-background]*with the end-of-string character?*
+Contains an UTF-16 little-endian without end-of-string character
 |===
 
 ==== Symbolic link flags
@@ -1895,18 +1971,20 @@ Contains an UTF-16 little-endian [yellow-background]*with the end-of-string char
 | 0x00000001 | SYMLINK_FLAG_RELATIVE | The substitute name is a path name relative to the directory containing the symbolic link.
 |===
 
-=== Windows Overlay Filter (WOF) reparse data
+=== [[wof_reparse_data]]Windows Overlay Filter (WOF) reparse data
 
-The Windows Overlay Filter (WOF) reparse data is 16 bytes of size and consists of:
+A reparse point with tag IO_REPARSE_TAG_WOF (0x80000017) contains Windows
+Overlay Filter (WOF) reparse data. The Windows Overlay Filter (WOF) reparse
+data is 16 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 4+| _External provider information_
-| 0 | 4 | 1 | [yellow-background]*Unknown (version)*
-| 4 | 4 | 2 | [yellow-background]*Unknown (provider)*
+| 0 | 4 | 1 | [yellow-background]*Unknown (WOF version)*
+| 4 | 4 | 2 | [yellow-background]*Unknown (WOF provider)*
 4+| _Internal provider information_
-| 8 | 4 | 1 | [yellow-background]*Unknown (version)*
+| 8 | 4 | 1 | [yellow-background]*Unknown (file information version)*
 | 12 | 4 | | Compression method +
 See section <<wof_compression_method,Windows Overlay Filter (WOF) compression method>>
 |===
@@ -1924,6 +2002,25 @@ See section <<wof_compression_method,Windows Overlay Filter (WOF) compression me
 
 For more information about LZXPRESS Huffman see:
 https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
+
+=== [[wci_reparse_data]]Windows Container Isolation (WCI) reparse data
+
+A reparse point with tag IO_REPARSE_TAG_WCI (0x80000018) contains Windows
+Container Isolation (WCI) reparse data. The Windows Container Isolation (WCI)
+reparse data is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | 1 | Version
+| 4 | 4 | 0 | [yellow-background]*Unknown (reserved)*
+| 8 | 16 | | Look-up identifier +
+Contains a GUID
+| 24 | 2 | | Name size +
+Value in bytes
+| 26 | ... | | Name +
+Contains an UTF-16 little-endian without end-of-string character
+|===
 
 == The allocation bitmap
 
