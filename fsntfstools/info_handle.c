@@ -8733,6 +8733,7 @@ int info_handle_volume_fprint(
 	size_t volume_name_size         = 0;
 	uint64_t serial_number          = 0;
 	uint16_t bytes_per_sector       = 0;
+	uint16_t flags                  = 0;
 	uint8_t major_version           = 0;
 	uint8_t minor_version           = 0;
 	int result                      = 0;
@@ -8905,87 +8906,65 @@ int info_handle_volume_fprint(
 	 major_version,
 	 minor_version );
 
-	if( info_handle->input_mft_metadata_file != NULL )
+	if( info_handle->input_volume != NULL )
 	{
-/* TODO */
-	}
-	else if( info_handle->input_volume != NULL )
-	{
-		result = libfsntfs_volume_get_serial_number(
-		          info_handle->input_volume,
-		          &serial_number,
-		          error );
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve serial number.",
-		 function );
+		if( libfsntfs_volume_get_serial_number(
+		     info_handle->input_volume,
+		     &serial_number,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve serial number.",
+			 function );
 
-		return( -1 );
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tSerial number\t\t\t: %08" PRIx64 "\n",
-	 serial_number );
+			return( -1 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tSerial number\t\t\t: %08" PRIx64 "\n",
+		 serial_number );
 
-	if( info_handle->input_mft_metadata_file != NULL )
-	{
-/* TODO */
-	}
-	else if( info_handle->input_volume != NULL )
-	{
-		result = libfsntfs_volume_get_bytes_per_sector(
-		          info_handle->input_volume,
-		          &bytes_per_sector,
-		          error );
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sector.",
-		 function );
+		if( libfsntfs_volume_get_bytes_per_sector(
+		     info_handle->input_volume,
+		     &bytes_per_sector,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve bytes per sector.",
+			 function );
 
-		return( -1 );
-	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tBytes per sector\t\t: %" PRIu16 "\n",
-	 bytes_per_sector );
+			return( -1 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tBytes per sector\t\t: %" PRIu16 "\n",
+		 bytes_per_sector );
 
-	if( info_handle->input_mft_metadata_file != NULL )
-	{
-/* TODO */
-	}
-	else if( info_handle->input_volume != NULL )
-	{
-		result = libfsntfs_volume_get_cluster_block_size(
-		          info_handle->input_volume,
-		          &cluster_block_size,
-		          error );
-	}
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve cluster block size.",
-		 function );
+		if( libfsntfs_volume_get_cluster_block_size(
+		     info_handle->input_volume,
+		     &cluster_block_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve cluster block size.",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tCluster block size\t\t: %" PRIu32 "\n",
+		 cluster_block_size );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tCluster block size\t\t: %" PRIu32 "\n",
-	 cluster_block_size );
-
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
 /* TODO */
@@ -9013,15 +8992,39 @@ int info_handle_volume_fprint(
 	 "\tMFT entry size\t\t\t: %" PRIu32 "\n",
 	 mft_entry_size );
 
+	if( info_handle->input_volume != NULL )
+	{
+		if( libfsntfs_volume_get_index_entry_size(
+		     info_handle->input_volume,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
+
+			return( -1 );
+		}
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tIndex entry size\t\t: %" PRIu32 "\n",
+		 index_entry_size );
+	}
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
-/* TODO */
+		result = libfsntfs_mft_metadata_file_get_volume_flags(
+		          info_handle->input_mft_metadata_file,
+		          &flags,
+		          error );
 	}
 	else if( info_handle->input_volume != NULL )
 	{
-		result = libfsntfs_volume_get_index_entry_size(
+		result = libfsntfs_volume_get_flags(
 		          info_handle->input_volume,
-		          &index_entry_size,
+		          &flags,
 		          error );
 	}
 	if( result != 1 )
@@ -9030,16 +9033,58 @@ int info_handle_volume_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index entry size.",
+		 "%s: unable to retrieve flags.",
 		 function );
 
 		return( -1 );
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tIndex entry size\t\t: %" PRIu32 "\n",
-	 index_entry_size );
+	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
+	 flags );
 
+	if( ( flags & 0x0001 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tIs dirty\n" );
+	}
+	if( ( flags & 0x0002 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tRe-size journal\n" );
+	}
+	if( ( flags & 0x0004 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tUpgrade on next mount\n" );
+	}
+	if( ( flags & 0x0008 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tMounted on Windows NT 4\n" );
+	}
+	if( ( flags & 0x0010 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tDelete USN underway\n" );
+	}
+	if( ( flags & 0x0020 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tRepair object identifiers\n" );
+	}
+	if( ( flags & 0x8000 ) != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\t\tModified by chkdsk\n" );
+	}
 /* TODO print more info */
 
 	fprintf(

@@ -1,4 +1,5 @@
 TODO
+* fsntfsinfo: print $VOLUME_INFORMATION flags
 * fsntfsinfo: print volume size
 * fsntfsinfo: print extents/data runs of $DATA stream?
 

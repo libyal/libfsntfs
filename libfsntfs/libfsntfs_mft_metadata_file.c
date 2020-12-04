@@ -1711,7 +1711,7 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 {
 	libfsntfs_attribute_t *volume_information_attribute                = NULL;
 	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
-	static char *function                                              = "libfsntfs_mft_metadata_file_get_version";
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_volume_version";
 	int result                                                         = 0;
 
 	if( mft_metadata_file == NULL )
@@ -1771,6 +1771,98 @@ int libfsntfs_mft_metadata_file_get_volume_version(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve version from volume information attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the volume flags
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_mft_metadata_file_get_volume_flags(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint16_t *flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *volume_information_attribute                = NULL;
+	libfsntfs_internal_mft_metadata_file_t *internal_mft_metadata_file = NULL;
+	static char *function                                              = "libfsntfs_mft_metadata_file_get_volume_flags";
+	int result                                                         = 0;
+
+	if( mft_metadata_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT metadata file.",
+		 function );
+
+		return( -1 );
+	}
+	internal_mft_metadata_file = (libfsntfs_internal_mft_metadata_file_t *) mft_metadata_file;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_mft_metadata_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libfsntfs_internal_mft_metadata_file_get_volume_information_attribute(
+	          internal_mft_metadata_file,
+	          &volume_information_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume information attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_information_attribute_get_flags(
+		     volume_information_attribute,
+		     flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve flags from volume information attribute.",
 			 function );
 
 			result = -1;

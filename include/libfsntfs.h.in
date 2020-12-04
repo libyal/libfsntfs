@@ -400,6 +400,15 @@ int libfsntfs_volume_get_version(
      uint8_t *minor_version,
      libfsntfs_error_t **error );
 
+/* Retrieves the flags
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_flags(
+     libfsntfs_volume_t *volume,
+     uint16_t *flags,
+     libfsntfs_error_t **error );
+
 /* Retrieves the serial number
  * Returns 1 if successful or -1 on error
  */
@@ -1887,6 +1896,15 @@ int libfsntfs_mft_metadata_file_get_volume_version(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      uint8_t *major_version,
      uint8_t *minor_version,
+     libfsntfs_error_t **error );
+
+/* Retrieves the volume flags
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_get_volume_flags(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint16_t *flags,
      libfsntfs_error_t **error );
 
 /* Retrieves the number of file entries (MFT entries)

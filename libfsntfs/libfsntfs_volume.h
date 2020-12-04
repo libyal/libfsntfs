@@ -229,6 +229,12 @@ int libfsntfs_volume_get_version(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_flags(
+     libfsntfs_volume_t *volume,
+     uint16_t *flags,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_serial_number(
      libfsntfs_volume_t *volume,
      uint64_t *serial_number,

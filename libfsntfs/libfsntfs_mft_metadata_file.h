@@ -174,6 +174,12 @@ int libfsntfs_mft_metadata_file_get_volume_version(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_mft_metadata_file_get_volume_flags(
+     libfsntfs_mft_metadata_file_t *mft_metadata_file,
+     uint16_t *flags,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_mft_metadata_file_get_number_of_file_entries(
      libfsntfs_mft_metadata_file_t *mft_metadata_file,
      uint64_t *number_of_file_entries,

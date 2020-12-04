@@ -391,7 +391,7 @@ eb 58 90 2d 46 56 45 26 46 53 2d
 ....
 
 BDE is largely a stand-alone but has some integration with NTFS. For more
-information about BDE see https://github.com/libyal/libbde/blob/master/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc[[LIBBDE\]].
+information about BDE see https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc[[LIBBDE\]].
 
 === Volume Shadow Snapshots (VSS)
 
@@ -399,7 +399,7 @@ Volume Shadow Snapshots (VSS) uses the GUID
 3808876b-c176-4e48-b7ae-04046e6cc752 (stored in little-endian) to identify its
 data. VSS is largely a stand-alone but has some integration with NTFS.
 
-For more information about VSS see https://github.com/libyal/libvshadow/blob/master/documentation/Volume%20Shadow%20Snapshot%20(VSS)%20format.asciidoc[[LIBVSHADOW\]].
+For more information about VSS see https://github.com/libyal/libvshadow/blob/main/documentation/Volume%20Shadow%20Snapshot%20(VSS)%20format.asciidoc[[LIBVSHADOW\]].
 
 === [[media_descriptor]]Media descriptor
 
@@ -505,7 +505,7 @@ record segment is freed; it is 0 if the segment is not used.
 value in the first sector. It also claims the update sequence array size value
 contains the number of bytes. It seems to be more likely to the number of words.
 
-The "BAAD" signature presumably indicates a bad MFT entry. `[LINUXNTFS]` states
+The "BAAD" signature presumably indicates a bad MFT entry. `[RUSSON05]` states
 that during chkdsk, if NTFS finds a multi-sector item where the multi-sector
 header does not match the values at the end of the sector, it marks the item as
 "BAAD" and fill it with 0-byte values except for a fix-up value at the end of
@@ -1051,8 +1051,7 @@ The Windows API function CreateFile allows to create case sensitive file names w
 
 Basically the conversion from a long name to short name boils down to the
 approach mentioned below. Note that it differs from the approach mentioned in
-`[RUSSON05]` and `[MSSUPPORT]`, in regard of the third case to make the short name
-unique.
+`[RUSSON05]`, in regard of the third case to make the short name unique.
 
 In the long name:
 
@@ -1122,7 +1121,7 @@ The security descriptor attribute ($SECURITY_DESCRIPTOR) contains a Windows NT
 security descriptor. It can be stored as either a resident (for a small amount
 of data) and non-resident MFT attribute.
 
-See: https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
+See: https://github.com/libyal/libfwnt/blob/main/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
 
 === The volume name attribute
 
@@ -1163,14 +1162,15 @@ The volume information attribute is used in the $Volume metadata file MFT entry.
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x0001 | | [yellow-background]*Is dirty*
-| 0x0002 | | [yellow-background]*Re-size journal (LogFile)*
-| 0x0004 | | [yellow-background]*Upgrade on next mount*
-| 0x0008 | | [yellow-background]*Mounted on Windows NT 4*
-| 0x0010 | | [yellow-background]*Delete USN underway*
-| 0x0020 | | [yellow-background]*Repair object identifiers*
+| 0x0001 | VOLUME_IS_DIRTY | [yellow-background]*Is dirty*
+| 0x0002 | VOLUME_RESIZE_LOG_FILE | [yellow-background]*Re-size journal (LogFile)*
+| 0x0004 | VOLUME_UPGRADE_ON_MOUNT | [yellow-background]*Upgrade on next mount*
+| 0x0008 | VOLUME_MOUNTED_ON_NT4 | [yellow-background]*Mounted on Windows NT 4*
+| 0x0010 | VOLUME_DELETE_USN_UNDERWAY | [yellow-background]*Delete USN underway*
+| 0x0020 | VOLUME_REPAIR_OBJECT_ID | [yellow-background]*Repair object identifiers*
 | | |
-| 0x8000 | | [yellow-background]*Modified by chkdsk*
+| 0x4000 | VOLUME_CHKDSK_UNDERWAY | [yellow-background]*chkdsk underway*
+| 0x8000 | VOLUME_MODIFIED_BY_CHKDSK | [yellow-background]*Modified by chkdsk*
 |===
 
 === The data stream attribute
@@ -1696,7 +1696,7 @@ The upper 4 bits of the block size are used as flags.
 === LZNT1 compression method
 
 For more information about LZNT1 see:
-https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
+https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
 Also see section: <<corruption_scenarios,Corruption scenarios>>
 
@@ -2001,7 +2001,7 @@ See section <<wof_compression_method,Windows Overlay Filter (WOF) compression me
 |===
 
 For more information about LZXPRESS Huffman see:
-https://github.com/libyal/libfwnt/blob/master/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
+https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
 
 === [[wci_reparse_data]]Windows Container Isolation (WCI) reparse data
 
@@ -2095,7 +2095,7 @@ Contains the mapping of the security descriptor identifier (in $STANDARD_INFORMA
 | 12 | 8 | | Security descriptor data offset (in $SDS)
 | 20 | 4 | | Security descriptor data size (in $SDS)
 | 24 | ... | | Security descriptor data +
-See: https://github.com/libyal/libfwnt/blob/master/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
+See: https://github.com/libyal/libfwnt/blob/main/documentation/Security%20Descriptor.asciidoc[[LIBFWNT\]]
 | ... | ... | | 16-bit alignment padding.
 |===
 
@@ -2923,7 +2923,7 @@ TODO: verify behavior of Windows NTFS implementation.
 
 == Notes
 
-Signatures as indicated in `[LINUXNTFS]`:
+Signatures as indicated in `[RUSSON05]`:
 ....
         "HOLE" == ??? (NTFS 3.0+?)
 ....
@@ -3069,16 +3069,6 @@ What file system metadata is missing:
 [appendix]
 == References
 
-`[SANDERSON02]`
-
-[cols="1,5",options="header"]
-|===
-| Title | NTFS Compression – a forensic view
-| Author(s) | Paul Sanderson
-| Date | October 2002
-| URL | http://www.sandersonforensics.co.uk/Files/NTFS%20compression%20white%20paper.pdf
-|===
-
 `[CARRIER05]`
 
 [cols="1,5",options="header"]
@@ -3096,7 +3086,7 @@ What file system metadata is missing:
 | Title | NTFS Documentation
 | Author(s) | Richard Russon, Yuval Fiedel
 | Date | 2005
-| URL | http://linux-ntfs.org/
+| URL | https://flatcap.github.io/linux-ntfs/ntfs/
 |===
 
 `[APPLE06]`
@@ -3113,16 +3103,7 @@ What file system metadata is missing:
 |===
 | Title | All about BIOS parameter blocks
 | Author(s) | Jonathan de Boyne Pollard
-| URL | http://homepage.ntlworld.com./jonathan.deboynepollard/FGA/bios-parameter-block.html
-|===
-
-`[MEDEIROS08]`
-
-[cols="1,5",options="header"]
-|===
-| Title | NTFS Forensics - A Programmers View of Raw Filesystem Data Extraction
-| Author(s) | Jason Medeiros
-| URL | http://grayscale-research.org/new/pdfs/NTFS%20forensics.pdf
+| URL | https://jdebp.eu/FGA/bios-parameter-block.html
 |===
 
 `[RUSSNOVICH09]`
@@ -3142,7 +3123,7 @@ What file system metadata is missing:
 | Title | BitLocker Drive Encryption (BDE) format specification - Analysis of theBitLocker Drive Encryption (BDE) volume format
 | Date | March 2011
 | Author(s) | Joachim Metz
-| URL | https://github.com/libyal/libbde/blob/master/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc
+| URL | https://github.com/libyal/libbde/blob/main/documentation/BitLocker%20Drive%20Encryption%20(BDE)%20format.asciidoc
 |===
 
 `[LIBFSCLFS]`
@@ -3152,7 +3133,7 @@ What file system metadata is missing:
 | Title | Common Log File System – Analysis of the Windows ARIES log system
 | Date | November 2010
 | Author(s) | Joachim Metz
-| URL | https://googledrive.com/host/0B3fBvzttpiiSM1QwSmdTYjB0b0E/Common%20Log%20File%20System%20(CLFS).pdf
+| URL | https://github.com/libyal/libfsclfs/blob/main/documenation/Common%20Log%20File%20System%20(CLFS).asciidoc
 |===
 
 `[LIBVSHADOW]`
@@ -3163,22 +3144,6 @@ What file system metadata is missing:
 | Date | March 2011
 | Author(s) | Joachim Metz
 | URL | https://github.com/libyal/libvshadow/blob/master/documentation/Volume%20Shadow%20Snapshot%20(VSS)%20format.asciidoc
-|===
-
-`[LINUXNTFS]`
-
-[cols="1,5",options="header"]
-|===
-| Title | Linux-NTFS Project
-| URL | http://inform.pucp.edu.pe/~inf232/Ntfs/ntfs_doc_v0.5/index.html
-|===
-
-`[MSSUPPORT]`
-
-[cols="1,5",options="header"]
-|===
-| Title | Microsoft Support - How Windows Generates 8.3 File Names from Long File Names
-| URL | http://support.microsoft.com/kb/142982/en-us
 |===
 
 `[MSDN]`
@@ -3216,12 +3181,6 @@ http://msdn.microsoft.com/en-us/library/dd541667%28PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232005%28v=PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232006%28v=PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232007%28v=PROT.13%29.aspx
-|===
-
-[cols="1,5",options="header"]
-|===
-| Subject | Understanding NTFS Compression
-| URL | http://blogs.msdn.com/b/ntdebugging/archive/2008/05/20/understanding-ntfs-compression.aspx
 |===
 
 [cols="1,5",options="header"]

@@ -2376,6 +2376,98 @@ int libfsntfs_volume_get_version(
 	return( result );
 }
 
+/* Retrieves the flags
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_volume_get_flags(
+     libfsntfs_volume_t *volume,
+     uint16_t *flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_attribute_t *volume_information_attribute = NULL;
+	libfsntfs_internal_volume_t *internal_volume        = NULL;
+	static char *function                               = "libfsntfs_volume_get_flags";
+	int result                                          = 0;
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libfsntfs_internal_volume_get_volume_information_attribute(
+	          internal_volume,
+	          &volume_information_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume information attribute.",
+		 function );
+
+		result = -1;
+	}
+	else if( result != 0 )
+	{
+		if( libfsntfs_volume_information_attribute_get_flags(
+		     volume_information_attribute,
+		     flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve flags from volume information attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the serial number
  * Returns 1 if successful or -1 on error
  */

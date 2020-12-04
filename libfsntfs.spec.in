@@ -3,7 +3,7 @@ Version: @VERSION@
 Release: 1
 Summary: Library to access the Windows New Technology File System (NTFS) format
 Group: System Environment/Libraries
-License: LGPL
+License: LGPLv3+
 Source: %{name}-%{version}.tar.gz
 URL: https://github.com/libyal/libfsntfs
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -52,8 +52,8 @@ Python 3 bindings for libfsntfs
 %package -n libfsntfs-tools
 Summary: Several tools for reading Windows New Technology File System (NTFS) volumes
 Group: Applications/System
-Requires: libfsntfs = %{version}-%{release} @ax_libfuse_spec_requires@ @ax_libfusn_spec_requires@
-@libfsntfs_spec_tools_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libfusn_spec_build_requires@
+Requires: libfsntfs = %{version}-%{release} @ax_libcrypto_spec_requires@ @ax_libfuse_spec_requires@ @ax_libfusn_spec_requires@ @ax_libhmac_spec_requires@
+@libfsntfs_spec_tools_build_requires@ @ax_libcrypto_spec_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libfusn_spec_build_requires@ @ax_libhmac_spec_build_requires@
 
 %description -n libfsntfs-tools
 Several tools for reading Windows New Technology File System (NTFS) volumes
