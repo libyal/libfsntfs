@@ -175,9 +175,9 @@ int libfsntfs_bitmap_values_free(
  */
 int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
-     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
+     size_t element_data_size,
      libcerror_error_t **error )
 {
 	static char *function             = "libfsntfs_bitmap_values_read_data";
@@ -198,17 +198,6 @@ int libfsntfs_bitmap_values_read_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid bitmap values.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid IO handle.",
 		 function );
 
 		return( -1 );
@@ -267,8 +256,8 @@ int libfsntfs_bitmap_values_read_data(
 			}
 			else if( ( byte_value & 0x01 ) == 0 )
 			{
-				allocated_range_offset = (off64_t) first_allocated_element_index * io_handle->cluster_block_size;
-				allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * io_handle->cluster_block_size;
+				allocated_range_offset = (off64_t) first_allocated_element_index * element_data_size;
+				allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * element_data_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
@@ -325,8 +314,8 @@ int libfsntfs_bitmap_values_read_data(
 	}
 	if( in_allocated_range != 0 )
 	{
-		allocated_range_offset = (off64_t) first_allocated_element_index * io_handle->cluster_block_size;
-		allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * io_handle->cluster_block_size;
+		allocated_range_offset = (off64_t) first_allocated_element_index * element_data_size;
+		allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * element_data_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -393,6 +382,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
      libfsntfs_mft_attribute_t *mft_attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     size_t element_data_size,
      uint8_t flags,
      libcerror_error_t **error )
 {
@@ -477,9 +467,9 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 		}
 		if( libfsntfs_bitmap_values_read_data(
 		     bitmap_values,
-		     io_handle,
 		     data,
 		     data_size,
+		     element_data_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -586,9 +576,9 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 			}
 			if( libfsntfs_bitmap_values_read_data(
 			     bitmap_values,
-			     io_handle,
 			     cluster_block->data,
 			     cluster_block->data_size,
+			     element_data_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

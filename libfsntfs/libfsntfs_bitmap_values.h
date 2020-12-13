@@ -54,9 +54,9 @@ int libfsntfs_bitmap_values_free(
 
 int libfsntfs_bitmap_values_read_data(
      libfsntfs_bitmap_values_t *bitmap_values,
-     libfsntfs_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
+     size_t element_data_size,
      libcerror_error_t **error );
 
 int libfsntfs_bitmap_values_read_from_mft_attribute(
@@ -64,6 +64,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
      libfsntfs_mft_attribute_t *mft_attribute,
      libfsntfs_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
+     size_t element_data_size,
      uint8_t flags,
      libcerror_error_t **error );
 

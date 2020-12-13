@@ -330,9 +330,9 @@ int fsntfs_test_bitmap_values_read_data(
 	 */
 	result = libfsntfs_bitmap_values_read_data(
 	          bitmap_values,
-	          io_handle,
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
+	          512,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -348,9 +348,9 @@ int fsntfs_test_bitmap_values_read_data(
 	 */
 	result = libfsntfs_bitmap_values_read_data(
 	          NULL,
-	          io_handle,
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
+	          512,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -368,8 +368,8 @@ int fsntfs_test_bitmap_values_read_data(
 	result = libfsntfs_bitmap_values_read_data(
 	          bitmap_values,
 	          NULL,
-	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
+	          512,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -386,28 +386,9 @@ int fsntfs_test_bitmap_values_read_data(
 
 	result = libfsntfs_bitmap_values_read_data(
 	          bitmap_values,
-	          io_handle,
-	          NULL,
-	          8,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_bitmap_values_read_data(
-	          bitmap_values,
-	          io_handle,
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          (size_t) SSIZE_MAX + 1,
+	          512,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -571,6 +552,7 @@ int fsntfs_test_bitmap_values_read_from_mft_attribute(
 	          mft_attribute,
 	          io_handle,
 	          NULL,
+	          512,
 	          0,
 	          &error );
 
@@ -590,6 +572,7 @@ int fsntfs_test_bitmap_values_read_from_mft_attribute(
 	          mft_attribute,
 	          io_handle,
 	          NULL,
+	          512,
 	          0,
 	          &error );
 
@@ -610,6 +593,7 @@ int fsntfs_test_bitmap_values_read_from_mft_attribute(
 	          NULL,
 	          io_handle,
 	          NULL,
+	          512,
 	          0,
 	          &error );
 
@@ -746,7 +730,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 

@@ -12,7 +12,8 @@ NTFS is the primary file system for Microsoft Windows versions that are based
 on Windows NT. This specification is based on publicly availble work on the
 format and was enhanced by analyzing test data.
 
-This document is intended as a working document for the NTFS format.
+This document is intended as a working document of the data format specification
+for the libfsntfs project.
 
 [preface]
 == Document information
@@ -100,7 +101,7 @@ There are multiple version of NTFS.
 |===
 | NTFS version | Remarks
 | 1.0 | Introduced in Windows NT 3.1
-| 1.1 | Introduced in Windows NT 3.5
+| 1.1 | Introduced in Windows NT 3.5, also seen to be used by Windows NT 3.1
 | 1.2 | Introduced in Windows NT 3.51
 | 3.0 | Introduced in Windows 2000
 | 3.1 | Introduced in Windows XP
@@ -118,6 +119,7 @@ NTFS used on Windows XP which is version 3.1 in schema mentioned above.
 The following version of programs were used to test the information within this
 document:
 
+* Windows NT 3.1 (version 1.1)
 * Windows NT4 (version 1.2)
 * Windows 2000 (version 3.0)
 * Windows XP SP3 (version 3.1)
@@ -205,11 +207,13 @@ Was MFT entry 9 in Windows NT 4
 _Transactional NTFS metadata (See section: <<transactional_ntfs,Transactional NTFS (TxF)>>)_
 | 27 | $Extend\$RmMetadata | Resource manager metadata directory
 | 28 | $Extend\$RmMetadata\$Repair | Repair information
-| 29 | $Extend\$RmMetadata\$TxfLog | Transactional NTFS (TxF) log metadata directory
-| 30 | $Extend\$RmMetadata\$Txf | Transactional NTFS (TxF) metadata directory
-| 31 | $Extend\$RmMetadata\$TxfLog\$Tops | TxF Old Page Stream (TOPS) file +
+| 29 or 30 | $Extend\$RmMetadata\$TxfLog | Transactional NTFS (TxF) log metadata directory
+| 30 or 31 | $Extend\$RmMetadata\$Txf | Transactional NTFS (TxF) metadata directory
+| 31 or 32 | $Extend\$RmMetadata\$TxfLog\$Tops | TxF Old Page Stream (TOPS) file +
 Used to store data that has been overwritten inside a currently active transaction
-| 32 | $Extend\$RmMetadata\$TxfLog\$TxfLog.blf | Transactional NTFS (TxF) base log metadata file
+| 32 or 33 | $Extend\$RmMetadata\$TxfLog\$TxfLog.blf | Transactional NTFS (TxF) base log metadata file
+3+| _As of Windows 10_
+| 29 | $Extend\$Deleted | Temporary location for files that have an open handle but a request has been made to delete them
 3+| _Common_
 | | ... | A file or directory
 |===

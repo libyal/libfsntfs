@@ -472,7 +472,7 @@ int libfsntfs_index_read(
 	{
 		return( 0 );
 	}
-	if( libfsntfs_index_read_root(
+	if( libfsntfs_index_read_root_header(
 	     index,
 	     index_root_attribute,
 	     error ) != 1 )
@@ -481,7 +481,7 @@ int libfsntfs_index_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read index root.",
+		 "%s: unable to read index root header.",
 		 function );
 
 		goto on_error;
@@ -506,6 +506,20 @@ int libfsntfs_index_read(
 
 			goto on_error;
 		}
+	}
+	if( libfsntfs_index_read_root_node(
+	     index,
+	     index_root_attribute,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read index root node.",
+		 function );
+
+		goto on_error;
 	}
 	/* The index does not necessarily have an $INDEX_ALLOCATION attribute
 	 */
@@ -559,17 +573,16 @@ on_error:
 	return( -1 );
 }
 
-/* Reads the index root
+/* Reads the index root header
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_index_read_root(
+int libfsntfs_index_read_root_header(
      libfsntfs_index_t *index,
      libfsntfs_mft_attribute_t *index_root_attribute,
      libcerror_error_t **error )
 {
 	uint8_t *data             = NULL;
-	static char *function     = "libfsntfs_index_read_root";
-	size_t data_offset        = 0;
+	static char *function     = "libfsntfs_index_read_root_header";
 	size_t data_size          = 0;
 	uint32_t index_entry_size = 0;
 	int result                = 0;
@@ -596,13 +609,13 @@ int libfsntfs_index_read_root(
 
 		return( -1 );
 	}
-	if( index->root_node != NULL )
+	if( index->root_header != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid index - root node value already set.",
+		 "%s: invalid index - root header value already set.",
 		 function );
 
 		return( -1 );
@@ -676,8 +689,6 @@ int libfsntfs_index_read_root(
 
 		goto on_error;
 	}
-	data_offset = sizeof( fsntfs_index_root_header_t );
-
 	if( libfsntfs_index_root_header_get_index_entry_size(
 	     index->root_header,
 	     &index_entry_size,
@@ -705,6 +716,95 @@ int libfsntfs_index_read_root(
 
 		goto on_error;
 	}
+	return( 1 );
+
+on_error:
+	if( index->root_header != NULL )
+	{
+		libfsntfs_index_root_header_free(
+		 &( index->root_header ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the index root node
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_index_read_root_node(
+     libfsntfs_index_t *index,
+     libfsntfs_mft_attribute_t *index_root_attribute,
+     libcerror_error_t **error )
+{
+	uint8_t *data         = NULL;
+	static char *function = "libfsntfs_index_read_root_node";
+	size_t data_offset    = 0;
+	size_t data_size      = 0;
+	int result            = 0;
+
+	if( index == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid index.",
+		 function );
+
+		return( -1 );
+	}
+	if( index->root_node != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid index - root node value already set.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_mft_attribute_data_is_resident(
+	          index_root_attribute,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if index root attribute data is resident.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported non-resident index root attribute.",
+		 function );
+
+		return( 1 );
+	}
+	if( libfsntfs_mft_attribute_get_resident_data(
+	     index_root_attribute,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index root attribute data.",
+		 function );
+
+		goto on_error;
+	}
 	if( libfsntfs_index_node_initialize(
 	     &( index->root_node ),
 	     error ) != 1 )
@@ -718,6 +818,8 @@ int libfsntfs_index_read_root(
 
 		goto on_error;
 	}
+	data_offset = sizeof( fsntfs_index_root_header_t );
+
 	if( libfsntfs_index_node_read_header(
 	     index->root_node,
 	     data,
@@ -782,12 +884,6 @@ on_error:
 		 &( index->root_node ),
 		 NULL );
 	}
-	if( index->root_header != NULL )
-	{
-		libfsntfs_index_root_header_free(
-		 &( index->root_header ),
-		 NULL );
-	}
 	return( -1 );
 }
 
@@ -801,7 +897,8 @@ int libfsntfs_index_read_bitmap(
      uint8_t flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_index_read_bitmap";
+	static char *function     = "libfsntfs_index_read_bitmap";
+	uint32_t index_entry_size = 0;
 
 	if( index == NULL )
 	{
@@ -813,6 +910,31 @@ int libfsntfs_index_read_bitmap(
 		 function );
 
 		return( -1 );
+	}
+	if( index->bitmap_values != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid index - bitmap values already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_index_root_header_get_index_entry_size(
+	     index->root_header,
+	     &index_entry_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size from root header.",
+		 function );
+
+		goto on_error;
 	}
 	if( libfsntfs_bitmap_values_initialize(
 	     &( index->bitmap_values ),
@@ -832,6 +954,7 @@ int libfsntfs_index_read_bitmap(
 	     bitmap_attribute,
 	     index->io_handle,
 	     file_io_handle,
+	     index_entry_size,
 	     flags,
 	     error ) != 1 )
 	{
@@ -1128,9 +1251,10 @@ int libfsntfs_index_get_sub_node(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index node from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+		 "%s: unable to retrieve index node from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
 		 sub_node_vcn,
+		 index_entry_offset,
 		 index_entry_offset );
 
 		return( -1 );

@@ -337,6 +337,7 @@ int libfsntfs_internal_attribute_read_value(
 			     internal_attribute->mft_attribute,
 			     io_handle,
 			     file_io_handle,
+			     io_handle->cluster_block_size,
 			     flags,
 			     error ) != 1 )
 			{

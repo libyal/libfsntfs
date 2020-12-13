@@ -468,10 +468,6 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 
 			goto on_error;
 		}
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
-		{
-			break;
-		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -507,6 +503,10 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 			{
 				continue;
 			}
+		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
 		}
 		if( libfsntfs_security_descriptor_index_value_initialize(
 		     &security_descriptor_index_value,

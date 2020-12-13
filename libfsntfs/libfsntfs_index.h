@@ -100,7 +100,12 @@ int libfsntfs_index_read(
      uint8_t flags,
      libcerror_error_t **error );
 
-int libfsntfs_index_read_root(
+int libfsntfs_index_read_root_header(
+     libfsntfs_index_t *index,
+     libfsntfs_mft_attribute_t *index_root_attribute,
+     libcerror_error_t **error );
+
+int libfsntfs_index_read_root_node(
      libfsntfs_index_t *index,
      libfsntfs_mft_attribute_t *index_root_attribute,
      libcerror_error_t **error );

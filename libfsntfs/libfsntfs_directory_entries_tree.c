@@ -654,9 +654,10 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+				 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 				 function,
 				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
 				 index_entry_offset );
 
 				goto on_error;
@@ -672,9 +673,10 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_IO,
 				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read directory entries tree from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+				 "%s: unable to read directory entries tree from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 				 function,
 				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
 				 index_entry_offset );
 
 				goto on_error;
@@ -1293,10 +1295,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
-		{
-			break;
-		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -1332,6 +1330,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			{
 				continue;
 			}
+		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
 		}
 		if( libfsntfs_file_name_values_initialize(
 		     &file_name_values,
@@ -1500,9 +1502,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 (int) index_value->sub_node_vcn,
+			 index_entry_offset,
 			 index_entry_offset );
 
 			goto on_error;
@@ -1523,9 +1526,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to retrieve directory entry by UTF-8 string from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve directory entry by UTF-8 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 (int) index_value->sub_node_vcn,
+			 index_entry_offset,
 			 index_entry_offset );
 
 			goto on_error;
@@ -1742,10 +1746,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
-		{
-			break;
-		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -1781,6 +1781,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			{
 				continue;
 			}
+		}
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
+		{
+			break;
 		}
 		if( libfsntfs_file_name_values_initialize(
 		     &file_name_values,
@@ -1949,9 +1953,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 (int) index_value->sub_node_vcn,
+			 index_entry_offset,
 			 index_entry_offset );
 
 			goto on_error;
@@ -1972,9 +1977,10 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to retrieve directory entry by UTF-16 string from index entry with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve directory entry by UTF-16 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 (int) index_value->sub_node_vcn,
+			 index_entry_offset,
 			 index_entry_offset );
 
 			goto on_error;
@@ -2083,7 +2089,6 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	static char *function                                 = "libfsntfs_directory_entries_tree_read_element_data";
 	off64_t index_entry_offset                            = 0;
 	off64_t sub_node_vcn                                  = 0;
-	uint32_t index_entry_size                             = 0;
 	int index_value_entry                                 = 0;
 	int is_allocated                                      = 0;
 	int result                                            = 0;
@@ -2174,21 +2179,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	}
 	else
 	{
-		if( libfsntfs_index_get_index_entry_size(
-		     directory_entries_tree->i30_index,
-		     &index_entry_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve index entry size.",
-			 function );
-
-			goto on_error;
-		}
-		sub_node_vcn       = index_value_offset / index_entry_size;
+		sub_node_vcn       = index_value_offset / directory_entries_tree->i30_index->io_handle->cluster_block_size;
 		index_entry_offset = (off64_t) ( sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
 		is_allocated = libfsntfs_index_sub_node_is_allocated(
@@ -2233,9 +2224,10 @@ int libfsntfs_directory_entries_tree_read_element_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: 0x%08" PRIx64 ".",
+			 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
 			 (int) sub_node_vcn,
+			 index_entry_offset,
 			 index_entry_offset );
 
 			goto on_error;
@@ -2283,6 +2275,20 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: index value: %03d file reference: %" PRIu64 "-%" PRIu64 "\n",
+		 function,
+		 index_value_entry,
+		 index_value->file_reference & 0xffffffffffffUL,
+		 index_value->file_reference >> 48 );
+
+		libcnotify_printf(
+		 "\n" );
+	}
+#endif
 	directory_entry->file_reference = index_value->file_reference;
 
 	if( libfsntfs_file_name_values_read_data(
