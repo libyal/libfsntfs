@@ -80,7 +80,7 @@ void usage_fprint(
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
-	fprintf( stream, "\t-B:     output file system information as a bodyfile\n" );
+	fprintf( stream, "\t-B:     output file system hierarchy as a bodyfile\n" );
 	fprintf( stream, "\t-d:     calculate a MD5 hash of a file entry to include in the bodyfile\n" );
 	fprintf( stream, "\t-E:     show information about a specific MFT entry index\n"
 	                 "\t        or \"all\".\n" );

@@ -9,7 +9,7 @@ Analysis of NTFS
 == Summary
 
 NTFS is the primary file system for Microsoft Windows versions that are based
-on Windows NT. This specification is based on publicly availble work on the
+on Windows NT. This specification is based on publicly available work on the
 format and was enhanced by analyzing test data.
 
 This document is intended as a working document of the data format specification

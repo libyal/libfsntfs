@@ -5830,10 +5830,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	uint64_t creation_time           = 0;
 	uint64_t entry_modification_time = 0;
 	uint64_t file_reference          = 0;
+	uint64_t mft_entry_index         = 0;
 	uint64_t modification_time       = 0;
 	uint32_t file_attribute_flags    = 0;
 	uint32_t group_identifier        = 0;
 	uint32_t owner_identifier        = 0;
+	int has_default_data_stream      = 0;
 	int result                       = 0;
 
 	if( info_handle == NULL )
@@ -5861,6 +5863,8 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		return( -1 );
 	}
+	mft_entry_index = file_reference & 0xffffffffffffUL;
+
 	if( libfsntfs_file_entry_get_creation_time(
 	     file_entry,
 	     &creation_time,
@@ -5965,6 +5969,23 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			return( -1 );
 		}
 	}
+	result = libfsntfs_file_entry_has_default_data_stream(
+		  file_entry,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has default data stream.",
+		 function );
+
+		return( -1 );
+	}
+	has_default_data_stream = result;
+
 	result = libfsntfs_file_entry_has_directory_entries_index(
 		  file_entry,
 		  error );
@@ -5997,7 +6018,8 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		file_mode_string[ 7 ]  = '-';
 		file_mode_string[ 10 ] = '-';
 	}
-	if( info_handle->calculate_md5 == 0 )
+	if( ( info_handle->calculate_md5 == 0 )
+	 || ( has_default_data_stream == 0 ) )
 	{
 		md5_string[ 1 ] = 0;
 	}
@@ -6010,14 +6032,23 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		     DIGEST_HASH_STRING_SIZE_MD5,
 		     error ) != 1 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retreive MD5 string.",
-			 function );
+			fprintf(
+			 info_handle->notify_stream,
+			 "Error calculating MD5 of MFT entry: %" PRIu64 "\n",
+			 mft_entry_index );
 
-			return( -1 );
+			if( ( error != NULL )
+			 && ( *error != NULL ) )
+			{
+				libcnotify_print_error_backtrace(
+				 *error );
+			}
+			libcerror_error_free(
+			 error );
+
+			fprintf(
+			 info_handle->notify_stream,
+			 "\n" );
 		}
 	}
 	/* Colums in a Sleuthkit 3.x and later bodyfile
@@ -6077,7 +6108,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	fprintf(
 	 info_handle->bodyfile_stream,
 	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
-	 file_reference & 0xffffffffffffUL,
+	 mft_entry_index,
 	 file_mode_string,
 	 owner_identifier,
 	 group_identifier,
@@ -6139,6 +6170,11 @@ int info_handle_bodyfile_mft_entry_fprint(
 	}
 	if( result != 1 )
 	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Error reading MFT entry: %" PRIu64 "\n",
+		 mft_entry_index );
+
 		if( ( error != NULL )
 		 && ( *error != NULL ) )
 		{
@@ -6150,8 +6186,7 @@ int info_handle_bodyfile_mft_entry_fprint(
 
 		fprintf(
 		 info_handle->notify_stream,
-		 "Error reading MFT entry: %" PRIu64 "\n\n",
-		 mft_entry_index );
+		 "\n" );
 
 		return( 0 );
 	}
@@ -7395,6 +7430,11 @@ int info_handle_mft_entry_fprint(
 	}
 	if( result != 1 )
 	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Error reading MFT entry: %" PRIu64 "\n",
+		 mft_entry_index );
+
 		if( ( error != NULL )
 		 && ( *error != NULL ) )
 		{
@@ -7406,8 +7446,7 @@ int info_handle_mft_entry_fprint(
 
 		fprintf(
 		 info_handle->notify_stream,
-		 "Error reading MFT entry: %" PRIu64 "\n\n",
-		 mft_entry_index );
+		 "\n" );
 
 		return( 0 );
 	}
