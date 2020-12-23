@@ -5926,42 +5926,25 @@ ssize_t libfsntfs_file_entry_read_buffer_at_offset(
 		return( -1 );
 	}
 #endif
-	if( libfdata_stream_seek_offset(
-	     internal_file_entry->data_cluster_block_stream,
-	     offset,
-	     SEEK_SET,
-	     error ) == -1 )
+	read_count = libfdata_stream_read_buffer_at_offset(
+	              internal_file_entry->data_cluster_block_stream,
+	              (intptr_t *) internal_file_entry->file_io_handle,
+	              buffer,
+	              buffer_size,
+	              offset,
+	              0,
+	              error );
+
+	if( read_count < 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in data cluster block stream.",
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read from data cluster block stream.",
 		 function );
 
 		read_count = -1;
-	}
-	else
-	{
-		read_count = libfdata_stream_read_buffer(
-		              internal_file_entry->data_cluster_block_stream,
-		              (intptr_t *) internal_file_entry->file_io_handle,
-		              buffer,
-		              buffer_size,
-		              0,
-		              error );
-
-		if( read_count < 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read from data cluster block stream.",
-			 function );
-
-			read_count = -1;
-		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(

@@ -449,24 +449,6 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 	}
 	while( (size64_t) data_offset < data_size )
 	{
-		if( libfdata_stream_seek_offset(
-		     cluster_block_stream,
-		     data_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek attribute list entry: %d offset: %" PRIi64 " (0x%08" PRIx64 ") in cluster block stream.",
-			 function,
-			 attribute_index,
-			 data_offset,
-			 data_offset );
-
-			goto on_error;
-		}
 		if( memory_set(
 		     data,
 		     0,
@@ -481,11 +463,12 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 
 			goto on_error;
 		}
-		read_count = libfdata_stream_read_buffer(
+		read_count = libfdata_stream_read_buffer_at_offset(
 		              cluster_block_stream,
 		              (intptr_t *) file_io_handle,
 		              data,
 		              sizeof( fsntfs_mft_attribute_list_entry_header_t ) + 256,
+		              data_offset,
 		              0,
 		              error );
 
@@ -495,9 +478,11 @@ int libfsntfs_mft_attribute_list_read_from_attribute(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read attribute list entry: %d from cluster block stream.",
+			 "%s: unable to read attribute list entry: %d from cluster block stream at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
-			 attribute_index );
+			 attribute_index,
+			 data_offset,
+			 data_offset );
 
 			goto on_error;
 		}

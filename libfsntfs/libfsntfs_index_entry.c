@@ -215,33 +215,6 @@ int libfsntfs_index_entry_read_file_io_handle(
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading index entry: %" PRIu32 " at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 index_entry_index,
-		 file_offset,
-		 file_offset );
-	}
-#endif
-	if( libbfio_handle_seek_offset(
-	     file_io_handle,
-	     file_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek index entry offset: 0x%08" PRIx64 ".",
-		 function,
-		 file_offset );
-
-		goto on_error;
-	}
 	index_entry_data = (uint8_t *) memory_allocate(
 	                                sizeof( uint8_t ) * index_entry_size );
 
@@ -256,10 +229,22 @@ int libfsntfs_index_entry_read_file_io_handle(
 
 		goto on_error;
 	}
-	read_count = libbfio_handle_read_buffer(
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading index entry: %" PRIu32 " at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
+		 function,
+		 index_entry_index,
+		 file_offset,
+		 file_offset );
+	}
+#endif
+	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
 	              index_entry_data,
 	              (size_t) index_entry_size,
+	              file_offset,
 	              error );
 
 	if( read_count != (ssize_t) index_entry_size )
@@ -268,8 +253,11 @@ int libfsntfs_index_entry_read_file_io_handle(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read index entry data.",
-		 function );
+		 "%s: unable to read index entry: %" PRIu32 " data at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 index_entry_index,
+		 file_offset,
+		 file_offset );
 
 		goto on_error;
 	}
