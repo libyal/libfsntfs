@@ -39,7 +39,7 @@
 
 #include "../fsntfstools/fsntfstools_output.h"
 
-/* Tests the fsntfstools_output_initialize and function
+/* Tests the fsntfstools_output_initialize function
  * Returns 1 if successful or 0 if not
  */
 int fsntfs_test_tools_output_initialize(
