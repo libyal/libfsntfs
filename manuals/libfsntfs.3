@@ -1,4 +1,4 @@
-.Dd July  8, 2020
+.Dd April 24, 2021
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -88,6 +88,8 @@ Volume functions
 .Fn libfsntfs_volume_get_utf16_name "libfsntfs_volume_t *volume" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_version "libfsntfs_volume_t *volume" "uint8_t *major_version" "uint8_t *minor_version" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_volume_get_flags "libfsntfs_volume_t *volume" "uint16_t *flags" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_serial_number "libfsntfs_volume_t *volume" "uint64_t *serial_number" "libfsntfs_error_t **error"
 .Ft int
@@ -406,6 +408,8 @@ MFT metadata file functions
 .Fn libfsntfs_mft_metadata_file_get_utf16_volume_name "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint16_t *utf16_string" "size_t utf16_string_size" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_mft_metadata_file_get_volume_version "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint8_t *major_version" "uint8_t *minor_version" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_mft_metadata_file_get_volume_flags "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint16_t *flags" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_mft_metadata_file_get_number_of_file_entries "libfsntfs_mft_metadata_file_t *mft_metadata_file" "uint64_t *number_of_file_entries" "libfsntfs_error_t **error"
 .Ft int
