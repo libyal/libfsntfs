@@ -47,6 +47,8 @@ int libfsntfs_index_entry_vector_initialize(
 	libfsntfs_data_run_t *data_run               = NULL;
 	static char *function                        = "libfsntfs_index_entry_vector_initialize";
 	size64_t attribute_data_vcn_size             = 0;
+	size64_t calculated_allocated_data_size      = 0;
+	size64_t stored_allocated_data_size          = 0;
 	off64_t attribute_data_vcn_offset            = 0;
 	off64_t calculated_attribute_data_vcn_offset = 0;
 	uint16_t attribute_data_flags                = 0;
@@ -131,6 +133,20 @@ int libfsntfs_index_entry_vector_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported compressed attribute data.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_attribute_get_allocated_data_size(
+	     mft_attribute,
+	     &stored_allocated_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute allocated data size.",
 		 function );
 
 		goto on_error;
@@ -295,6 +311,7 @@ int libfsntfs_index_entry_vector_initialize(
 
 				goto on_error;
 			}
+			calculated_allocated_data_size += data_run->size;
 		}
 		attribute_index++;
 
@@ -313,6 +330,19 @@ int libfsntfs_index_entry_vector_initialize(
 
 			goto on_error;
 		}
+	}
+	if( calculated_allocated_data_size != stored_allocated_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: size of data runs: %" PRIu64 " does not match allocated data size: %" PRIu64 ".",
+		 function,
+		 calculated_allocated_data_size,
+		 stored_allocated_data_size );
+
+		goto on_error;
 	}
 	*index_entry_vector = safe_index_entry_vector;
 

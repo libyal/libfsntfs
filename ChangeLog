@@ -31,6 +31,9 @@ TODO
 ** preserve attribute list data MFT entries?
 ** libfsntfs_attribute add function to indicate partial attribute (has attribute_list_entry but no mft_attribute)
 
+* bitmap values
+** handle sparse data runs more efficiently
+
 * fsntfsinfo complete bodyfile support
 ** fix libfsntfs_file_entry_get_security_descriptor_size: unable to retrieve security descriptor from index for identifier: 0.
 ** add support for tsk metadata address calculation? inside MFT attribute?

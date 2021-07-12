@@ -152,6 +152,11 @@ int libfsntfs_mft_attribute_get_data_vcn_range(
      uint64_t *data_last_vcn,
      libcerror_error_t **error );
 
+int libfsntfs_mft_attribute_get_allocated_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *allocated_data_size,
+     libcerror_error_t **error );
+
 int libfsntfs_mft_attribute_get_valid_data_size(
      libfsntfs_mft_attribute_t *mft_attribute,
      uint64_t *valid_data_size,

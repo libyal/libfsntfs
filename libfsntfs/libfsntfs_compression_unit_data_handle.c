@@ -47,10 +47,12 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	libfsntfs_mft_attribute_t *safe_mft_attribute       = NULL;
 	static char *function                               = "libfsntfs_compression_unit_data_handle_initialize";
 	size64_t attribute_data_vcn_size                    = 0;
+	size64_t calculated_allocated_data_size             = 0;
 	size64_t data_run_size                              = 0;
 	size64_t data_segment_size                          = 0;
-	size_t compression_unit_size                        = 0;
 	size64_t remaining_compression_unit_size            = 0;
+	size64_t stored_allocated_data_size                 = 0;
+	size_t compression_unit_size                        = 0;
 	off64_t attribute_data_vcn_offset                   = 0;
 	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
@@ -134,6 +136,20 @@ int libfsntfs_compression_unit_data_handle_initialize(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported uncompressed attribute data.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfsntfs_mft_attribute_get_allocated_data_size(
+	     mft_attribute,
+	     &stored_allocated_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute allocated data size.",
 		 function );
 
 		goto on_error;
@@ -372,6 +388,8 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			data_run_offset = data_run->start_offset;
 			data_run_size   = data_run->size;
 
+			calculated_allocated_data_size += data_run->size;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
@@ -581,6 +599,19 @@ int libfsntfs_compression_unit_data_handle_initialize(
 			goto on_error;
 		}
 		attribute_index++;
+	}
+	if( calculated_allocated_data_size != stored_allocated_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: size of data runs: %" PRIu64 " does not match allocated data size: %" PRIu64 ".",
+		 function,
+		 calculated_allocated_data_size,
+		 stored_allocated_data_size );
+
+		goto on_error;
 	}
 	if( remaining_compression_unit_size != 0 )
 	{

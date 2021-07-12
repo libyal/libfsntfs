@@ -1424,6 +1424,43 @@ int libfsntfs_mft_attribute_get_data_vcn_range(
 	return( 0 );
 }
 
+/* Retrieves the allocated data size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_mft_attribute_get_allocated_data_size(
+     libfsntfs_mft_attribute_t *mft_attribute,
+     uint64_t *allocated_data_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_mft_attribute_get_allocated_data_size";
+
+	if( mft_attribute == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MFT attribute.",
+		 function );
+
+		return( -1 );
+	}
+	if( allocated_data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid allocated data size.",
+		 function );
+
+		return( -1 );
+	}
+	*allocated_data_size = mft_attribute->allocated_data_size;
+
+	return( 1 );
+}
+
 /* Retrieves the valid data size
  * Returns 1 if successful or -1 on error
  */
@@ -2015,6 +2052,8 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 	libfsntfs_data_run_t *data_run               = NULL;
 	static char *function                        = "libfsntfs_mft_attribute_get_data_extents_array";
 	size64_t attribute_data_vcn_size             = 0;
+	size64_t calculated_allocated_data_size      = 0;
+	size64_t stored_allocated_data_size          = 0;
 	off64_t attribute_data_vcn_offset            = 0;
 	off64_t calculated_attribute_data_vcn_offset = 0;
 	int attribute_index                          = 0;
@@ -2065,6 +2104,20 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 		 function );
 
 		return( -1 );
+	}
+	if( libfsntfs_mft_attribute_get_allocated_data_size(
+	     mft_attribute,
+	     &stored_allocated_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute allocated data size.",
+		 function );
+
+		goto on_error;
 	}
 	if( libcdata_array_initialize(
 	     &safe_data_extents_array,
@@ -2232,6 +2285,8 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 
 					goto on_error;
 				}
+				calculated_allocated_data_size += data_run->size;
+
 				data_extent = NULL;
 			}
 		}
@@ -2252,6 +2307,19 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 
 			goto on_error;
 		}
+	}
+	if( calculated_allocated_data_size != stored_allocated_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: size of data runs: %" PRIu64 " does not match allocated data size: %" PRIu64 ".",
+		 function,
+		 calculated_allocated_data_size,
+		 stored_allocated_data_size );
+
+		goto on_error;
 	}
 	*data_extents_array = safe_data_extents_array;
 

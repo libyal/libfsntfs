@@ -153,7 +153,9 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 	libfsntfs_data_run_t *data_run               = NULL;
 	static char *function                        = "libfsntfs_cluster_block_stream_initialize_from_data_runs";
 	size64_t attribute_data_vcn_size             = 0;
+	size64_t calculated_allocated_data_size      = 0;
 	size64_t data_segment_size                   = 0;
+	size64_t stored_allocated_data_size          = 0;
 	size64_t valid_data_size                     = 0;
 	off64_t attribute_data_vcn_offset            = 0;
 	off64_t calculated_attribute_data_vcn_offset = 0;
@@ -236,6 +238,20 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 
 		goto on_error;
 	}
+	if( libfsntfs_mft_attribute_get_allocated_data_size(
+	     data_attribute,
+	     &stored_allocated_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve attribute allocated data size.",
+		 function );
+
+		goto on_error;
+	}
 	if( libfdata_stream_initialize(
 	     &safe_data_stream,
 	     NULL,
@@ -257,136 +273,136 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 
 		goto on_error;
 	}
-	if( valid_data_size > 0 )
+	while( data_attribute != NULL )
 	{
-		while( data_attribute != NULL )
+		if( libfsntfs_mft_attribute_get_data_vcn_range(
+		     data_attribute,
+		     (uint64_t *) &attribute_data_vcn_offset,
+		     (uint64_t *) &attribute_data_vcn_size,
+		     error ) != 1 )
 		{
-			if( libfsntfs_mft_attribute_get_data_vcn_range(
-			     data_attribute,
-			     (uint64_t *) &attribute_data_vcn_offset,
-			     (uint64_t *) &attribute_data_vcn_size,
-			     error ) != 1 )
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute data VCN range.",
+			 function );
+
+			goto on_error;
+		}
+		if( attribute_data_vcn_size != 0xffffffffffffffffULL )
+		{
+			if( (uint64_t) attribute_data_vcn_offset > (uint64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute data VCN range.",
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value out of bounds.",
 				 function );
 
 				goto on_error;
 			}
-			if( attribute_data_vcn_size != 0xffffffffffffffffULL )
+			if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
 			{
-				if( (uint64_t) attribute_data_vcn_offset > (uint64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid attribute data first VCN value out of bounds.",
-					 function );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data last VCN value out of bounds.",
+				 function );
 
-					goto on_error;
-				}
-				if( attribute_data_vcn_size > (size64_t) ( ( INT64_MAX / io_handle->cluster_block_size ) - 1 ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid attribute data last VCN value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid attribute data first VCN value exceeds last VCN value.",
-					 function );
-
-					goto on_error;
-				}
-				attribute_data_vcn_size   += 1;
-				attribute_data_vcn_size   -= attribute_data_vcn_offset;
-				attribute_data_vcn_offset *= io_handle->cluster_block_size;
-				attribute_data_vcn_size   *= io_handle->cluster_block_size;
-
-				if( ( calculated_attribute_data_vcn_offset != 0 )
-				 && ( calculated_attribute_data_vcn_offset != attribute_data_vcn_offset ) )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-					 "%s: invalid attribute data VCN offset value out of bounds.",
-					 function );
-
-					goto on_error;
-				}
-				calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
+				goto on_error;
 			}
-			if( libfsntfs_mft_attribute_get_number_of_data_runs(
+			if( attribute_data_vcn_offset > (off64_t) attribute_data_vcn_size )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data first VCN value exceeds last VCN value.",
+				 function );
+
+				goto on_error;
+			}
+			attribute_data_vcn_size   += 1;
+			attribute_data_vcn_size   -= attribute_data_vcn_offset;
+			attribute_data_vcn_offset *= io_handle->cluster_block_size;
+			attribute_data_vcn_size   *= io_handle->cluster_block_size;
+
+			if( ( calculated_attribute_data_vcn_offset != 0 )
+			 && ( calculated_attribute_data_vcn_offset != attribute_data_vcn_offset ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid attribute data VCN offset value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			calculated_attribute_data_vcn_offset = attribute_data_vcn_offset + (off64_t) attribute_data_vcn_size;
+		}
+		if( libfsntfs_mft_attribute_get_number_of_data_runs(
+		     data_attribute,
+		     &number_of_data_runs,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve attribute: %d number of data runs.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+		for( data_run_index = 0;
+		     data_run_index < number_of_data_runs;
+		     data_run_index++ )
+		{
+			if( libfsntfs_mft_attribute_get_data_run_by_index(
 			     data_attribute,
-			     &number_of_data_runs,
+			     data_run_index,
+			     &data_run,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve attribute: %d number of data runs.",
+				 "%s: unable to retrieve attribute: %d data run: %d.",
 				 function,
-				 attribute_index );
+				 attribute_index,
+				 data_run_index );
 
 				goto on_error;
 			}
-			for( data_run_index = 0;
-			     data_run_index < number_of_data_runs;
-			     data_run_index++ )
+			if( data_run == NULL )
 			{
-				if( libfsntfs_mft_attribute_get_data_run_by_index(
-				     data_attribute,
-				     data_run_index,
-				     &data_run,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve attribute: %d data run: %d.",
-					 function,
-					 attribute_index,
-					 data_run_index );
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+				 "%s: missing attribute: %d data run: %d.",
+				 function,
+				 attribute_index,
+				 data_run_index );
 
-					goto on_error;
-				}
-				if( data_run == NULL )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: missing attribute: %d data run: %d.",
-					 function,
-					 attribute_index,
-					 data_run_index );
-
-					goto on_error;
-				}
-				if( data_run->size > ( valid_data_size - data_segment_offset ) )
-				{
-					data_segment_size = valid_data_size - data_segment_offset;
-				}
-				else
-				{
-					data_segment_size = data_run->size;
-				}
+				goto on_error;
+			}
+			if( data_run->size > ( valid_data_size - data_segment_offset ) )
+			{
+				data_segment_size = valid_data_size - data_segment_offset;
+			}
+			else
+			{
+				data_segment_size = data_run->size;
+			}
+			if( (size64_t) data_segment_offset < valid_data_size )
+			{
 				if( libfdata_stream_append_segment(
 				     safe_data_stream,
 				     &segment_index,
@@ -408,30 +424,39 @@ int libfsntfs_cluster_block_stream_initialize_from_data_runs(
 					goto on_error;
 				}
 				data_segment_offset += data_segment_size;
-
-				if( (size64_t) data_segment_offset >= valid_data_size )
-				{
-					break;
-				}
 			}
-			attribute_index++;
-
-			if( libfsntfs_mft_attribute_get_next_attribute(
-			     data_attribute,
-			     &data_attribute,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve next MFT attribute: %d.",
-				 function,
-				 attribute_index );
-
-				goto on_error;
-			}
+			calculated_allocated_data_size += data_run->size;
 		}
+		attribute_index++;
+
+		if( libfsntfs_mft_attribute_get_next_attribute(
+		     data_attribute,
+		     &data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve next MFT attribute: %d.",
+			 function,
+			 attribute_index );
+
+			goto on_error;
+		}
+	}
+	if( calculated_allocated_data_size != stored_allocated_data_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: size of data runs: %" PRIu64 " does not match allocated data size: %" PRIu64 ".",
+		 function,
+		 calculated_allocated_data_size,
+		 stored_allocated_data_size );
+
+		goto on_error;
 	}
 	if( (size64_t) data_segment_offset < data_size )
 	{

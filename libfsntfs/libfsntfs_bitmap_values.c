@@ -574,6 +574,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 
 				goto on_error;
 			}
+/* TODO handle sparse data runs more efficiently */
 			if( libfsntfs_bitmap_values_read_data(
 			     bitmap_values,
 			     cluster_block->data,
