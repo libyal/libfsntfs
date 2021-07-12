@@ -328,6 +328,7 @@ int main( int argc, char * const argv[] )
 			 fsntfsinfo_info_handle->volume_offset );
 		}
 	}
+/* TODO check for BDE */
 	if( info_handle_open_input(
 	     fsntfsinfo_info_handle,
 	     source,

@@ -321,6 +321,7 @@ The MFT entry size and index entry size are defined as following:
 * Other values are not considered valid `[POLLARD06]`.
 
 The cluster block size can be determined as following:
+
 ....
 cluster block size = bytes per sector x sectors per cluster block
 ....
@@ -359,6 +360,7 @@ appears to be 64 KiB.
 mkntfs restricts the cluster size to: bytes per sector >= cluster size > 4096 * bytes per sector
 
 The MFT offset can be determined as following:
+
 ....
 MFT offset = volume header offset
            + ( MFT cluster block number x Cluster block size )
@@ -366,6 +368,7 @@ MFT offset = volume header offset
 
 Note that the lower 32-bit part of the NTFS volume serial number is the WINAPI
 volume serial number. E.g. compare the output of:
+
 ....
 fsutil fsinfo volumeinfo C:
 fsutil fsinfo ntfsinfo C:
@@ -385,11 +388,13 @@ Where FVE is an abbreviation of Full Volume Encryption.
 The data structures of BDE on Windows Vista and 7 differ.
 
 A Windows Vista BDE volume starts with:
+
 ....
 eb 52 90 2d 46 56 45 26 46 53 2d
 ....
 
 A Windows 7 BDE volume starts with:
+
 ....
 eb 58 90 2d 46 56 45 26 46 53 2d
 ....
@@ -622,6 +627,7 @@ See section: <<mft_attribute_data_flags,MFT attribute data flags>>
 ===== Notes
 
 [yellow-background]*Size (or record length) upper 2 bytes overloaded or remnant data?*
+
 ....
 type					: 0x000000a0 ($INDEX_ALLOCATION)
 size					: 458832 (0x70050)
@@ -672,6 +678,7 @@ Contains an empty byte
 $INDEX_ROOT attribute? The attribute data is uncompressed.*
 
 Seen on Windows 10 (NTFS version 3.1)
+
 ....
 type                                 : 0x00000090 ($INDEX_ROOT)
 size                                 : 88
@@ -1262,6 +1269,7 @@ The extended attribute information data is 8 bytes of size and consists of:
 |===
 
 E.g.
+
 ....
 00000000: 08 00 00 00 18 00 00 00                            ........
 ....
@@ -1289,6 +1297,7 @@ Contains an ASCII string +
 |===
 
 E.g.
+
 ....
 00000000: 18 00 00 00 00 09 04 00  2e 55 4e 49 58 41 54 54   ........ .UNIXATT
 00000010: 52 00 b6 01 00 00 03 87                            R.......
@@ -1629,6 +1638,7 @@ The maximum uncompressed data size is always the cluster size (in most cases
 4096).
 
 The data runs in the $DATA stream define cluster block ranges. A simple example:
+
 ....
 21 02 35 52
 ....
@@ -1640,6 +1650,7 @@ compression unit. The data is stored compressed in the first 2 blocks and the
 compression unit size. They do not define actual sparse data.
 
 Another example:
+
 ....
 21 40 37 52
 ....
@@ -1935,6 +1946,7 @@ Contains an UTF-16 little-endian [yellow-background]*with the end-of-string char
 |===
 
 [yellow-background]*TODO: what do byte values like 0x02 represent in the substitute name?*
+
 ....
 00000010: 5c 00 3f 00 3f 00 02 00  43 00 3a 00 5c 00 55 00   \.?.?... C.:.\.U.
 00000020: 73 00 65 00 72 00 73 00  5c 00 74 00 65 00 73 00   s.e.r.s. \.t.e.s.
@@ -2480,6 +2492,7 @@ As of Vista ([yellow-background]*or windows server 2003?*) Transactional NTFS
 
 In TxF the resource manager (RM) keeps track of transactional metadata and log
 files. The TxF related metadata files are stored in the metadata directory:
+
 ....
 $Extend\$RmMetadata
 ....
@@ -2558,6 +2571,7 @@ somewhere else?*
 
 A pending transaction XML-document starts with an UTF-8 byte-order-mark. Is
 roughly contains the following data:
+
 ....
 <?xml version='1.0' encoding='utf-8'?>
 <PendingTransaction Version="2.0" Identifier="...">
@@ -2623,11 +2637,13 @@ See `[RUSSNOVICH09]`, `[MSDN]` and `[LIBFSCLFS]` for more information about
 CLFS.
 
 The base log file (BLF) of the TxF log store is:
+
 ....
 $Extend\$RmMetadata\$TxfLog\TxfLog.blf
 ....
 
 Commonly the corresponding container files are:
+
 ....
 $Extend\$RmMetadata\$TxfLog\TxfLogContainer00000000000000000001
 $Extend\$RmMetadata\$TxfLog\TxfLogContainer00000000000000000002
@@ -2928,6 +2944,7 @@ TODO: verify behavior of Windows NTFS implementation.
 == Notes
 
 Signatures as indicated in `[RUSSON05]`:
+
 ....
         "HOLE" == ??? (NTFS 3.0+?)
 ....
