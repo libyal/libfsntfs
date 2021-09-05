@@ -398,6 +398,15 @@ void pyfsntfs_volume_free(
 
 		return;
 	}
+	if( pyfsntfs_volume->file_io_handle != NULL )
+	{
+		if( pyfsntfs_volume_close(
+		     pyfsntfs_volume,
+		     NULL ) == NULL )
+		{
+			return;
+		}
+	}
 	if( pyfsntfs_volume->volume != NULL )
 	{
 		Py_BEGIN_ALLOW_THREADS
