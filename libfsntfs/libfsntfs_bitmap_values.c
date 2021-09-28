@@ -391,11 +391,17 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 	libfsntfs_cluster_block_t *cluster_block = NULL;
 	uint8_t *data                            = NULL;
 	static char *function                    = "libfsntfs_bitmap_values_read_from_mft_attribute";
+	size64_t segment_size                    = 0;
 	size_t data_size                         = 0;
+	off64_t segment_offset                   = 0;
 	uint32_t attribute_type                  = 0;
+	uint32_t segment_flags                   = 0;
 	int cluster_block_index                  = 0;
 	int number_of_cluster_blocks             = 0;
+	int number_of_segments                   = 0;
 	int result                               = 0;
+	int segment_file_index                   = 0;
+	int segment_index                        = 0;
 
 	if( bitmap_values == NULL )
 	{
@@ -404,6 +410,28 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid bitmap values.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle->cluster_block_size == 0 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid IO handle - cluster block size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -527,69 +555,109 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 
 			goto on_error;
 		}
-		for( cluster_block_index = 0;
-		     cluster_block_index < number_of_cluster_blocks;
-		     cluster_block_index++ )
+		if( libfdata_vector_get_number_of_segments(
+		     cluster_block_vector,
+		     &number_of_segments,
+		     error ) != 1 )
 		{
-			if( libfdata_vector_get_element_value_by_index(
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve number of cluster block vector segments.",
+			 function );
+
+			goto on_error;
+		}
+		for( segment_index = 0;
+		     segment_index < number_of_segments;
+		     segment_index++ )
+		{
+			if( libfdata_vector_get_segment_by_index(
 			     cluster_block_vector,
-			     (intptr_t *) file_io_handle,
-			     (libfdata_cache_t *) cluster_block_cache,
-			     cluster_block_index,
-			     (intptr_t **) &cluster_block,
-			     0,
+			     segment_index,
+			     &segment_file_index,
+			     &segment_offset,
+			     &segment_size,
+			     &segment_flags,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve cluster block: %d from vector.",
+				 "%s: unable to retrieve cluster block vector segment: %d.",
 				 function,
-				 cluster_block_index );
+				 segment_index );
 
 				goto on_error;
 			}
-			if( cluster_block == NULL )
+			if( ( segment_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing cluster block: %d.",
-				 function,
-				 cluster_block_index );
-
-				goto on_error;
+				continue;
 			}
-			if( cluster_block->data == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid cluster block: %d - missing data.",
-				 function,
-				 cluster_block_index );
+			cluster_block_index = segment_offset / io_handle->cluster_block_size;
 
-				goto on_error;
+			while( segment_size > 0 )
+			{
+				if( cluster_block_index >= number_of_cluster_blocks )
+				{
+					break;
+				}
+				if( libfdata_vector_get_element_value_by_index(
+				     cluster_block_vector,
+				     (intptr_t *) file_io_handle,
+				     (libfdata_cache_t *) cluster_block_cache,
+				     cluster_block_index,
+				     (intptr_t **) &cluster_block,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve cluster block: %d from vector.",
+					 function,
+					 cluster_block_index );
+
+					goto on_error;
+				}
+				if( cluster_block == NULL )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+					 "%s: missing cluster block: %d.",
+					 function,
+					 cluster_block_index );
+
+					goto on_error;
+				}
+				if( libfsntfs_bitmap_values_read_data(
+				     bitmap_values,
+				     cluster_block->data,
+				     cluster_block->data_size,
+				     element_data_size,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read bitmap values.",
+					 function );
+
+					goto on_error;
+				}
+				segment_size -= io_handle->cluster_block_size;
+
+				cluster_block_index++;
 			}
-/* TODO handle sparse data runs more efficiently */
-			if( libfsntfs_bitmap_values_read_data(
-			     bitmap_values,
-			     cluster_block->data,
-			     cluster_block->data_size,
-			     element_data_size,
-			     error ) != 1 )
+			if( cluster_block_index >= number_of_cluster_blocks )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read bitmap values.",
-				 function );
-
-				goto on_error;
+				break;
 			}
 		}
 		if( libfdata_vector_free(
