@@ -42,7 +42,7 @@ int libfsntfs_volume_information_attribute_get_version(
 {
 	libfsntfs_internal_attribute_t *internal_attribute               = NULL;
 	libfsntfs_volume_information_values_t *volume_information_values = NULL;
-	static char *function                                            = "libfsntfs_volume_information_attribute_get_flags";
+	static char *function                                            = "libfsntfs_volume_information_attribute_get_version";
 	uint32_t attribute_type                                          = 0;
 
 	if( attribute == NULL )

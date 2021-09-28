@@ -974,7 +974,7 @@ int libfsntfs_file_system_read_bitmap(
 						if( libcnotify_verbose != 0 )
 						{
 							libcnotify_printf(
-							 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
+							 "%s: offset range\t\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
 							 function,
 							 start_offset,
 							 bitmap_offset,
@@ -1021,7 +1021,7 @@ int libfsntfs_file_system_read_bitmap(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: offset range\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
+				 "%s: offset range\t\t\t\t: 0x%08" PRIx64 " - 0x%08" PRIx64 " (0x%08" PRIx64 ")\n",
 				 function,
 				 start_offset,
 				 bitmap_offset,

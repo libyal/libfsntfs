@@ -8798,7 +8798,7 @@ int info_handle_volume_fprint(
 
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tName\t\t\t\t: " );
+	 "\tName\t\t\t\t:" );
 
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
@@ -8828,7 +8828,7 @@ int info_handle_volume_fprint(
 		          error );
 #endif
 	}
-	if( result != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -8839,7 +8839,8 @@ int info_handle_volume_fprint(
 
 		goto on_error;
 	}
-	if( volume_name_size > 0 )
+	else if( ( result != 0 )
+	      && ( volume_name_size > 0 ) )
 	{
 		volume_name = system_string_allocate(
 		               volume_name_size );
@@ -8900,7 +8901,7 @@ int info_handle_volume_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "%" PRIs_SYSTEM "",
+		 " %" PRIs_SYSTEM "",
 		 volume_name );
 
 		memory_free(
@@ -8911,6 +8912,10 @@ int info_handle_volume_fprint(
 	fprintf(
 	 info_handle->notify_stream,
 	 "\n" );
+
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tVersion\t\t\t\t:" );
 
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
@@ -8928,7 +8933,7 @@ int info_handle_volume_fprint(
 		          &minor_version,
 		          error );
 	}
-	if( result != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -8939,11 +8944,17 @@ int info_handle_volume_fprint(
 
 		return( -1 );
 	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 " %" PRIu8 ".%" PRIu8 "",
+		 major_version,
+		 minor_version );
+	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tVersion\t\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
-	 major_version,
-	 minor_version );
+	 "\n" );
 
 	if( info_handle->input_volume != NULL )
 	{
@@ -9052,6 +9063,10 @@ int info_handle_volume_fprint(
 		 "\tIndex entry size\t\t: %" PRIu32 "\n",
 		 index_entry_size );
 	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\tFlags\t\t\t\t:" );
+
 	if( info_handle->input_mft_metadata_file != NULL )
 	{
 		result = libfsntfs_mft_metadata_file_get_volume_flags(
@@ -9066,7 +9081,7 @@ int info_handle_volume_fprint(
 		          &flags,
 		          error );
 	}
-	if( result != 1 )
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -9077,10 +9092,16 @@ int info_handle_volume_fprint(
 
 		return( -1 );
 	}
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 " 0x%04" PRIx16 "",
+		 flags );
+	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
-	 flags );
+	 "\n" );
 
 	if( ( flags & 0x0001 ) != 0 )
 	{
