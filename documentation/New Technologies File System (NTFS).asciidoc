@@ -2724,11 +2724,42 @@ _For now the latter is assumed._
 
 == [[corruption_scenarios]]Corruption scenarios
 
+=== $FILE_NAME attribute with non-proper UTF-16 name
+
+An MFT entry contains an $FILE_NAME attribute that contains a name that contains
+non-proper UTF-16.
+
+....
+parent file reference             : 9711-3
+creation time                     : Oct 04, 2014 14:44:40.703125000 UTC
+modification time                 : Oct 04, 2014 14:48:37.562500000 UTC
+entry modification time           : Oct 04, 2014 14:48:37.750000000 UTC
+access time                       : Oct 04, 2014 14:48:37.562500000 UTC
+allocated file size               : 40960
+file size                         : 38926
+file attribute flags              : 0x00000020
+        Should be archived (FILE_ATTRIBUTE_ARCHIVE)
+
+extended data                     : 0x00000000
+name size                         : 36
+name space                        : 1 (Windows)
+
+name data:
+00000040:       2e 00 63 dc 79 dc  67 dc 30 00 30 00 32 00     ..c.y. g.0.0.2.
+00000050: 65 00 30 00 30 00 30 00  30 00 30 00 30 00 30 00   e.0.0.0. 0.0.0.0.
+00000060: 31 00 61 00 39 00 34 00  66 00 62 00 36 00 30 00   1.a.9.4. f.b.6.0.
+00000070: 62 00 35 00 30 00 37 00  66 00 30 00 36 00 38 00   b.5.0.7. f.0.6.8.
+00000080: 30 00 66 00 39 00 36 00  38 00                     0.f.9.6. 8.
+....
+
+This edge case was observed on Windows XP in the Recycler directory. The same
+name is stored in the corresponding $I30 entry.
+
 === Data steam with inconsistent data flags
 
-An MFT entry contains an $ATTRIBUTE_LIST that contains multiple $DATA
-attributes. The $DATA attributes define a LZNT1 compressed data stream
-though only the first $DATA attribute has the compressed data flag set.
+An MFT entry contains an $ATTRIBUTE_LIST attribute that contains multiple $DATA
+attributes. The $DATA attributes define a LZNT1 compressed data stream though
+only the first $DATA attribute has the compressed data flag set.
 
 [NOTE]
 It is unclear if this is a corruption scenario or not.
