@@ -5351,6 +5351,10 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 	uint64_t entry_modification_time = 0;
 	uint64_t file_reference          = 0;
 	uint64_t modification_time       = 0;
+	int64_t posix_access_time        = 0;
+	int64_t posix_creation_time      = 0;
+	int64_t posix_inode_change_time  = 0;
+	int64_t posix_modification_time  = 0;
 	uint32_t file_attribute_flags    = 0;
 	uint32_t group_identifier        = 0;
 	uint32_t owner_identifier        = 0;
@@ -5543,18 +5547,28 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $FILE_NAME attribute address */
 
+	posix_access_time       = (int64_t) access_time - 116444736000000000L;
+	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
+	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
+	posix_modification_time = (int64_t) modification_time - 116444736000000000L;
+
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 " ($FILE_NAME)|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+	 " ($FILE_NAME)|%" PRIu64 "-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
 	 file_reference & 0xffffffffffffUL,
+	 file_reference >> 48,
 	 file_mode_string,
 	 owner_identifier,
 	 group_identifier,
 	 size,
-	 (double) ( access_time - 116444736000000000L ) / 10000000,
-	 (double) ( modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+	 posix_access_time / 10000000,
+	 posix_access_time - ( ( posix_access_time / 10000000 ) * 10000000 ),
+	 posix_modification_time / 10000000,
+	 posix_modification_time - ( ( posix_modification_time / 10000000 ) * 10000000 ),
+	 posix_inode_change_time / 10000000,
+	 posix_inode_change_time - ( ( posix_inode_change_time / 10000000 ) * 10000000 ),
+	 posix_creation_time / 10000000,
+	 posix_creation_time - ( ( posix_creation_time / 10000000 ) * 10000000 ) );
 
 	return( 1 );
 }
@@ -5583,6 +5597,10 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 	uint64_t entry_modification_time = 0;
 	uint64_t file_reference          = 0;
 	uint64_t modification_time       = 0;
+	int64_t posix_access_time        = 0;
+	int64_t posix_creation_time      = 0;
+	int64_t posix_inode_change_time  = 0;
+	int64_t posix_modification_time  = 0;
 	uint32_t file_attribute_flags    = 0;
 	uint32_t group_identifier        = 0;
 	uint32_t owner_identifier        = 0;
@@ -5787,18 +5805,28 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $INDEX_ROOT attribute address */
 
+	posix_access_time       = (int64_t) access_time - 116444736000000000L;
+	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
+	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
+	posix_modification_time = (int64_t) modification_time - 116444736000000000L;
+
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+	 "|%" PRIu64 "-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
 	 file_reference & 0xffffffffffffUL,
+	 file_reference >> 48,
 	 file_mode_string,
 	 owner_identifier,
 	 group_identifier,
 	 size,
-	 (double) ( access_time - 116444736000000000L ) / 10000000,
-	 (double) ( modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+	 posix_access_time / 10000000,
+	 posix_access_time - ( ( posix_access_time / 10000000 ) * 10000000 ),
+	 posix_modification_time / 10000000,
+	 posix_modification_time - ( ( posix_modification_time / 10000000 ) * 10000000 ),
+	 posix_inode_change_time / 10000000,
+	 posix_inode_change_time - ( ( posix_inode_change_time / 10000000 ) * 10000000 ),
+	 posix_creation_time / 10000000,
+	 posix_creation_time - ( ( posix_creation_time / 10000000 ) * 10000000 ) );
 
 	return( 1 );
 }
@@ -5817,26 +5845,33 @@ int info_handle_bodyfile_file_entry_value_fprint(
      const system_character_t *data_stream_name,
      libcerror_error_t **error )
 {
-	char md5_string[ DIGEST_HASH_STRING_SIZE_MD5 ]    = {
+	char md5_string[ DIGEST_HASH_STRING_SIZE_MD5 ] = {
 		'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
 		'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
 		0 };
 
-	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+	char file_mode_string[ 13 ]              = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
-	static char *function            = "info_handle_bodyfile_file_entry_value_fprint";
-	size64_t size                    = 0;
-	uint64_t access_time             = 0;
-	uint64_t creation_time           = 0;
-	uint64_t entry_modification_time = 0;
-	uint64_t file_reference          = 0;
-	uint64_t mft_entry_index         = 0;
-	uint64_t modification_time       = 0;
-	uint32_t file_attribute_flags    = 0;
-	uint32_t group_identifier        = 0;
-	uint32_t owner_identifier        = 0;
-	int has_default_data_stream      = 0;
-	int result                       = 0;
+	system_character_t *symbolic_link_target = NULL;
+	static char *function                    = "info_handle_bodyfile_file_entry_value_fprint";
+	size64_t size                            = 0;
+	size_t symbolic_link_target_length       = 0;
+	size_t symbolic_link_target_size         = 0;
+	uint64_t access_time                     = 0;
+	uint64_t creation_time                   = 0;
+	uint64_t entry_modification_time         = 0;
+	uint64_t file_reference                  = 0;
+	uint64_t mft_entry_index                 = 0;
+	uint64_t modification_time               = 0;
+	int64_t posix_access_time                = 0;
+	int64_t posix_creation_time              = 0;
+	int64_t posix_inode_change_time          = 0;
+	int64_t posix_modification_time          = 0;
+	uint32_t file_attribute_flags            = 0;
+	uint32_t group_identifier                = 0;
+	uint32_t owner_identifier                = 0;
+	int has_default_data_stream              = 0;
+	int result                               = 0;
 
 	if( info_handle == NULL )
 	{
@@ -5861,7 +5896,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve file reference.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	mft_entry_index = file_reference & 0xffffffffffffUL;
 
@@ -5877,7 +5912,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve creation time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_modification_time(
 	     file_entry,
@@ -5891,7 +5926,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve modification time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_access_time(
 	     file_entry,
@@ -5905,7 +5940,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve access time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_entry_modification_time(
 	     file_entry,
@@ -5919,7 +5954,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve entry modification time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_file_attribute_flags(
 	     file_entry,
@@ -5933,7 +5968,71 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to retrieve file attribute flags.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
+	          file_entry,
+	          &symbolic_link_target_size,
+	          error );
+#else
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
+	          file_entry,
+	          &symbolic_link_target_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve symbolic link target string size.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		symbolic_link_target = system_string_allocate(
+		                        symbolic_link_target_size );
+
+		if( symbolic_link_target == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create symbolic link target string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
+		          file_entry,
+		          (uint16_t *) symbolic_link_target,
+		          symbolic_link_target_size,
+		          error );
+#else
+		result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
+		          file_entry,
+		          (uint8_t *) symbolic_link_target,
+		          symbolic_link_target_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve symbolic link target string.",
+			 function );
+
+			goto on_error;
+		}
+		symbolic_link_target_length = symbolic_link_target_size - 1;
 	}
 	if( alternate_data_stream != NULL )
 	{
@@ -5949,7 +6048,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			 "%s: unable to retrieve size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else
@@ -5966,7 +6065,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			 "%s: unable to retrieve size.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	result = libfsntfs_file_entry_has_default_data_stream(
@@ -5982,7 +6081,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to determine if file entry has default data stream.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	has_default_data_stream = result;
 
@@ -5999,7 +6098,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 "%s: unable to determine if file entry has directory entries index.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
@@ -6074,7 +6173,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			 "%s: unable to print path string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( file_entry_name != NULL )
@@ -6092,7 +6191,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			 "%s: unable to print file entry name string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( data_stream_name != NULL )
@@ -6102,23 +6201,69 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 ":%" PRIs_SYSTEM "",
 		 data_stream_name );
 	}
+	if( symbolic_link_target != NULL )
+	{
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 " -> " );
+
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     symbolic_link_target,
+		     symbolic_link_target_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			goto on_error;
+		}
+	}
 /* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $DATA or $INDEX_ROOT attribute address */
 
+	posix_access_time       = (int64_t) access_time - 116444736000000000L;
+	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
+	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
+	posix_modification_time = (int64_t) modification_time - 116444736000000000L;
+
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%.9f|%.9f|%.9f|%.9f\n",
+	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
 	 mft_entry_index,
 	 file_mode_string,
 	 owner_identifier,
 	 group_identifier,
 	 size,
-	 (double) ( access_time - 116444736000000000L ) / 10000000,
-	 (double) ( modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( entry_modification_time - 116444736000000000L ) / 10000000,
-	 (double) ( creation_time - 116444736000000000L ) / 10000000 );
+	 posix_access_time / 10000000,
+	 posix_access_time - ( ( posix_access_time / 10000000 ) * 10000000 ),
+	 posix_modification_time / 10000000,
+	 posix_modification_time - ( ( posix_modification_time / 10000000 ) * 10000000 ),
+	 posix_inode_change_time / 10000000,
+	 posix_inode_change_time - ( ( posix_inode_change_time / 10000000 ) * 10000000 ),
+	 posix_creation_time / 10000000,
+	 posix_creation_time - ( ( posix_creation_time / 10000000 ) * 10000000 ) );
 
+	if( symbolic_link_target != NULL )
+	{
+		memory_free(
+		 symbolic_link_target );
+
+		symbolic_link_target = NULL;
+	}
 	return( 1 );
+
+on_error:
+	if( symbolic_link_target != NULL )
+	{
+		memory_free(
+		 symbolic_link_target );
+	}
+	return( -1 );
 }
 
 /* Prints the MFT entry to a bodyfile
