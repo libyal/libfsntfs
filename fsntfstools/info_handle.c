@@ -5342,7 +5342,7 @@ int info_handle_bodyfile_file_name_attribute_fprint(
      size_t file_entry_name_length,
      libcerror_error_t **error )
 {
-	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+	char file_mode_string[ 11 ]      = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
 	static char *function            = "info_handle_bodyfile_file_name_attribute_fprint";
 	size64_t size                    = 0;
@@ -5487,19 +5487,13 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 	else if( result != 0 )
 	{
 		file_mode_string[ 0 ] = 'd';
-		file_mode_string[ 2 ] = 'd';
-	}
-	else
-	{
-		file_mode_string[ 0 ] = 'r';
-		file_mode_string[ 2 ] = 'r';
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
 	{
-		file_mode_string[ 4 ]  = '-';
-		file_mode_string[ 7 ]  = '-';
-		file_mode_string[ 10 ] = '-';
+		file_mode_string[ 2 ] = '-';
+		file_mode_string[ 5 ] = '-';
+		file_mode_string[ 8 ] = '-';
 	}
 	/* Colums in a Sleuthkit 3.x and later bodyfile
 	 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
@@ -5588,7 +5582,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
      size_t attribute_name_size,
      libcerror_error_t **error )
 {
-	char file_mode_string[ 13 ]      = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+	char file_mode_string[ 11 ]      = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
 	static char *function            = "info_handle_bodyfile_index_root_attribute_fprint";
 	size64_t size                    = 0;
@@ -5733,19 +5727,13 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 	else if( result != 0 )
 	{
 		file_mode_string[ 0 ] = 'd';
-		file_mode_string[ 2 ] = 'd';
-	}
-	else
-	{
-		file_mode_string[ 0 ] = 'r';
-		file_mode_string[ 2 ] = 'r';
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
 	{
-		file_mode_string[ 4 ]  = '-';
-		file_mode_string[ 7 ]  = '-';
-		file_mode_string[ 10 ] = '-';
+		file_mode_string[ 2 ] = '-';
+		file_mode_string[ 5 ] = '-';
+		file_mode_string[ 8 ] = '-';
 	}
 	/* Colums in a Sleuthkit 3.x and later bodyfile
 	 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
@@ -5850,7 +5838,7 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
 		0 };
 
-	char file_mode_string[ 13 ]              = { '-', '/', '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+	char file_mode_string[ 11 ]              = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
 	system_character_t *symbolic_link_target = NULL;
 	static char *function                    = "info_handle_bodyfile_file_entry_value_fprint";
@@ -6103,19 +6091,13 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	else if( result != 0 )
 	{
 		file_mode_string[ 0 ] = 'd';
-		file_mode_string[ 2 ] = 'd';
-	}
-	else
-	{
-		file_mode_string[ 0 ] = 'r';
-		file_mode_string[ 2 ] = 'r';
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
 	{
-		file_mode_string[ 4 ]  = '-';
-		file_mode_string[ 7 ]  = '-';
-		file_mode_string[ 10 ] = '-';
+		file_mode_string[ 2 ] = '-';
+		file_mode_string[ 5 ] = '-';
+		file_mode_string[ 8 ] = '-';
 	}
 	if( ( info_handle->calculate_md5 == 0 )
 	 || ( has_default_data_stream == 0 ) )
@@ -6233,8 +6215,9 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 	fprintf(
 	 info_handle->bodyfile_stream,
-	 "|%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
+	 "|%" PRIu64 "-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
 	 mft_entry_index,
+	 file_reference >> 48,
 	 file_mode_string,
 	 owner_identifier,
 	 group_identifier,
