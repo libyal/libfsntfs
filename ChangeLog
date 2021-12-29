@@ -1,4 +1,5 @@
 TODO
+* fsntfsinfo: mode_as_string set 'l' if symbolic link target is set
 * fsntfsinfo: print $VOLUME_INFORMATION flags
 * fsntfsinfo: print volume size
 * fsntfsinfo: print extents/data runs of $DATA stream?

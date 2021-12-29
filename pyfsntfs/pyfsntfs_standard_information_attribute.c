@@ -106,21 +106,21 @@ PyMethodDef pyfsntfs_standard_information_attribute_object_methods[] = {
 	{ "get_owner_identifier",
 	  (PyCFunction) pyfsntfs_standard_information_attribute_get_owner_identifier,
 	  METH_NOARGS,
-	  "get_owner_identifier() -> Integer\n"
+	  "get_owner_identifier() -> Integer or None\n"
 	  "\n"
 	  "Returns the owner identifier." },
 
 	{ "get_security_descriptor_identifier",
 	  (PyCFunction) pyfsntfs_standard_information_attribute_get_security_descriptor_identifier,
 	  METH_NOARGS,
-	  "get_security_descriptor_identifier() -> Integer\n"
+	  "get_security_descriptor_identifier() -> Integer or None\n"
 	  "\n"
 	  "Returns the security descriptor identifier." },
 
 	{ "get_update_sequence_number",
 	  (PyCFunction) pyfsntfs_standard_information_attribute_get_update_sequence_number,
 	  METH_NOARGS,
-	  "get_update_sequence_number() -> Integer\n"
+	  "get_update_sequence_number() -> Integer or None\n"
 	  "\n"
 	  "Returns the update sequence number." },
 
@@ -834,7 +834,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -846,6 +846,13 @@ PyObject *pyfsntfs_standard_information_attribute_get_owner_identifier(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  (uint64_t) owner_identifier );
@@ -886,7 +893,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_security_descriptor_identi
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -898,6 +905,13 @@ PyObject *pyfsntfs_standard_information_attribute_get_security_descriptor_identi
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  (uint64_t) security_descriptor_identifier );
@@ -938,7 +952,7 @@ PyObject *pyfsntfs_standard_information_attribute_get_update_sequence_number(
 
 	Py_END_ALLOW_THREADS
 
-	if( result != 1 )
+	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
 		 error,
@@ -950,6 +964,13 @@ PyObject *pyfsntfs_standard_information_attribute_get_update_sequence_number(
 		 &error );
 
 		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
 	}
 	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
 	                  update_sequence_number );
