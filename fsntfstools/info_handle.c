@@ -5469,9 +5469,9 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 
 		return( -1 );
 	}
-	result = libfsntfs_file_entry_has_directory_entries_index(
-		  file_entry,
-		  error );
+	result = libfsntfs_file_entry_is_symbolic_link(
+	          file_entry,
+	          error );
 
 	if( result == -1 )
 	{
@@ -5479,14 +5479,36 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if file entry has directory entries index.",
+		 "%s: unable to determine if file entry is a symbolic link.",
 		 function );
 
 		return( -1 );
 	}
 	else if( result != 0 )
 	{
-		file_mode_string[ 0 ] = 'd';
+		file_mode_string[ 0 ] = 'l';
+	}
+	else
+	{
+		result = libfsntfs_file_entry_has_directory_entries_index(
+			  file_entry,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry has directory entries index.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			file_mode_string[ 0 ] = 'd';
+		}
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
@@ -5538,7 +5560,6 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 			return( -1 );
 		}
 	}
-/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $FILE_NAME attribute address */
 
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
@@ -5582,23 +5603,26 @@ int info_handle_bodyfile_index_root_attribute_fprint(
      size_t attribute_name_size,
      libcerror_error_t **error )
 {
-	char file_mode_string[ 11 ]      = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+	char file_mode_string[ 11 ]              = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
 
-	static char *function            = "info_handle_bodyfile_index_root_attribute_fprint";
-	size64_t size                    = 0;
-	uint64_t access_time             = 0;
-	uint64_t creation_time           = 0;
-	uint64_t entry_modification_time = 0;
-	uint64_t file_reference          = 0;
-	uint64_t modification_time       = 0;
-	int64_t posix_access_time        = 0;
-	int64_t posix_creation_time      = 0;
-	int64_t posix_inode_change_time  = 0;
-	int64_t posix_modification_time  = 0;
-	uint32_t file_attribute_flags    = 0;
-	uint32_t group_identifier        = 0;
-	uint32_t owner_identifier        = 0;
-	int result                       = 0;
+	system_character_t *symbolic_link_target = NULL;
+	static char *function                    = "info_handle_bodyfile_index_root_attribute_fprint";
+	size64_t size                            = 0;
+	size_t symbolic_link_target_length       = 0;
+	size_t symbolic_link_target_size         = 0;
+	uint64_t access_time                     = 0;
+	uint64_t creation_time                   = 0;
+	uint64_t entry_modification_time         = 0;
+	uint64_t file_reference                  = 0;
+	uint64_t modification_time               = 0;
+	int64_t posix_access_time                = 0;
+	int64_t posix_creation_time              = 0;
+	int64_t posix_inode_change_time          = 0;
+	int64_t posix_modification_time          = 0;
+	uint32_t file_attribute_flags            = 0;
+	uint32_t group_identifier                = 0;
+	uint32_t owner_identifier                = 0;
+	int result                               = 0;
 
 	if( info_handle == NULL )
 	{
@@ -5623,7 +5647,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve file reference.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_creation_time(
 	     file_entry,
@@ -5637,7 +5661,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve creation time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_modification_time(
 	     file_entry,
@@ -5651,7 +5675,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve modification time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_access_time(
 	     file_entry,
@@ -5665,7 +5689,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve access time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_entry_modification_time(
 	     file_entry,
@@ -5679,7 +5703,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve entry modification time.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libfsntfs_file_entry_get_file_attribute_flags(
 	     file_entry,
@@ -5693,7 +5717,71 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve file attribute flags.",
 		 function );
 
-		return( -1 );
+		goto on_error;
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
+	          file_entry,
+	          &symbolic_link_target_size,
+	          error );
+#else
+	result = libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
+	          file_entry,
+	          &symbolic_link_target_size,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve symbolic link target string size.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+		symbolic_link_target = system_string_allocate(
+		                        symbolic_link_target_size );
+
+		if( symbolic_link_target == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create symbolic link target string.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+		result = libfsntfs_file_entry_get_utf16_symbolic_link_target(
+		          file_entry,
+		          (uint16_t *) symbolic_link_target,
+		          symbolic_link_target_size,
+		          error );
+#else
+		result = libfsntfs_file_entry_get_utf8_symbolic_link_target(
+		          file_entry,
+		          (uint8_t *) symbolic_link_target,
+		          symbolic_link_target_size,
+		          error );
+#endif
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve symbolic link target string.",
+			 function );
+
+			goto on_error;
+		}
+		symbolic_link_target_length = symbolic_link_target_size - 1;
 	}
 	if( libfsntfs_attribute_get_data_size(
 	     attribute,
@@ -5707,11 +5795,11 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 "%s: unable to retrieve data size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	result = libfsntfs_file_entry_has_directory_entries_index(
-		  file_entry,
-		  error );
+	result = libfsntfs_file_entry_is_symbolic_link(
+	          file_entry,
+	          error );
 
 	if( result == -1 )
 	{
@@ -5719,14 +5807,36 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if file entry has directory entries index.",
+		 "%s: unable to determine if file entry is a symbolic link.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	else if( result != 0 )
 	{
-		file_mode_string[ 0 ] = 'd';
+		file_mode_string[ 0 ] = 'l';
+	}
+	else
+	{
+		result = libfsntfs_file_entry_has_directory_entries_index(
+			  file_entry,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry has directory entries index.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			file_mode_string[ 0 ] = 'd';
+		}
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
@@ -5757,7 +5867,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 			 "%s: unable to print path string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( file_entry_name != NULL )
@@ -5775,7 +5885,7 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 			 "%s: unable to print file entry name string.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	if( ( attribute_name != NULL )
@@ -5790,7 +5900,28 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 		 ":%" PRIs_SYSTEM "",
 		 attribute_name );
 	}
-/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
+	if( symbolic_link_target != NULL )
+	{
+		fprintf(
+		 info_handle->bodyfile_stream,
+		 " -> " );
+
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     symbolic_link_target,
+		     symbolic_link_target_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			goto on_error;
+		}
+	}
 /* TODO determine $INDEX_ROOT attribute address */
 
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
@@ -5816,7 +5947,22 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 	 posix_creation_time / 10000000,
 	 posix_creation_time - ( ( posix_creation_time / 10000000 ) * 10000000 ) );
 
+	if( symbolic_link_target != NULL )
+	{
+		memory_free(
+		 symbolic_link_target );
+
+		symbolic_link_target = NULL;
+	}
 	return( 1 );
+
+on_error:
+	if( symbolic_link_target != NULL )
+	{
+		memory_free(
+		 symbolic_link_target );
+	}
+	return( -1 );
 }
 
 /* Prints a file entry value to a bodyfile
@@ -6073,9 +6219,9 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	}
 	has_default_data_stream = result;
 
-	result = libfsntfs_file_entry_has_directory_entries_index(
-		  file_entry,
-		  error );
+	result = libfsntfs_file_entry_is_symbolic_link(
+	          file_entry,
+	          error );
 
 	if( result == -1 )
 	{
@@ -6083,14 +6229,36 @@ int info_handle_bodyfile_file_entry_value_fprint(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if file entry has directory entries index.",
+		 "%s: unable to determine if file entry is a symbolic link.",
 		 function );
 
 		goto on_error;
 	}
 	else if( result != 0 )
 	{
-		file_mode_string[ 0 ] = 'd';
+		file_mode_string[ 0 ] = 'l';
+	}
+	else
+	{
+		result = libfsntfs_file_entry_has_directory_entries_index(
+			  file_entry,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry has directory entries index.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			file_mode_string[ 0 ] = 'd';
+		}
 	}
 	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
 	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
@@ -6205,7 +6373,6 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			goto on_error;
 		}
 	}
-/* TODO determine Sleuthkit metadata address https://wiki.sleuthkit.org/index.php?title=Metadata_Address */
 /* TODO determine $DATA or $INDEX_ROOT attribute address */
 
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
