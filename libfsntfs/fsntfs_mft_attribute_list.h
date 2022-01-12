@@ -1,7 +1,7 @@
 /*
  * The NTFS attribute list attribute ($ATTRIBUTE_LIST) definition
  *
- * Copyright (C) 2010-2021, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

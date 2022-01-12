@@ -1,7 +1,7 @@
 /*
  * Python object wrapper of libfsntfs_mft_metadata_file_t
  *
- * Copyright (C) 2010-2021, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
