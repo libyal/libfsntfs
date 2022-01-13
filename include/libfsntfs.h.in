@@ -1390,7 +1390,7 @@ int libfsntfs_reparse_point_attribute_get_tag(
      uint32_t *tag,
      libfsntfs_error_t **error );
 
-/* Retrieves the Windows Overlay Filter (WOF) compression_method
+/* Retrieves the Windows Overlay Filter (WOF) compression method
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \

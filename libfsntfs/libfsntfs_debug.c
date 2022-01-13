@@ -279,6 +279,54 @@ void libfsntfs_debug_print_reparse_point_tag(
 	}
 }
 
+/* Prints the volume information flags
+ */
+void libfsntfs_debug_print_volume_information_flags(
+      uint16_t volume_information_flags )
+{
+	if( ( volume_information_flags & 0x0001 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\tIs dirty (VOLUME_IS_DIRTY)\n" );
+	}
+	if( ( volume_information_flags & 0x0002 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_RESIZE_LOG_FILE)\n" );
+	}
+	if( ( volume_information_flags & 0x0004 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_UPGRADE_ON_MOUNT)\n" );
+	}
+	if( ( volume_information_flags & 0x0008 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_MOUNTED_ON_NT4)\n" );
+	}
+	if( ( volume_information_flags & 0x0010 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_DELETE_USN_UNDERWAY)\n" );
+	}
+	if( ( volume_information_flags & 0x0020 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_REPAIR_OBJECT_ID)\n" );
+	}
+
+	if( ( volume_information_flags & 0x4000 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_CHKDSK_UNDERWAY)\n" );
+	}
+	if( ( volume_information_flags & 0x8000 ) != 0 )
+	{
+		libcnotify_printf(
+		 "\t(VOLUME_MODIFIED_BY_CHKDSK)\n" );
+	}
+}
+
 /* Prints the attribute type
  */
 const char *libfsntfs_debug_print_attribute_type(

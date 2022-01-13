@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
@@ -235,6 +236,10 @@ int libfsntfs_volume_information_values_read_data(
 		 "%s: flags\t\t\t: 0x%04" PRIx16 "\n",
 		 function,
 		 volume_information_values->flags );
+		libfsntfs_debug_print_volume_information_flags(
+		 volume_information_values->flags );
+		libcnotify_printf(
+		 "\n" );
 
 		libcnotify_printf(
 		 "\n" );

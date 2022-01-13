@@ -1,5 +1,7 @@
 TODO
-* fsntfsinfo: print $VOLUME_INFORMATION flags
+* extent: flag WofCompressedData extent as wof_compressed?
+* extent: rename compressed flag to lznt1_compressed?
+
 * fsntfsinfo: print volume size
 * fsntfsinfo: print extents/data runs of $DATA stream?
 

@@ -82,6 +82,20 @@ int fsntfstools_system_string_copy_from_64_bit_in_decimal(
      uint64_t *value_64bit,
      libcerror_error_t **error );
 
+void info_handle_file_attribute_flags_fprint(
+      uint32_t file_attribute_flags,
+      FILE *notify_stream );
+
+void info_handle_volume_information_flags_fprint(
+      uint16_t volume_information_flags,
+      FILE *notify_stream );
+
+const char *info_handle_get_access_control_entry_type(
+             uint8_t entry_type );
+
+const char *info_handle_get_attribute_type_description(
+             uint32_t attribute_type );
+
 int info_handle_initialize(
      info_handle_t **info_handle,
      uint8_t calculate_md5,

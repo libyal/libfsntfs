@@ -290,6 +290,63 @@ void info_handle_file_attribute_flags_fprint(
 	}
 }
 
+/* Prints the volume information flags to the notify stream
+ */
+void info_handle_volume_information_flags_fprint(
+      uint16_t volume_information_flags,
+      FILE *notify_stream )
+{
+	if( ( volume_information_flags & 0x0001 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_IS_DIRTY)\n" );
+	}
+	if( ( volume_information_flags & 0x0002 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_RESIZE_LOG_FILE)\n" );
+	}
+	if( ( volume_information_flags & 0x0004 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_UPGRADE_ON_MOUNT)\n" );
+	}
+	if( ( volume_information_flags & 0x0008 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_MOUNTED_ON_NT4)\n" );
+	}
+	if( ( volume_information_flags & 0x0010 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_DELETE_USN_UNDERWAY)\n" );
+	}
+	if( ( volume_information_flags & 0x0020 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_REPAIR_OBJECT_ID)\n" );
+	}
+
+	if( ( volume_information_flags & 0x4000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_CHKDSK_UNDERWAY)\n" );
+	}
+	if( ( volume_information_flags & 0x8000 ) != 0 )
+	{
+		fprintf(
+		 notify_stream,
+		 "\t\t(VOLUME_MODIFIED_BY_CHKDSK)\n" );
+	}
+}
+
 /* Retrieves a string containing the access control entry type
  */
 const char *info_handle_get_access_control_entry_type(
@@ -4573,6 +4630,9 @@ int info_handle_volume_information_attribute_fprint(
 	 info_handle->notify_stream,
 	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
 	 value_16bit );
+	info_handle_volume_information_flags_fprint(
+	 value_16bit,
+	 info_handle->notify_stream );
 
 	return( 1 );
 }

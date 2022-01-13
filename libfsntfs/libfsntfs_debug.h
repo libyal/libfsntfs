@@ -52,6 +52,9 @@ void libfsntfs_debug_print_index_value_flags(
 void libfsntfs_debug_print_reparse_point_tag(
       uint32_t tag );
 
+void libfsntfs_debug_print_volume_information_flags(
+      uint16_t volume_information_flags );
+
 const char *libfsntfs_debug_print_attribute_type(
              uint32_t attribute_type );
 
