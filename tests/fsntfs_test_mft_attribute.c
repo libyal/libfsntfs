@@ -35,8 +35,8 @@
 #include "fsntfs_test_memory.h"
 #include "fsntfs_test_unused.h"
 
-#include "../libfsntfs/libfsntfs_data_extent.h"
 #include "../libfsntfs/libfsntfs_data_run.h"
+#include "../libfsntfs/libfsntfs_extent.h"
 #include "../libfsntfs/libfsntfs_io_handle.h"
 #include "../libfsntfs/libfsntfs_mft_attribute.h"
 
@@ -2355,7 +2355,7 @@ int fsntfs_test_mft_attribute_get_data_extents_array(
 
 	result = libcdata_array_free(
 	          &data_extents_array,
-	          (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+	          (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -2458,7 +2458,7 @@ on_error:
 	{
 		libcdata_array_free(
 		 &data_extents_array,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 		 NULL );
 	}
 	if( io_handle != NULL )

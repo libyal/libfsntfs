@@ -24,10 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_data_extent.h"
 #include "libfsntfs_data_run.h"
 #include "libfsntfs_debug.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_extent.h"
 #include "libfsntfs_libcdata.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
@@ -2048,8 +2048,8 @@ int libfsntfs_mft_attribute_get_data_extents_array(
      libcerror_error_t **error )
 {
 	libcdata_array_t *safe_data_extents_array    = NULL;
-	libfsntfs_data_extent_t *data_extent         = NULL;
 	libfsntfs_data_run_t *data_run               = NULL;
+	libfsntfs_extent_t *data_extent              = NULL;
 	static char *function                        = "libfsntfs_mft_attribute_get_data_extents_array";
 	size64_t attribute_data_vcn_size             = 0;
 	size64_t calculated_allocated_data_size      = 0;
@@ -2243,7 +2243,7 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 
 					goto on_error;
 				}
-				if( libfsntfs_data_extent_initialize(
+				if( libfsntfs_extent_initialize(
 				     &data_extent,
 				     error ) != 1 )
 				{
@@ -2328,7 +2328,7 @@ int libfsntfs_mft_attribute_get_data_extents_array(
 on_error:
 	if( data_extent != NULL )
 	{
-		libfsntfs_data_extent_free(
+		libfsntfs_extent_free(
 		 &data_extent,
 		 NULL );
 	}
@@ -2336,7 +2336,7 @@ on_error:
 	{
 		libcdata_array_free(
 		 &safe_data_extents_array,
-		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+		 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 		 NULL );
 	}
 	return( -1 );

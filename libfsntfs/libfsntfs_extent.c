@@ -1,5 +1,5 @@
 /*
- * Data extent functions
+ * Extent functions
  *
  * Copyright (C) 2010-2022, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -23,113 +23,113 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_data_extent.h"
+#include "libfsntfs_extent.h"
 #include "libfsntfs_libcerror.h"
 
-/* Creates a data extent
- * Make sure the value data_extent is referencing, is set to NULL
+/* Creates a extent
+ * Make sure the value extent is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_data_extent_initialize(
-     libfsntfs_data_extent_t **data_extent,
+int libfsntfs_extent_initialize(
+     libfsntfs_extent_t **extent,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_data_extent_initialize";
+	static char *function = "libfsntfs_extent_initialize";
 
-	if( data_extent == NULL )
+	if( extent == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data extent.",
+		 "%s: invalid extent.",
 		 function );
 
 		return( -1 );
 	}
-	if( *data_extent != NULL )
+	if( *extent != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid data extent value already set.",
+		 "%s: invalid extent value already set.",
 		 function );
 
 		return( -1 );
 	}
-	*data_extent = memory_allocate_structure(
-	                libfsntfs_data_extent_t );
+	*extent = memory_allocate_structure(
+	           libfsntfs_extent_t );
 
-	if( *data_extent == NULL )
+	if( *extent == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create data extent.",
+		 "%s: unable to create extent.",
 		 function );
 
 		goto on_error;
 	}
 	if( memory_set(
-	     *data_extent,
+	     *extent,
 	     0,
-	     sizeof( libfsntfs_data_extent_t ) ) == NULL )
+	     sizeof( libfsntfs_extent_t ) ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear data extent.",
+		 "%s: unable to clear extent.",
 		 function );
 
 		memory_free(
-		 *data_extent );
+		 *extent );
 
-		*data_extent = NULL;
+		*extent = NULL;
 
 		return( -1 );
 	}
 	return( 1 );
 
 on_error:
-	if( *data_extent != NULL )
+	if( *extent != NULL )
 	{
 		memory_free(
-		 *data_extent );
+		 *extent );
 
-		*data_extent = NULL;
+		*extent = NULL;
 	}
 	return( -1 );
 }
 
-/* Frees a data extent
+/* Frees a extent
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_data_extent_free(
-     libfsntfs_data_extent_t **data_extent,
+int libfsntfs_extent_free(
+     libfsntfs_extent_t **extent,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_data_extent_free";
+	static char *function = "libfsntfs_extent_free";
 
-	if( data_extent == NULL )
+	if( extent == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data extent.",
+		 "%s: invalid extent.",
 		 function );
 
 		return( -1 );
 	}
-	if( *data_extent != NULL )
+	if( *extent != NULL )
 	{
 		memory_free(
-		 *data_extent );
+		 *extent );
 
-		*data_extent = NULL;
+		*extent = NULL;
 	}
 	return( 1 );
 }
@@ -137,22 +137,22 @@ int libfsntfs_data_extent_free(
 /* Retrieves the extent values
  * Returns 1 if successful or -1 on error
  */
-int libfsntfs_data_extent_get_values(
-     libfsntfs_data_extent_t *data_extent,
+int libfsntfs_extent_get_values(
+     libfsntfs_extent_t *extent,
      off64_t *extent_offset,
      size64_t *extent_size,
      uint32_t *extent_flags,
      libcerror_error_t **error )
 {
-	static char *function = "libfsntfs_data_extent_get_values";
+	static char *function = "libfsntfs_extent_get_values";
 
-	if( data_extent == NULL )
+	if( extent == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data extent.",
+		 "%s: invalid extent.",
 		 function );
 
 		return( -1 );
@@ -190,9 +190,9 @@ int libfsntfs_data_extent_get_values(
 
 		return( -1 );
 	}
-	*extent_offset = data_extent->start_offset;
-	*extent_size   = data_extent->size;
-	*extent_flags  = data_extent->range_flags;
+	*extent_offset = extent->start_offset;
+	*extent_size   = extent->size;
+	*extent_flags  = extent->range_flags;
 
 	return( 1 );
 }

@@ -284,6 +284,7 @@ artifacts:
 deploy_script:
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:TARGET -eq "vs2017") {
     Invoke-Expression "nuget push *.nupkg -NonInteractive -NoSymbols -Source https://api.nuget.org/v3/index.json -ApiKey ${env:NUGET_TOKEN}" }
-- ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and (-not $isLinux) -and $env:BUILD_ENVIRONMENT -eq "python") {
+- ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m twine upload dist/*.whl --username __token__ --password ${env:PYPI_TOKEN} --skip-existing" }
+- sh: if test ${APPVEYOR_REPO_TAG} = "true" && ${BUILD_ENVIRONMENT} = "python"; then twine upload dist/*.whl --username __token__ --password ${PYPI_TOKEN} --skip-existing; fi
 

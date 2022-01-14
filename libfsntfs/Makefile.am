@@ -52,7 +52,6 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_compression.c libfsntfs_compression.h \
 	libfsntfs_compression_unit_data_handle.c libfsntfs_compression_unit_data_handle.h \
 	libfsntfs_compression_unit_descriptor.c libfsntfs_compression_unit_descriptor.h \
-	libfsntfs_data_extent.c libfsntfs_data_extent.h \
 	libfsntfs_data_run.c libfsntfs_data_run.h \
 	libfsntfs_data_stream.c libfsntfs_data_stream.h \
 	libfsntfs_debug.c libfsntfs_debug.h \
@@ -60,6 +59,7 @@ libfsntfs_la_SOURCES = \
 	libfsntfs_directory_entries_tree.c libfsntfs_directory_entries_tree.h \
 	libfsntfs_directory_entry.c libfsntfs_directory_entry.h \
 	libfsntfs_error.c libfsntfs_error.h \
+	libfsntfs_extent.c libfsntfs_extent.h \
 	libfsntfs_extern.h \
 	libfsntfs_file_entry.c libfsntfs_file_entry.h \
 	libfsntfs_file_name_attribute.c libfsntfs_file_name_attribute.h \

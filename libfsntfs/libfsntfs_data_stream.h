@@ -68,8 +68,8 @@ struct libfsntfs_internal_data_stream
 
 int libfsntfs_data_stream_initialize(
      libfsntfs_data_stream_t **data_stream,
-     libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
      libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error );
 

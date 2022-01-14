@@ -238,10 +238,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_data_extent.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_data_run.c"
 				>
 			</File>
@@ -263,6 +259,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_error.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_extent.c"
 				>
 			</File>
 			<File
@@ -572,10 +572,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libfsntfs\libfsntfs_data_extent.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_data_run.h"
 				>
 			</File>
@@ -601,6 +597,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libfsntfs\libfsntfs_error.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libfsntfs\libfsntfs_extent.h"
 				>
 			</File>
 			<File

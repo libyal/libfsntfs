@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_data_extent"
-	ProjectGUID="{FAAE746F-BCA2-4157-A23A-DE89B2DF8687}"
-	RootNamespace="fsntfs_test_data_extent"
+	Name="fsntfs_test_extent"
+	ProjectGUID="{CEDB7153-D51D-4A20-B268-816AC7F79D85}"
+	RootNamespace="fsntfs_test_extent"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_data_extent.c"
+				RelativePath="..\..\tests\fsntfs_test_extent.c"
 				>
 			</File>
 			<File

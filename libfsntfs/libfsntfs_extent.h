@@ -1,5 +1,5 @@
 /*
- * Data extent functions
+ * Extent functions
  *
  * Copyright (C) 2010-2022, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBFSNTFS_DATA_EXTENT_H )
-#define _LIBFSNTFS_DATA_EXTENT_H
+#if !defined( _LIBFSNTFS_EXTENT_H )
+#define _LIBFSNTFS_EXTENT_H
 
 #include <common.h>
 #include <types.h>
@@ -31,9 +31,9 @@
 extern "C" {
 #endif
 
-typedef struct libfsntfs_data_extent libfsntfs_data_extent_t;
+typedef struct libfsntfs_extent libfsntfs_extent_t;
 
-struct libfsntfs_data_extent
+struct libfsntfs_extent
 {
 	/* The start offset
 	 */
@@ -48,16 +48,16 @@ struct libfsntfs_data_extent
 	uint32_t range_flags;
 };
 
-int libfsntfs_data_extent_initialize(
-     libfsntfs_data_extent_t **data_extent,
+int libfsntfs_extent_initialize(
+     libfsntfs_extent_t **extent,
      libcerror_error_t **error );
 
-int libfsntfs_data_extent_free(
-     libfsntfs_data_extent_t **data_extent,
+int libfsntfs_extent_free(
+     libfsntfs_extent_t **extent,
      libcerror_error_t **error );
 
-int libfsntfs_data_extent_get_values(
-     libfsntfs_data_extent_t *data_extent,
+int libfsntfs_extent_get_values(
+     libfsntfs_extent_t *extent,
      off64_t *extent_offset,
      size64_t *extent_size,
      uint32_t *extent_flags,
@@ -67,5 +67,5 @@ int libfsntfs_data_extent_get_values(
 }
 #endif
 
-#endif /* !defined( _LIBFSNTFS_DATA_EXTENT_H ) */
+#endif /* !defined( _LIBFSNTFS_EXTENT_H ) */
 

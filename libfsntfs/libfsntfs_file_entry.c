@@ -25,11 +25,11 @@
 
 #include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
-#include "libfsntfs_data_extent.h"
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_directory_entries_tree.h"
 #include "libfsntfs_directory_entry.h"
+#include "libfsntfs_extent.h"
 #include "libfsntfs_file_entry.h"
 #include "libfsntfs_file_name_attribute.h"
 #include "libfsntfs_file_name_values.h"
@@ -364,7 +364,7 @@ on_error:
 		{
 			libcdata_array_free(
 			 &( internal_file_entry->extents_array ),
-			 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 			 NULL );
 		}
 		memory_free(
@@ -454,7 +454,7 @@ int libfsntfs_file_entry_free(
 		}
 		if( libcdata_array_free(
 		     &( internal_file_entry->extents_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -4897,22 +4897,25 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_index(
 
 		result = -1;
 	}
-	else if( libfsntfs_data_stream_initialize(
-	          alternate_data_stream,
-	          internal_file_entry->file_io_handle,
-	          internal_file_entry->io_handle,
-	          data_attribute,
-	          error ) != 1 )
+	if( result == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create alternate data stream: %d.",
-		 function,
-		 alternate_data_stream_index );
+		if( libfsntfs_data_stream_initialize(
+		     alternate_data_stream,
+		     internal_file_entry->io_handle,
+		     internal_file_entry->file_io_handle,
+		     data_attribute,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create alternate data stream: %d.",
+			 function,
+			 alternate_data_stream_index );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(
@@ -5175,8 +5178,8 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf8_name(
 	{
 		if( libfsntfs_data_stream_initialize(
 		     alternate_data_stream,
-		     internal_file_entry->file_io_handle,
 		     internal_file_entry->io_handle,
+		     internal_file_entry->file_io_handle,
 		     data_attribute,
 		     error ) != 1 )
 		{
@@ -5295,8 +5298,8 @@ int libfsntfs_file_entry_get_alternate_data_stream_by_utf16_name(
 	{
 		if( libfsntfs_data_stream_initialize(
 		     alternate_data_stream,
-		     internal_file_entry->file_io_handle,
 		     internal_file_entry->io_handle,
+		     internal_file_entry->file_io_handle,
 		     data_attribute,
 		     error ) != 1 )
 		{
@@ -6326,7 +6329,7 @@ int libfsntfs_file_entry_get_extent_by_index(
      uint32_t *extent_flags,
      libcerror_error_t **error )
 {
-	libfsntfs_data_extent_t *data_extent                 = NULL;
+	libfsntfs_extent_t *data_extent                      = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_extent_by_index";
 	int result                                           = 1;
@@ -6375,22 +6378,25 @@ int libfsntfs_file_entry_get_extent_by_index(
 
 		result = -1;
 	}
-	else if( libfsntfs_data_extent_get_values(
-	          data_extent,
-	          extent_offset,
-	          extent_size,
-	          extent_flags,
-	          error ) != 1 )
+	if( result == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve extent: %d values.",
-		 function,
-		 extent_index );
+		if( libfsntfs_extent_get_values(
+		     data_extent,
+		     extent_offset,
+		     extent_size,
+		     extent_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve extent: %d values.",
+			 function,
+			 extent_index );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

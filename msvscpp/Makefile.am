@@ -14,12 +14,12 @@ MSVSCPP_FILES = \
 	fsntfs_test_compression/fsntfs_test_compression.vcproj \
 	fsntfs_test_compression_unit_data_handle/fsntfs_test_compression_unit_data_handle.vcproj \
 	fsntfs_test_compression_unit_descriptor/fsntfs_test_compression_unit_descriptor.vcproj \
-	fsntfs_test_data_extent/fsntfs_test_data_extent.vcproj \
 	fsntfs_test_data_run/fsntfs_test_data_run.vcproj \
 	fsntfs_test_data_stream/fsntfs_test_data_stream.vcproj \
 	fsntfs_test_directory_entries_tree/fsntfs_test_directory_entries_tree.vcproj \
 	fsntfs_test_directory_entry/fsntfs_test_directory_entry.vcproj \
 	fsntfs_test_error/fsntfs_test_error.vcproj \
+	fsntfs_test_extent/fsntfs_test_extent.vcproj \
 	fsntfs_test_file_entry/fsntfs_test_file_entry.vcproj \
 	fsntfs_test_file_name_attribute/fsntfs_test_file_name_attribute.vcproj \
 	fsntfs_test_file_name_values/fsntfs_test_file_name_values.vcproj \

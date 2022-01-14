@@ -23,11 +23,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libfsntfs_attribute.h"
 #include "libfsntfs_cluster_block_stream.h"
-#include "libfsntfs_data_extent.h"
 #include "libfsntfs_data_stream.h"
 #include "libfsntfs_definitions.h"
+#include "libfsntfs_extent.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcdata.h"
@@ -43,8 +42,8 @@
  */
 int libfsntfs_data_stream_initialize(
      libfsntfs_data_stream_t **data_stream,
-     libbfio_handle_t *file_io_handle,
      libfsntfs_io_handle_t *io_handle,
+     libbfio_handle_t *file_io_handle,
      libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
@@ -182,7 +181,7 @@ on_error:
 		{
 			libcdata_array_free(
 			 &( internal_data_stream->extents_array ),
-			 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+			 (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 			 NULL );
 		}
 		memory_free(
@@ -235,25 +234,22 @@ int libfsntfs_data_stream_free(
 #endif
 		/* The file_io_handle and data_attribute references are freed elsewhere
 		 */
-		if( internal_data_stream->data_cluster_block_stream != NULL )
+		if( libfdata_stream_free(
+		     &( internal_data_stream->data_cluster_block_stream ),
+		     error ) != 1 )
 		{
-			if( libfdata_stream_free(
-			     &( internal_data_stream->data_cluster_block_stream ),
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free data cluster block stream.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free data cluster block stream.",
+			 function );
 
-				result = -1;
-			}
+			result = -1;
 		}
 		if( libcdata_array_free(
 		     &( internal_data_stream->extents_array ),
-		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_data_extent_free,
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libfsntfs_extent_free,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -921,7 +917,7 @@ int libfsntfs_data_stream_get_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data attribute data size.",
+		 "%s: unable to retrieve size from data cluster block stream.",
 		 function );
 
 		result = -1;
@@ -1027,7 +1023,7 @@ int libfsntfs_data_stream_get_extent_by_index(
      uint32_t *extent_flags,
      libcerror_error_t **error )
 {
-	libfsntfs_data_extent_t *data_extent                   = NULL;
+	libfsntfs_extent_t *data_extent                        = NULL;
 	libfsntfs_internal_data_stream_t *internal_data_stream = NULL;
 	static char *function                                  = "libfsntfs_data_stream_get_extent_by_index";
 	int result                                             = 1;
@@ -1076,22 +1072,25 @@ int libfsntfs_data_stream_get_extent_by_index(
 
 		result = -1;
 	}
-	else if( libfsntfs_data_extent_get_values(
-	          data_extent,
-	          extent_offset,
-	          extent_size,
-	          extent_flags,
-	          error ) != 1 )
+	if( result == 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve extent: %d values.",
-		 function,
-		 extent_index );
+		if( libfsntfs_extent_get_values(
+		     data_extent,
+		     extent_offset,
+		     extent_size,
+		     extent_flags,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve extent: %d values.",
+			 function,
+			 extent_index );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

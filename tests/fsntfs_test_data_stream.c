@@ -912,8 +912,8 @@ int fsntfs_test_data_stream_initialize(
 	 */
 	result = libfsntfs_data_stream_initialize(
 	          &data_stream,
-	          NULL,
 	          io_handle,
+	          NULL,
 	          mft_attribute,
 	          &error );
 
@@ -951,8 +951,8 @@ int fsntfs_test_data_stream_initialize(
 	 */
 	result = libfsntfs_data_stream_initialize(
 	          NULL,
-	          NULL,
 	          io_handle,
+	          NULL,
 	          mft_attribute,
 	          &error );
 
@@ -972,8 +972,8 @@ int fsntfs_test_data_stream_initialize(
 
 	result = libfsntfs_data_stream_initialize(
 	          &data_stream,
-	          NULL,
 	          io_handle,
+	          NULL,
 	          mft_attribute,
 	          &error );
 
@@ -1012,8 +1012,8 @@ int fsntfs_test_data_stream_initialize(
 
 	result = libfsntfs_data_stream_initialize(
 	          &data_stream,
-	          NULL,
 	          io_handle,
+	          NULL,
 	          NULL,
 	          &error );
 
@@ -1041,8 +1041,8 @@ int fsntfs_test_data_stream_initialize(
 
 		result = libfsntfs_data_stream_initialize(
 		          &data_stream,
-		          NULL,
 		          io_handle,
+		          NULL,
 		          mft_attribute,
 		          &error );
 
@@ -1086,8 +1086,8 @@ int fsntfs_test_data_stream_initialize(
 
 		result = libfsntfs_data_stream_initialize(
 		          &data_stream,
-		          NULL,
 		          io_handle,
+		          NULL,
 		          mft_attribute,
 		          &error );
 
@@ -3522,8 +3522,8 @@ int main(
 
 	result = libfsntfs_data_stream_initialize(
 	          &data_stream,
-	          file_io_handle,
 	          io_handle,
+	          file_io_handle,
 	          mft_attribute,
 	          &error );
 

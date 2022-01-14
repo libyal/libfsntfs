@@ -125,8 +125,8 @@ int libfsntfs_security_descriptor_index_initialize(
 /* TODO move out of index ? */
 	if( libfsntfs_data_stream_initialize(
 	     &( ( *security_descriptor_index )->data_stream ),
-	     file_io_handle,
 	     io_handle,
+	     file_io_handle,
 	     data_attribute,
 	     error ) != 1 )
 	{

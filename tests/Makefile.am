@@ -66,12 +66,12 @@ check_PROGRAMS = \
 	fsntfs_test_compression \
 	fsntfs_test_compression_unit_data_handle \
 	fsntfs_test_compression_unit_descriptor \
-	fsntfs_test_data_extent \
 	fsntfs_test_data_run \
 	fsntfs_test_data_stream \
 	fsntfs_test_directory_entries_tree \
 	fsntfs_test_directory_entry \
 	fsntfs_test_error \
+	fsntfs_test_extent \
 	fsntfs_test_file_entry \
 	fsntfs_test_file_name_attribute \
 	fsntfs_test_file_name_values \
@@ -363,18 +363,6 @@ fsntfs_test_compression_unit_descriptor_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
-fsntfs_test_data_extent_SOURCES = \
-	fsntfs_test_data_extent.c \
-	fsntfs_test_libcerror.h \
-	fsntfs_test_libfsntfs.h \
-	fsntfs_test_macros.h \
-	fsntfs_test_memory.c fsntfs_test_memory.h \
-	fsntfs_test_unused.h
-
-fsntfs_test_data_extent_LDADD = \
-	../libfsntfs/libfsntfs.la \
-	@LIBCERROR_LIBADD@
-
 fsntfs_test_data_run_SOURCES = \
 	fsntfs_test_data_run.c \
 	fsntfs_test_libcerror.h \
@@ -455,6 +443,18 @@ fsntfs_test_error_SOURCES = \
 
 fsntfs_test_error_LDADD = \
 	../libfsntfs/libfsntfs.la
+
+fsntfs_test_extent_SOURCES = \
+	fsntfs_test_extent.c \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libfsntfs.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_memory.c fsntfs_test_memory.h \
+	fsntfs_test_unused.h
+
+fsntfs_test_extent_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
 
 fsntfs_test_file_entry_SOURCES = \
 	fsntfs_test_file_entry.c \
