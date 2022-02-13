@@ -532,7 +532,8 @@ int libfsntfs_mft_entry_read_data(
 			 total_entry_size );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( libfsntfs_mft_entry_header_get_attributes_offset(
 	     mft_entry->header,
 	     &attributes_offset,

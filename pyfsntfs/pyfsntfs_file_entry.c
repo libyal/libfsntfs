@@ -1846,7 +1846,7 @@ PyObject *pyfsntfs_file_entry_has_directory_entries_index(
 	return( Py_False );
 }
 
-/* Determines if the file entry has the default data stream
+/* Determines if the file entry has a default data stream
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyfsntfs_file_entry_has_default_data_stream(
@@ -1881,7 +1881,7 @@ PyObject *pyfsntfs_file_entry_has_default_data_stream(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to determine if file entry has default data stream.",
+		 "%s: unable to determine if file entry has a default data stream.",
 		 function );
 
 		libcerror_error_free(

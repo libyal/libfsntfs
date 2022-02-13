@@ -4572,7 +4572,7 @@ int libfsntfs_file_entry_has_directory_entries_index(
 	return( result );
 }
 
-/* Determines if the file entry has the default data stream (nameless $DATA attribute)
+/* Determines if the file entry has a default data stream (nameless $DATA attribute)
  * Returns 1 if the file entry has a default data stream, 0 if not or -1 on error
  */
 int libfsntfs_file_entry_has_default_data_stream(

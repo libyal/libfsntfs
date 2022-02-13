@@ -594,10 +594,10 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 			}
 			if( ( segment_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) != 0 )
 			{
+				cluster_block_index += segment_size / io_handle->cluster_block_size;
+
 				continue;
 			}
-			cluster_block_index = segment_offset / io_handle->cluster_block_size;
-
 			while( segment_size > 0 )
 			{
 				if( cluster_block_index >= number_of_cluster_blocks )

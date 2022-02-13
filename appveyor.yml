@@ -1,7 +1,7 @@
 environment:
   nuget_token:
     secure: HYYxq3O5WWQ5cjS9AMu1OxtPtevYd1f8pglgXUCrb9uK8T6C+P8cUgfCpiX/Z2YJ
-  pypi_token:
+  PYPI_TOKEN:
     secure: VHuZiUWgTqTciKE2nsv/LnlJvdvgSuFO4ecmPJXxvqKYrKAEarlOZZkPpim6qoenbdFUHr9DmMN/YY3UqxVVJN0Lp0jIXi7c/5hrrrbfpaWRxrKXgB8FONONMkuXlnhEnlaRvCMu1pxiOT97szNaK0X6lUGGfyC0Lk6APYYUu1WJKP4DQypQp7uznLT+8TLOwK+I2x2vALR1nmm7DKTK6TeJ0rrVQTtntMS1VPS+WwfWPU+AMjINxRpqqn74tBkGzj0aKApo1MJggwvUdN3JxckFOJUrghPPGy7Jb3jiEKs=
   matrix:
   - TARGET: vs2008
@@ -82,7 +82,7 @@ environment:
   - TARGET: python39-x64
     BUILD_ENVIRONMENT: python
     APPVEYOR_BUILD_WORKER_IMAGE: macos
-    PYTHON: "/usr/local/opt/python@3.9/bin/python3"
+    PYTHON: "/usr/local/opt/python@3.10/bin/python3"
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     CFLAGS: "-I/usr/local/include"
     LDFLAGS: "-L/usr/local/lib"
@@ -286,5 +286,5 @@ deploy_script:
     Invoke-Expression "nuget push *.nupkg -NonInteractive -NoSymbols -Source https://api.nuget.org/v3/index.json -ApiKey ${env:NUGET_TOKEN}" }
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:BUILD_ENVIRONMENT -eq "python") {
     Invoke-Expression "${env:PYTHON} -m twine upload dist/*.whl --username __token__ --password ${env:PYPI_TOKEN} --skip-existing" }
-- sh: if test ${APPVEYOR_REPO_TAG} = "true" && ${BUILD_ENVIRONMENT} = "python"; then twine upload dist/*.whl --username __token__ --password ${PYPI_TOKEN} --skip-existing; fi
+- sh: if test ${APPVEYOR_REPO_TAG} = "true" && test ${BUILD_ENVIRONMENT} = "python"; then ${PYTHON} -m twine upload dist/*.whl --username __token__ --password ${PYPI_TOKEN} --skip-existing; fi
 

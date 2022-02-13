@@ -1157,6 +1157,7 @@ int libfsntfs_mft_attribute_read_data(
 				}
 			}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 			if( ( data_run->range_flags & LIBFDATA_RANGE_FLAG_IS_SPARSE ) == 0 )
 			{
 				last_cluster_block_number = data_run->cluster_block_number;
