@@ -644,6 +644,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          io_handle,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -682,6 +683,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          NULL,
 	          io_handle,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -702,6 +704,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          io_handle,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	index_entry_vector = NULL;
@@ -724,6 +727,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          io_handle,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	io_handle->cluster_block_size = 4096;
@@ -740,15 +744,12 @@ int fsntfs_test_index_entry_vector_initialize(
 	libcerror_error_free(
 	 &error );
 
-	io_handle->index_entry_size = 0;
-
 	result = libfsntfs_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          io_handle,
 	          mft_attribute,
+	          0,
 	          &error );
-
-	io_handle->index_entry_size = 4096;
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -766,6 +767,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          NULL,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -784,6 +786,7 @@ int fsntfs_test_index_entry_vector_initialize(
 	          &index_entry_vector,
 	          io_handle,
 	          NULL,
+	          4096,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -814,6 +817,7 @@ int fsntfs_test_index_entry_vector_initialize(
 		          &index_entry_vector,
 		          io_handle,
 		          mft_attribute,
+		          4096,
 		          &error );
 
 		if( fsntfs_test_malloc_attempts_before_fail != -1 )
@@ -858,6 +862,7 @@ int fsntfs_test_index_entry_vector_initialize(
 		          &index_entry_vector,
 		          io_handle,
 		          mft_attribute,
+		          4096,
 		          &error );
 
 		if( fsntfs_test_memset_attempts_before_fail != -1 )
@@ -1030,6 +1035,7 @@ int fsntfs_test_index_entry_vector_read_element_data(
 	          &index_entry_vector,
 	          io_handle,
 	          mft_attribute,
+	          4096,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -1425,7 +1431,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 

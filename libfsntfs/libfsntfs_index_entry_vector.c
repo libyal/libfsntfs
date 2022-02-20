@@ -41,6 +41,7 @@ int libfsntfs_index_entry_vector_initialize(
      libfdata_vector_t **index_entry_vector,
      libfsntfs_io_handle_t *io_handle,
      libfsntfs_mft_attribute_t *mft_attribute,
+     uint32_t index_entry_size,
      libcerror_error_t **error )
 {
 	libfdata_vector_t *safe_index_entry_vector   = NULL;
@@ -101,13 +102,13 @@ int libfsntfs_index_entry_vector_initialize(
 
 		return( -1 );
 	}
-	if( io_handle->index_entry_size == 0 )
+	if( index_entry_size == 0 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid IO handle - index entry size value out of bounds.",
+		 "%s: invalid index entry size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -153,7 +154,7 @@ int libfsntfs_index_entry_vector_initialize(
 	}
 	if( libfdata_vector_initialize(
 	     &safe_index_entry_vector,
-	     (size64_t) io_handle->index_entry_size,
+	     (size64_t) index_entry_size,
 	     NULL,
 	     NULL,
 	     NULL,
