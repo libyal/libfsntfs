@@ -29,17 +29,6 @@ Requires: libfsntfs = %{version}-%{release}
 %description -n libfsntfs-devel
 Header files and libraries for developing applications for libfsntfs.
 
-%package -n libfsntfs-python2
-Obsoletes: libfsntfs-python < %{version}
-Provides: libfsntfs-python = %{version}
-Summary: Python 2 bindings for libfsntfs
-Group: System Environment/Libraries
-Requires: libfsntfs = %{version}-%{release} python2
-BuildRequires: python2-devel
-
-%description -n libfsntfs-python2
-Python 2 bindings for libfsntfs
-
 %package -n libfsntfs-python3
 Summary: Python 3 bindings for libfsntfs
 Group: System Environment/Libraries
@@ -62,7 +51,7 @@ Several tools for reading Windows New Technology File System (NTFS) volumes
 %setup -q
 
 %build
-%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python2 --enable-python3
+%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python3
 make %{?_smp_mflags}
 
 %install
@@ -97,14 +86,6 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/libfsntfs.pc
 %{_includedir}/*
 %{_mandir}/man3/*
-
-%files -n libfsntfs-python2
-%defattr(644,root,root,755)
-%license COPYING COPYING.LESSER
-%doc AUTHORS README
-%{_libdir}/python2*/site-packages/*.a
-%{_libdir}/python2*/site-packages/*.la
-%{_libdir}/python2*/site-packages/*.so
 
 %files -n libfsntfs-python3
 %defattr(644,root,root,755)
