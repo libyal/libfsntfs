@@ -40,7 +40,6 @@ DPKG_FILES = \
 	dpkg/rules \
 	dpkg/libfsntfs.install \
 	dpkg/libfsntfs-dev.install \
-	dpkg/libfsntfs-python.install \
 	dpkg/libfsntfs-python3.install \
 	dpkg/libfsntfs-tools.install \
 	dpkg/source/format
