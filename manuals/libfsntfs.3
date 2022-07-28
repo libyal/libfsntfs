@@ -1,4 +1,4 @@
-.Dd April 24, 2021
+.Dd July 28, 2022
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -93,6 +93,8 @@ Volume functions
 .Ft int
 .Fn libfsntfs_volume_get_serial_number "libfsntfs_volume_t *volume" "uint64_t *serial_number" "libfsntfs_error_t **error"
 .Ft int
+.Fn libfsntfs_volume_get_root_directory "libfsntfs_volume_t *volume" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
+.Ft int
 .Fn libfsntfs_volume_get_number_of_file_entries "libfsntfs_volume_t *volume" "uint64_t *number_of_file_entries" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_file_entry_by_index "libfsntfs_volume_t *volume" "uint64_t mft_entry_index" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
@@ -100,8 +102,6 @@ Volume functions
 .Fn libfsntfs_volume_get_file_entry_by_utf8_path "libfsntfs_volume_t *volume" "const uint8_t *utf8_string" "size_t utf8_string_length" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_file_entry_by_utf16_path "libfsntfs_volume_t *volume" "const uint16_t *utf16_string" "size_t utf16_string_length" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
-.Ft int
-.Fn libfsntfs_volume_get_root_directory "libfsntfs_volume_t *volume" "libfsntfs_file_entry_t **file_entry" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_volume_get_usn_change_journal "libfsntfs_volume_t *volume" "libfsntfs_usn_change_journal_t **usn_change_journal" "libfsntfs_error_t **error"
 .Pp

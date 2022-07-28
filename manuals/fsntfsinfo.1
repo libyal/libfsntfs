@@ -1,4 +1,4 @@
-.Dd December 27, 2019
+.Dd July 28, 2022
 .Dt fsntfsinfo
 .Os libfsntfs
 .Sh NAME
@@ -10,7 +10,7 @@
 .Op Fl E Ar mft_entry_index
 .Op Fl F Ar file_entry
 .Op Fl o Ar offset
-.Op Fl hHUvV
+.Op Fl dhHUvV
 .Ar source
 .Sh DESCRIPTION
 .Nm fsntfsinfo
@@ -28,10 +28,10 @@ is the source file.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl a
-shows allocation information
 .It Fl B Ar bodyfile
 output file system hierarchy as a bodyfile
+.It Fl d
+calculate a MD5 hash of a file entry to include in the bodyfile
 .It Fl E Ar mft_entry_index
 show information about a specific MFT entry index or "all"
 .It Fl F Ar file_entry
@@ -78,6 +78,6 @@ https://github.com/libyal/libfsntfs/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
-Copyright 2010-2019, Joachim Metz <joachim.metz@gmail.com>.
+Copyright 2010-2022, Joachim Metz <joachim.metz@gmail.com>.
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO

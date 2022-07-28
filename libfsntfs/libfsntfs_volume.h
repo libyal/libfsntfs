@@ -241,6 +241,12 @@ int libfsntfs_volume_get_serial_number(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_number_of_file_entries(
      libfsntfs_volume_t *volume,
      uint64_t *number_of_file_entries,
@@ -282,12 +288,6 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      libfsntfs_volume_t *volume,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_file_entry_t **file_entry,
-     libcerror_error_t **error );
-
-LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
      libfsntfs_file_entry_t **file_entry,
      libcerror_error_t **error );
 

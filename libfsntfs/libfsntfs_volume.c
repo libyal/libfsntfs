@@ -2540,6 +2540,106 @@ int libfsntfs_volume_get_serial_number(
 	return( result );
 }
 
+/* Retrieves the root directory file entry
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_root_directory";
+	int result                                   = 1;
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( *file_entry != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file entry value already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_file_entry_initialize(
+	     file_entry,
+	     internal_volume->io_handle,
+	     internal_volume->file_io_handle,
+	     internal_volume->file_system,
+	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
+	     NULL,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file entry from MFT entry: %d.",
+		 function,
+		 LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_volume->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the number of file entries (MFT entries)
  * Returns 1 if successful or -1 on error
  */
@@ -3635,106 +3735,6 @@ on_error:
 	 NULL );
 #endif
 	return( -1 );
-}
-
-/* Retrieves the root directory file entry
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
-     libfsntfs_file_entry_t **file_entry,
-     libcerror_error_t **error )
-{
-	libfsntfs_internal_volume_t *internal_volume = NULL;
-	static char *function                        = "libfsntfs_volume_get_root_directory";
-	int result                                   = 1;
-
-	if( volume == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume.",
-		 function );
-
-		return( -1 );
-	}
-	internal_volume = (libfsntfs_internal_volume_t *) volume;
-
-	if( file_entry == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( -1 );
-	}
-	if( *file_entry != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file entry value already set.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
-	     internal_volume->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( libfsntfs_file_entry_initialize(
-	     file_entry,
-	     internal_volume->io_handle,
-	     internal_volume->file_io_handle,
-	     internal_volume->file_system,
-	     LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY,
-	     NULL,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create file entry from MFT entry: %d.",
-		 function,
-		 LIBFSNTFS_MFT_ENTRY_INDEX_ROOT_DIRECTORY );
-
-		result = -1;
-	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
-	     internal_volume->read_write_lock,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	return( result );
 }
 
 /* Retrieves the USN change journal

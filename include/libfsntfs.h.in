@@ -418,6 +418,15 @@ int libfsntfs_volume_get_serial_number(
      uint64_t *serial_number,
      libfsntfs_error_t **error );
 
+/* Retrieves the root directory file entry
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_root_directory(
+     libfsntfs_volume_t *volume,
+     libfsntfs_file_entry_t **file_entry,
+     libfsntfs_error_t **error );
+
 /* Retrieves the number of file entries (MFT entries)
  * Returns 1 if successful or -1 on error
  */
@@ -456,15 +465,6 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
      libfsntfs_volume_t *volume,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
-     libfsntfs_file_entry_t **file_entry,
-     libfsntfs_error_t **error );
-
-/* Retrieves the root directory file entry
- * Returns 1 if successful or -1 on error
- */
-LIBFSNTFS_EXTERN \
-int libfsntfs_volume_get_root_directory(
-     libfsntfs_volume_t *volume,
      libfsntfs_file_entry_t **file_entry,
      libfsntfs_error_t **error );
 
