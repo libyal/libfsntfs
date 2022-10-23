@@ -124,7 +124,7 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	{ "get_extent",
 	  (PyCFunction) pyfsntfs_file_entry_get_extent,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "get_extent(extent_index) -> Tuple( Integer, Integer, Integer )\n"
+	  "get_extent(extent_index) -> Tuple(Integer, Integer, Integer)\n"
 	  "\n"
 	  "Retrieves a specific extent.\t"
           "The extent is a tuple of offset, size and flags." },
