@@ -390,7 +390,8 @@ int libfsntfs_volume_get_utf16_name(
      size_t utf16_string_size,
      libfsntfs_error_t **error );
 
-/* Retrieves the version
+/* Retrieves the format version
+ * This value is retrieved from the $VOLUME_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -401,6 +402,7 @@ int libfsntfs_volume_get_version(
      libfsntfs_error_t **error );
 
 /* Retrieves the flags
+ * This value is retrieved from the $VOLUME_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 LIBFSNTFS_EXTERN \

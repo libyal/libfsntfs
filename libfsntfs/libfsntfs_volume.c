@@ -2282,7 +2282,8 @@ int libfsntfs_volume_get_utf16_name(
 	return( result );
 }
 
-/* Retrieves the version
+/* Retrieves the format version
+ * This value is retrieved from the $VOLUME_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_volume_get_version(
@@ -2377,6 +2378,7 @@ int libfsntfs_volume_get_version(
 }
 
 /* Retrieves the flags
+ * This value is retrieved from the $VOLUME_INFORMATION attribute
  * Returns 1 if successful, 0 if not available or -1 on error
  */
 int libfsntfs_volume_get_flags(

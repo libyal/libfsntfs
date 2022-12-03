@@ -75,6 +75,7 @@ Switched to asccidoc format.
 | 0.0.23 | J.B. Metz | December 2020 | Additional information regarding reparse point tag values.
 | 0.0.24 | J.B. Metz | October 2021 | Small changes.
 | 0.0.25 | J.B. Metz | February 2022 | Additional information regarding index entry size.
+| 0.0.26 | J.B. Metz | December 2022 | Additional information regarding $VOLUME_INFORMATION flags.
 |===
 
 :numbered:
@@ -1154,8 +1155,8 @@ The volume name attribute is used in the $Volume metadata file MFT entry.
 
 === The volume information attribute
 
-The volume information attribute ($VOLUME_INFORMATION) contains the name of the
-volume. It is stored as a resident MFT attribute.
+The volume information attribute ($VOLUME_INFORMATION) contains information
+about the volume. It is stored as a resident MFT attribute.
 
 The volume information data is 12 bytes of size and consists of:
 
@@ -1181,6 +1182,8 @@ The volume information attribute is used in the $Volume metadata file MFT entry.
 | 0x0008 | VOLUME_MOUNTED_ON_NT4 | [yellow-background]*Mounted on Windows NT 4*
 | 0x0010 | VOLUME_DELETE_USN_UNDERWAY | [yellow-background]*Delete USN underway*
 | 0x0020 | VOLUME_REPAIR_OBJECT_ID | [yellow-background]*Repair object identifiers*
+| | |
+| 0x0080 | | [yellow-background]*Unknown*
 | | |
 | 0x4000 | VOLUME_CHKDSK_UNDERWAY | [yellow-background]*chkdsk underway*
 | 0x8000 | VOLUME_MODIFIED_BY_CHKDSK | [yellow-background]*Modified by chkdsk*
