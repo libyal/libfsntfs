@@ -4960,10 +4960,12 @@ int info_handle_file_entry_value_fprint(
 	 "\tSize\t\t\t\t: %" PRIu64 "\n",
 	 size );
 
-	if( libfsntfs_file_entry_get_creation_time(
-	     file_entry,
-	     &creation_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_creation_time(
+	          file_entry,
+	          &creation_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -4974,25 +4976,30 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tCreation time\t\t\t",
-	     creation_time,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tCreation time\t\t\t",
+		     creation_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
-	if( libfsntfs_file_entry_get_modification_time(
-	     file_entry,
-	     &modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_modification_time(
+	          file_entry,
+	          &modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5003,25 +5010,30 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tModification time\t\t",
-	     modification_time,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tModification time\t\t",
+		     modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
-	if( libfsntfs_file_entry_get_access_time(
-	     file_entry,
-	     &access_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_access_time(
+	          file_entry,
+	          &access_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5032,25 +5044,30 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tAccess time\t\t\t",
-	     access_time,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tAccess time\t\t\t",
+		     access_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
-	if( libfsntfs_file_entry_get_entry_modification_time(
-	     file_entry,
-	     &entry_modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_entry_modification_time(
+	          file_entry,
+	          &entry_modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5061,25 +5078,30 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( info_handle_filetime_value_fprint(
-	     info_handle,
-	     "\tEntry modification time\t\t",
-	     entry_modification_time,
-	     error ) != 1 )
+	else if( result != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-		 "%s: unable to print FILETIME value.",
-		 function );
+		if( info_handle_filetime_value_fprint(
+		     info_handle,
+		     "\tEntry modification time\t\t",
+		     entry_modification_time,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
 	}
-	if( libfsntfs_file_entry_get_file_attribute_flags(
-	     file_entry,
-	     &file_attribute_flags,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_file_attribute_flags(
+	          file_entry,
+	          &file_attribute_flags,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5090,14 +5112,16 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tFile attribute flags\t\t: 0x%08" PRIx32 "\n",
-	 file_attribute_flags );
-	info_handle_file_attribute_flags_fprint(
-	 file_attribute_flags,
-	 info_handle->notify_stream );
-
+	else if( result != 0 )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "\tFile attribute flags\t\t: 0x%08" PRIx32 "\n",
+		 file_attribute_flags );
+		info_handle_file_attribute_flags_fprint(
+		 file_attribute_flags,
+		 info_handle->notify_stream );
+	}
 #ifdef TODO
 	result = libfsntfs_file_entry_get_security_descriptor_size(
 	          file_entry,
@@ -5709,10 +5733,12 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_creation_time(
-	     file_entry,
-	     &creation_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_creation_time(
+	          file_entry,
+	          &creation_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5723,10 +5749,12 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_modification_time(
-	     file_entry,
-	     &modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_modification_time(
+	          file_entry,
+	          &modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5737,10 +5765,12 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_access_time(
-	     file_entry,
-	     &access_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_access_time(
+	          file_entry,
+	          &access_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5751,10 +5781,12 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_entry_modification_time(
-	     file_entry,
-	     &entry_modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_entry_modification_time(
+	          file_entry,
+	          &entry_modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -5765,10 +5797,12 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_file_attribute_flags(
-	     file_entry,
-	     &file_attribute_flags,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_file_attribute_flags(
+	          file_entry,
+	          &file_attribute_flags,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6094,10 +6128,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 	}
 	mft_entry_index = file_reference & 0xffffffffffffUL;
 
-	if( libfsntfs_file_entry_get_creation_time(
-	     file_entry,
-	     &creation_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_creation_time(
+	          file_entry,
+	          &creation_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6108,10 +6144,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_modification_time(
-	     file_entry,
-	     &modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_modification_time(
+	          file_entry,
+	          &modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6122,10 +6160,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_access_time(
-	     file_entry,
-	     &access_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_access_time(
+	          file_entry,
+	          &access_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6136,10 +6176,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_entry_modification_time(
-	     file_entry,
-	     &entry_modification_time,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_entry_modification_time(
+	          file_entry,
+	          &entry_modification_time,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -6150,10 +6192,12 @@ int info_handle_bodyfile_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	if( libfsntfs_file_entry_get_file_attribute_flags(
-	     file_entry,
-	     &file_attribute_flags,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_file_attribute_flags(
+	          file_entry,
+	          &file_attribute_flags,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
