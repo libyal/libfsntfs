@@ -1,6 +1,6 @@
 dnl Checks for required headers and functions
 dnl
-dnl Version: 20220728
+dnl Version: 20230206
 
 dnl Function to detect if libfsntfs dependencies are available
 AC_DEFUN([AX_LIBFSNTFS_CHECK_LOCAL],
@@ -35,9 +35,7 @@ AC_DEFUN([AX_FSNTFSTOOLS_CHECK_LOCAL],
   ])
 
   dnl Headers included in fsntfstools/fsntfsmount.c
-  AC_CHECK_HEADERS([errno.h])
-
-  AC_HEADER_TIME
+  AC_CHECK_HEADERS([errno.h sys/time.h])
 
   dnl Functions included in fsntfstools/mount_file_system.c and fsntfstools/mount_file_entry.c
   AS_IF(
