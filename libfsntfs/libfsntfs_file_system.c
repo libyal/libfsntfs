@@ -529,7 +529,8 @@ int libfsntfs_file_system_read_mft(
 		}
 		last_data_attribute = mft_entry->data_attribute;
 	}
-	if( mft_entry->list_attribute != NULL )
+	if( ( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
+	 && ( mft_entry->list_attribute != NULL ) )
 	{
 		if( libfsntfs_mft_entry_read_attribute_list(
 		     mft_entry,
