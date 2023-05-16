@@ -204,7 +204,7 @@ int libfsntfs_internal_attribute_free(
 	}
 	if( *internal_attribute != NULL )
 	{
-		/* The mft_attribute references is freed elsewhere
+		/* The mft_attribute reference is freed elsewhere
 		 */
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 		if( libcthreads_read_write_lock_free(
