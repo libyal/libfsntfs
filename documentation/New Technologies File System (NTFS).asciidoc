@@ -1716,7 +1716,7 @@ The upper 4 bits of the block size are used as flags.
 === LZNT1 compression method
 
 For more information about LZNT1 see:
-https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
+https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[[LIBFWNT\]]
 
 Also see section: <<corruption_scenarios,Corruption scenarios>>
 
@@ -2022,7 +2022,7 @@ See section <<wof_compression_method,Windows Overlay Filter (WOF) compression me
 |===
 
 For more information about LZXPRESS Huffman see:
-https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[LIBFWNT\]]
+https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.asciidoc[[LIBFWNT\]]
 
 === [[wci_reparse_data]]Windows Container Isolation (WCI) reparse data
 
