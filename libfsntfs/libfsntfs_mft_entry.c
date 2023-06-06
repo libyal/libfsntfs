@@ -2460,7 +2460,7 @@ int libfsntfs_mft_entry_set_attribute_helper_values(
      libfsntfs_mft_attribute_t *attribute,
      libcerror_error_t **error )
 {
-	uint8_t utf8_attribute_name[ 64 ];
+	uint8_t utf8_attribute_name[ 8 ];
 
 	static char *function                                                = "libfsntfs_mft_entry_set_attribute_helper_values";
 	size_t utf8_attribute_name_size                                      = 0;
@@ -2537,10 +2537,17 @@ int libfsntfs_mft_entry_set_attribute_helper_values(
 			break;
 
 		case LIBFSNTFS_ATTRIBUTE_TYPE_INDEX_ROOT:
+			/* Only interested in attribute names that would match $I30
+			 */
+			if( ( utf8_attribute_name_size == 0 )
+			 || ( utf8_attribute_name_size > 8 ) )
+			{
+				break;
+			}
 			if( libfsntfs_mft_attribute_get_utf8_name(
 			     attribute,
 			     utf8_attribute_name,
-			     64,
+			     utf8_attribute_name_size,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -2727,9 +2734,8 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
      libfsntfs_mft_attribute_t *data_attribute,
      libcerror_error_t **error )
 {
-	uint8_t utf8_attribute_name[ 64 ];
-
 	libfsntfs_mft_attribute_t *existing_data_attribute = NULL;
+	uint8_t *utf8_attribute_name                       = NULL;
 	static char *function                              = "libfsntfs_mft_entry_set_data_attribute_helper_values";
 	size_t utf8_attribute_name_size                    = 0;
 	int attribute_index                                = 0;
@@ -2759,7 +2765,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 		 "%s: unable to retrieve UTF-8 attribute name size.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( utf8_attribute_name_size <= 1 )
 	{
@@ -2775,15 +2781,40 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			 "%s: unable to chain attribute.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 	}
 	else
 	{
+		if( utf8_attribute_name_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid UTF-8 attribute name size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
+		utf8_attribute_name = (uint8_t *) memory_allocate(
+		                                   (size_t) utf8_attribute_name_size );
+
+		if( utf8_attribute_name == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create UTF-8 attribute name.",
+			 function );
+
+			goto on_error;
+		}
 		if( libfsntfs_mft_attribute_get_utf8_name(
 		     data_attribute,
 		     utf8_attribute_name,
-		     64,
+		     utf8_attribute_name_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -2793,7 +2824,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			 "%s: unable to retrieve UTF-8 attribute name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		result = libfsntfs_mft_entry_get_data_attribute_by_utf8_name(
 		          mft_entry,
@@ -2812,7 +2843,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			 "%s: unable to retrieve data attribute.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 0 )
 		{
@@ -2829,7 +2860,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 				 "%s: unable to append alternate data attribute to array.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			existing_data_attribute = data_attribute;
 		}
@@ -2847,7 +2878,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 				 "%s: unable to chain alternate data attribute.",
 				 function );
 
-				return( -1 );
+				goto on_error;
 			}
 			if( libcdata_array_set_entry_by_index(
 			     mft_entry->alternate_data_attributes_array,
@@ -2863,9 +2894,14 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 				 function,
 				 attribute_index );
 
-				return( -1 );
+				goto on_error;
 			}
 		}
+		memory_free(
+		 utf8_attribute_name );
+
+		utf8_attribute_name = NULL;
+
 		result = libfsntfs_mft_attribute_compare_name_with_utf8_string(
 		          data_attribute,
 		          (uint8_t *) "WofCompressedData",
@@ -2881,7 +2917,7 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 			 "%s: unable to compare UTF-8 string with alternative data attribute name.",
 			 function );
 
-			return( -1 );
+			goto on_error;
 		}
 		else if( result == 1 )
 		{
@@ -2889,6 +2925,14 @@ int libfsntfs_mft_entry_set_data_attribute_helper_values(
 		}
 	}
 	return( 1 );
+
+on_error:
+	if( utf8_attribute_name != NULL )
+	{
+		memory_free(
+		 utf8_attribute_name );
+	}
+	return( -1 );
 }
 
 /* Retrieves a data attribute with the specified name
