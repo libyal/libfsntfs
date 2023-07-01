@@ -482,7 +482,7 @@ int libfsntfs_file_name_values_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
+			 "%s: unable to print FILETIME value.",
 			 function );
 
 			goto on_error;
@@ -500,7 +500,7 @@ int libfsntfs_file_name_values_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
+			 "%s: unable to print FILETIME value.",
 			 function );
 
 			goto on_error;
@@ -518,7 +518,7 @@ int libfsntfs_file_name_values_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
+			 "%s: unable to print FILETIME value.",
 			 function );
 
 			goto on_error;
@@ -536,24 +536,24 @@ int libfsntfs_file_name_values_read_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
+			 "%s: unable to print FILETIME value.",
 			 function );
 
 			goto on_error;
 		}
 		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_file_name_t *) data )->allocated_file_size,
+		 ( (fsntfs_file_name_t *) data )->allocated_data_size,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: allocated file size\t\t: %" PRIu64 "\n",
+		 "%s: allocated data size\t\t: %" PRIu64 "\n",
 		 function,
 		 value_64bit );
 
 		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_file_name_t *) data )->file_size,
+		 ( (fsntfs_file_name_t *) data )->data_size,
 		 value_64bit );
 		libcnotify_printf(
-		 "%s: file size\t\t\t\t: %" PRIu64 "\n",
+		 "%s: data size\t\t\t\t: %" PRIu64 "\n",
 		 function,
 		 value_64bit );
 

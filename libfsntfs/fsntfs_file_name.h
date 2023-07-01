@@ -40,37 +40,37 @@ struct fsntfs_file_name
 
 	/* The creation date and time
 	 * Consists of 8 bytes
-	 * Contains a filetime
+	 * Contains a FILETIME
 	 */
 	uint8_t creation_time[ 8 ];
 
 	/* The last modification date and time
 	 * Consists of 8 bytes
-	 * Contains a filetime
+	 * Contains a FILETIME
 	 */
 	uint8_t modification_time[ 8 ];
 
 	/* The entry last modification date and time
 	 * Consists of 8 bytes
-	 * Contains a filetime
+	 * Contains a FILETIME
 	 */
 	uint8_t entry_modification_time[ 8 ];
 
 	/* The last access date and time
 	 * Consists of 8 bytes
-	 * Contains a filetime
+	 * Contains a FILETIME
 	 */
 	uint8_t access_time[ 8 ];
 
-	/* The allocated (or reserved) file size
+	/* The allocated (or reserved) data size
 	 * Consists of 8 bytes
 	 */
-	uint8_t allocated_file_size[ 8 ];
+	uint8_t allocated_data_size[ 8 ];
 
-	/* The file size
+	/* The data size
 	 * Consists of 8 bytes
 	 */
-	uint8_t file_size[ 8 ];
+	uint8_t data_size[ 8 ];
 
 	/* The file attribute flags
 	 * Consists of 4 bytes

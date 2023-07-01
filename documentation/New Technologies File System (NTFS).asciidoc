@@ -54,8 +54,7 @@ December 2010 | Initial version, based on earlier notes.
 | 0.0.4 | J.B. Metz | February 2014 | Additional information.
 | 0.0.5 | J.B. Metz | July 2014 +
 August 2014 | Textual changes and additional information.
-| 0.0.6 | J.B. Metz | March 2015 | Additional information. +
-Switched to asccidoc format.
+| 0.0.6 | J.B. Metz | March 2015 | Additional information and switched to asciidoc format.
 | 0.0.7 | J.B. Metz | May 2015 | Additional information.
 | 0.0.8 | J.B. Metz | July 2015 | Textual changes.
 | 0.0.9 | J.B. Metz | August 2015 | Additional information.
@@ -889,12 +888,12 @@ Contains a FILETIME
 Contains a FILETIME
 | 32 | 4 | | File attribute flags +
 See section: <<file_attribute_flags,File attribute flags>>
-| 36 | 4 | | [yellow-background]*Unknown (Maximum number of versions) +
+| 36 | 4 | | [yellow-background]*Unknown (Maximum number of versions)* +
 [yellow-background]*What does it contain and what is it used for?*
 | 40 | 4 | | [yellow-background]*Unknown (Version number)* +
 [yellow-background]*What does it contain and what is it used for?* +
 [yellow-background]*On Windows 10 does a value of 1 indicate case-senstive folder?*
-| 44 | 4 | | [yellow-background]*Unknown (Class identifier) +
+| 44 | 4 | | [yellow-background]*Unknown (Class identifier)* +
 [yellow-background]*What does it contain and what is it used for?*
 4+| _Introduced in NTFS version 3.0_
 | 48 | 4 | | Owner identifier +

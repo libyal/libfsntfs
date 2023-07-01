@@ -678,7 +678,7 @@ int libfsntfs_volume_header_read_file_io_handle(
 #endif
 	read_count = libbfio_handle_read_buffer_at_offset(
 	              file_io_handle,
-	              (uint8_t *) &volume_header_data,
+	              volume_header_data,
 	              sizeof( fsntfs_volume_header_t ),
 	              file_offset,
 	              error );
@@ -698,7 +698,7 @@ int libfsntfs_volume_header_read_file_io_handle(
 	}
 	if( libfsntfs_volume_header_read_data(
 	     volume_header,
-	     (uint8_t *) &volume_header_data,
+	     volume_header_data,
 	     sizeof( fsntfs_volume_header_t ),
 	     error ) != 1 )
 	{

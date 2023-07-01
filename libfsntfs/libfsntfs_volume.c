@@ -36,6 +36,7 @@
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
 #include "libfsntfs_libcnotify.h"
+#include "libfsntfs_libcthreads.h"
 #include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_libuna.h"
@@ -854,7 +855,8 @@ int libfsntfs_volume_close(
 			}
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	if( internal_volume->file_io_handle_opened_in_library != 0 )
 	{
 		if( libbfio_handle_close(
@@ -3218,7 +3220,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		 "%s: unable to retrieve MFT and directory entry by path.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -3242,7 +3244,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 			 function,
 			 mft_entry->index );
 
-			goto on_error;
+			result = -1;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3257,24 +3259,19 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 		 "%s: unable to release read/write lock for writing.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 #endif
-	return( result );
-
-on_error:
-	if( directory_entry != NULL )
+	if( result == -1 )
 	{
-		libfsntfs_directory_entry_free(
-		 &directory_entry,
-		 NULL );
+		if( directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &directory_entry,
+			 NULL );
+		}
 	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_volume->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the MFT entry for an UTF-16 encoded path
@@ -3680,7 +3677,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		 "%s: unable to retrieve MFT and directory entry by path.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -3704,7 +3701,7 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 			 function,
 			 mft_entry->index );
 
-			goto on_error;
+			result = -1;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3719,24 +3716,19 @@ int libfsntfs_volume_get_file_entry_by_utf16_path(
 		 "%s: unable to release read/write lock for writing.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
 #endif
-	return( result );
-
-on_error:
-	if( directory_entry != NULL )
+	if( result == -1 )
 	{
-		libfsntfs_directory_entry_free(
-		 &directory_entry,
-		 NULL );
+		if( directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &directory_entry,
+			 NULL );
+		}
 	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_volume->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the USN change journal
@@ -3799,7 +3791,7 @@ int libfsntfs_volume_get_usn_change_journal(
 		 "%s: unable to retrieve \\$Extend\\$UsnJrnl MFT and directory entry by path.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
 	else if( result != 0 )
 	{
@@ -3819,7 +3811,7 @@ int libfsntfs_volume_get_usn_change_journal(
 			 "%s: unable to retrieve $J data attribute.",
 			 function );
 
-			goto on_error;
+			result = -1;
 		}
 		else if( result != 0 )
 		{
@@ -3840,7 +3832,7 @@ int libfsntfs_volume_get_usn_change_journal(
 				 "%s: unable to create USN change journal.",
 				 function );
 
-				goto on_error;
+				result = -1;
 			}
 		}
 		else
@@ -3856,7 +3848,7 @@ int libfsntfs_volume_get_usn_change_journal(
 				 "%s: unable to free directory entry.",
 				 function );
 
-				goto on_error;
+				result = -1;
 			}
 		}
 	}
@@ -3875,20 +3867,15 @@ int libfsntfs_volume_get_usn_change_journal(
 		return( -1 );
 	}
 #endif
-	return( result );
-
-on_error:
-	if( directory_entry != NULL )
+	if( result == - 1 )
 	{
-		libfsntfs_directory_entry_free(
-		 &directory_entry,
-		 NULL );
+		if( directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &directory_entry,
+			 NULL );
+		}
 	}
-#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
-	libcthreads_read_write_lock_release_for_write(
-	 internal_volume->read_write_lock,
-	 NULL );
-#endif
-	return( -1 );
+	return( result );
 }
 

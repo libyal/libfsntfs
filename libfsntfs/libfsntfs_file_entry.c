@@ -5435,6 +5435,7 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_sub_file_entry_by_index";
 	uint64_t mft_entry_index                             = 0;
+	int result                                           = 1;
 
 	if( file_entry == NULL )
 	{
@@ -5471,8 +5472,21 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 
 		return( -1 );
 	}
-/* TODO add thread lock suport */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfsntfs_directory_entries_tree_get_entry_by_index(
 	     internal_file_entry->directory_entries_tree,
 	     internal_file_entry->file_io_handle,
@@ -5488,55 +5502,73 @@ int libfsntfs_file_entry_get_sub_file_entry_by_index(
 		 function,
 		 sub_file_entry_index );
 
-		goto on_error;
+		result = -1;
 	}
-	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     sub_directory_entry,
-	     &mft_entry_index,
+	else
+	{
+		if( libfsntfs_directory_entry_get_mft_entry_index(
+		     sub_directory_entry,
+		     &mft_entry_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry index.",
+			 function );
+
+			result = -1;
+		}
+		/* sub_file_entry takes over management of sub_directory_entry
+		 */
+		else if( libfsntfs_file_entry_initialize(
+			  sub_file_entry,
+			  internal_file_entry->io_handle,
+			  internal_file_entry->file_io_handle,
+			  internal_file_entry->file_system,
+			  mft_entry_index,
+			  sub_directory_entry,
+			  internal_file_entry->flags,
+			  error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create sub file entry: %d with MFT entry: %" PRIu64 ".",
+			 function,
+			 sub_file_entry_index,
+			 mft_entry_index );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry index.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	/* sub_file_entry takes over management of sub_directory_entry
-	 */
-	if( libfsntfs_file_entry_initialize(
-	     sub_file_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->file_system,
-	     mft_entry_index,
-	     sub_directory_entry,
-	     internal_file_entry->flags,
-	     error ) != 1 )
+#endif
+	if( result == -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry: %d with MFT entry: %" PRIu64 ".",
-		 function,
-		 sub_file_entry_index,
-		 mft_entry_index );
-
-		goto on_error;
+		if( sub_directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &sub_directory_entry,
+			 NULL );
+		}
 	}
-	return( 1 );
-
-on_error:
-	if( sub_directory_entry != NULL )
-	{
-		libfsntfs_directory_entry_free(
-		 &sub_directory_entry,
-		 NULL );
-	}
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the sub file entry for an UTF-8 encoded name
@@ -5590,8 +5622,21 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock suport */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_directory_entries_tree_get_entry_by_utf8_name(
 	          internal_file_entry->directory_entries_tree,
 	          internal_file_entry->file_io_handle,
@@ -5609,58 +5654,72 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf8_name(
 		 "%s: unable to retrieve directory entry.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
+		if( libfsntfs_directory_entry_get_mft_entry_index(
+		     sub_directory_entry,
+		     &mft_entry_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry index.",
+			 function );
+
+			result = -1;
+		}
+		/* sub_file_entry takes over management of sub_directory_entry
+		 */
+		else if( libfsntfs_file_entry_initialize(
+		          sub_file_entry,
+		          internal_file_entry->io_handle,
+		          internal_file_entry->file_io_handle,
+		          internal_file_entry->file_system,
+		          mft_entry_index,
+		          sub_directory_entry,
+		          internal_file_entry->flags,
+		          error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
+			 function,
+			 mft_entry_index );
+
+			result = -1;
+		}
 	}
-	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     sub_directory_entry,
-	     &mft_entry_index,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry index.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	/* sub_file_entry takes over management of sub_directory_entry
-	 */
-	if( libfsntfs_file_entry_initialize(
-	     sub_file_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->file_system,
-	     mft_entry_index,
-	     sub_directory_entry,
-	     internal_file_entry->flags,
-	     error ) != 1 )
+#endif
+	if( result == -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
+		if( sub_directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &sub_directory_entry,
+			 NULL );
+		}
 	}
-	return( 1 );
-
-on_error:
-	if( sub_directory_entry != NULL )
-	{
-		libfsntfs_directory_entry_free(
-		 &sub_directory_entry,
-		 NULL );
-	}
-	return( -1 );
+	return( result );
 }
 
 /* Retrieves the sub file entry for an UTF-16 encoded name
@@ -5714,8 +5773,21 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock suport */
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	result = libfsntfs_directory_entries_tree_get_entry_by_utf16_name(
 	          internal_file_entry->directory_entries_tree,
 	          internal_file_entry->file_io_handle,
@@ -5733,58 +5805,72 @@ int libfsntfs_file_entry_get_sub_file_entry_by_utf16_name(
 		 "%s: unable to retrieve directory entry.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	else if( result == 0 )
+	else if( result != 0 )
 	{
-		return( 0 );
+		if( libfsntfs_directory_entry_get_mft_entry_index(
+		     sub_directory_entry,
+		     &mft_entry_index,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve MFT entry index.",
+			 function );
+
+			result = -1;
+		}
+		/* sub_file_entry takes over management of sub_directory_entry
+		 */
+		else if( libfsntfs_file_entry_initialize(
+		          sub_file_entry,
+		          internal_file_entry->io_handle,
+		          internal_file_entry->file_io_handle,
+		          internal_file_entry->file_system,
+		          mft_entry_index,
+		          sub_directory_entry,
+		          internal_file_entry->flags,
+		          error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
+			 function,
+			 mft_entry_index );
+
+			result = -1;
+		}
 	}
-	if( libfsntfs_directory_entry_get_mft_entry_index(
-	     sub_directory_entry,
-	     &mft_entry_index,
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MFT entry index.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	/* sub_file_entry takes over management of sub_directory_entry
-	 */
-	if( libfsntfs_file_entry_initialize(
-	     sub_file_entry,
-	     internal_file_entry->io_handle,
-	     internal_file_entry->file_io_handle,
-	     internal_file_entry->file_system,
-	     mft_entry_index,
-	     sub_directory_entry,
-	     internal_file_entry->flags,
-	     error ) != 1 )
+#endif
+	if( result == -1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create sub file entry with MFT entry: %" PRIu64 ".",
-		 function,
-		 mft_entry_index );
-
-		goto on_error;
+		if( sub_directory_entry != NULL )
+		{
+			libfsntfs_directory_entry_free(
+			 &sub_directory_entry,
+			 NULL );
+		}
 	}
-	return( 1 );
-
-on_error:
-	if( sub_directory_entry != NULL )
-	{
-		libfsntfs_directory_entry_free(
-		 &sub_directory_entry,
-		 NULL );
-	}
-	return( -1 );
+	return( result );
 }
 
 /* Reads data at the current offset from the default data stream (nameless $DATA attribute)
