@@ -1,4 +1,6 @@
 TODO
+* escape unpaired surrogates in bodyfile
+
 * extent: flag WofCompressedData extent as wof_compressed?
 * extent: rename compressed flag to lznt1_compressed?
 

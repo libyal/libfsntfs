@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <memory.h>
 #include <types.h>
 
 #include "libfsntfs_buffer_data_handle.h"
@@ -31,10 +30,8 @@
 #include "libfsntfs_definitions.h"
 #include "libfsntfs_io_handle.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
-#include "libfsntfs_unused.h"
 
 /* Creates cluster block stream from a buffer of data
  * Make sure the value cluster_block_stream is referencing, is set to NULL

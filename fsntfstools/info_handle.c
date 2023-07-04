@@ -1263,17 +1263,19 @@ int info_handle_name_value_fprint(
 
 		goto on_error;
 	}
+	/* Using UCS-2 or RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
+	 */
 	while( value_string_index < value_string_length )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_utf16(
+		result = libuna_unicode_character_copy_from_ucs2(
 		          &unicode_character,
 		          (libuna_utf16_character_t *) value_string,
 		          value_string_length,
 		          &value_string_index,
 		          error );
 #else
-		result = libuna_unicode_character_copy_from_utf8(
+		result = libuna_unicode_character_copy_from_utf8_rfc2279(
 		          &unicode_character,
 		          (libuna_utf8_character_t *) value_string,
 		          value_string_length,
@@ -1292,10 +1294,11 @@ int info_handle_name_value_fprint(
 			goto on_error;
 		}
 		/* Replace:
-		 *   values <= 0x1f and 0x7f by \x##
+		 *   Control characters ([U+0-U+1f, U+7f-U+9f]) by \x##
 		 */
 		if( ( unicode_character <= 0x1f )
-		 || ( unicode_character == 0x7f ) )
+		 || ( ( unicode_character >= 0x7f )
+		  &&  ( unicode_character <= 0x9f ) ) )
 		{
 			print_count = system_string_sprintf(
 			               &( escaped_value_string[ escaped_value_string_index ] ),
@@ -1319,14 +1322,14 @@ int info_handle_name_value_fprint(
 		else
 		{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_unicode_character_copy_to_utf16(
+			result = libuna_unicode_character_copy_to_ucs2(
 			          unicode_character,
 			          (libuna_utf16_character_t *) escaped_value_string,
 			          escaped_value_string_size,
 			          &escaped_value_string_index,
 			          error );
 #else
-			result = libuna_unicode_character_copy_to_utf8(
+			result = libuna_unicode_character_copy_to_utf8_rfc2279(
 			          unicode_character,
 			          (libuna_utf8_character_t *) escaped_value_string,
 			          escaped_value_string_size,
@@ -2260,7 +2263,7 @@ int info_handle_attribute_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "\tName\t\t\t\t: " );
+			 "\tName\t\t\t: " );
 
 			if( info_handle_name_value_fprint(
 			     info_handle,
@@ -2487,7 +2490,7 @@ int info_handle_attribute_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tPath hint\t\t\t: " );
+		 "\tPath hint\t\t: " );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfsntfs_file_entry_get_utf16_path_hint_size(
@@ -4608,7 +4611,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tVersion\t\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
+	 "\tVersion\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
 	 major_version,
 	 minor_version );
 
@@ -4628,7 +4631,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
+	 "\tFlags\t\t\t: 0x%04" PRIx16 "\n",
 	 value_16bit );
 	info_handle_volume_information_flags_fprint(
 	 value_16bit,
@@ -5287,17 +5290,19 @@ int info_handle_bodyfile_name_value_fprint(
 
 		goto on_error;
 	}
+	/* Using UCS-2 or RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
+	 */
 	while( value_string_index < value_string_length )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_utf16(
+		result = libuna_unicode_character_copy_from_ucs2(
 		          &unicode_character,
 		          (libuna_utf16_character_t *) value_string,
 		          value_string_length,
 		          &value_string_index,
 		          error );
 #else
-		result = libuna_unicode_character_copy_from_utf8(
+		result = libuna_unicode_character_copy_from_utf8_rfc2279(
 		          &unicode_character,
 		          (libuna_utf8_character_t *) value_string,
 		          value_string_length,
@@ -5316,10 +5321,11 @@ int info_handle_bodyfile_name_value_fprint(
 			goto on_error;
 		}
 		/* Replace:
-		 *   values <= 0x1f and 0x7f by \x##
+		 *   Control characters ([U+0-U+1f, U+7f-U+9f]) by \x##
 		 */
 		if( ( unicode_character <= 0x1f )
-		 || ( unicode_character == 0x7f ) )
+		 || ( ( unicode_character >= 0x7f )
+		  &&  ( unicode_character <= 0x9f ) ) )
 		{
 			print_count = system_string_sprintf(
 			               &( escaped_value_string[ escaped_value_string_index ] ),
@@ -5365,14 +5371,14 @@ int info_handle_bodyfile_name_value_fprint(
 		else
 		{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_unicode_character_copy_to_utf16(
+			result = libuna_unicode_character_copy_to_ucs2(
 			          unicode_character,
 			          (libuna_utf16_character_t *) escaped_value_string,
 			          escaped_value_string_size,
 			          &escaped_value_string_index,
 			          error );
 #else
-			result = libuna_unicode_character_copy_to_utf8(
+			result = libuna_unicode_character_copy_to_utf8_rfc2279(
 			          unicode_character,
 			          (libuna_utf8_character_t *) escaped_value_string,
 			          escaped_value_string_size,
@@ -8882,7 +8888,7 @@ int info_handle_usn_record_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tParent file reference\t\t\t: %" PRIu64 "\n",
+		 "\tParent file reference\t\t: %" PRIu64 "\n",
 		 value_64bit );
 	}
 	else

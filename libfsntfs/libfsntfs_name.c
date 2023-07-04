@@ -135,7 +135,7 @@ int libfsntfs_name_compare(
 		     name,
 		     name_size,
 		     &name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -152,7 +152,7 @@ int libfsntfs_name_compare(
 		     other_name,
 		     other_name_size,
 		     &other_name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -295,7 +295,7 @@ int libfsntfs_name_compare_short(
 		     name,
 		     name_size,
 		     &name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -337,7 +337,7 @@ int libfsntfs_name_compare_short(
 		     short_name,
 		     short_name_size,
 		     &short_name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -383,7 +383,7 @@ int libfsntfs_name_compare_short(
 		     short_name,
 		     short_name_size,
 		     &short_name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -414,7 +414,7 @@ int libfsntfs_name_compare_short(
 		     short_name,
 		     short_name_size,
 		     &short_name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -458,7 +458,7 @@ int libfsntfs_name_compare_short(
 			     name,
 			     name_size,
 			     &name_index,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -487,7 +487,7 @@ int libfsntfs_name_compare_short(
 			     name,
 			     name_size,
 			     &name_index,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -521,7 +521,7 @@ int libfsntfs_name_compare_short(
 			     short_name,
 			     short_name_size,
 			     &short_name_index,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -563,7 +563,7 @@ int libfsntfs_name_compare_short(
 			     name,
 			     name_size,
 			     &name_index,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -580,7 +580,7 @@ int libfsntfs_name_compare_short(
 			     short_name,
 			     short_name_size,
 			     &short_name_index,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -701,7 +701,7 @@ int libfsntfs_name_compare_with_utf8_string(
 		     name,
 		     name_size,
 		     &name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -713,7 +713,9 @@ int libfsntfs_name_compare_with_utf8_string(
 
 			return( -1 );
 		}
-		if( libuna_unicode_character_copy_from_utf8(
+		/* Using RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
+		 */
+		if( libuna_unicode_character_copy_from_utf8_rfc2279(
 		     &string_character,
 		     utf8_string,
 		     utf8_string_length,
@@ -724,7 +726,7 @@ int libfsntfs_name_compare_with_utf8_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy UTF-8 string to Unicode character.",
+			 "%s: unable to copy UTF-8 RFC 2279 string to Unicode character.",
 			 function );
 
 			return( -1 );
@@ -847,7 +849,7 @@ int libfsntfs_name_compare_with_utf16_string(
 		     name,
 		     name_size,
 		     &name_index,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -859,7 +861,9 @@ int libfsntfs_name_compare_with_utf16_string(
 
 			return( -1 );
 		}
-		if( libuna_unicode_character_copy_from_utf16(
+		/* Using UCS-2 to support unpaired UTF-16 surrogates
+		 */
+		if( libuna_unicode_character_copy_from_ucs2(
 		     &string_character,
 		     utf16_string,
 		     utf16_string_length,
@@ -870,7 +874,7 @@ int libfsntfs_name_compare_with_utf16_string(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy UTF-16 string to Unicode character.",
+			 "%s: unable to copy UCS-2 string to Unicode character.",
 			 function );
 
 			return( -1 );

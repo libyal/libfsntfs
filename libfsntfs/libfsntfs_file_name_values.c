@@ -628,7 +628,7 @@ int libfsntfs_file_name_values_read_data(
 			     "name\t\t\t\t",
 			     file_name_values->name,
 			     file_name_values->name_size,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -1072,7 +1072,7 @@ int libfsntfs_file_name_values_get_utf8_name_size(
 	if( libuna_utf8_string_size_from_utf16_stream(
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     utf8_string_size,
 	     error ) != 1 )
 	{
@@ -1116,7 +1116,7 @@ int libfsntfs_file_name_values_get_utf8_name(
 	     utf8_string_size,
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1128,6 +1128,18 @@ int libfsntfs_file_name_values_get_utf8_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: string data:\n",
+		 function );
+		libcnotify_print_data(
+		 utf8_string,
+		 utf8_string_size,
+		 0 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1156,7 +1168,7 @@ int libfsntfs_file_name_values_get_utf16_name_size(
 	if( libuna_utf16_string_size_from_utf16_stream(
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     utf16_string_size,
 	     error ) != 1 )
 	{
@@ -1200,7 +1212,7 @@ int libfsntfs_file_name_values_get_utf16_name(
 	     utf16_string_size,
 	     file_name_values->name,
 	     (size_t) file_name_values->name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

@@ -26,9 +26,7 @@
 #include <types.h>
 
 #include "libfsntfs_io_handle.h"
-#include "libfsntfs_libbfio.h"
 #include "libfsntfs_libcerror.h"
-#include "libfsntfs_libfcache.h"
 #include "libfsntfs_libfdata.h"
 #include "libfsntfs_mft_attribute.h"
 

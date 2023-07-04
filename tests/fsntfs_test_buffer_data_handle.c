@@ -617,25 +617,6 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 	libcerror_error_free(
 	 &error );
 
-	/* Clean up
-	 */
-	result = libfsntfs_buffer_data_handle_free(
-	          &buffer_data_handle,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "buffer_data_handle",
-	 buffer_data_handle );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
 #if defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED )
 
 	/* Test libfsntfs_buffer_data_handle_read_segment_data with memcpy failing
@@ -672,6 +653,25 @@ int fsntfs_test_buffer_data_handle_read_segment_data(
 		 &error );
 	}
 #endif /* defined( HAVE_FSNTFS_TEST_MEMORY ) && defined( OPTIMIZATION_DISABLED ) */
+
+	/* Clean up
+	 */
+	result = libfsntfs_buffer_data_handle_free(
+	          &buffer_data_handle,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "buffer_data_handle",
+	 buffer_data_handle );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
 
@@ -878,7 +878,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 
