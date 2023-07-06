@@ -403,7 +403,7 @@ ssize_t libfsntfs_index_value_read(
 		data_offset    += index_value->key_data_size;
 		remaining_size -= index_value->key_data_size;
 	}
-	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 		if( remaining_size < 8 )
 		{
@@ -479,7 +479,7 @@ ssize_t libfsntfs_index_value_read(
 #endif
 		data_offset += remaining_size;
 	}
-	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )

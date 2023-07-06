@@ -286,6 +286,7 @@ int fsntfs_test_bitmap_values_read_data(
 	libcerror_error_t *error                 = NULL;
 	libfsntfs_bitmap_values_t *bitmap_values = NULL;
 	libfsntfs_io_handle_t *io_handle         = NULL;
+	off64_t base_offset                      = 0;
 	int result                               = 0;
 
 	/* Initialize test
@@ -333,6 +334,7 @@ int fsntfs_test_bitmap_values_read_data(
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
 	          512,
+	          &base_offset,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -351,6 +353,7 @@ int fsntfs_test_bitmap_values_read_data(
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          8,
 	          512,
+	          &base_offset,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -370,6 +373,7 @@ int fsntfs_test_bitmap_values_read_data(
 	          NULL,
 	          8,
 	          512,
+	          &base_offset,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
@@ -389,6 +393,27 @@ int fsntfs_test_bitmap_values_read_data(
 	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
 	          (size_t) SSIZE_MAX + 1,
 	          512,
+	          &base_offset,
+	          &error );
+
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libfsntfs_bitmap_values_read_data(
+	          bitmap_values,
+	          &( fsntfs_test_bitmap_values_data1[ 32 ] ),
+	          8,
+	          512,
+	          NULL,
 	          &error );
 
 	FSNTFS_TEST_ASSERT_EQUAL_INT(

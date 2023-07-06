@@ -108,7 +108,9 @@ check_PROGRAMS = \
 	fsntfs_test_standard_information_values \
 	fsntfs_test_support \
 	fsntfs_test_tools_info_handle \
+	fsntfs_test_tools_mount_path_string \
 	fsntfs_test_tools_output \
+	fsntfs_test_tools_path_string \
 	fsntfs_test_tools_signal \
 	fsntfs_test_txf_data_values \
 	fsntfs_test_usn_change_journal \
@@ -982,6 +984,7 @@ fsntfs_test_support_LDADD = \
 fsntfs_test_tools_info_handle_SOURCES = \
 	../fsntfstools/digest_hash.c ../fsntfstools/digest_hash.h \
 	../fsntfstools/info_handle.c ../fsntfstools/info_handle.h \
+	../fsntfstools/path_string.c ../fsntfstools/path_string.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_macros.h \
 	fsntfs_test_memory.c fsntfs_test_memory.h \
@@ -1006,6 +1009,18 @@ fsntfs_test_tools_info_handle_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
+fsntfs_test_tools_mount_path_string_SOURCES = \
+	../fsntfstools/mount_path_string.c ../fsntfstools/mount_path_string.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_mount_path_string.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_mount_path_string_LDADD = \
+	@LIBUNA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
 fsntfs_test_tools_output_SOURCES = \
 	../fsntfstools/fsntfstools_output.c ../fsntfstools/fsntfstools_output.h \
 	fsntfs_test_libcerror.h \
@@ -1014,6 +1029,19 @@ fsntfs_test_tools_output_SOURCES = \
 	fsntfs_test_unused.h
 
 fsntfs_test_tools_output_LDADD = \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_tools_path_string_SOURCES = \
+	../fsntfstools/path_string.c ../fsntfstools/path_string.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libcpath.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_path_string.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_path_string_LDADD = \
+	@LIBUNA_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 

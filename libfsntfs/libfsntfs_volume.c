@@ -2818,6 +2818,7 @@ int libfsntfs_volume_get_file_entry_by_index(
 }
 
 /* Retrieves the MFT entry for an UTF-8 encoded path
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * A new directory_entry is allocated if a match is found
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
@@ -2978,7 +2979,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf8_path(
 
 		while( utf8_string_index < utf8_string_length )
 		{
-			if( libuna_unicode_character_copy_from_utf8(
+			if( libuna_unicode_character_copy_from_utf8_rfc2279(
 			     &unicode_character,
 			     utf8_string,
 			     utf8_string_length,
@@ -3138,6 +3139,7 @@ on_error:
 }
 
 /* Retrieves the file entry for an UTF-8 encoded path
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libfsntfs_volume_get_file_entry_by_utf8_path(
@@ -3275,6 +3277,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
 }
 
 /* Retrieves the MFT entry for an UTF-16 encoded path
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * A new directory_entry is allocated if a match is found
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
@@ -3435,7 +3438,7 @@ int libfsntfs_internal_volume_get_mft_and_directory_entry_by_utf16_path(
 
 		while( utf16_string_index < utf16_string_length )
 		{
-			if( libuna_unicode_character_copy_from_utf16(
+			if( libuna_unicode_character_copy_from_ucs2(
 			     &unicode_character,
 			     utf16_string,
 			     utf16_string_length,
@@ -3595,6 +3598,7 @@ on_error:
 }
 
 /* Retrieves the file entry for an UTF-16 encoded path
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 int libfsntfs_volume_get_file_entry_by_utf16_path(

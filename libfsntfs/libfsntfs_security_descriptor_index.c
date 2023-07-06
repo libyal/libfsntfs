@@ -468,7 +468,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 
 			goto on_error;
 		}
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
 			{
@@ -566,7 +566,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 		}
 		if( compare_result == LIBCDATA_COMPARE_LESS )
 		{
-			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 			{
 				break;
 			}
@@ -734,7 +734,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 
 		result = 1;
 	}
-	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * security_descriptor_index->sii_index->io_handle->cluster_block_size );
 

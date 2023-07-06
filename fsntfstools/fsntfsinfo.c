@@ -407,7 +407,7 @@ int main( int argc, char * const argv[] )
 					goto on_error;
 				}
 			}
-			else if( fsntfstools_system_string_copy_from_64_bit_in_decimal(
+			else if( fsntfstools_system_string_copy_decimal_to_integer_64_bit(
 			          option_mft_entry_index,
 			          string_length + 1,
 			          &mft_entry_index,

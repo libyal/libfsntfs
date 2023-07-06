@@ -57,6 +57,7 @@ int libfsntfs_bitmap_values_read_data(
      const uint8_t *data,
      size_t data_size,
      size_t element_data_size,
+     off64_t *base_offset,
      libcerror_error_t **error );
 
 int libfsntfs_bitmap_values_read_from_mft_attribute(

@@ -1,5 +1,5 @@
 TODO
-* escape unpaired surrogates in bodyfile
+* libfsntfs and fsntfsmount how to support \\ in file name? since \\ is separator used by the library
 
 * extent: flag WofCompressedData extent as wof_compressed?
 * extent: rename compressed flag to lznt1_compressed?

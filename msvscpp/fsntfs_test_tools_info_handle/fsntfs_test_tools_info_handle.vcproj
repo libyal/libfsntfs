@@ -184,6 +184,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\fsntfstools\path_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\fsntfs_test_memory.c"
 				>
 			</File>
@@ -203,6 +207,10 @@
 			</File>
 			<File
 				RelativePath="..\..\fsntfstools\info_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\path_string.h"
 				>
 			</File>
 			<File

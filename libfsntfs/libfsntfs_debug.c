@@ -199,10 +199,10 @@ void libfsntfs_debug_print_index_node_flags(
 void libfsntfs_debug_print_index_value_flags(
       uint32_t index_value_flags )
 {
-	if( ( index_value_flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	if( ( index_value_flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 		libcnotify_printf(
-		 "\tHas sub node\n" );
+		 "\tIs branch node\n" );
 	}
 	if( ( index_value_flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
 	{

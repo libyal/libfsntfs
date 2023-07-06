@@ -178,12 +178,14 @@ int libfsntfs_bitmap_values_read_data(
      const uint8_t *data,
      size_t data_size,
      size_t element_data_size,
+     off64_t *base_offset,
      libcerror_error_t **error )
 {
 	static char *function             = "libfsntfs_bitmap_values_read_data";
 	size64_t allocated_range_size     = 0;
 	size_t data_offset                = 0;
 	off64_t allocated_range_offset    = 0;
+	off64_t safe_base_offset          = 0;
 	uint8_t bit_index                 = 0;
 	uint8_t byte_value                = 0;
 	uint8_t in_allocated_range        = 0;
@@ -224,6 +226,19 @@ int libfsntfs_bitmap_values_read_data(
 
 		return( -1 );
 	}
+	if( base_offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid base offset.",
+		 function );
+
+		return( -1 );
+	}
+	safe_base_offset = *base_offset;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -256,7 +271,7 @@ int libfsntfs_bitmap_values_read_data(
 			}
 			else if( ( byte_value & 0x01 ) == 0 )
 			{
-				allocated_range_offset = (off64_t) first_allocated_element_index * element_data_size;
+				allocated_range_offset = safe_base_offset + ( (off64_t) first_allocated_element_index * element_data_size );
 				allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * element_data_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -314,7 +329,7 @@ int libfsntfs_bitmap_values_read_data(
 	}
 	if( in_allocated_range != 0 )
 	{
-		allocated_range_offset = (off64_t) first_allocated_element_index * element_data_size;
+		allocated_range_offset = safe_base_offset + ( (off64_t) first_allocated_element_index * element_data_size );
 		allocated_range_size   = ( (size64_t) allocated_element_index - first_allocated_element_index ) * element_data_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -371,6 +386,8 @@ int libfsntfs_bitmap_values_read_data(
 		 "\n" );
 	}
 #endif
+	*base_offset = safe_base_offset + ( (off64_t) allocated_element_index * element_data_size );
+
 	return( 1 );
 }
 
@@ -393,6 +410,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 	static char *function                    = "libfsntfs_bitmap_values_read_from_mft_attribute";
 	size64_t segment_size                    = 0;
 	size_t data_size                         = 0;
+	off64_t base_offset                      = 0;
 	off64_t segment_offset                   = 0;
 	uint32_t attribute_type                  = 0;
 	uint32_t segment_flags                   = 0;
@@ -498,6 +516,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 		     data,
 		     data_size,
 		     element_data_size,
+		     &base_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -640,6 +659,7 @@ int libfsntfs_bitmap_values_read_from_mft_attribute(
 				     cluster_block->data,
 				     cluster_block->data_size,
 				     element_data_size,
+				     &base_offset,
 				     error ) != 1 )
 				{
 					libcerror_error_set(

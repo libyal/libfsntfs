@@ -604,7 +604,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
 			{
@@ -635,7 +635,21 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 
 				goto on_error;
 			}
-			else if( is_allocated == 0 )
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: index value: %03d sub node VCN: %" PRIu64 " (%s).\n",
+				 function,
+				 index_value_entry,
+				 index_value->sub_node_vcn,
+				 is_allocated ? "allocated" : "unallocated" );
+
+				libcnotify_printf(
+				 "\n" );
+			}
+#endif
+			if( is_allocated == 0 )
 			{
 				continue;
 			}
@@ -1295,7 +1309,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
 			{
@@ -1400,7 +1414,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		}
 		if( compare_result == LIBUNA_COMPARE_LESS )
 		{
-			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 			{
 				break;
 			}
@@ -1485,7 +1499,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 		result = 1;
 	}
-	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 
@@ -1746,7 +1760,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
 			{
@@ -1851,7 +1865,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		}
 		if( compare_result == LIBUNA_COMPARE_LESS )
 		{
-			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 			{
 				break;
 			}
@@ -1936,7 +1950,7 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 		result = 1;
 	}
-	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_HAS_SUB_NODE ) != 0 )
+	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
 		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
 

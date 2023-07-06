@@ -49,7 +49,8 @@ fsntfsinfo_SOURCES = \
 	fsntfstools_output.c fsntfstools_output.h \
 	fsntfstools_signal.c fsntfstools_signal.h \
 	fsntfstools_unused.h \
-	info_handle.c info_handle.h
+	info_handle.c info_handle.h \
+	path_string.c path_string.h
 
 fsntfsinfo_LDADD = \
 	@LIBHMAC_LIBADD@ \
@@ -89,7 +90,8 @@ fsntfsmount_SOURCES = \
 	mount_file_entry.c mount_file_entry.h \
 	mount_file_system.c mount_file_system.h \
 	mount_fuse.c mount_fuse.h \
-	mount_handle.c mount_handle.h
+	mount_handle.c mount_handle.h \
+	mount_path_string.c mount_path_string.h
 
 fsntfsmount_LDADD = \
 	@LIBFUSE_LIBADD@ \

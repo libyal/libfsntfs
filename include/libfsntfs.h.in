@@ -449,6 +449,7 @@ int libfsntfs_volume_get_file_entry_by_index(
      libfsntfs_error_t **error );
 
 /* Retrieves the file entry for an UTF-8 encoded path
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -460,6 +461,7 @@ int libfsntfs_volume_get_file_entry_by_utf8_path(
      libfsntfs_error_t **error );
 
 /* Retrieves the file entry for an UTF-16 encoded path
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * Returns 1 if successful, 0 if no such file entry or -1 on error
  */
 LIBFSNTFS_EXTERN \
@@ -613,6 +615,7 @@ int libfsntfs_file_entry_get_file_attribute_flags(
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
@@ -624,6 +627,7 @@ int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
@@ -636,6 +640,7 @@ int libfsntfs_file_entry_get_utf8_name(
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
@@ -647,6 +652,7 @@ int libfsntfs_file_entry_get_utf16_name_size(
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * This value is retrieved from the directory entry $FILE_NAME attribute
  * Returns 1 if successful, 0 if not available or -1 on error
@@ -1293,6 +1299,7 @@ int libfsntfs_file_name_attribute_get_name_space(
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1303,6 +1310,7 @@ int libfsntfs_file_name_attribute_get_utf8_name_size(
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1314,6 +1322,7 @@ int libfsntfs_file_name_attribute_get_utf8_name(
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1324,6 +1333,7 @@ int libfsntfs_file_name_attribute_get_utf16_name_size(
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */

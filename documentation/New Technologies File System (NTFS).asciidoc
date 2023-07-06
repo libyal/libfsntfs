@@ -1569,7 +1569,7 @@ See section: <<file_reference,The file reference>>
 4+| _If index key data size > 0_
 | 16 | ... | | Index key data
 | ... | ... | | Index value data
-4+| _If index value flag 0x00000001 (has sub node) is set_
+4+| _If index value flag 0x00000001 (is branch node) is set_
 | ... | 8 | | Sub node Virtual Cluster Number (VCN)
 |===
 

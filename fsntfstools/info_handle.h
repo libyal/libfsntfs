@@ -76,7 +76,7 @@ struct info_handle
 	int abort;
 };
 
-int fsntfstools_system_string_copy_from_64_bit_in_decimal(
+int fsntfstools_system_string_copy_decimal_to_integer_64_bit(
      const system_character_t *string,
      size_t string_size,
      uint64_t *value_64bit,

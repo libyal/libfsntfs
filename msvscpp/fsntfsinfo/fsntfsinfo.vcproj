@@ -199,6 +199,10 @@
 				RelativePath="..\..\fsntfstools\info_handle.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\fsntfstools\path_string.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -283,6 +287,10 @@
 			</File>
 			<File
 				RelativePath="..\..\fsntfstools\info_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\fsntfstools\path_string.h"
 				>
 			</File>
 		</Filter>
