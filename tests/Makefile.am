@@ -107,6 +107,8 @@ check_PROGRAMS = \
 	fsntfs_test_security_descriptor_values \
 	fsntfs_test_standard_information_values \
 	fsntfs_test_support \
+	fsntfs_test_tools_bodyfile \
+	fsntfs_test_tools_digest_hash \
 	fsntfs_test_tools_info_handle \
 	fsntfs_test_tools_mount_path_string \
 	fsntfs_test_tools_output \
@@ -981,7 +983,31 @@ fsntfs_test_support_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
+fsntfs_test_tools_bodyfile_SOURCES = \
+	../fsntfstools/bodyfile.c ../fsntfstools/bodyfile.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_libcpath.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_bodyfile.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_bodyfile_LDADD = \
+	@LIBUNA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCERROR_LIBADD@
+
+fsntfs_test_tools_digest_hash_SOURCES = \
+	../fsntfstools/digest_hash.c ../fsntfstools/digest_hash.h \
+	fsntfs_test_libcerror.h \
+	fsntfs_test_macros.h \
+	fsntfs_test_tools_digest_hash.c \
+	fsntfs_test_unused.h
+
+fsntfs_test_tools_digest_hash_LDADD = \
+	@LIBCERROR_LIBADD@
+
 fsntfs_test_tools_info_handle_SOURCES = \
+	../fsntfstools/bodyfile.c ../fsntfstools/bodyfile.h \
 	../fsntfstools/digest_hash.c ../fsntfstools/digest_hash.h \
 	../fsntfstools/info_handle.c ../fsntfstools/info_handle.h \
 	../fsntfstools/path_string.c ../fsntfstools/path_string.h \

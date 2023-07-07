@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_tools_info_handle"
-	ProjectGUID="{60D0DC49-FB23-4356-B93B-3083D6C7870F}"
-	RootNamespace="fsntfs_test_tools_info_handle"
+	Name="fsntfs_test_tools_bodyfile"
+	ProjectGUID="{92D81AA9-3090-4B66-966F-EE4CAA062A18}"
+	RootNamespace="fsntfs_test_tools_bodyfile"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -180,23 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\fsntfstools\digest_hash.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\info_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\path_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_tools_info_handle.c"
+				RelativePath="..\..\tests\fsntfs_test_tools_bodyfile.c"
 				>
 			</File>
 		</Filter>
@@ -210,27 +194,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\fsntfstools\digest_hash.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\info_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\path_string.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\tests\fsntfs_test_libcerror.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_macros.h"
+				RelativePath="..\..\tests\fsntfs_test_libcpath.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.h"
+				RelativePath="..\..\tests\fsntfs_test_macros.h"
 				>
 			</File>
 			<File

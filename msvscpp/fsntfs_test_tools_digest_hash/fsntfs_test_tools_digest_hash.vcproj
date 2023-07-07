@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="fsntfs_test_tools_info_handle"
-	ProjectGUID="{60D0DC49-FB23-4356-B93B-3083D6C7870F}"
-	RootNamespace="fsntfs_test_tools_info_handle"
+	Name="fsntfs_test_tools_digest_hash"
+	ProjectGUID="{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}"
+	RootNamespace="fsntfs_test_tools_digest_hash"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,27 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\fsntfstools\bodyfile.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\fsntfstools\digest_hash.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\fsntfstools\info_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\path_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_tools_info_handle.c"
+				RelativePath="..\..\tests\fsntfs_test_tools_digest_hash.c"
 				>
 			</File>
 		</Filter>
@@ -206,19 +190,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\fsntfstools\bodyfile.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\fsntfstools\digest_hash.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\info_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\fsntfstools\path_string.h"
 				>
 			</File>
 			<File
@@ -227,10 +199,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\fsntfs_test_macros.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\fsntfs_test_memory.h"
 				>
 			</File>
 			<File

@@ -185,6 +185,8 @@ stamp-h[1-9]
 /tests/fsntfs_test_security_descriptor_values
 /tests/fsntfs_test_standard_information_values
 /tests/fsntfs_test_support
+/tests/fsntfs_test_tools_bodyfile
+/tests/fsntfs_test_tools_digest_hash
 /tests/fsntfs_test_tools_info_handle
 /tests/fsntfs_test_tools_mount_path_string
 /tests/fsntfs_test_tools_output

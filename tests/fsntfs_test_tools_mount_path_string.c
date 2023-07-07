@@ -179,7 +179,7 @@ int fsntfs_test_tools_mount_path_string_copy_from_file_entry_path(
      void )
 {
 #if defined( WINAPI )
-	system_character_t file_entry_path3[ 5 ] = { 't', 'e', 0x2808, 't', 0 };
+	system_character_t file_entry_path3[ 5 ] = { 't', 'e', 0x2028, 't', 0 };
 	system_character_t file_entry_path4[ 5 ] = { 't', 'e', '\\', 't', 0 };
 	system_character_t file_entry_path5[ 5 ] = { 't', 'e', '^', 't', 0 };
 	system_character_t expected_path2[ 8 ]   = { 't', 'e', '^', 'x', '0', '3', 't', 0 };
@@ -540,7 +540,7 @@ int fsntfs_test_tools_mount_path_string_copy_to_file_entry_path(
      void )
 {
 #if defined( WINAPI )
-	system_character_t expected_file_entry_path3[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 0x2808, 't', 0 };
+	system_character_t expected_file_entry_path3[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 0x2028, 't', 0 };
 	system_character_t expected_file_entry_path4[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', '^', 't', 0 };
 	system_character_t path2[ 9 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', '^', 'x', '0', '3', 't', 0 };
 	system_character_t path3[ 15 ]                    = { LIBCPATH_SEPARATOR, 't', 'e', '^', 'U', '0', '0', '0', '0', '2', '0', '2', '8', 't', 0 };
@@ -548,16 +548,16 @@ int fsntfs_test_tools_mount_path_string_copy_to_file_entry_path(
 #else
 	system_character_t expected_file_entry_path3[ 8 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 0xe2, 0x80, 0xa8, 't', 0 };
 	system_character_t expected_file_entry_path4[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', '\\', 't', 0 };
-	system_character_t expected_file_entry_path5[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', '\\', 't', 0 };
 	system_character_t path2[ 9 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', '\\', 'x', '0', '3', 't', 0 };
 	system_character_t path3[ 15 ]                    = { LIBCPATH_SEPARATOR, 't', 'e', '\\', 'U', '0', '0', '0', '0', '2', '0', '2', '8', 't', 0 };
 	system_character_t path4[ 7 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', '\\', '\\', 't', 0 };
-	system_character_t path5[ 6 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', '/', 't', 0 };
 #endif
 
 	system_character_t expected_file_entry_path1[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 's', 't', 0 };
 	system_character_t expected_file_entry_path2[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 0x03, 't', 0 };
+	system_character_t expected_file_entry_path5[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', LIBFSNTFS_SEPARATOR, 't', 0 };
 	system_character_t path1[ 6 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', 's', 't', 0 };
+	system_character_t path5[ 6 ]                     = { LIBCPATH_SEPARATOR, 't', 'e', LIBCPATH_SEPARATOR, 't', 0 };
 	libcerror_error_t *error                          = NULL;
 	system_character_t *file_entry_path               = NULL;
 	size_t file_entry_path_size                       = 0;
@@ -731,8 +731,6 @@ int fsntfs_test_tools_mount_path_string_copy_to_file_entry_path(
 
 	file_entry_path = NULL;
 
-#if !defined( WINAPI )
-
 	result = mount_path_string_copy_to_file_entry_path(
 	          path5,
 	          6,
@@ -772,8 +770,6 @@ int fsntfs_test_tools_mount_path_string_copy_to_file_entry_path(
 	 file_entry_path );
 
 	file_entry_path = NULL;
-
-#endif /* !defined( WINAPI ) */
 
 	/* Test error cases
 	 */

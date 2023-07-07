@@ -481,6 +481,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_support", "fsnt
 		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_tools_bodyfile", "fsntfs_test_tools_bodyfile\fsntfs_test_tools_bodyfile.vcproj", "{92D81AA9-3090-4B66-966F-EE4CAA062A18}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8447CA5B-9D12-4DF0-B225-A25F4B288D2D} = {8447CA5B-9D12-4DF0-B225-A25F4B288D2D}
+		{D1CA56F0-00C0-4E8C-BD6F-8A15619A954D} = {D1CA56F0-00C0-4E8C-BD6F-8A15619A954D}
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_tools_digest_hash", "fsntfs_test_tools_digest_hash\fsntfs_test_tools_digest_hash.vcproj", "{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4C79D798-FB54-4CD5-9067-9BDC8678478A} = {4C79D798-FB54-4CD5-9067-9BDC8678478A}
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fsntfs_test_tools_info_handle", "fsntfs_test_tools_info_handle\fsntfs_test_tools_info_handle.vcproj", "{60D0DC49-FB23-4356-B93B-3083D6C7870F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6BA13A4B-8361-474A-8055-3A9F2437C3AC} = {6BA13A4B-8361-474A-8055-3A9F2437C3AC}
@@ -990,6 +1002,14 @@ Global
 		{A3CAA91B-F202-4B5E-B11B-367E05C097DC}.Release|Win32.Build.0 = Release|Win32
 		{A3CAA91B-F202-4B5E-B11B-367E05C097DC}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
 		{A3CAA91B-F202-4B5E-B11B-367E05C097DC}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{92D81AA9-3090-4B66-966F-EE4CAA062A18}.Release|Win32.ActiveCfg = Release|Win32
+		{92D81AA9-3090-4B66-966F-EE4CAA062A18}.Release|Win32.Build.0 = Release|Win32
+		{92D81AA9-3090-4B66-966F-EE4CAA062A18}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{92D81AA9-3090-4B66-966F-EE4CAA062A18}.VSDebug|Win32.Build.0 = VSDebug|Win32
+		{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}.Release|Win32.ActiveCfg = Release|Win32
+		{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}.Release|Win32.Build.0 = Release|Win32
+		{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}.VSDebug|Win32.ActiveCfg = VSDebug|Win32
+		{9BA6CBAE-1B19-41BE-9E46-0824CCD932E3}.VSDebug|Win32.Build.0 = VSDebug|Win32
 		{60D0DC49-FB23-4356-B93B-3083D6C7870F}.Release|Win32.ActiveCfg = Release|Win32
 		{60D0DC49-FB23-4356-B93B-3083D6C7870F}.Release|Win32.Build.0 = Release|Win32
 		{60D0DC49-FB23-4356-B93B-3083D6C7870F}.VSDebug|Win32.ActiveCfg = VSDebug|Win32

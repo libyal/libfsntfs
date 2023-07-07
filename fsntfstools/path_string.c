@@ -27,6 +27,7 @@
 #include <wide_string.h>
 
 #include "fsntfstools_libcerror.h"
+#include "fsntfstools_libfsntfs.h"
 #include "fsntfstools_libuna.h"
 #include "path_string.h"
 
@@ -251,7 +252,7 @@ int path_string_copy_from_file_entry_path(
 			print_count = system_string_sprintf(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
-			               "%" PRIc_SYSTEM "x%02" PRIx32 "",
+			               _SYSTEM_STRING( "%" PRIc_SYSTEM "x%02" PRIx32 "" ),
 			               escape_character,
 			               unicode_character );
 
@@ -297,7 +298,7 @@ int path_string_copy_from_file_entry_path(
 			print_count = system_string_sprintf(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
-			               "%" PRIc_SYSTEM "U%08" PRIx32 "",
+			               _SYSTEM_STRING( "%" PRIc_SYSTEM "U%08" PRIx32 "" ),
 			               escape_character,
 			               unicode_character );
 
@@ -315,7 +316,7 @@ int path_string_copy_from_file_entry_path(
 			path_index += print_count;
 		}
 		/* Replace:
-		 *   \ by \\
+		 *   Escape character (\) by \\
 		 */
 		else if( unicode_character == (libuna_unicode_character_t) escape_character )
 		{
@@ -331,7 +332,7 @@ int path_string_copy_from_file_entry_path(
 				goto on_error;
 			}
 			safe_path[ path_index++ ] = escape_character;
-			safe_path[ path_index++ ] = escape_character;
+			safe_path[ path_index++ ] = (system_character_t) unicode_character;
 		}
 		else
 		{
@@ -385,6 +386,7 @@ on_error:
 int path_string_copy_to_file_entry_path(
      const system_character_t *path,
      size_t path_length,
+     system_character_t path_segment_separator,
      system_character_t **file_entry_path,
      size_t *file_entry_path_size,
      libcerror_error_t **error )
@@ -662,6 +664,10 @@ int path_string_copy_to_file_entry_path(
 				goto on_error;
 			}
 			unicode_character = (libuna_unicode_character_t) escaped_value;
+		}
+		if( unicode_character == (libuna_unicode_character_t) path_segment_separator )
+		{
+			unicode_character = (libuna_unicode_character_t) LIBFSNTFS_SEPARATOR;
 		}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libuna_unicode_character_copy_to_ucs2(

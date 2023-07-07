@@ -263,11 +263,9 @@ int mount_path_string_copy_from_file_entry_path(
 		 *
 		 * On Windows replace:
 		 *   \ by ^x5c
-		 *   ^ by ^^
 		 *
 		 * On other platforms replace:
 		 *   / by \x2f
-		 *   \ by \\
 		 */
 		if( ( unicode_character <= 0x1f )
 		 || ( unicode_character == (libuna_unicode_character_t) LIBCPATH_SEPARATOR )
@@ -277,7 +275,7 @@ int mount_path_string_copy_from_file_entry_path(
 			print_count = system_string_sprintf(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
-			               "%" PRIc_SYSTEM "x%02" PRIx32 "",
+			               _SYSTEM_STRING( "%" PRIc_SYSTEM "x%02" PRIx32 "" ),
 			               escape_character,
 			               unicode_character );
 
@@ -294,7 +292,7 @@ int mount_path_string_copy_from_file_entry_path(
 			}
 			path_index += print_count;
 		}
-		/* Replace by \U########:
+		/* Replace by \U######## (or ^U######## on Windows):
 		 *   Unicode surrogate characters ([U+d800-U+dfff])
 		 *   Undefined Unicode characters ([
 		 *       U+fdd0-U+fddf, U+fffe-U+ffff, U+1fffe-U+1ffff, U+2fffe-U+2ffff,
@@ -323,7 +321,7 @@ int mount_path_string_copy_from_file_entry_path(
 			print_count = system_string_sprintf(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
-			               "%" PRIc_SYSTEM "U%08" PRIx32 "",
+			               _SYSTEM_STRING( "%" PRIc_SYSTEM "U%08" PRIx32 "" ),
 			               escape_character,
 			               unicode_character );
 
@@ -340,6 +338,9 @@ int mount_path_string_copy_from_file_entry_path(
 			}
 			path_index += print_count;
 		}
+		/* Replace:
+		 *   Escape character (\) by \\ (or ^ by ^^ on Windows)
+		 */
 		else if( unicode_character == (libuna_unicode_character_t) escape_character )
 		{
 			if( ( path_index + 2 ) > safe_path_size )
@@ -354,7 +355,7 @@ int mount_path_string_copy_from_file_entry_path(
 				goto on_error;
 			}
 			safe_path[ path_index++ ] = escape_character;
-			safe_path[ path_index++ ] = escape_character;
+			safe_path[ path_index++ ] = (system_character_t) unicode_character;
 		}
 		else
 		{
@@ -584,7 +585,7 @@ int mount_path_string_copy_to_file_entry_path(
 			}
 #if defined( WINAPI )
 			else if( ( character == (system_character_t) 'X' )
-			      && ( character == (system_character_t) 'x' ) )
+			      || ( character == (system_character_t) 'x' ) )
 #else
 			else if( character == (system_character_t) 'x' )
 #endif
@@ -651,7 +652,7 @@ int mount_path_string_copy_to_file_entry_path(
 			 */
 #if defined( WINAPI )
 			else if( ( character == (system_character_t) 'U' )
-			      && ( character == (system_character_t) 'u' ) )
+			      || ( character == (system_character_t) 'u' ) )
 #else
 			else if( character == (system_character_t) 'U' )
 #endif
@@ -729,12 +730,10 @@ int mount_path_string_copy_to_file_entry_path(
 			}
 			unicode_character = (libuna_unicode_character_t) escaped_value;
 		}
-#if !defined( WINAPI )
-		else if( unicode_character == (libuna_unicode_character_t) '/' )
+		if( unicode_character == (libuna_unicode_character_t) LIBCPATH_SEPARATOR )
 		{
 			unicode_character = (libuna_unicode_character_t) LIBFSNTFS_SEPARATOR;
 		}
-#endif
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libuna_unicode_character_copy_to_ucs2(
 		          unicode_character,

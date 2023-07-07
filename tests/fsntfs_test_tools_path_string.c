@@ -178,7 +178,7 @@ int fsntfs_test_tools_path_string_copy_from_file_entry_path(
      void )
 {
 #if defined( WINAPI )
-	system_character_t file_entry_path3[ 5 ] = { 't', 'e', 0x2808, 't', 0 };
+	system_character_t file_entry_path3[ 5 ] = { 't', 'e', 0x2028, 't', 0 };
 #else
 	system_character_t file_entry_path3[ 7 ] = { 't', 'e', 0xe2, 0x80, 0xa8, 't', 0 };
 #endif
@@ -489,7 +489,7 @@ on_error:
 int fsntfs_test_tools_path_string_copy_to_file_entry_path(
      void )
 {
-	system_character_t expected_file_entry_path1[ 6 ] = { '\\', 't', 'e', 's', 't', 0 };
+	system_character_t expected_file_entry_path1[ 6 ] = { LIBFSNTFS_SEPARATOR, 't', 'e', 's', 't', 0 };
 	system_character_t path1[ 7 ]                     = { '\\', '\\', 't', 'e', 's', 't', 0 };
 	libcerror_error_t *error                          = NULL;
 	system_character_t *file_entry_path               = NULL;
@@ -501,6 +501,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          path1,
 	          6,
+	          (system_character_t) '\\',
 	          &file_entry_path,
 	          &file_entry_path_size,
 	          &error );
@@ -549,6 +550,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          NULL,
 	          4,
+	          (system_character_t) '\\',
 	          &file_entry_path,
 	          &file_entry_path_size,
 	          &error );
@@ -568,6 +570,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          path1,
 	          0,
+	          (system_character_t) '\\',
 	          &file_entry_path,
 	          &file_entry_path_size,
 	          &error );
@@ -587,6 +590,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          path1,
 	          (size_t) SSIZE_MAX + 1,
+	          (system_character_t) '\\',
 	          &file_entry_path,
 	          &file_entry_path_size,
 	          &error );
@@ -606,6 +610,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          path1,
 	          4,
+	          (system_character_t) '\\',
 	          NULL,
 	          &file_entry_path_size,
 	          &error );
@@ -625,6 +630,7 @@ int fsntfs_test_tools_path_string_copy_to_file_entry_path(
 	result = path_string_copy_to_file_entry_path(
 	          path1,
 	          4,
+	          (system_character_t) '\\',
 	          &file_entry_path,
 	          NULL,
 	          &error );

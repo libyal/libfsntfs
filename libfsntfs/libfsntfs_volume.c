@@ -626,7 +626,7 @@ int libfsntfs_volume_open_file_io_handle(
 	static char *function                        = "libfsntfs_volume_open_file_io_handle";
 	int bfio_access_flags                        = 0;
 	int file_io_handle_is_open                   = 0;
-	int file_io_handle_opened_in_library         = 0;
+	uint8_t file_io_handle_opened_in_library     = 0;
 
 	if( volume == NULL )
 	{
@@ -753,7 +753,7 @@ int libfsntfs_volume_open_file_io_handle(
 	}
 #endif
 	internal_volume->file_io_handle                   = file_io_handle;
-	internal_volume->file_io_handle_opened_in_library = (uint8_t) file_io_handle_opened_in_library;
+	internal_volume->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
 
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(

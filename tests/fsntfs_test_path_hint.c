@@ -43,14 +43,14 @@
 int fsntfs_test_path_hint_initialize(
      void )
 {
-	libcerror_error_t *error             = NULL;
+	libcerror_error_t *error         = NULL;
 	libfsntfs_path_hint_t *path_hint = NULL;
-	int result                           = 0;
+	int result                       = 0;
 
 #if defined( HAVE_FSNTFS_TEST_MEMORY )
-	int number_of_malloc_fail_tests      = 1;
-	int number_of_memset_fail_tests      = 1;
-	int test_number                      = 0;
+	int number_of_malloc_fail_tests  = 1;
+	int number_of_memset_fail_tests  = 1;
+	int test_number                  = 0;
 #endif
 
 	/* Test regular cases
@@ -301,7 +301,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 

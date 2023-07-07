@@ -29,6 +29,7 @@ bin_PROGRAMS = \
 	fsntfsmount
 
 fsntfsinfo_SOURCES = \
+	bodyfile.c bodyfile.h \
 	digest_hash.c digest_hash.h \
 	fsntfsinfo.c \
 	fsntfstools_getopt.c fsntfstools_getopt.h \
