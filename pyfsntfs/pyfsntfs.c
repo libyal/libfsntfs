@@ -196,8 +196,13 @@ PyObject *pyfsntfs_check_volume_signature(
 		PyErr_Clear();
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		filename_wide = (wchar_t *) PyUnicode_AsWideChar(
+		                             string_object );
+#else
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
+#endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_check_volume_signature_wide(

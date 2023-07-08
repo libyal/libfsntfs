@@ -245,7 +245,6 @@ PyObject *pyfsntfs_reparse_point_attribute_get_substitute_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_reparse_point_attribute_get_substitute_name";
 	size_t name_size         = 0;
@@ -298,7 +297,7 @@ PyObject *pyfsntfs_reparse_point_attribute_get_substitute_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create substitute name.",
 		 function );
 
@@ -334,7 +333,7 @@ PyObject *pyfsntfs_reparse_point_attribute_get_substitute_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );
@@ -359,7 +358,6 @@ PyObject *pyfsntfs_reparse_point_attribute_get_print_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_reparse_point_attribute_get_print_name";
 	size_t name_size         = 0;
@@ -412,7 +410,7 @@ PyObject *pyfsntfs_reparse_point_attribute_get_print_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create print name.",
 		 function );
 
@@ -448,7 +446,7 @@ PyObject *pyfsntfs_reparse_point_attribute_get_print_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );

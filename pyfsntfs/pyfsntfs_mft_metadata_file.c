@@ -396,7 +396,7 @@ PyObject *pyfsntfs_mft_metadata_file_open(
 	{
 		pyfsntfs_error_fetch_and_raise(
 	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -406,8 +406,13 @@ PyObject *pyfsntfs_mft_metadata_file_open(
 		PyErr_Clear();
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		filename_wide = (wchar_t *) PyUnicode_AsWideChar(
+		                             string_object );
+#else
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
+#endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_mft_metadata_file_open_wide(
@@ -716,7 +721,6 @@ PyObject *pyfsntfs_mft_metadata_file_get_volume_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *volume_name     = NULL;
 	static char *function    = "pyfsntfs_mft_metadata_file_get_volume_name";
 	size_t volume_name_size  = 0;
@@ -769,7 +773,7 @@ PyObject *pyfsntfs_mft_metadata_file_get_volume_name(
 	if( volume_name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create volume name.",
 		 function );
 
@@ -805,7 +809,7 @@ PyObject *pyfsntfs_mft_metadata_file_get_volume_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) volume_name,
 			 (Py_ssize_t) volume_name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 volume_name );

@@ -254,6 +254,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_usn_change_journal.c"
 				>
 			</File>
@@ -360,6 +364,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_libuna.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_mft_metadata_file.h"
 				>
 			</File>
@@ -385,6 +393,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyfsntfs\pyfsntfs_standard_information_attribute.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyfsntfs\pyfsntfs_string.h"
 				>
 			</File>
 			<File

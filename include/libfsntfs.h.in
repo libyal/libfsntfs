@@ -685,6 +685,7 @@ int libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
      libfsntfs_error_t **error );
 
 /* Retrieves the UTF-8 encoded name for a specific $FILE_NAME attribute
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -697,6 +698,7 @@ int libfsntfs_file_entry_get_utf8_name_by_attribute_index(
      libfsntfs_error_t **error );
 
 /* Retrieves the size of the UTF-16 encoded name for a specific $FILE_NAME attribute
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */

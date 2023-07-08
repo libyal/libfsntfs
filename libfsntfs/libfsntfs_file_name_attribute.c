@@ -501,6 +501,7 @@ int libfsntfs_file_name_attribute_get_name_space(
 }
 
 /* Retrieves the size of the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -569,6 +570,7 @@ int libfsntfs_file_name_attribute_get_utf8_name_size(
 }
 
 /* Retrieves the UTF-8 encoded name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -639,6 +641,7 @@ int libfsntfs_file_name_attribute_get_utf8_name(
 }
 
 /* Retrieves the size of the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -707,6 +710,7 @@ int libfsntfs_file_name_attribute_get_utf16_name_size(
 }
 
 /* Retrieves the UTF-16 encoded name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */

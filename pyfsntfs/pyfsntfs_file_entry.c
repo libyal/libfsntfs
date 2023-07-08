@@ -44,6 +44,7 @@
 #include "pyfsntfs_reparse_point_attribute.h"
 #include "pyfsntfs_security_descriptor_attribute.h"
 #include "pyfsntfs_standard_information_attribute.h"
+#include "pyfsntfs_string.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_volume_information_attribute.h"
 #include "pyfsntfs_volume_name_attribute.h"
@@ -2664,7 +2665,6 @@ PyObject *pyfsntfs_file_entry_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_file_entry_get_name";
 	size_t name_size         = 0;
@@ -2717,7 +2717,7 @@ PyObject *pyfsntfs_file_entry_get_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -2725,6 +2725,8 @@ PyObject *pyfsntfs_file_entry_get_name(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
+	/* Using RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
+	 */
 	result = libfsntfs_file_entry_get_utf8_name(
 		  pyfsntfs_file_entry->file_entry,
 		  name,
@@ -2746,15 +2748,20 @@ PyObject *pyfsntfs_file_entry_get_name(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyfsntfs_string_new_from_utf8_rfc2279(
+			 name,
+			 name_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
-			 errors );
-
+	                 (char *) name,
+	                 (Py_ssize_t) name_size - 1,
+	                 NULL );
+#endif
 	PyMem_Free(
 	 name );
 
@@ -2842,7 +2849,6 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 {
 	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
-	const char *errors          = NULL;
 	uint8_t *name               = NULL;
 	static char *function       = "pyfsntfs_file_entry_get_name_by_attribute_index";
 	static char *keyword_list[] = { "attribute_index", NULL };
@@ -2906,7 +2912,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -2936,15 +2942,20 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyfsntfs_string_new_from_utf8_rfc2279(
+			 name,
+			 name_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
-			 errors );
-
+	                 (char *) name,
+	                 (Py_ssize_t) name_size - 1,
+	                 NULL );
+#endif
 	PyMem_Free(
 	 name );
 
@@ -3028,7 +3039,6 @@ PyObject *pyfsntfs_file_entry_get_path_hint(
 {
 	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
-	const char *errors          = NULL;
 	uint8_t *path               = NULL;
 	static char *function       = "pyfsntfs_file_entry_get_path_hint";
 	static char *keyword_list[] = { "attribute_index", NULL };
@@ -3092,7 +3102,7 @@ PyObject *pyfsntfs_file_entry_get_path_hint(
 	if( path == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create path.",
 		 function );
 
@@ -3129,7 +3139,7 @@ PyObject *pyfsntfs_file_entry_get_path_hint(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) path,
 			 (Py_ssize_t) path_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 path );
@@ -3154,7 +3164,6 @@ PyObject *pyfsntfs_file_entry_get_symbolic_link_target(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_file_entry_get_symbolic_link_target";
 	size_t name_size         = 0;
@@ -3207,7 +3216,7 @@ PyObject *pyfsntfs_file_entry_get_symbolic_link_target(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -3243,7 +3252,7 @@ PyObject *pyfsntfs_file_entry_get_symbolic_link_target(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );

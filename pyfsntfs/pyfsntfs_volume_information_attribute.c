@@ -180,8 +180,8 @@ PyObject *pyfsntfs_volume_information_attribute_get_version(
 {
 	char version_string[ 4 ];
 
+	PyObject *string_object  = NULL;
 	libcerror_error_t *error = NULL;
-	const char *errors       = NULL;
 	static char *function    = "pyfsntfs_volume_information_attribute_get_version";
 	uint8_t major_version    = 0;
 	uint8_t minor_version    = 0;
@@ -255,10 +255,12 @@ PyObject *pyfsntfs_volume_information_attribute_get_version(
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
-	return( PyUnicode_DecodeUTF8(
-	         version_string,
-	         (Py_ssize_t) 3,
-	         errors ) );
+	string_object = PyUnicode_DecodeUTF8(
+	                 version_string,
+	                 (Py_ssize_t) 3,
+	                 NULL );
+
+	return( string_object );
 }
 
 /* Retrieves the flags

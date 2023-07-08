@@ -35,6 +35,7 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_string.h"
 #include "pyfsntfs_unused.h"
 #include "pyfsntfs_usn_change_journal.h"
 #include "pyfsntfs_volume.h"
@@ -559,9 +560,13 @@ PyObject *pyfsntfs_volume_open(
 		PyErr_Clear();
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		filename_wide = (wchar_t *) PyUnicode_AsWideChar(
+		                             string_object );
+#else
 		filename_wide = (wchar_t *) PyUnicode_AsUnicode(
 		                             string_object );
-
+#endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libfsntfs_volume_open_wide(
@@ -1122,7 +1127,6 @@ PyObject *pyfsntfs_volume_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_volume_get_name";
 	size_t name_size         = 0;
@@ -1175,7 +1179,7 @@ PyObject *pyfsntfs_volume_get_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -1211,7 +1215,7 @@ PyObject *pyfsntfs_volume_get_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );
@@ -1501,14 +1505,21 @@ PyObject *pyfsntfs_volume_get_file_entry_by_path(
            PyObject *arguments,
            PyObject *keywords )
 {
+	PyObject *file_entry_object        = NULL;
+	PyObject *string_object            = NULL;
 	libcerror_error_t *error           = NULL;
 	libfsntfs_file_entry_t *file_entry = NULL;
-	PyObject *file_entry_object        = NULL;
-	char *path                         = NULL;
-	static char *keyword_list[]        = { "path", NULL };
 	static char *function              = "pyfsntfs_volume_get_file_entry_by_path";
+	static char *keyword_list[]        = { "path", NULL };
+	char *path                         = NULL;
+	const char *narrow_string          = NULL;
 	size_t path_length                 = 0;
+	size_t path_size                   = 0;
 	int result                         = 0;
+
+#if PY_MAJOR_VERSION <= 2 || ( PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION <= 2 )
+	PyObject *utf8_string_object       = NULL;
+#endif
 
 	if( pyfsntfs_volume == NULL )
 	{
@@ -1522,26 +1533,146 @@ PyObject *pyfsntfs_volume_get_file_entry_by_path(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "s",
+	     "O",
 	     keyword_list,
-	     &path ) == 0 )
+	     &string_object ) == 0 )
 	{
 		goto on_error;
 	}
-	path_length = narrow_string_length(
-	               path );
+	PyErr_Clear();
 
+	result = PyObject_IsInstance(
+	          string_object,
+	          (PyObject *) &PyUnicode_Type );
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_fetch_and_raise(
+	         PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type Unicode.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+		if( pyfsntfs_string_copy_to_utf8_rfc2279(
+		     string_object,
+		     (uint8_t **) &path,
+		     &path_size,
+		     &error ) != 1 )
+		{
+			pyfsntfs_error_raise(
+			 error,
+		         PyExc_RuntimeError,
+			 "%s: unable to copy string object to UTF-8 string.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+
+			goto on_error;
+		}
+		narrow_string = path;
+		path_length   = path_size - 1;
+#else
+		PyErr_Clear();
+
+		utf8_string_object = PyUnicode_AsUTF8String(
+		                      string_object );
+
+		if( utf8_string_object == NULL )
+		{
+			pyfsntfs_error_fetch_and_raise(
+			 PyExc_RuntimeError,
+			 "%s: unable to convert Unicode string to UTF-8.",
+			 function );
+
+			goto on_error;
+		}
+#if PY_MAJOR_VERSION >= 3
+		narrow_string = PyBytes_AsString(
+		                 utf8_string_object );
+#else
+		narrow_string = PyString_AsString(
+		                 utf8_string_object );
+#endif
+		path_length = narrow_string_length(
+		               narrow_string );
+#endif
+	}
+	else if( result == 0 )
+	{
+		PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+		result = PyObject_IsInstance(
+			  string_object,
+			  (PyObject *) &PyBytes_Type );
+#else
+		result = PyObject_IsInstance(
+			  string_object,
+			  (PyObject *) &PyString_Type );
+#endif
+		if( result == -1 )
+		{
+			pyfsntfs_error_fetch_and_raise(
+		         PyExc_RuntimeError,
+			 "%s: unable to determine if string object is of type string.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			PyErr_Format(
+			 PyExc_TypeError,
+			 "%s: unsupported string object type.",
+			 function );
+
+			goto on_error;
+		}
+		PyErr_Clear();
+
+#if PY_MAJOR_VERSION >= 3
+		narrow_string = PyBytes_AsString(
+		                 string_object );
+#else
+		narrow_string = PyString_AsString(
+		                 string_object );
+#endif
+		path_length = narrow_string_length(
+		               narrow_string );
+	}
 	Py_BEGIN_ALLOW_THREADS
 
 	result = libfsntfs_volume_get_file_entry_by_utf8_path(
 	           pyfsntfs_volume->volume,
-	           (uint8_t *) path,
+	           (uint8_t *) narrow_string,
 	           path_length,
 	           &file_entry,
 	           &error );
 
 	Py_END_ALLOW_THREADS
 
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	if( path != NULL )
+	{
+		PyMem_Free(
+		 path );
+
+		path = NULL;
+	}
+#else
+	if( utf8_string_object != NULL )
+	{
+		Py_DecRef(
+		 utf8_string_object );
+
+		utf8_string_object = NULL;
+	}
+#endif
 	if( result == -1 )
 	{
 		pyfsntfs_error_raise(
@@ -1586,6 +1717,19 @@ on_error:
 		 &file_entry,
 		 NULL );
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	if( path != NULL )
+	{
+		PyMem_Free(
+		 path );
+	}
+#else
+	if( utf8_string_object != NULL )
+	{
+		Py_DecRef(
+		 utf8_string_object );
+	}
+#endif
 	return( NULL );
 }
 

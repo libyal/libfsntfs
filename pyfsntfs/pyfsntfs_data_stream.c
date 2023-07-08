@@ -1078,7 +1078,7 @@ PyObject *pyfsntfs_data_stream_get_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 

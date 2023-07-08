@@ -34,6 +34,7 @@
 #include "pyfsntfs_libcerror.h"
 #include "pyfsntfs_libfsntfs.h"
 #include "pyfsntfs_python.h"
+#include "pyfsntfs_string.h"
 #include "pyfsntfs_unused.h"
 
 PyMethodDef pyfsntfs_file_name_attribute_object_methods[] = {
@@ -914,7 +915,6 @@ PyObject *pyfsntfs_file_name_attribute_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_file_name_attribute_get_name";
 	size_t name_size         = 0;
@@ -967,7 +967,7 @@ PyObject *pyfsntfs_file_name_attribute_get_name(
 	if( name == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -996,15 +996,20 @@ PyObject *pyfsntfs_file_name_attribute_get_name(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyfsntfs_string_new_from_utf8_rfc2279(
+			 name,
+			 name_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
-			 errors );
-
+	                 (char *) name,
+	                 (Py_ssize_t) name_size - 1,
+	                 NULL );
+#endif
 	PyMem_Free(
 	 name );
 

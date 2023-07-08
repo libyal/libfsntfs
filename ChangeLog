@@ -1,4 +1,6 @@
 TODO
+* pyfsntfs convert lookup path to support additional character range
+
 * libfsntfs and fsntfsmount how to support \\ in file name? since \\ is separator used by the library
 
 * extent: flag WofCompressedData extent as wof_compressed?
