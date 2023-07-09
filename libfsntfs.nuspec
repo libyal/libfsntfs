@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>libfsntfs</id>
-    <version>20230706</version>
+    <version>20230708</version>
     <authors>Joachim Metz</authors>
     <owners>joachimmetz</owners>
     <license type="expression">LGPL-3.0-or-later</license>
@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <title>libfsntfs</title>
     <description>Library to access the Windows New Technology File System (NTFS) format</description>
-    <releaseNotes>Release of libfsntfs 20230706</releaseNotes>
+    <releaseNotes>Release of libfsntfs 20230708</releaseNotes>
     <copyright>Copyright (C) 2010-2023</copyright>
     <tags>native</tags>
   </metadata>

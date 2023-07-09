@@ -2676,6 +2676,7 @@ int main(
 	return( EXIT_SUCCESS );
 
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
+
 on_error:
 	if( error != NULL )
 	{

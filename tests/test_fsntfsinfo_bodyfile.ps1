@@ -1,6 +1,6 @@
 # Info tool testing script
 #
-# Version: 20200414
+# Version: 20230410
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -8,7 +8,7 @@ $ExitIgnore = 77
 
 $Profiles = @("fsntfsinfo_bodyfile_fs", "fsntfsinfo_bodyfile_mft")
 $OptionsPerProfile = @("-Bbodyfile -H", "-Bbodyfile -Eall")
-$OptionSets = "offset";
+$OptionSets = "offset"
 
 $InputGlob = "*"
 
@@ -16,11 +16,11 @@ Function GetTestExecutablesDirectory
 {
 	$TestExecutablesDirectory = ""
 
-	ForEach (${VSDirectory} in "msvscpp vs2008 vs2010 vs2012 vs2013 vs2015 vs2017 vs2019" -split " ")
+	ForEach (${VSDirectory} in ("msvscpp", "vs2008", "vs2010", "vs2012", "vs2013", "vs2015", "vs2017", "vs2019", "vs2022"))
 	{
-		ForEach (${VSConfiguration} in "Release VSDebug" -split " ")
+		ForEach (${VSConfiguration} in ("Release", "VSDebug"))
 		{
-			ForEach (${VSPlatform} in "Win32 x64" -split " ")
+			ForEach (${VSPlatform} in ("Win32", "x64"))
 			{
 				$TestExecutablesDirectory = "..\${VSDirectory}\${VSConfiguration}\${VSPlatform}"
 

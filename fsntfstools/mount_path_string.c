@@ -32,6 +32,12 @@
 #include "fsntfstools_libuna.h"
 #include "mount_path_string.h"
 
+#if defined( WINAPI )
+#define ESCAPE_CHARACTER (system_character_t) '^'
+#else
+#define ESCAPE_CHARACTER (system_character_t) '\\'
+#endif
+
 /* Copies a string of a hexadecimal value to a 32-bit value
  * Returns 1 if successful or -1 on error
  */
@@ -137,7 +143,6 @@ int mount_path_string_copy_from_file_entry_path(
 	system_character_t *safe_path                = NULL;
 	static char *function                        = "mount_path_string_copy_from_file_entry_path";
 	libuna_unicode_character_t unicode_character = 0;
-	system_character_t escape_character          = 0;
 	size_t file_entry_path_index                 = 0;
 	size_t path_index                            = 0;
 	size_t safe_path_size                        = 0;
@@ -218,25 +223,17 @@ int mount_path_string_copy_from_file_entry_path(
 
 		goto on_error;
 	}
-#if defined( WINAPI )
-	escape_character = (system_character_t) '^';
-#else
-	escape_character = (system_character_t) '\\';
-#endif
-
-	/* Using UCS-2 or RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
-	 */
 	while( file_entry_path_index < file_entry_path_length )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_from_ucs2(
+		result = libuna_unicode_character_copy_from_utf16(
 		          &unicode_character,
 		          (libuna_utf16_character_t *) file_entry_path,
 		          file_entry_path_length,
 		          &file_entry_path_index,
 		          error );
 #else
-		result = libuna_unicode_character_copy_from_utf8_rfc2279(
+		result = libuna_unicode_character_copy_from_utf8(
 		          &unicode_character,
 		          (libuna_utf8_character_t *) file_entry_path,
 		          file_entry_path_length,
@@ -276,7 +273,7 @@ int mount_path_string_copy_from_file_entry_path(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
 			               _SYSTEM_STRING( "%" PRIc_SYSTEM "x%02" PRIx32 "" ),
-			               escape_character,
+			               ESCAPE_CHARACTER,
 			               unicode_character );
 
 			if( print_count < 0 )
@@ -322,7 +319,7 @@ int mount_path_string_copy_from_file_entry_path(
 			               &( safe_path[ path_index ] ),
 			               safe_path_size - path_index,
 			               _SYSTEM_STRING( "%" PRIc_SYSTEM "U%08" PRIx32 "" ),
-			               escape_character,
+			               ESCAPE_CHARACTER,
 			               unicode_character );
 
 			if( print_count < 0 )
@@ -341,7 +338,7 @@ int mount_path_string_copy_from_file_entry_path(
 		/* Replace:
 		 *   Escape character (\) by \\ (or ^ by ^^ on Windows)
 		 */
-		else if( unicode_character == (libuna_unicode_character_t) escape_character )
+		else if( unicode_character == (libuna_unicode_character_t) ESCAPE_CHARACTER )
 		{
 			if( ( path_index + 2 ) > safe_path_size )
 			{
@@ -354,7 +351,7 @@ int mount_path_string_copy_from_file_entry_path(
 
 				goto on_error;
 			}
-			safe_path[ path_index++ ] = escape_character;
+			safe_path[ path_index++ ] = ESCAPE_CHARACTER;
 			safe_path[ path_index++ ] = (system_character_t) unicode_character;
 		}
 		else
@@ -428,7 +425,6 @@ int mount_path_string_copy_to_file_entry_path(
 	static char *function                        = "mount_path_string_copy_to_file_entry_path";
 	libuna_unicode_character_t unicode_character = 0;
 	system_character_t character                 = 0;
-	system_character_t escape_character          = 0;
 	size_t file_entry_path_index                 = 0;
 	size_t path_index                            = 0;
 	size_t safe_file_entry_path_size             = 0;
@@ -518,12 +514,6 @@ int mount_path_string_copy_to_file_entry_path(
 
 		goto on_error;
 	}
-#if defined( WINAPI )
-	escape_character = (system_character_t) '^';
-#else
-	escape_character = (system_character_t) '\\';
-#endif
-
 	while( path_index < path_length )
 	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -552,7 +542,7 @@ int mount_path_string_copy_to_file_entry_path(
 
 			goto on_error;
 		}
-		if( unicode_character == (libuna_unicode_character_t) escape_character )
+		if( unicode_character == (libuna_unicode_character_t) ESCAPE_CHARACTER )
 		{
 			if( ( path_index + 1 ) > path_length )
 			{
@@ -579,7 +569,7 @@ int mount_path_string_copy_to_file_entry_path(
 			 *   \x2f by /
 			 *   / by \
 			 */
-			if( character == escape_character )
+			if( character == ESCAPE_CHARACTER )
 			{
 				escaped_value = (uint32_t) character;
 			}
@@ -633,7 +623,7 @@ int mount_path_string_copy_to_file_entry_path(
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 					 "%s: invalid escaped character: %" PRIc_SYSTEM "x%02" PRIx32 " value out of bounds.",
 					 function,
-					 escape_character,
+					 ESCAPE_CHARACTER,
 					 escaped_value );
 
 					goto on_error;
@@ -709,7 +699,7 @@ int mount_path_string_copy_to_file_entry_path(
 					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 					 "%s: invalid escaped character: %" PRIc_SYSTEM "U%08" PRIx32 " value out of bounds.",
 					 function,
-					 escape_character,
+					 ESCAPE_CHARACTER,
 					 escaped_value );
 
 					goto on_error;
@@ -724,7 +714,7 @@ int mount_path_string_copy_to_file_entry_path(
 				 "%s: unsupported path - invalid character: %" PRIc_SYSTEM " after escape character: %" PRIc_SYSTEM ".",
 				 function,
 				 character,
-				 escape_character );
+				 ESCAPE_CHARACTER );
 
 				goto on_error;
 			}
@@ -735,14 +725,14 @@ int mount_path_string_copy_to_file_entry_path(
 			unicode_character = (libuna_unicode_character_t) LIBFSNTFS_SEPARATOR;
 		}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libuna_unicode_character_copy_to_ucs2(
+		result = libuna_unicode_character_copy_to_utf16(
 		          unicode_character,
 		          (libuna_utf16_character_t *) safe_file_entry_path,
 		          safe_file_entry_path_size,
 		          &file_entry_path_index,
 		          error );
 #else
-		result = libuna_unicode_character_copy_to_utf8_rfc2279(
+		result = libuna_unicode_character_copy_to_utf8(
 		          unicode_character,
 		          (libuna_utf8_character_t *) safe_file_entry_path,
 		          safe_file_entry_path_size,
@@ -787,3 +777,4 @@ on_error:
 	}
 	return( -1 );
 }
+

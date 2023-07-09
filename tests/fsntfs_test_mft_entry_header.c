@@ -1034,9 +1034,9 @@ int main(
 
 	return( EXIT_SUCCESS );
 
-on_error:
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
+on_error:
 	if( error != NULL )
 	{
 		libcerror_error_free(
@@ -1048,8 +1048,8 @@ on_error:
 		 &mft_entry_header,
 		 NULL );
 	}
-#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
-
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */
 }
 
