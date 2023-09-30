@@ -164,16 +164,6 @@ PyObject *pyfsntfs_string_new_from_utf8_rfc2279(
 			goto on_error;
 		}
 	}
-	if( PyUnicode_READY(
-	     string_object ) == -1 )
-	{
-		PyErr_Format(
-		 PyExc_RuntimeError,
-		 "%s: unable to finalize string object.",
-		 function );
-
-		goto on_error;
-	}
 	PyMem_Free(
 	 utf32_string );
 

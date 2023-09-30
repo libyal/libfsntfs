@@ -2663,11 +2663,11 @@ PyObject *pyfsntfs_file_entry_get_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	uint8_t *name            = NULL;
+	libcerror_error_t *error = NULL;
+	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyfsntfs_file_entry_get_name";
-	size_t name_size         = 0;
+	size_t utf8_string_size  = 0;
 	int result               = 0;
 
 	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
@@ -2685,7 +2685,7 @@ PyObject *pyfsntfs_file_entry_get_name(
 
 	result = libfsntfs_file_entry_get_utf8_name_size(
 	          pyfsntfs_file_entry->file_entry,
-	          &name_size,
+	          &utf8_string_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -2695,7 +2695,7 @@ PyObject *pyfsntfs_file_entry_get_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to determine size of name as UTF-8 string.",
 		 function );
 
 		libcerror_error_free(
@@ -2704,21 +2704,21 @@ PyObject *pyfsntfs_file_entry_get_name(
 		goto on_error;
 	}
 	else if( ( result == 0 )
-	      || ( name_size == 0 ) )
+	      || ( utf8_string_size == 0 ) )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
+	utf8_string = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( name == NULL )
+	if( utf8_string == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create name.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
@@ -2729,8 +2729,8 @@ PyObject *pyfsntfs_file_entry_get_name(
 	 */
 	result = libfsntfs_file_entry_get_utf8_name(
 		  pyfsntfs_file_entry->file_entry,
-		  name,
-		  name_size,
+		  utf8_string,
+		  utf8_string_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -2740,7 +2740,7 @@ PyObject *pyfsntfs_file_entry_get_name(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name.",
+		 "%s: unable to retrieve name as UTF-8 string.",
 		 function );
 
 		libcerror_error_free(
@@ -2750,28 +2750,37 @@ PyObject *pyfsntfs_file_entry_get_name(
 	}
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
 	string_object = pyfsntfs_string_new_from_utf8_rfc2279(
-			 name,
-			 name_size );
+			 utf8_string,
+			 utf8_string_size );
 #else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-	                 (char *) name,
-	                 (Py_ssize_t) name_size - 1,
+	                 (char *) utf8_string,
+	                 (Py_ssize_t) utf8_string_size - 1,
 	                 NULL );
 #endif
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 string into Unicode object.",
+		 function );
+
+		goto on_error;
+	}
 	PyMem_Free(
-	 name );
+	 utf8_string );
 
 	return( string_object );
 
 on_error:
-	if( name != NULL )
+	if( utf8_string != NULL )
 	{
 		PyMem_Free(
-		 name );
+		 utf8_string );
 	}
 	return( NULL );
 }
@@ -2847,12 +2856,12 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
            PyObject *arguments,
            PyObject *keywords )
 {
-	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
-	uint8_t *name               = NULL;
+	libcerror_error_t *error    = NULL;
+	uint8_t *utf8_string        = NULL;
 	static char *function       = "pyfsntfs_file_entry_get_name_by_attribute_index";
 	static char *keyword_list[] = { "attribute_index", NULL };
-	size_t name_size            = 0;
+	size_t utf8_string_size     = 0;
 	int attribute_index         = 0;
 	int result                  = 0;
 
@@ -2881,7 +2890,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 	result = libfsntfs_file_entry_get_utf8_name_size_by_attribute_index(
 	          pyfsntfs_file_entry->file_entry,
 	          attribute_index,
-	          &name_size,
+	          &utf8_string_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -2891,7 +2900,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name size.",
+		 "%s: unable to determine size of name as UTF-8 string.",
 		 function );
 
 		libcerror_error_free(
@@ -2899,32 +2908,34 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 
 		goto on_error;
 	}
-	else if( name_size == 0 )
+	else if( utf8_string_size == 0 )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
+	utf8_string = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( name == NULL )
+	if( utf8_string == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create name.",
+		 "%s: unable to create UTF-8 string.",
 		 function );
 
 		goto on_error;
 	}
 	Py_BEGIN_ALLOW_THREADS
 
+	/* Using RFC 2279 UTF-8 to support unpaired UTF-16 surrogates
+	 */
 	result = libfsntfs_file_entry_get_utf8_name_by_attribute_index(
 		  pyfsntfs_file_entry->file_entry,
 	          attribute_index,
-		  name,
-		  name_size,
+		  utf8_string,
+		  utf8_string_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -2934,7 +2945,7 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 		pyfsntfs_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to retrieve name.",
+		 "%s: unable to retrieve name as UTF-8 string.",
 		 function );
 
 		libcerror_error_free(
@@ -2944,28 +2955,37 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
 	}
 #if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
 	string_object = pyfsntfs_string_new_from_utf8_rfc2279(
-			 name,
-			 name_size );
+			 utf8_string,
+			 utf8_string_size );
 #else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-	                 (char *) name,
-	                 (Py_ssize_t) name_size - 1,
+	                 (char *) utf8_string,
+	                 (Py_ssize_t) utf8_string_size - 1,
 	                 NULL );
 #endif
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 string into Unicode object.",
+		 function );
+
+		goto on_error;
+	}
 	PyMem_Free(
-	 name );
+	 utf8_string );
 
 	return( string_object );
 
 on_error:
-	if( name != NULL )
+	if( utf8_string != NULL )
 	{
 		PyMem_Free(
-		 name );
+		 utf8_string );
 	}
 	return( NULL );
 }

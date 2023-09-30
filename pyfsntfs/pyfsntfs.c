@@ -113,7 +113,6 @@ PyObject *pyfsntfs_get_version(
            PyObject *self PYFSNTFS_ATTRIBUTE_UNUSED,
            PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
 {
-	const char *errors           = NULL;
 	const char *version_string   = NULL;
 	size_t version_string_length = 0;
 
@@ -136,7 +135,7 @@ PyObject *pyfsntfs_get_version(
 	return( PyUnicode_DecodeUTF8(
 	         version_string,
 	         (Py_ssize_t) version_string_length,
-	         errors ) );
+	         NULL ) );
 }
 
 /* Checks if a volume has a Windows New Technology File System (NTFS) volume signature

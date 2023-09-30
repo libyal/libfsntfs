@@ -384,7 +384,6 @@ PyObject *pyfsntfs_attribute_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *name            = NULL;
 	static char *function    = "pyfsntfs_attribute_get_name";
 	size_t name_size         = 0;
@@ -473,7 +472,7 @@ PyObject *pyfsntfs_attribute_get_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) name,
 			 (Py_ssize_t) name_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 name );
