@@ -19,9 +19,9 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libfsntfs.h
-	/bin/rm -f libfsntfs/definitions.h
-	/bin/rm -f libfsntfs/features.h
-	/bin/rm -f libfsntfs/types.h
-	/bin/rm -f Makefile
+	-rm -f libfsntfs.h
+	-rm -f libfsntfs/definitions.h
+	-rm -f libfsntfs/features.h
+	-rm -f libfsntfs/types.h
+	-rm -f Makefile
 

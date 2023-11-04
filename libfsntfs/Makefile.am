@@ -151,11 +151,13 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libfsntfs_definitions.h
-	/bin/rm -f libfsntfs.rc
-	/bin/rm -f Makefile
+	-rm -f libfsntfs_definitions.h
+	-rm -f libfsntfs.rc
+	-rm -f Makefile
 
-splint:
+sources-local: $(BUILT_SOURCES)
+
+splint-local:
 	@echo "Running splint on libfsntfs ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(libfsntfs_la_SOURCES)
 
