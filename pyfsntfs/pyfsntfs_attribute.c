@@ -51,7 +51,14 @@ PyMethodDef pyfsntfs_attribute_object_methods[] = {
 	  "get_attribute_name() -> Unicode string or None\n"
 	  "\n"
 	  "Returns the name of the attribute." },
-
+	
+	{ "get_attribute_data_size",
+	  (PyCFunction) pyfsntfs_attribute_get_data_size,
+	  METH_NOARGS,
+	  "get_attribute_data_size() -> Integer\n"
+	  "\n"
+	  "Returns the size of the data of the attribute." },
+	
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
 };
@@ -68,6 +75,12 @@ PyGetSetDef pyfsntfs_attribute_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_attribute_get_name,
 	  (setter) 0,
 	  "The name of the attribute.",
+	  NULL },
+
+	{ "attribute_data_size",
+	  (getter) pyfsntfs_attribute_get_data_size,
+	  (setter) 0,
+	  "The size of the data of the attribute.",
 	  NULL },
 
 	/* Sentinel */
@@ -371,6 +384,58 @@ PyObject *pyfsntfs_attribute_get_type(
 	}
 	integer_object = PyLong_FromUnsignedLong(
 	                  (unsigned long) value_32bit );
+
+	return( integer_object );
+}
+
+/* Retrieves the size of the data
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_attribute_get_data_size(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_attribute_get_data_size";
+	uint64_t value_64bit     = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_attribute == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid attribute.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_attribute_get_data_size(
+	          pyfsntfs_attribute->attribute,
+	          &value_64bit,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = PyLong_FromUnsignedLong(
+	                  (unsigned long) value_64bit );
 
 	return( integer_object );
 }
