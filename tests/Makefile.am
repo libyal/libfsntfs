@@ -37,6 +37,8 @@ TESTS = \
 	$(TESTS_PYFSNTFS)
 
 check_SCRIPTS = \
+	pyfsntfs_test_attribute.py \
+	pyfsntfs_test_file_entry.py \
 	pyfsntfs_test_support.py \
 	pyfsntfs_test_volume.py \
 	test_fsntfsinfo.sh \

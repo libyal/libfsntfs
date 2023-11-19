@@ -72,6 +72,14 @@ PyObject *pyfsntfs_attribute_get_name(
            pyfsntfs_attribute_t *pyfsntfs_attribute,
            PyObject *arguments );
 
+PyObject *pyfsntfs_attribute_get_data_size(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_attribute_get_valid_data_size(
+           pyfsntfs_attribute_t *pyfsntfs_attribute,
+           PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif

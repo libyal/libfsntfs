@@ -2082,7 +2082,7 @@ int info_handle_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tType\t\t\t\t: %s (0x%08" PRIx32 ")\n",
+	 "\tAttribute type\t\t\t: %s (0x%08" PRIx32 ")\n",
 	 info_handle_get_attribute_type_description(
 	  attribute_type ),
 	 attribute_type );
@@ -2160,7 +2160,7 @@ int info_handle_attribute_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "\tName\t\t\t: " );
+			 "\tAttribute name\t\t: " );
 
 			if( info_handle_name_value_fprint(
 			     info_handle,
@@ -2172,7 +2172,7 @@ int info_handle_attribute_fprint(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print name string.",
+				 "%s: unable to print attribute name string.",
 				 function );
 
 				goto on_error;

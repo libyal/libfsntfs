@@ -1138,6 +1138,15 @@ int libfsntfs_attribute_get_data_size(
      size64_t *data_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the valid data size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_attribute_get_valid_data_size(
+     libfsntfs_attribute_t *attribute,
+     size64_t *valid_data_size,
+     libfsntfs_error_t **error );
+
 /* -------------------------------------------------------------------------
  * $ATTRIBUTE_LIST attribute functions
  * ------------------------------------------------------------------------- */

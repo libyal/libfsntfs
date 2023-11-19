@@ -1,4 +1,4 @@
-.Dd July 28, 2022
+.Dd November 19, 2023
 .Dt libfsntfs 3
 .Os libfsntfs
 .Sh NAME
@@ -244,6 +244,8 @@ Attribute functions
 .Fn libfsntfs_attribute_get_data_vcn_range "libfsntfs_attribute_t *attribute" "uint64_t *data_first_vcn" "uint64_t *data_last_vcn" "libfsntfs_error_t **error"
 .Ft int
 .Fn libfsntfs_attribute_get_data_size "libfsntfs_attribute_t *attribute" "size64_t *data_size" "libfsntfs_error_t **error"
+.Ft int
+.Fn libfsntfs_attribute_get_valid_data_size "libfsntfs_attribute_t *attribute" "size64_t *valid_data_size" "libfsntfs_error_t **error"
 .Pp
 $ATTRIBUTE_LIST attribute functions
 .Ft int
