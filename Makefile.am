@@ -23,8 +23,6 @@ SUBDIRS = \
 	libhmac \
 	fsntfstools \
 	pyfsntfs \
-	pyfsntfs-python2 \
-	pyfsntfs-python3 \
 	po \
 	manuals \
 	tests \

@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
  [libfsntfs],
- [20231119],
+ [20231125],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -119,7 +119,7 @@ dnl Check if libfsntfs Python bindings (pyfsntfs) required headers and functions
 AX_PYTHON_CHECK_ENABLE
 
 AS_IF(
-  [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno],
+  [test "x${ac_cv_enable_python}" != xno],
   [dnl Headers included in pyfsntfs/pyfsntfs_error.c
   AC_CHECK_HEADERS([stdarg.h varargs.h])
 
@@ -199,8 +199,6 @@ AC_CONFIG_FILES([libfguid/Makefile])
 AC_CONFIG_FILES([libfwnt/Makefile])
 AC_CONFIG_FILES([libfsntfs/Makefile])
 AC_CONFIG_FILES([pyfsntfs/Makefile])
-AC_CONFIG_FILES([pyfsntfs-python2/Makefile])
-AC_CONFIG_FILES([pyfsntfs-python3/Makefile])
 AC_CONFIG_FILES([libfusn/Makefile])
 AC_CONFIG_FILES([libhmac/Makefile])
 AC_CONFIG_FILES([fsntfstools/Makefile])
