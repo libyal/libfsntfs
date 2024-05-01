@@ -1,6 +1,6 @@
 dnl Checks for libfusn required headers and functions
 dnl
-dnl Version: 20190308
+dnl Version: 20240413
 
 dnl Function to detect if libfusn is available
 dnl ac_libfusn_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -10,8 +10,10 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
     [ac_cv_libfusn=no],
     [ac_cv_libfusn=check
     dnl Check if the directory provided as parameter exists
+    dnl For both --with-libfusn which returns "yes" and --with-libfusn= which returns ""
+    dnl treat them as auto-detection.
     AS_IF(
-      [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect],
+      [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_with_libfusn" != xyes],
       [AS_IF(
         [test -d "$ac_cv_with_libfusn"],
         [CFLAGS="$CFLAGS -I${ac_cv_with_libfusn}/include"
@@ -79,8 +81,9 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
 
         ac_cv_libfusn_LIBADD="-lfusn"])
       ])
+
     AS_IF(
-      [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_libfusn" != xyes],
+      [test "x$ac_cv_libfusn" != xyes && test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_with_libfusn" != xyes],
       [AC_MSG_FAILURE(
         [unable to find supported libfusn in directory: $ac_cv_with_libfusn],
         [1])
@@ -110,7 +113,7 @@ dnl Function to detect if libfusn dependencies are available
 AC_DEFUN([AX_LIBFUSN_CHECK_LOCAL],
   [dnl No additional checks.
 
-  ac_cv_libfusn_CPPFLAGS="-I../libfusn";
+  ac_cv_libfusn_CPPFLAGS="-I../libfusn -I\$(top_srcdir)/libfusn";
   ac_cv_libfusn_LIBADD="../libfusn/libfusn.la";
 
   ac_cv_libfusn=local

@@ -6,9 +6,7 @@ EXTRA_DIST = \
 	fsntfsinfo.1 \
 	libfsntfs.3
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f Makefile
 

@@ -2160,7 +2160,7 @@ int info_handle_attribute_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "\tAttribute name\t\t: " );
+			 "\tAttribute name\t\t\t: " );
 
 			if( info_handle_name_value_fprint(
 			     info_handle,

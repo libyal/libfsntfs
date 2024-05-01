@@ -204,6 +204,7 @@ stamp-h[1-9]
 /tests/fsntfs_test_volume_name_attribute
 /tests/fsntfs_test_volume_name_values
 /tests/input
+/tests/notify_stream.log
 /tests/tmp*
 
 # Local library dependencies specific files

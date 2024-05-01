@@ -15,13 +15,11 @@ EXTRA_DIST = \
 	libfsntfs/features.h.in \
 	libfsntfs/types.h.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libfsntfs.h \
+	libfsntfs/definitions.h \
+	libfsntfs/features.h \
+	libfsntfs/types.h \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libfsntfs.h
-	-rm -f libfsntfs/definitions.h
-	-rm -f libfsntfs/features.h
-	-rm -f libfsntfs/types.h
-	-rm -f Makefile
 
