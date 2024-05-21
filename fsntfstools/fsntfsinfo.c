@@ -1,5 +1,5 @@
 /*
- * Shows information obtained from a Windows NT File System (NTFS) volume
+ * Shows information obtained from a New Technology File System (NTFS) volume.
  *
  * Copyright (C) 2010-2024, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,12 +33,12 @@
 #include <io.h>
 #endif
 
-#if defined( HAVE_UNISTD_H )
-#include <unistd.h>
-#endif
-
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
+#endif
+
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
 #endif
 
 #include "fsntfstools_getopt.h"
@@ -63,7 +63,7 @@ enum FSNTFSINFO_MODES
 info_handle_t *fsntfsinfo_info_handle = NULL;
 int fsntfsinfo_abort                  = 0;
 
-/* Prints the executable usage information
+/* Prints usage information
  */
 void usage_fprint(
       FILE *stream )
@@ -72,8 +72,8 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Use fsntfsinfo to determine information about a Windows NT\n"
-	                 " File System (NTFS) volume.\n\n" );
+	fprintf( stream, "Use fsntfsinfo to determine information about a New\n"
+	                 " Technology File System (NTFS) volume.\n\n" );
 
 	fprintf( stream, "Usage: fsntfsinfo [ -B bodyfile ] [ -E mft_entry_index ] [ -F path ]\n"
 	                 "                  [ -o offset ] [ -dhHUvV ] source\n\n" );
@@ -167,7 +167,7 @@ int main( int argc, char * const argv[] )
 	 1 );
 
 	if( libclocale_initialize(
-             "fsntfstools",
+	     "fsntfstools",
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -176,9 +176,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-        if( fsntfstools_output_initialize(
-             _IONBF,
-             &error ) != 1 )
+	if( fsntfstools_output_initialize(
+	     _IONBF,
+	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,

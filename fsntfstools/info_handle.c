@@ -8116,7 +8116,7 @@ int info_handle_file_entry_fprint_by_path(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "Windows NT File System information:\n\n" );
+		 "New Technology File System information:\n\n" );
 
 		fprintf(
 		 info_handle->notify_stream,
@@ -8201,7 +8201,7 @@ int info_handle_file_system_hierarchy_fprint(
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "Windows NT File System information:\n\n" );
+		 "New Technology File System information:\n\n" );
 
 		fprintf(
 		 info_handle->notify_stream,
@@ -8779,7 +8779,7 @@ int info_handle_usn_change_journal_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "Windows NT File System information:\n\n" );
+	 "New Technology File System information:\n\n" );
 
 	result = libfsntfs_volume_get_usn_change_journal(
 	          info_handle->input_volume,
@@ -9010,7 +9010,7 @@ int info_handle_volume_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "Windows NT File System information:\n\n" );
+	 "New Technology File System information:\n\n" );
 
 	fprintf(
 	 info_handle->notify_stream,
