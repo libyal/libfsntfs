@@ -1,6 +1,6 @@
 dnl Checks for libfusn required headers and functions
 dnl
-dnl Version: 20240413
+dnl Version: 20240521
 
 dnl Function to detect if libfusn is available
 dnl ac_libfusn_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
@@ -14,15 +14,7 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
     dnl treat them as auto-detection.
     AS_IF(
       [test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_with_libfusn" != xyes],
-      [AS_IF(
-        [test -d "$ac_cv_with_libfusn"],
-        [CFLAGS="$CFLAGS -I${ac_cv_with_libfusn}/include"
-        LDFLAGS="$LDFLAGS -L${ac_cv_with_libfusn}/lib"],
-        [AC_MSG_FAILURE(
-          [no such directory: $ac_cv_with_libfusn],
-          [1])
-        ])
-      ],
+      [AX_CHECK_LIB_DIRECTORY_EXISTS([libfusn])],
       [dnl Check for a pkg-config file
       AS_IF(
         [test "x$cross_compiling" != "xyes" && test "x$PKGCONFIG" != "x"],
@@ -46,48 +38,32 @@ AC_DEFUN([AX_LIBFUSN_CHECK_LIB],
       AS_IF(
         [test "x$ac_cv_header_libfusn_h" = xno],
         [ac_cv_libfusn=no],
-        [dnl Check for the individual functions
-        ac_cv_libfusn=yes
+        [ac_cv_libfusn=yes
 
-        AC_CHECK_LIB(
-          fusn,
-          libfusn_get_version,
-          [ac_cv_libfusn_dummy=yes],
-          [ac_cv_libfusn=no])
-
-        dnl Record functions
-        AC_CHECK_LIB(
-          fusn,
-          libfusn_record_initialize,
-          [ac_cv_libfusn_dummy=yes],
-          [ac_cv_libfusn=no])
-        AC_CHECK_LIB(
-          fusn,
-          libfusn_record_free,
-          [ac_cv_libfusn_dummy=yes],
-          [ac_cv_libfusn=no])
-
-        AC_CHECK_LIB(
-          fusn,
-          libfusn_record_copy_from_byte_stream,
-          [ac_cv_libfusn_dummy=yes],
-          [ac_cv_libfusn=no])
-
-        AC_CHECK_LIB(
-          fusn,
-          libfusn_record_get_size,
-          [ac_cv_libfusn_dummy=yes],
-          [ac_cv_libfusn=no])
+        AX_CHECK_LIB_FUNCTIONS(
+          [libfusn],
+          [fusn],
+          [[libfusn_get_version],
+           [libfusn_record_initialize],
+           [libfusn_record_free],
+           [libfusn_record_copy_from_byte_stream],
+           [libfusn_record_get_size],
+           [libfusn_record_get_update_time],
+           [libfusn_record_get_file_reference],
+           [libfusn_record_get_parent_file_reference],
+           [libfusn_record_get_update_sequence_number],
+           [libfusn_record_get_update_reason_flags],
+           [libfusn_record_get_update_source_flags],
+           [libfusn_record_get_file_attribute_flags],
+           [libfusn_record_get_utf8_name_size],
+           [libfusn_record_get_utf8_name],
+           [libfusn_record_get_utf16_name_size],
+           [libfusn_record_get_utf16_name]])
 
         ac_cv_libfusn_LIBADD="-lfusn"])
       ])
 
-    AS_IF(
-      [test "x$ac_cv_libfusn" != xyes && test "x$ac_cv_with_libfusn" != x && test "x$ac_cv_with_libfusn" != xauto-detect && test "x$ac_cv_with_libfusn" != xyes],
-      [AC_MSG_FAILURE(
-        [unable to find supported libfusn in directory: $ac_cv_with_libfusn],
-        [1])
-      ])
+    AX_CHECK_LIB_DIRECTORY_MSG_ON_FAILURE([libfusn])
     ])
 
   AS_IF(
