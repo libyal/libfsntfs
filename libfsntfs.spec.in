@@ -1,7 +1,7 @@
 Name: libfsntfs
 Version: @VERSION@
 Release: 1
-Summary: Library to access the Windows New Technology File System (NTFS) format
+Summary: Library to access the New Technology File System (NTFS) format
 Group: System Environment/Libraries
 License: LGPL-3.0-or-later
 Source: %{name}-%{version}.tar.gz
@@ -10,10 +10,10 @@ URL: https://github.com/libyal/libfsntfs
 BuildRequires: gcc @ax_libbfio_spec_build_requires@ @ax_libcdata_spec_build_requires@ @ax_libcerror_spec_build_requires@ @ax_libcfile_spec_build_requires@ @ax_libclocale_spec_build_requires@ @ax_libcnotify_spec_build_requires@ @ax_libcpath_spec_build_requires@ @ax_libcsplit_spec_build_requires@ @ax_libcthreads_spec_build_requires@ @ax_libfcache_spec_build_requires@ @ax_libfdata_spec_build_requires@ @ax_libfdatetime_spec_build_requires@ @ax_libfguid_spec_build_requires@ @ax_libfwnt_spec_build_requires@ @ax_libuna_spec_build_requires@
 
 %description -n libfsntfs
-Library to access the Windows New Technology File System (NTFS) format
+Library to access the New Technology File System (NTFS) format
 
 %package -n libfsntfs-static
-Summary: Library to access the Windows New Technology File System (NTFS) format
+Summary: Library to access the New Technology File System (NTFS) format
 Group: Development/Libraries
 Requires: libfsntfs = %{version}-%{release}
 
@@ -38,13 +38,13 @@ BuildRequires: python3-devel python3-setuptools
 Python 3 bindings for libfsntfs
 
 %package -n libfsntfs-tools
-Summary: Several tools for reading Windows New Technology File System (NTFS) volumes
+Summary: Several tools for reading New Technology File System (NTFS) volumes
 Group: Applications/System
 Requires: libfsntfs = %{version}-%{release} @ax_libcrypto_spec_requires@ @ax_libfuse_spec_requires@ @ax_libfusn_spec_requires@ @ax_libhmac_spec_requires@
 @libfsntfs_spec_tools_build_requires@ @ax_libcrypto_spec_build_requires@ @ax_libfuse_spec_build_requires@ @ax_libfusn_spec_build_requires@ @ax_libhmac_spec_build_requires@
 
 %description -n libfsntfs-tools
-Several tools for reading Windows New Technology File System (NTFS) volumes
+Several tools for reading New Technology File System (NTFS) volumes
 
 %prep
 %setup -q
