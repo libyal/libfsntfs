@@ -326,6 +326,15 @@ int libfsntfs_volume_get_cluster_block_size(
      size32_t *cluster_block_size,
      libfsntfs_error_t **error );
 
+/* Retrieves the volume size
+ * Returns 1 if successful or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_size(
+	 libfsntfs_volume_t *volume,
+	 size64_t *volume_size,
+	 libfsntfs_error_t **error );
+
 /* Retrieves the MFT entry size
  * Returns 1 if successful or -1 on error
  */

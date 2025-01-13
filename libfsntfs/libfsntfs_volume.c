@@ -1760,6 +1760,78 @@ int libfsntfs_volume_get_cluster_block_size(
 	return( result );
 }
 
+/* Retrieves the volume size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_volume_get_size(
+	 libfsntfs_volume_t *volume,
+	 size64_t *volume_size,
+	 libcerror_error_t **error )
+{
+	libfsntfs_internal_volume_t *internal_volume = NULL;
+	static char *function                        = "libfsntfs_volume_get_size";
+	int result                                   = 1;
+
+	if( volume == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume.",
+		 function );
+
+		return( -1 );
+	}
+	internal_volume = (libfsntfs_internal_volume_t *) volume;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+		 internal_volume->read_write_lock,
+		 error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfsntfs_volume_header_get_volume_size(
+		 internal_volume->volume_header,
+		 volume_size,
+		 error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve volume size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+		 internal_volume->read_write_lock,
+		 error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the MFT entry size
  * Returns 1 if successful or -1 on error
  */
