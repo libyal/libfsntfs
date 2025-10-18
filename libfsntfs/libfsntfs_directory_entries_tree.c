@@ -643,7 +643,7 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 				 function,
 				 index_value_entry,
 				 index_value->sub_node_vcn,
-				 is_allocated ? "allocated" : "unallocated" );
+				 is_allocated != 0 ? "allocated" : "unallocated" );
 
 				libcnotify_printf(
 				 "\n" );

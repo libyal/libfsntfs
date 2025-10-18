@@ -2934,7 +2934,7 @@ int info_handle_bitmap_attribute_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "\tName\t\t\t\t: " );
+		 "\tAttribute name\t\t\t: " );
 
 		if( info_handle_name_value_fprint(
 		     info_handle,
@@ -4508,7 +4508,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tVersion\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
+	 "\tVersion\t\t\t\t: %" PRIu8 ".%" PRIu8 "\n",
 	 major_version,
 	 minor_version );
 
@@ -4528,7 +4528,7 @@ int info_handle_volume_information_attribute_fprint(
 	}
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFlags\t\t\t: 0x%04" PRIx16 "\n",
+	 "\tFlags\t\t\t\t: 0x%04" PRIx16 "\n",
 	 value_16bit );
 	info_handle_volume_information_flags_fprint(
 	 value_16bit,

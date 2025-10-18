@@ -261,11 +261,11 @@ int libfsntfs_mft_entry_header_read_data(
 	 ( (fsntfs_mft_entry_header_t *) data )->flags,
 	 mft_entry_header->flags );
 
-	byte_stream_copy_to_uint16_little_endian(
+	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->used_entry_size,
 	 mft_entry_header->used_entry_size );
 
-	byte_stream_copy_to_uint16_little_endian(
+	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_mft_entry_header_t *) data )->total_entry_size,
 	 mft_entry_header->total_entry_size );
 
@@ -330,12 +330,12 @@ int libfsntfs_mft_entry_header_read_data(
 		 "\n" );
 
 		libcnotify_printf(
-		 "%s: used entry size\t\t\t\t: %" PRIu16 "\n",
+		 "%s: used entry size\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 mft_entry_header->used_entry_size );
 
 		libcnotify_printf(
-		 "%s: total entry size\t\t\t\t: %" PRIu16 "\n",
+		 "%s: total entry size\t\t\t\t: %" PRIu32 "\n",
 		 function,
 		 mft_entry_header->total_entry_size );
 
@@ -588,7 +588,7 @@ int libfsntfs_mft_entry_header_get_attributes_offset(
  */
 int libfsntfs_mft_entry_header_get_used_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
-     uint16_t *used_entry_size,
+     uint32_t *used_entry_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_header_get_used_entry_size";
@@ -625,7 +625,7 @@ int libfsntfs_mft_entry_header_get_used_entry_size(
  */
 int libfsntfs_mft_entry_header_get_total_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
-     uint16_t *total_entry_size,
+     uint32_t *total_entry_size,
      libcerror_error_t **error )
 {
 	static char *function = "libfsntfs_mft_entry_header_get_total_entry_size";

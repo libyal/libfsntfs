@@ -758,7 +758,7 @@ int fsntfs_test_mft_entry_header_get_used_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header )
 {
 	libcerror_error_t *error = NULL;
-	uint16_t used_entry_size = 0;
+	uint32_t used_entry_size = 0;
 	int result               = 0;
 
 	/* Test regular cases
@@ -836,7 +836,7 @@ int fsntfs_test_mft_entry_header_get_total_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header )
 {
 	libcerror_error_t *error  = NULL;
-	uint16_t total_entry_size = 0;
+	uint32_t total_entry_size = 0;
 	int result                = 0;
 
 	/* Test regular cases

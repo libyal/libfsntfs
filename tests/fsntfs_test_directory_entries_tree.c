@@ -1538,11 +1538,8 @@ int main(
 {
 #if defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT )
 
-	libbfio_handle_t *file_io_handle                           = NULL;
 	libcerror_error_t *error                                   = NULL;
 	libfsntfs_directory_entries_tree_t *directory_entries_tree = NULL;
-	libfsntfs_io_handle_t *io_handle                           = NULL;
-	libfsntfs_mft_entry_t *mft_entry                           = NULL;
 	int result                                                 = 0;
 
 #endif /* defined( __GNUC__ ) && !defined( LIBFSNTFS_DLL_IMPORT ) */

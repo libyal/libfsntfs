@@ -65,11 +65,11 @@ struct libfsntfs_mft_entry_header
 
 	/* The used entry size 
 	 */
-	uint16_t used_entry_size;
+	uint32_t used_entry_size;
 
 	/* The total entry size 
 	 */
-	uint16_t total_entry_size;
+	uint32_t total_entry_size;
 
 	/* The base record file reference
 	 */
@@ -126,12 +126,12 @@ int libfsntfs_mft_entry_header_get_attributes_offset(
 
 int libfsntfs_mft_entry_header_get_used_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
-     uint16_t *used_entry_size,
+     uint32_t *used_entry_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_header_get_total_entry_size(
      libfsntfs_mft_entry_header_t *mft_entry_header,
-     uint16_t *total_entry_size,
+     uint32_t *total_entry_size,
      libcerror_error_t **error );
 
 int libfsntfs_mft_entry_header_get_base_record_file_reference(

@@ -505,7 +505,7 @@ ssize_t libfsntfs_index_value_read(
 
 			goto on_error;
 		}
-		byte_stream_copy_to_uint32_little_endian(
+		byte_stream_copy_to_uint64_little_endian(
 		 &( data[ data_offset ] ),
 		 index_value->sub_node_vcn );
 

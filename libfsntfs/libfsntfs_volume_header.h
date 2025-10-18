@@ -44,10 +44,6 @@ struct libfsntfs_volume_header
 	 */
 	uint16_t bytes_per_sector;
 
-	/* The volume size
-	 */
-	size64_t volume_size;
-
 	/* The volume serial number
 	 */
 	uint64_t volume_serial_number;
@@ -107,11 +103,6 @@ int libfsntfs_volume_header_get_mft_entry_size(
 int libfsntfs_volume_header_get_index_entry_size(
      libfsntfs_volume_header_t *volume_header,
      size32_t *index_entry_size,
-     libcerror_error_t **error );
-
-int libfsntfs_volume_header_get_volume_size(
-     libfsntfs_volume_header_t *volume_header,
-     size64_t *volume_size,
      libcerror_error_t **error );
 
 int libfsntfs_volume_header_get_volume_serial_number(

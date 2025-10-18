@@ -30,7 +30,7 @@ for the libfsntfs project.
 == License
 
 ....
-Copyright (C) 2009-2023, Joachim Metz <joachim.metz@gmail.com>.
+Copyright (C) 2009-2025, Joachim Metz <joachim.metz@gmail.com>.
 Permission is granted to copy, distribute and/or modify this document under the
 terms of the GNU Free Documentation License, Version 1.3 or any later version
 published by the Free Software Foundation; with no Invariant Sections, no
@@ -76,6 +76,7 @@ August 2014 | Textual changes and additional information.
 | 0.0.25 | J.B. Metz | February 2022 | Additional information regarding index entry size.
 | 0.0.26 | J.B. Metz | December 2022 | Additional information regarding $VOLUME_INFORMATION flags.
 | 0.0.27 | J.B. Metz | July 2023 | Additional information file name UTF-16 strings.
+| 0.0.28 | J.B. Metz | January 2025 | Textual changes.
 |===
 
 :numbered:
@@ -148,7 +149,7 @@ same as the physical clusters of a harddisk. For clarity these are referred to
 as cluster blocks. In other sources they are also referred to as logical
 clusters which are numbered globally (or absolute).
 
-Typically the cluster block is 8 sectors (8 x 512 = 4096 bytes) of size.
+Typically the cluster block is 8 sectors (8 x 512 = 4096 bytes) in size.
 
 === Virtual cluster
 
@@ -187,7 +188,7 @@ The following metadata files are predefined and use a fixed MFT entry index.
 | 2 | $LogFile | Metadata transaction journal
 | 3 | $Volume | Volume information
 | 4 | $AttrDef | MFT entry attribute definitions
-| 5 | .  | Root directory
+| 5 | . | Root directory
 | 6 | $Bitmap | Cluster block allocation bitmap
 | 7 | $Boot | Boot record (or boot code)
 | 8 | $BadClus | Bad clusters
@@ -241,7 +242,7 @@ file) and contains:
 * the BIOS parameter block
 * the boot loader
 
-The volume header is 512 bytes of size and consists of:
+The volume header is 512 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -259,17 +260,17 @@ Values supported by mkntfs: 256, 512, 1024, 2048 and 4096
 | 13 | 1 | | Sectors per cluster block +
 See below.
 | 14 | 2 | 0x00 | [yellow-background]*Unknown (Reserved Sectors)* +
-not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+not used by NTFS and must be 0 `[MSDN]`
 | 16 | 1 | 0x00 | Number of File Allocation Tables (FATs) +
-not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+not used by NTFS and must be 0 `[MSDN]`
 | 17 | 2 | 0 | Root directory entries +
-not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+not used by NTFS and must be 0 `[MSDN]`
 | 19 | 2 | | [yellow-background]*Unknown (Total number of sectors (16-bit))* +
 [yellow-background]*Used if the total of number of sectors fits in 16-bit?*
 | 21 | 1 | | Media descriptor +
 See section: <<media_descriptor,Media descriptor>>
 | 22 | 2 | 0x00 | Sectors Per File Allocation Table (FAT) +
-not used by NTFS `[POLLARD06]` and must be 0 `[MSDN]`
+not used by NTFS and must be 0 `[MSDN]`
 4+| _DOS version 3.4 BIOS parameter block (BPB)_
 | 24 | 2 | 0x3f | Sectors per track +
 Not used by NTFS `[MSDN]`
@@ -304,7 +305,7 @@ Not used by NTFS `[MSDN]`
 | 72 | 8 | | NTFS volume serial number +
 See below.
 | 80 | 4 | 0x00 | Checksum +
-not used by NTFS `[POLLARD06]`, `[MSDN]`
+not used by NTFS `[MSDN]`
 4+|
 | 84 | 426 | | Bootcode +
 [yellow-background]*What is the exact end of the bootcode and are there no trailing values?*
@@ -321,7 +322,7 @@ The MFT entry size and index entry size are defined as following:
 
 * Values 0 to 127 represent sizes of 0 to 127 cluster blocks.
 * Values 128 to 255 represent sizes of `2^(256-n)` bytes; or `2^(-n)` if considered as a signed byte.
-* Other values are not considered valid `[POLLARD06]`.
+* Other values are not considered valid.
 
 The cluster block size can be determined as following:
 
@@ -455,7 +456,7 @@ $MFT metadata file.
 === MFT entry
 
 Although the size of a MFT entry is defined in the volume header is commonly
-1024 bytes of size and consists of:
+1024 bytes in size and consists of:
 
 * The MFT entry header
 * The fix-up values
@@ -468,7 +469,7 @@ for MFT entry indexes 16 - 23.
 
 ==== MFT entry header
 
-The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 42 or 48 bytes of size
+The MFT entry header (FILE_RECORD_SEGMENT_HEADER) is 42 or 48 bytes in size
 and consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -504,7 +505,7 @@ See section: <<file_reference,The file reference>>
 | 44 | 4 | | [yellow-background]*Unknown*
 4+| _Version 3.1_
 | 42 | 2 | | [yellow-background]*Unknown (wfixupPattern)*
-| 44 | 4 | | The index
+| 44 | 4 | | MFT entry index
 |===
 
 The base record file reference indicates if the MFT entry is used to store
@@ -528,19 +529,6 @@ In NT4 (version 1.2) the MFT entry is 42 bytes in size and the fix-up values
 are stored at offset 42. This is likely where the field name wfixupPattern
 originates from.
 
-==== Notes
-
-....
-Live MFT header:
-00000000: 02 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-00000020: 00 00 00 00 00 00 00 00  00 00                     ........ ..
-
-00000000: 03 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-00000020: 00 00 00 00 00 00 00 00  00 00                     ........ ..
-....
-
 === [[mft_entry_flags]]MFT entry flags
 
 [cols="1,1,5",options="header"]
@@ -560,20 +548,20 @@ According to `[APPLE06]` this is set for all indices other than $I30
 
 === [[file_reference]]The file reference
 
-The file reference (FILE_REFERENCE or MFT_SEGMENT_REFERENCE) is 8 bytes of size
+The file reference (FILE_REFERENCE or MFT_SEGMENT_REFERENCE) is 8 bytes in size
 and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 6 | | MFT entry index +
-Note that the index value in the MFT entry is only 32-bit of size.
+Note that the index value in the MFT entry is only 32-bit in size.
 | 6 | 2 | | Sequence number
 |===
 
 === [[fix_up_values]]The fix-up values
 
-The fix-up values are variable of size and consists of:
+The fix-up values are of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -597,14 +585,14 @@ The MFT attribute consist of:
 
 * the attribute header
 * the attribute resident or non-resident data
-* the attribute name
+* the <<attribute_name,attribute name>>
 * [yellow-background]*unknown data likely alignment padding (4-byte alignment)*
 * the attribute data runs or data
 * alignment padding (8-byte alignment), can contain remnant data
 
 ==== MFT attribute header
 
-The MFT attribute header (ATTRIBUTE_RECORD_HEADER) is 16 bytes of size and
+The MFT attribute header (ATTRIBUTE_RECORD_HEADER) is 16 bytes in size and
 consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -721,7 +709,7 @@ Contains the data size in number of bytes. +
 This value is not valid if the first VCN is nonzero.
 | 40 | 8 | | Valid data size (or valid data length) +
 Contains the valid data size in number of bytes.
-This value is not valid if the first VCN is nonzero. +
+This value is not valid if the first VCN is nonzero.
 4+| _If compression unit size > 0_
 | 48 | 8 | | Total allocated size +
 Contains the total allocated size in number of cluster blocks.
@@ -736,9 +724,9 @@ The data size remains unchanged. This applies to compressed and uncompressed
 data. If the first VCN is zero a valid data size of 0 represents a file
 entirely filled with 0-byte values.
 
-==== Attribute name
+==== [[attribute_name]]Attribute name
 
-The attribute name is variable of size and consists of:
+The attribute name is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -752,7 +740,7 @@ Contains an UTF-16 little-endian without end-of-string character
 The data runs are stored in a variable size (data) runlist. This runlist
 consists of runlist elements.
 
-A runlist element is variable of size and consists of:
+A runlist element is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -873,7 +861,7 @@ The standard information attribute ($STANDARD_INFORMATION) contains the basic
 file entry metadata. It is stored as a resident MFT attribute.
 
 The standard information data (STANDARD_INFORMATION) is either 48 or 72 bytes
-of size and consists of:
+in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -932,12 +920,12 @@ listed attributes beyond the first data run.
 The attribute list entry consists of:
 
 * the attribute list entry header
-* the the attribute name
+* the <<attribute_name,attribute name>>
 * alignment padding (8-byte alignment), can contain remnant data
 
 ===== The attribute list entry header
 
-The attribute list entry header (ATTRIBUTE_LIST_ENTRY) is 26 bytes of size and consists of:
+The attribute list entry header (ATTRIBUTE_LIST_ENTRY) is 26 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -963,24 +951,13 @@ contains an attribute list entry for every cluster block. The corresponding
 cluster block will contain an MFT attribute containing the attribute data. See
 `[CARRIER05]` pages 365 and 366 for more information.
 
-===== Attribute name
-
-The attribute name is variable of size and consists of:
-
-[cols="1,1,1,5",options="header"]
-|===
-| Offset | Size | Value | Description
-| 0 | ... | | Name +
-Contains an UTF-16 little-endian without end-of-string character
-|===
-
 === [[file_name_attribute]]The file name attribute
 
 The file name attribute ($FILE_NAME) contains the basic file system
 information, like the parent file entry, MAC times and filename. It is stored
 as a resident MFT attribute.
 
-The file name data (FILE_NAME) is variable of size and consists of:
+The file name data (FILE_NAME) is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1006,7 +983,7 @@ See section: <<file_attribute_flags,File attribute flags>>
 See below.
 | 64 | 1 | | Name string size +
 Contains the number of characters without the end-of-string character
-| 65 | 1 | | Namespace of the name string +
+| 65 | 1 | | Namespace of the name string
 | 66 | ... | | Name string
 Contains an UTF-16 little-endian without an end-of-string character
 |===
@@ -1017,7 +994,7 @@ such as "U+d800" and "U+dc00".
 
 The extended data contains:
 
-* the reparse point tag (see section <<reparse_point_rage,Reparse point tag>>) if the reparse point file attribute flag (FILE_ATTRIBUTE_REPARSE_POINT) is set;
+* the reparse point tag (see section <<reparse_point_tag,Reparse point tag>>) if the reparse point file attribute flag (FILE_ATTRIBUTE_REPARSE_POINT) is set;
 * [yellow-background]*the extended attribute data size.*
 
 The allocated file size and file size values do not always contain accurate
@@ -1048,7 +1025,7 @@ attributes with the parent file reference of each hard link.
 \0 (zero character), +
 / (forward slash). +
  +
-The : (colon) is valid for NTFS but not for Windows. +
+The : (colon) is valid for NTFS but not for Windows.
 | 1 | FILE_NAME_NTFS (or WINDOWS) | A case insensitive sub set of the POSIX character set that consists of all Unicode characters except for: +
 " * / : < > ? \ \| +
  +
@@ -1106,14 +1083,14 @@ in a directory with a lot of filenames starting with "x86_microsoft", becomes "X
 The volume version attribute ($VOLUME_VERSION) contains [yellow-background]*TODO*
 
 [yellow-background]*Need a pre NTFS 3.0 volume with this attribute. $AttrDef
-indicates the attribute to be 8 bytes of size.*
+indicates the attribute to be 8 bytes in size.*
 
 === The object identifier attribute
 
 The object identifier attribute ($OBJECT_ID) contains distributed link tracker
 properties. It is stored as a resident MFT attribute.
 
-The object identifier data is either 16 or 64 bytes of size and consists of:
+The object identifier data is either 16 or 64 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1145,7 +1122,7 @@ See: https://github.com/libyal/libfwnt/blob/main/documentation/Security%20Descri
 The volume name attribute ($VOLUME_NAME) contains the name of the volume. It is
 stored as a resident MFT attribute.
 
-The volume name data is variable of size and consists of:
+The volume name data is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1161,7 +1138,7 @@ The volume name attribute is used in the $Volume metadata file MFT entry.
 The volume information attribute ($VOLUME_INFORMATION) contains information
 about the volume. It is stored as a resident MFT attribute.
 
-The volume information data is 12 bytes of size and consists of:
+The volume information data is 12 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1251,7 +1228,7 @@ It is known to be used in:
 The symbolic link attribute ($SYMBOLIC_LINK) contains [yellow-background]*TODO*
 
 [yellow-background]*Need a pre NTFS 3.0 volume with this attribute. $AttrDef
-indicates the attribute is variable of size.*
+indicates the attribute is of variable size.*
 
 === The reparse point attribute
 
@@ -1265,7 +1242,7 @@ See section: <<reparse_point,The reparse point>>.
 The (HPFS) extended attribute information ($EA_INFORMATION) contains
 information about the extended attribute ($EA).
 
-The extended attribute information data is 8 bytes of size and consists of:
+The extended attribute information data is 8 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1286,7 +1263,7 @@ E.g.
 
 The (HPFS) extended attribute ($EA) contains the extended attribute data.
 
-The extended attribute data is variable of size and consists of:
+The extended attribute data is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1341,7 +1318,7 @@ indicates does not seem to always define this attribute.*
 
 [yellow-background]*TODO add text*
 
-=== Attribute chains
+=== [[attribute_chains]]Attribute chains
 
 Multiple attributes can make up a single attribute, e.g. the attributes:
 
@@ -1449,7 +1426,7 @@ The index root consists of:
 
 ==== The index root header
 
-The index root header is 16 bytes of size and consists of:
+The index root header is 16 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1458,7 +1435,7 @@ The index root header is 16 bytes of size and consists of:
 Contains the type of the indexed attribute or 0 if none
 | 4 | 4 | | Collation type +
 Contains a value to indicate the ordering of the index entries +
-See section: <<collection_type,Collation type>>
+See section: <<collation_type,Collation type>>
 | 8 | 4 | | Index entry size
 | 12 | 4 | | Index entry number of cluster blocks
 |===
@@ -1466,7 +1443,7 @@ See section: <<collection_type,Collation type>>
 [NOTE]
 `[CARRIER05]` and `[RUSSON05]` state that the last 3 bytes are unused
 (alignment padding). However it is highly probably that the last value is
-32-bit of size.
+32-bit in size.
 
 [NOTE]
 In NT4 (version 1.2) the index entry size does not have to match the index
@@ -1502,7 +1479,7 @@ The index entry consists of:
 
 ==== The index entry header
 
-The index entry header is 32 bytes of size and consists of:
+The index entry header is 24 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1521,7 +1498,7 @@ There can be more fix-up value than supported by the index entry data size.
 
 === The index node header
 
-The index node header is 16 bytes of size and consists of:
+The index node header is 16 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1537,8 +1514,8 @@ See section: <<index_node_flags,The index node flags>>
 |===
 
 Note that `[RUSSON05]` states that the last 3 bytes are unused (alignment
-padding), while `[CARRIER05]` states that the last value is 32-bit of size.
-Here we assume that the index node flags are a 32‑bit value.
+padding), while `[CARRIER05]` states that the last value is 32-bit in size.
+Here we assume that the index node flags are a 32-bit value.
 
 In an index entry (index allocation attribute) the index node size includes the
 size of the fix-up values and the alignment padding following it.
@@ -1556,7 +1533,7 @@ Used to indicate if the node is a branch node that has sub nodes
 
 === The index value
 
-The index value is variable of size and consists of:
+The index value is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1697,7 +1674,7 @@ Also see `[RUSSON05]` for more detailed examples.
 NTFS compression stores the \'compressed' data in blocks. Each block has a 2
 byte block header.
 
-The block is variable of size and consists of:
+The block is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1711,7 +1688,7 @@ The upper 4 bits of the block size are used as flags.
 [cols="1,5",options="header"]
 |===
 | Bit(s) | Description
-| 0 ‑ 11 | Compressed data size
+| 0 - 11 | Compressed data size
 | 12 - 14 | [yellow-background]*Unknown flags*
 | 15 | Data is compressed
 |===
@@ -1762,7 +1739,7 @@ For more information about the compression methods see section
 
 The reparse point is used to create file system-level links. Reparse data is
 stored in the reparse point attribute. The reparse point data
-(REPARSE_DATA_BUFFER) is variable of size and consists of:
+(REPARSE_DATA_BUFFER) is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1933,7 +1910,7 @@ Reserved according to `[MSDN]`
 
 A reparse point with tag IO_REPARSE_TAG_MOUNT_POINT (0xa0000003) contains
 junction or mount point reparse data. The junction or mount point reparse data
-is variable of size and consists of:
+is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -1965,7 +1942,7 @@ Contains an UTF-16 little-endian [yellow-background]*with the end-of-string char
 === [[symbolic_link_reparse_data]]Symbolic link reparse data
 
 A reparse point with tag IO_REPARSE_TAG_SYMLINK (0xa000000c0) contains symbolic
-link reparse data. The symbolic link reparse data is variable of size and
+link reparse data. The symbolic link reparse data is of variable size and
 consists of:
 
 [cols="1,1,1,5",options="header"]
@@ -1999,7 +1976,7 @@ Contains an UTF-16 little-endian without end-of-string character
 
 A reparse point with tag IO_REPARSE_TAG_WOF (0x80000017) contains Windows
 Overlay Filter (WOF) reparse data. The Windows Overlay Filter (WOF) reparse
-data is 16 bytes of size and consists of:
+data is 16 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2031,7 +2008,7 @@ https://github.com/libyal/libfwnt/blob/main/documentation/Compression%20methods.
 
 A reparse point with tag IO_REPARSE_TAG_WCI (0x80000018) contains Windows
 Container Isolation (WCI) reparse data. The Windows Container Isolation (WCI)
-reparse data is variable of size and consists of:
+reparse data is of variable size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2178,7 +2155,7 @@ The metadata file $LogFile contains the metadata transaction journal.
 === Log File service restart page header
 
 The Log File service restart page header (LFS_RESTART_PAGE_HEADER) is 30 bytes
-of size and consists of:
+in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2282,7 +2259,7 @@ The USN change journal consists of:
 
 === USN change journal metadata
 
-The USN change journal metadata is 32 bytes of size and consists of:
+The USN change journal metadata is 32 bytes in size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2311,17 +2288,15 @@ are removed from the stream and replaced with a sparse data run.
 
 ==== USN change journal entry
 
-===== USN change journal entry version 2
-
-The USN change journal entry version 2 (USN_RECORD or USN_RECORD_V2) is
-variable of size and consists of:
+The USN change journal entry (USN_RECORD_V2) is of variable size and consists
+of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Entry (or record) size
-| 4 | 2 | 0x0002 | Major version
-| 6 | 2 | 0x0000 | Minor version
+| 4 | 2 | 2 | Major version
+| 6 | 2 | 0 | Minor version
 | 8 | 8 | | File reference
 | 16 | 8 | | Parent file reference
 | 24 | 8 | | Update sequence number (USN) +
@@ -2341,59 +2316,8 @@ See section: <<file_attribute_flags,File attribute flags>>
 Contains the byte size of the name
 | 58 | 2 | | Name offset +
 The offset is relative from the start of the USN change journal entry
-4+| _Common_
 | 60 | (name size) | | Name
 | ... | ... | 0x00 | Padding
-|===
-
-===== USN change journal entry version 3
-
-[yellow-background]*TODO need a sample to confirm this version of the USN
-record is actually used by NTFS. For now it is assumed that it is likely used
-by ReFS.*
-
-The USN change journal entry version 3 (USN_RECORD_V3) is variable of size and
-consists of:
-
-[cols="1,1,1,5",options="header"]
-|===
-| Offset | Size | Value | Description
-| 0 | 4 | | Entry (or record) size
-| 4 | 2 | 0x0003 | Major version
-| 6 | 2 | 0x0000 | Minor version
-| 8 | *16* | | File reference
-| 24 | *16* | | Parent file reference
-| 40 | 8 | | Update sequence number (USN) +
-Contains the file offset of the USN change journal entry which is used as a unique identifier
-| 48 | 8 | | Update date and time +
-Contains a FILETIME
-| 56 | 4 | | Update reason flags +
-See section: <<update_reason_flags,Update reason flags>>
-| 60 | 4 | | Update source flags +
-See section: <<update_source_flags,Update source flags>>
-| 64 | 4 | | Security descriptor identifier +
-Contains the entry number in the security ID index ($Secure:$SII) +
-See section: <<access_control,Access Control>>
-| 68 | 4 | | File attribute flags +
-See section: <<file_attribute_flags,File attribute flags>>
-| 72 | 2 | | Name size +
-Contains the byte size of the name
-| 74 | 2 | | Name offset +
-The offset is relative from the start of the USN change journal entry
-4+| _Common_
-| 78 | (name size) | | Name
-| ... | ... | 0x00 | Padding
-|===
-
-The file reference has changed from a 64-bit to a 128-bit value which consists
-of:
-
-[cols="1,1,1,5",options="header"]
-|===
-| Offset | Size | Value | Description
-| 0 | 8 | | MFT entry index +
-Note that the index value in the MFT entry is only 32-bit of size.
-| 8 | 8 | | Sequence number
 |===
 
 ==== [[update_reason_flags]]Update reason flags
@@ -2665,7 +2589,7 @@ TxF uses a multiplexed log store which contains two streams:
 === Transactional data logged utility stream attribute
 
 The transactional data ($TXF_DATA) logged utility stream attribute is 56 bytes
-of size and consist of:
+in size and consist of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -2730,37 +2654,6 @@ _For now the latter is assumed._
 |===
 
 == [[corruption_scenarios]]Corruption scenarios
-
-=== $FILE_NAME attribute with non-proper UTF-16 name
-
-An MFT entry contains an $FILE_NAME attribute that contains a name that contains
-non-proper UTF-16.
-
-....
-parent file reference             : 9711-3
-creation time                     : Oct 04, 2014 14:44:40.703125000 UTC
-modification time                 : Oct 04, 2014 14:48:37.562500000 UTC
-entry modification time           : Oct 04, 2014 14:48:37.750000000 UTC
-access time                       : Oct 04, 2014 14:48:37.562500000 UTC
-allocated file size               : 40960
-file size                         : 38926
-file attribute flags              : 0x00000020
-        Should be archived (FILE_ATTRIBUTE_ARCHIVE)
-
-extended data                     : 0x00000000
-name size                         : 36
-name space                        : 1 (Windows)
-
-name data:
-00000040:       2e 00 63 dc 79 dc  67 dc 30 00 30 00 32 00     ..c.y. g.0.0.2.
-00000050: 65 00 30 00 30 00 30 00  30 00 30 00 30 00 30 00   e.0.0.0. 0.0.0.0.
-00000060: 31 00 61 00 39 00 34 00  66 00 62 00 36 00 30 00   1.a.9.4. f.b.6.0.
-00000070: 62 00 35 00 30 00 37 00  66 00 30 00 36 00 38 00   b.5.0.7. f.0.6.8.
-00000080: 30 00 66 00 39 00 36 00  38 00                     0.f.9.6. 8.
-....
-
-This edge case was observed on Windows XP in the Recycler directory. The same
-name is stored in the corresponding $I30 entry.
 
 === Data steam with inconsistent data flags
 
@@ -3157,15 +3050,6 @@ What file system metadata is missing:
 | URL | https://opensource.apple.com/source/ntfs/ntfs-65.2/kext/ntfs_layout.h.auto.html
 |===
 
-`[POLLARD06]`
-
-[cols="1,5",options="header"]
-|===
-| Title | All about BIOS parameter blocks
-| Author(s) | Jonathan de Boyne Pollard
-| URL | https://jdebp.eu/FGA/bios-parameter-block.html
-|===
-
 `[RUSSNOVICH09]`
 
 [cols="1,5",options="header"]
@@ -3210,33 +3094,26 @@ What file system metadata is missing:
 
 [cols="1,5",options="header"]
 |===
-| Title | Microsoft Developer Network
-| URL | http://technet.microsoft.com/en-us/library/cc781134%28WS.10%29.aspx
+| Title | How NTFS Works
+| URL | https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc781134(v=ws.10)
 |===
 
 [cols="1,5",options="header"]
 |===
 | Subject | Master File Table
-| URL | http://msdn.microsoft.com/en-us/library/bb470206(v=vs.85).aspx
+| URL | https://learn.microsoft.com/en-us/windows/win32/devnotes/master-file-table
 |===
 
 [cols="1,5",options="header"]
 |===
-| Subject | Reserved file names
-| URL | http://msdn.microsoft.com/en-us/library/ff469234%28v=PROT.10%29.aspx
-|===
-
-[cols="1,5",options="header"]
-|===
-| Subject | NTFS attribute types
-| URL | http://msdn.microsoft.com/en-us/library/ff469236%28PROT.10%29.aspx
+| Subject | WIN32_FIND_DATAA structure (minwinbase.h)
+| URL | https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-win32_find_dataa
 |===
 
 [cols="1,5",options="header"]
 |===
 | Subject | Reparse point
-| URL | http://msdn.microsoft.com/en-us/library/aa365740%28VS.85%29.aspx +
-http://msdn.microsoft.com/en-us/library/aa365511%28v=VS.85%29.aspx +
+| URL | http://msdn.microsoft.com/en-us/library/aa365511%28v=VS.85%29.aspx +
 http://msdn.microsoft.com/en-us/library/dd541667%28PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232005%28v=PROT.13%29.aspx +
 http://msdn.microsoft.com/en-us/library/cc232006%28v=PROT.13%29.aspx +

@@ -149,6 +149,7 @@ int libfsntfs_volume_header_read_data(
 	static char *function                    = "libfsntfs_volume_header_read_data";
 	uint64_t mft_cluster_block_number        = 0;
 	uint64_t mirror_mft_cluster_block_number = 0;
+	uint64_t volume_size                     = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	uint32_t value_32bit                     = 0;
@@ -221,7 +222,7 @@ int libfsntfs_volume_header_read_data(
 
 	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_volume_header_t *) data )->total_number_of_sectors,
-	 volume_header->volume_size );
+	 volume_size );
 
 	byte_stream_copy_to_uint64_little_endian(
 	 ( (fsntfs_volume_header_t *) data )->mft_cluster_block_number,
@@ -341,7 +342,7 @@ int libfsntfs_volume_header_read_data(
 		libcnotify_printf(
 		 "%s: total number of sectors\t\t: %" PRIu64 "\n",
 		 function,
-		 volume_header->volume_size );
+		 volume_size );
 
 		libcnotify_printf(
 		 "%s: MFT cluster block number\t\t: %" PRIu64 "\n",
@@ -580,7 +581,7 @@ int libfsntfs_volume_header_read_data(
 
 		return( -1 );
 	}
-	if( volume_header->volume_size > (size64_t) ( ( UINT64_MAX / volume_header->bytes_per_sector ) + 1 ) )
+	if( volume_size > (size64_t) ( ( UINT64_MAX / volume_header->bytes_per_sector ) + 1 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -591,8 +592,8 @@ int libfsntfs_volume_header_read_data(
 
 		return( -1 );
 	}
-	volume_header->volume_size *= volume_header->bytes_per_sector;
-	volume_header->volume_size += volume_header->bytes_per_sector;
+	volume_size *= volume_header->bytes_per_sector;
+	volume_size += volume_header->bytes_per_sector;
 
 	volume_header->mft_offset = mft_cluster_block_number
 	                          * volume_header->cluster_block_size;
@@ -621,7 +622,7 @@ int libfsntfs_volume_header_read_data(
 		libcnotify_printf(
 		 "%s: calculated volume size\t\t: %" PRIu64 "\n",
 		 function,
-		 volume_header->volume_size );
+		 volume_size );
 
 		libcnotify_printf(
 		 "%s: calculated MFT offset\t\t: 0x%08" PRIx64 "\n",
@@ -858,43 +859,6 @@ int libfsntfs_volume_header_get_index_entry_size(
 		return( -1 );
 	}
 	*index_entry_size = volume_header->index_entry_size;
-
-	return( 1 );
-}
-
-/* Retrieves the volume size
- * Returns 1 if successful or -1 on error
- */
-int libfsntfs_volume_header_get_volume_size(
-     libfsntfs_volume_header_t *volume_header,
-     size64_t *volume_size,
-     libcerror_error_t **error )
-{
-	static char *function = "libfsntfs_volume_header_get_volume_size";
-
-	if( volume_header == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume header.",
-		 function );
-
-		return( -1 );
-	}
-	if( volume_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid volume size.",
-		 function );
-
-		return( -1 );
-	}
-	*volume_size = volume_header->volume_size;
 
 	return( 1 );
 }

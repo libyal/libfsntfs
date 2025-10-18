@@ -3609,6 +3609,7 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_symbolic_link_target_size";
+	uint32_t reparse_point_tag			     = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3658,12 +3659,12 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 	}
 	else if( result != 0 )
 	{
-		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+		result = libfsntfs_reparse_point_attribute_get_tag(
 		          reparse_point_attribute,
-		          utf8_string_size,
+		          &reparse_point_tag,
 		          error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -3673,6 +3674,29 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 			 function );
 
 			result = -1;
+		}
+		if( reparse_point_tag == 0xa000000c )
+		{
+			result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
+			          reparse_point_attribute,
+			          utf8_string_size,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of UTF-8 substitute name from reparse point attribute.",
+				 function );
+
+				result = -1;
+			}
+		}
+		else
+		{
+			result = 0;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3707,6 +3731,7 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf8_symbolic_link_target";
+	uint32_t reparse_point_tag			     = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3756,22 +3781,45 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target(
 	}
 	else if( result != 0 )
 	{
-		result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+		result = libfsntfs_reparse_point_attribute_get_tag(
 		          reparse_point_attribute,
-		          utf8_string,
-		          utf8_string_size,
+		          &reparse_point_tag,
 		          error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 substitute name from reparse point attribute.",
+			 "%s: unable to retrieve size of UTF-8 substitute name from reparse point attribute.",
 			 function );
 
 			result = -1;
+		}
+		if( reparse_point_tag == 0xa000000c )
+		{
+			result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
+				  reparse_point_attribute,
+				  utf8_string,
+				  utf8_string_size,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-8 substitute name from reparse point attribute.",
+				 function );
+
+				result = -1;
+			}
+		}
+		else
+		{
+			result = 0;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3805,6 +3853,7 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_symbolic_link_target_size";
+	uint32_t reparse_point_tag			     = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3854,21 +3903,44 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 	}
 	else if( result != 0 )
 	{
-		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+		result = libfsntfs_reparse_point_attribute_get_tag(
 		          reparse_point_attribute,
-		          utf16_string_size,
+		          &reparse_point_tag,
 		          error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size of UTF-16 substitute name from reparse point attribute.",
+			 "%s: unable to retrieve size of UTF-8 substitute name from reparse point attribute.",
 			 function );
 
 			result = -1;
+		}
+		if( reparse_point_tag == 0xa000000c )
+		{
+			result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
+				  reparse_point_attribute,
+				  utf16_string_size,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve size of UTF-16 substitute name from reparse point attribute.",
+				 function );
+
+				result = -1;
+			}
+		}
+		else
+		{
+			result = 0;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
@@ -3903,6 +3975,7 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	libfsntfs_attribute_t *reparse_point_attribute       = NULL;
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_utf16_symbolic_link_target";
+	uint32_t reparse_point_tag			     = 0;
 	int result                                           = 0;
 
 	if( file_entry == NULL )
@@ -3952,22 +4025,45 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target(
 	}
 	else if( result != 0 )
 	{
-		result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+		result = libfsntfs_reparse_point_attribute_get_tag(
 		          reparse_point_attribute,
-		          utf16_string,
-		          utf16_string_size,
+		          &reparse_point_tag,
 		          error );
 
-		if( result == -1 )
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 substitute name from reparse point attribute.",
+			 "%s: unable to retrieve size of UTF-8 substitute name from reparse point attribute.",
 			 function );
 
 			result = -1;
+		}
+		if( reparse_point_tag == 0xa000000c )
+		{
+			result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
+				  reparse_point_attribute,
+				  utf16_string,
+				  utf16_string_size,
+				  error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve UTF-16 substitute name from reparse point attribute.",
+				 function );
+
+				result = -1;
+			}
+		}
+		else
+		{
+			result = 0;
 		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )

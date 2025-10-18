@@ -39,8 +39,10 @@
 
 #endif /* !defined( FUSE_USE_VERSION ) && !defined( CYGFUSE ) */
 
-#if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 )
-#include <fuse.h>
+#if defined( HAVE_LIBFUSE )
+#include <fuse/fuse.h>
+#elif defined( HAVE_LIBFUSE3 )
+#include <fuse3/fuse.h>
 #elif defined( HAVE_LIBOSXFUSE )
 #include <osxfuse/fuse.h>
 #endif

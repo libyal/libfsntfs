@@ -390,7 +390,7 @@ int libfsntfs_mft_entry_read_data(
 	int result                      = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint16_t total_entry_size       = 0;
+	uint32_t total_entry_size       = 0;
 #endif
 
 	if( mft_entry == NULL )
@@ -526,7 +526,7 @@ int libfsntfs_mft_entry_read_data(
 		if( data_size != (size_t) total_entry_size )
 		{
 			libcnotify_printf(
-			 "%s: mismatch in total MFT entry size (calculated: %" PRIzd ", stored: %" PRIu16 ").\n",
+			 "%s: mismatch in total MFT entry size (calculated: %" PRIzd ", stored: %" PRIu32 ").\n",
 			 function,
 			 data_size,
 			 total_entry_size );
@@ -844,7 +844,7 @@ int libfsntfs_mft_entry_read_attributes_data(
 	int entry_index                          = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint16_t used_entry_size                 = 0;
+	uint32_t used_entry_size                 = 0;
 #endif
 
 	if( mft_entry == NULL )
@@ -1041,7 +1041,7 @@ int libfsntfs_mft_entry_read_attributes_data(
 		if( data_offset != (size_t) used_entry_size )
 		{
 			libcnotify_printf(
-			 "%s: mismatch in used MFT entry size (calculated: %" PRIzd ", stored: %" PRIu16 ").\n",
+			 "%s: mismatch in used MFT entry size (calculated: %" PRIzd ", stored: %" PRIu32 ").\n",
 			 function,
 			 data_offset,
 			 used_entry_size );

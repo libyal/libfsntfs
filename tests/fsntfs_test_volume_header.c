@@ -1344,84 +1344,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libfsntfs_volume_header_get_volume_size function
- * Returns 1 if successful or 0 if not
- */
-int fsntfs_test_volume_header_get_volume_size(
-     libfsntfs_volume_header_t *volume_header )
-{
-	libcerror_error_t *error = NULL;
-	size64_t volume_size     = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libfsntfs_volume_header_get_volume_size(
-	          volume_header,
-	          &volume_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	FSNTFS_TEST_ASSERT_EQUAL_UINT64(
-	 "volume_size",
-	 (uint64_t) volume_size,
-	 (uint64_t) 8225280 );
-
-	FSNTFS_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libfsntfs_volume_header_get_volume_size(
-	          NULL,
-	          &volume_size,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libfsntfs_volume_header_get_volume_size(
-	          volume_header,
-	          NULL,
-	          &error );
-
-	FSNTFS_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	FSNTFS_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 /* Tests the libfsntfs_volume_header_get_volume_serial_number function
  * Returns 1 if successful or 0 if not
  */
@@ -1677,11 +1599,6 @@ int main(
 	FSNTFS_TEST_RUN_WITH_ARGS(
 	 "libfsntfs_volume_header_get_index_entry_size",
 	 fsntfs_test_volume_header_get_index_entry_size,
-	 volume_header );
-
-	FSNTFS_TEST_RUN_WITH_ARGS(
-	 "libfsntfs_volume_header_get_volume_size",
-	 fsntfs_test_volume_header_get_volume_size,
 	 volume_header );
 
 	FSNTFS_TEST_RUN_WITH_ARGS(

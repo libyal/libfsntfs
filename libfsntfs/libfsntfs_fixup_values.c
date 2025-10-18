@@ -90,7 +90,7 @@ int libfsntfs_fixup_values_apply(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalide number of fix-up values value out of bounds.",
+		 "%s: invalid number of fix-up values value out of bounds.",
 		 function );
 
 		return( -1 );
