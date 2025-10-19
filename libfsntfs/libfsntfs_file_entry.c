@@ -2449,6 +2449,7 @@ int libfsntfs_file_entry_get_name_attribute_index(
 	uint8_t *lookup_name                                 = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_name_attribute_index";
 	size_t lookup_name_size                              = 0;
+	uint64_t lookup_parent_file_reference                = 0;
 	uint32_t attribute_type                              = 0;
 	uint8_t lookup_name_space                            = 0;
 	int number_of_attributes                             = 0;
@@ -2499,9 +2500,10 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 			return( -1 );
 		}
-		lookup_name       = internal_file_entry->directory_entry->file_name_values->name;
-		lookup_name_size  = internal_file_entry->directory_entry->file_name_values->name_size;
-		lookup_name_space = internal_file_entry->directory_entry->file_name_values->name_space;
+		lookup_name                  = internal_file_entry->directory_entry->file_name_values->name;
+		lookup_name_size             = internal_file_entry->directory_entry->file_name_values->name_size;
+		lookup_name_space            = internal_file_entry->directory_entry->file_name_values->name_space;
+		lookup_parent_file_reference = internal_file_entry->directory_entry->file_name_values->parent_file_reference;
 	}
 	if( libfsntfs_mft_entry_get_number_of_attributes(
 	     internal_file_entry->mft_entry,
@@ -2572,7 +2574,8 @@ int libfsntfs_file_entry_get_name_attribute_index(
 
 			return( -1 );
 		}
-		if( ( lookup_name_space == file_name_values->name_space )
+		if( ( lookup_parent_file_reference == file_name_values->parent_file_reference )
+		 && ( lookup_name_space == file_name_values->name_space )
 		 && ( lookup_name_size == file_name_values->name_size )
 		 && ( memory_compare(
 		       lookup_name,
