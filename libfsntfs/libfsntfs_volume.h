@@ -184,6 +184,12 @@ int libfsntfs_volume_get_cluster_block_size(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_volume_get_size(
+	 libfsntfs_volume_t *volume,
+	 size64_t *volume_size,
+	 libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_volume_get_mft_entry_size(
      libfsntfs_volume_t *volume,
      size32_t *mft_entry_size,
