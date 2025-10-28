@@ -4821,29 +4821,30 @@ int info_handle_file_entry_value_fprint(
 
 		goto on_error;
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\tParent file reference\t\t: " );
-
-	if( ( result == 0 )
-	 || ( parent_file_reference == 0 ) )
+	else if( result != 0 )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "Not set (0)" );
-	}
-	else
-	{
+		 "\tParent file reference\t\t: " );
+
+		if( parent_file_reference == 0 )
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "Not set (0)" );
+		}
+		else
+		{
+			fprintf(
+			 info_handle->notify_stream,
+			 "%" PRIu64 "-%" PRIu64 "",
+			 parent_file_reference & 0xffffffffffffUL,
+			 parent_file_reference >> 48 );
+		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "%" PRIu64 "-%" PRIu64 "",
-		 parent_file_reference & 0xffffffffffffUL,
-		 parent_file_reference >> 48 );
+		 "\n" );
 	}
-	fprintf(
-	 info_handle->notify_stream,
-	 "\n" );
-
 	if( libfsntfs_file_entry_get_size(
 	     file_entry,
 	     &size,
