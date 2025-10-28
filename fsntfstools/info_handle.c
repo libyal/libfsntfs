@@ -4805,10 +4805,12 @@ int info_handle_file_entry_value_fprint(
 		 info_handle->notify_stream,
 		 "\n" );
 	}
-	if( libfsntfs_file_entry_get_parent_file_reference(
-	     file_entry,
-	     &parent_file_reference,
-	     error ) != 1 )
+	result = libfsntfs_file_entry_get_parent_file_reference(
+	          file_entry,
+	          &parent_file_reference,
+	          error );
+       
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -4823,7 +4825,8 @@ int info_handle_file_entry_value_fprint(
 	 info_handle->notify_stream,
 	 "\tParent file reference\t\t: " );
 
-	if( parent_file_reference == 0 )
+	if( ( result == 0 )
+	 || ( parent_file_reference == 0 ) )
 	{
 		fprintf(
 		 info_handle->notify_stream,

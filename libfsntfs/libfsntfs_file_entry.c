@@ -1344,7 +1344,7 @@ int libfsntfs_file_entry_get_parent_file_reference(
 {
 	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
 	static char *function                                = "libfsntfs_file_entry_get_parent_file_reference";
-	int result                                           = 1;
+	int result                                           = 0;
 
 	if( file_entry == NULL )
 	{
@@ -1374,19 +1374,28 @@ int libfsntfs_file_entry_get_parent_file_reference(
 		return( -1 );
 	}
 #endif
-	if( libfsntfs_directory_entry_get_parent_file_reference(
-	     internal_file_entry->directory_entry,
-	     parent_file_reference,
-	     error ) != 1 )
+	if( internal_file_entry->directory_entry == NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve parent reference from directory entry.",
-		 function );
+		result = 0;
+	}
+	else
+	{
+		result = libfsntfs_directory_entry_get_parent_file_reference(
+		          internal_file_entry->directory_entry,
+		          parent_file_reference,
+		          error );
+	       
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve parent reference from directory entry.",
+			 function );
 
-		result = -1;
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

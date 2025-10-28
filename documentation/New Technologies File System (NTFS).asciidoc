@@ -608,7 +608,7 @@ The size of the attribute including the 8 bytes of the attribute type and size
 | 9 | 1 | | Name size (or name length) +
 Contains the number of characters without the end-of-string character
 | 10 | 2 | | Name offset +
-Contains an offset relative from the start of the MFT entry
+Contains an offset relative from the start of the MFT attribute
 | 12 | 2 | | Attribute data flags +
 See section: <<mft_attribute_data_flags,MFT attribute data flags>>
 | 14 | 2 | | Attribute identifier (or instance) +

@@ -494,7 +494,7 @@ ssize_t libfsntfs_index_value_read(
 			 0 );
 		}
 #endif
-		if( data_offset > ( data_size - 4 ) )
+		if( data_offset > ( data_size - 8 ) )
 		{
 			libcerror_error_set(
 			 error,
