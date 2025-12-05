@@ -1,7 +1,7 @@
 /*
  * Library to access the New Technology File System (NTFS) format
  *
- * Copyright (C) 2010-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *

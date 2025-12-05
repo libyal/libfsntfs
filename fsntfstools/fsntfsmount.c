@@ -1,7 +1,7 @@
 /*
  * Mounts a New Technology File System (NTFS) volume.
  *
- * Copyright (C) 2010-2024, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2025, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -64,12 +64,12 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Use fsntfsmount to mount a Windows New Technology File System (NTFS) volume\n\n" );
+	fprintf( stream, "Use fsntfsmount to mount a New Technology File System (NTFS) volume\n\n" );
 
 	fprintf( stream, "Usage: fsntfsmount [ -o offset ] [ -X extended_options ] [ -hvV ] volume\n"
 	                 "                   mount_point\n\n" );
 
-	fprintf( stream, "\tvolume:      a Windows New Technology File System (NTFS) volume\n\n" );
+	fprintf( stream, "\tvolume:      a New Technology File System (NTFS) volume\n\n" );
 	fprintf( stream, "\tmount_point: the directory to serve as mount point\n\n" );
 
 	fprintf( stream, "\t-h:          shows this help\n" );
@@ -149,13 +149,13 @@ int main( int argc, char * const argv[] )
 	/* Need to set this to 1 even if there no arguments, otherwise this causes
 	 * fuse: empty argv passed to fuse_session_new()
 	 */
-	char *fuse_argv[ 2 ]                         = { program, NULL };
-	struct fuse_args fsntfsmount_fuse_arguments  = FUSE_ARGS_INIT(1, fuse_argv);
+	char *fuse_argv[ 2 ]                        = { program, NULL };
+	struct fuse_args fsntfsmount_fuse_arguments = FUSE_ARGS_INIT(1, fuse_argv);
 #else
-	struct fuse_args fsntfsmount_fuse_arguments  = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *fsntfsmount_fuse_channel   = NULL;
+	struct fuse_args fsntfsmount_fuse_arguments = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *fsntfsmount_fuse_channel  = NULL;
 #endif
-	struct fuse *fsntfsmount_fuse_handle         = NULL;
+	struct fuse *fsntfsmount_fuse_handle        = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS fsntfsmount_dokan_operations;
@@ -311,6 +311,11 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBFUSE3 ) || defined( HAVE_LIBOSXFUSE )
 	if( option_extended_options != NULL )
 	{
+#if defined( HAVE_LIBFUSE3 )
+		// fuse_opt_add_arg: Assertion `!args->argv || args->allocated' failed.
+		fsntfsmount_fuse_arguments.argc = 0;
+		fsntfsmount_fuse_arguments.argv = NULL;
+#endif
 		/* This argument is required but ignored
 		 */
 		if( fuse_opt_add_arg(
