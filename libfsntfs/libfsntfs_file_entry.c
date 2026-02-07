@@ -1,7 +1,7 @@
 /*
  * File entry functions
  *
- * Copyright (C) 2010-2025, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2010-2026, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1157,6 +1157,7 @@ int libfsntfs_internal_file_entry_get_standard_information_attribute(
 }
 
 /* Retrieves the file reference
+ * This value is retrieved from the MFT entry
  * Returns 1 if successful or -1 on error
  */
 int libfsntfs_file_entry_get_file_reference(
@@ -1207,39 +1208,19 @@ int libfsntfs_file_entry_get_file_reference(
 		return( -1 );
 	}
 #endif
-	if( internal_file_entry->directory_entry != NULL )
+	if( libfsntfs_mft_entry_get_file_reference(
+	     internal_file_entry->mft_entry,
+	     file_reference,
+	     error ) != 1 )
 	{
-		if( libfsntfs_directory_entry_get_file_reference(
-		     internal_file_entry->directory_entry,
-		     file_reference,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve reference from directory entry.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference from MFT entry.",
+		 function );
 
-			result = -1;
-		}
-	}
-	else
-	{
-		if( libfsntfs_mft_entry_get_file_reference(
-		     internal_file_entry->mft_entry,
-		     file_reference,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve file reference from MFT entry.",
-			 function );
-
-			result = -1;
-		}
+		result = -1;
 	}
 #if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_read(

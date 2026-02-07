@@ -274,7 +274,6 @@ after_test:
 
 artifacts:
 - path: \*.nupkg
-- path: dist\*.whl
 
 deploy_script:
 - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -and $isWindows -and $env:TARGET -eq "vs2022-nuget") {
