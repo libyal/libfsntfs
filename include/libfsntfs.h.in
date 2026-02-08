@@ -615,6 +615,76 @@ int libfsntfs_file_entry_get_file_attribute_flags(
      uint32_t *file_attribute_flags,
      libfsntfs_error_t **error );
 
+/* Retrieves the file reference
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_file_reference(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *file_reference,
+     libfsntfs_error_t **error );
+
+/* Retrieves the creation date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_creation_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libfsntfs_error_t **error );
+
+/* Retrieves the modification date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libfsntfs_error_t **error );
+
+/* Retrieves the access date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_access_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libfsntfs_error_t **error );
+
+/* Retrieves the entry modification date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_entry_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libfsntfs_error_t **error );
+
+/* Retrieves the size
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_size(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *size,
+     libfsntfs_error_t **error );
+
+/* Retrieves the file attribute flags
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_file_attribute_flags(
+     libfsntfs_file_entry_t *file_entry,
+     uint32_t *file_attribute_flags,
+     libfsntfs_error_t **error );
+
 /* Retrieves the size of the UTF-8 encoded name
  * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
@@ -865,6 +935,14 @@ int libfsntfs_file_entry_has_directory_entries_index(
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry,
+     libfsntfs_error_t **error );
+
+/* Determines if the file entry has a $I30 entry
+ * Returns 1 if the file entry has a $I30 entry, 0 if not or -1 on error
+ */
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_i30_entry(
      libfsntfs_file_entry_t *file_entry,
      libfsntfs_error_t **error );
 

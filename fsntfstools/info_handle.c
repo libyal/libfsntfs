@@ -4809,7 +4809,7 @@ int info_handle_file_entry_value_fprint(
 	          file_entry,
 	          &parent_file_reference,
 	          error );
-       
+
 	if( result == -1 )
 	{
 		libcerror_error_set(
@@ -5191,7 +5191,7 @@ on_error:
 }
 
 /* Prints a $FILE_NAME attribute to a bodyfile
- * Returns 1 if successful, 0 if not or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int info_handle_bodyfile_file_name_attribute_fprint(
      info_handle_t *info_handle,
@@ -5421,8 +5421,6 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 			return( -1 );
 		}
 	}
-/* TODO determine $FILE_NAME attribute address */
-
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
 	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
 	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
@@ -5431,6 +5429,281 @@ int info_handle_bodyfile_file_name_attribute_fprint(
 	fprintf(
 	 info_handle->bodyfile_stream,
 	 " ($FILE_NAME)|%" PRIu64 "-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
+	 file_reference & 0xffffffffffffUL,
+	 file_reference >> 48,
+	 file_mode_string,
+	 owner_identifier,
+	 group_identifier,
+	 size,
+	 posix_access_time / 10000000,
+	 posix_access_time - ( ( posix_access_time / 10000000 ) * 10000000 ),
+	 posix_modification_time / 10000000,
+	 posix_modification_time - ( ( posix_modification_time / 10000000 ) * 10000000 ),
+	 posix_inode_change_time / 10000000,
+	 posix_inode_change_time - ( ( posix_inode_change_time / 10000000 ) * 10000000 ),
+	 posix_creation_time / 10000000,
+	 posix_creation_time - ( ( posix_creation_time / 10000000 ) * 10000000 ) );
+
+	return( 1 );
+}
+
+/* Prints a $I30 entry to a bodyfile
+ * Returns 1 if successful or -1 on error
+ */
+int info_handle_bodyfile_i30_entry_fprint(
+     info_handle_t *info_handle,
+     libfsntfs_file_entry_t *file_entry,
+     const system_character_t *path,
+     size_t path_length,
+     const system_character_t *file_entry_name,
+     size_t file_entry_name_length,
+     libcerror_error_t **error )
+{
+	char file_mode_string[ 11 ]      = { '-', 'r', 'w', 'x', 'r', 'w', 'x', 'r', 'w', 'x', 0 };
+
+	static char *function            = "info_handle_bodyfile_i30_entry_fprint";
+	size64_t size                    = 0;
+	uint64_t access_time             = 0;
+	uint64_t creation_time           = 0;
+	uint64_t entry_modification_time = 0;
+	uint64_t file_reference          = 0;
+	uint64_t modification_time       = 0;
+	int64_t posix_access_time        = 0;
+	int64_t posix_creation_time      = 0;
+	int64_t posix_inode_change_time  = 0;
+	int64_t posix_modification_time  = 0;
+	uint32_t file_attribute_flags    = 0;
+	uint32_t group_identifier        = 0;
+	uint32_t owner_identifier        = 0;
+	int result                       = 0;
+
+	if( info_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid info handle.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_file_entry_has_i30_entry(
+	          file_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry has a $I30 entry.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 1 );
+	}
+	if( libfsntfs_file_entry_get_i30_file_reference(
+	     file_entry,
+	     &file_reference,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_creation_time(
+	     file_entry,
+	     &creation_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_modification_time(
+	     file_entry,
+	     &modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_access_time(
+	     file_entry,
+	     &access_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_entry_modification_time(
+	     file_entry,
+	     &entry_modification_time,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_file_attribute_flags(
+	     file_entry,
+	     &file_attribute_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_entry_get_i30_size(
+	     file_entry,
+	     &size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfsntfs_file_entry_is_symbolic_link(
+	          file_entry,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if file entry is a symbolic link.",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 0 )
+	{
+		file_mode_string[ 0 ] = 'l';
+	}
+	else
+	{
+		result = libfsntfs_file_entry_has_directory_entries_index(
+			  file_entry,
+			  error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if file entry has directory entries index.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result != 0 )
+		{
+			file_mode_string[ 0 ] = 'd';
+		}
+	}
+	if( ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_READ_ONLY ) != 0 )
+	 || ( ( file_attribute_flags & LIBFSNTFS_FILE_ATTRIBUTE_FLAG_SYSTEM ) != 0 ) )
+	{
+		file_mode_string[ 2 ] = '-';
+		file_mode_string[ 5 ] = '-';
+		file_mode_string[ 8 ] = '-';
+	}
+	/* Colums in a Sleuthkit 3.x and later bodyfile
+	 * MD5|name|inode|mode_as_string|UID|GID|size|atime|mtime|ctime|crtime
+	 */
+	fprintf(
+	 info_handle->bodyfile_stream,
+	 "0|" );
+
+	if( path != NULL )
+	{
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     path,
+		     path_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print path string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( file_entry_name != NULL )
+	{
+		if( info_handle_bodyfile_name_value_fprint(
+		     info_handle,
+		     file_entry_name,
+		     file_entry_name_length,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print file entry name string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	posix_access_time       = (int64_t) access_time - 116444736000000000L;
+	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
+	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
+	posix_modification_time = (int64_t) modification_time - 116444736000000000L;
+
+	fprintf(
+	 info_handle->bodyfile_stream,
+	 " ($I30)|%" PRIu64 "-%" PRIu64 "|%s|%" PRIu32 "|%" PRIu32 "|%" PRIu64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "|%" PRIi64 ".%07" PRIi64 "\n",
 	 file_reference & 0xffffffffffffUL,
 	 file_reference >> 48,
 	 file_mode_string,
@@ -5793,8 +6066,6 @@ int info_handle_bodyfile_index_root_attribute_fprint(
 			goto on_error;
 		}
 	}
-/* TODO determine $INDEX_ROOT attribute address */
-
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
 	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
 	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
@@ -6254,8 +6525,6 @@ int info_handle_bodyfile_file_entry_value_fprint(
 			goto on_error;
 		}
 	}
-/* TODO determine $DATA or $INDEX_ROOT attribute address */
-
 	posix_access_time       = (int64_t) access_time - 116444736000000000L;
 	posix_creation_time     = (int64_t) creation_time - 116444736000000000L;
 	posix_inode_change_time = (int64_t) entry_modification_time - 116444736000000000L;
@@ -7155,13 +7424,33 @@ int info_handle_file_entry_fprint(
 			goto on_error;
 		}
 	}
-	if( ( info_handle->bodyfile_stream != NULL )
-	 && ( file_name_attribute != NULL ) )
+	if( info_handle->bodyfile_stream != NULL )
 	{
-		if( info_handle_bodyfile_file_name_attribute_fprint(
+		if( file_name_attribute != NULL )
+		{
+			if( info_handle_bodyfile_file_name_attribute_fprint(
+			     info_handle,
+			     file_entry,
+			     file_name_attribute,
+			     path,
+			     path_length,
+			     file_entry_name,
+			     file_entry_name_length,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print $FILE_NAME attribute.",
+				 function );
+
+				goto on_error;
+			}
+		}
+		if( info_handle_bodyfile_i30_entry_fprint(
 		     info_handle,
 		     file_entry,
-		     file_name_attribute,
 		     path,
 		     path_length,
 		     file_entry_name,
@@ -7172,7 +7461,7 @@ int info_handle_file_entry_fprint(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print $FILE_NAME attribute.",
+			 "%s: unable to print $I30 entry.",
 			 function );
 
 			goto on_error;

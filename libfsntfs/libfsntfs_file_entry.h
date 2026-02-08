@@ -232,6 +232,48 @@ int libfsntfs_file_entry_get_file_attribute_flags(
      libcerror_error_t **error );
 
 LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_file_reference(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_creation_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_access_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_entry_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_size(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *size,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_get_i30_file_attribute_flags(
+     libfsntfs_file_entry_t *file_entry,
+     uint32_t *file_attribute_flags,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_get_utf8_name_size(
      libfsntfs_file_entry_t *file_entry,
      size_t *utf8_string_size,
@@ -388,6 +430,11 @@ int libfsntfs_file_entry_has_directory_entries_index(
 
 LIBFSNTFS_EXTERN \
 int libfsntfs_file_entry_has_default_data_stream(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error );
+
+LIBFSNTFS_EXTERN \
+int libfsntfs_file_entry_has_i30_entry(
      libfsntfs_file_entry_t *file_entry,
      libcerror_error_t **error );
 

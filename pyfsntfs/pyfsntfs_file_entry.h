@@ -115,6 +115,10 @@ PyObject *pyfsntfs_file_entry_has_default_data_stream(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_has_i30_entry(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_file_reference(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
@@ -168,6 +172,50 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time_as_integer(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 
+PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_creation_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_creation_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_modification_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_modification_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_access_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_access_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_entry_modification_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_entry_modification_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
+PyObject *pyfsntfs_file_entry_get_i30_file_attribute_flags(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments );
+
 PyObject *pyfsntfs_file_entry_get_name(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
@@ -182,10 +230,6 @@ PyObject *pyfsntfs_file_entry_get_name_by_attribute_index(
            PyObject *keywords );
 
 PyObject *pyfsntfs_file_entry_get_name(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments );
-
-PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
            pyfsntfs_file_entry_t *pyfsntfs_file_entry,
            PyObject *arguments );
 

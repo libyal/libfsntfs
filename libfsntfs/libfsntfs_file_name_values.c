@@ -452,6 +452,10 @@ int libfsntfs_file_name_values_read_data(
 	 ( (fsntfs_file_name_t *) data )->entry_modification_time,
 	 file_name_values->entry_modification_time );
 
+	byte_stream_copy_to_uint64_little_endian(
+	 ( (fsntfs_file_name_t *) data )->data_size,
+	 file_name_values->size );
+
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (fsntfs_file_name_t *) data )->file_attribute_flags,
 	 file_name_values->file_attribute_flags );
@@ -549,13 +553,10 @@ int libfsntfs_file_name_values_read_data(
 		 function,
 		 value_64bit );
 
-		byte_stream_copy_to_uint64_little_endian(
-		 ( (fsntfs_file_name_t *) data )->data_size,
-		 value_64bit );
 		libcnotify_printf(
 		 "%s: data size\t\t\t\t: %" PRIu64 "\n",
 		 function,
-		 value_64bit );
+		 file_name_values->size );
 
 		libcnotify_printf(
 		 "%s: file attribute flags\t\t: 0x%08" PRIx32 "\n",
@@ -969,6 +970,43 @@ int libfsntfs_file_name_values_get_entry_modification_time(
 		return( -1 );
 	}
 	*filetime = file_name_values->entry_modification_time;
+
+	return( 1 );
+}
+
+/* Retrieves the size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_file_name_values_get_size(
+     libfsntfs_file_name_values_t *file_name_values,
+     uint64_t *size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_file_name_values_get_size";
+
+	if( file_name_values == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file name values.",
+		 function );
+
+		return( -1 );
+	}
+	if( size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.",
+		 function );
+
+		return( -1 );
+	}
+	*size = file_name_values->size;
 
 	return( 1 );
 }

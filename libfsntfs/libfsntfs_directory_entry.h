@@ -82,6 +82,36 @@ int libfsntfs_directory_entry_get_parent_file_reference(
      uint64_t *parent_file_reference,
      libcerror_error_t **error );
 
+int libfsntfs_directory_entry_get_creation_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_modification_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_access_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_entry_modification_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *size,
+     libcerror_error_t **error );
+
+int libfsntfs_directory_entry_get_file_attribute_flags(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint32_t *file_attribute_flags,
+     libcerror_error_t **error );
+
 int libfsntfs_directory_entry_get_utf8_name_size(
      libfsntfs_directory_entry_t *directory_entry,
      size_t *utf8_string_size,

@@ -1355,17 +1355,13 @@ int libfsntfs_file_entry_get_parent_file_reference(
 		return( -1 );
 	}
 #endif
-	if( internal_file_entry->directory_entry == NULL )
-	{
-		result = 0;
-	}
-	else
+	if( internal_file_entry->directory_entry != NULL )
 	{
 		result = libfsntfs_directory_entry_get_parent_file_reference(
 		          internal_file_entry->directory_entry,
 		          parent_file_reference,
 		          error );
-	       
+
 		if( result != 1 )
 		{
 			libcerror_error_set(
@@ -2076,6 +2072,563 @@ int libfsntfs_file_entry_get_file_attribute_flags(
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to retrieve file attribute flags from standard information attribute.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the file reference
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_file_reference(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *file_reference,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_file_reference";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( file_reference == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file reference.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_file_reference(
+		          internal_file_entry->directory_entry,
+		          file_reference,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file reference from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the creation date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_creation_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_creation_time";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_creation_time(
+		          internal_file_entry->directory_entry,
+		          filetime,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve creation time from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the modification date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_modification_time";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_modification_time(
+		          internal_file_entry->directory_entry,
+		          filetime,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve modification time from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the access date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_access_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_access_time";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_access_time(
+		          internal_file_entry->directory_entry,
+		          filetime,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve access time from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the entry modification date and time
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_entry_modification_time(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_entry_modification_time";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_entry_modification_time(
+		          internal_file_entry->directory_entry,
+		          filetime,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve entry modification time from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the size
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_size(
+     libfsntfs_file_entry_t *file_entry,
+     uint64_t *size,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_size";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_size(
+		          internal_file_entry->directory_entry,
+		          size,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size from directory entry.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the file attribute flags
+ * This value is retrieved from the $I30 $FILE_NAME directory entry
+ * Returns 1 if successful, 0 if not available or -1 on error
+ */
+int libfsntfs_file_entry_get_i30_file_attribute_flags(
+     libfsntfs_file_entry_t *file_entry,
+     uint32_t *file_attribute_flags,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_get_i30_file_attribute_flags";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+#if defined( HAVE_LIBFSNTFS_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file_entry->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = libfsntfs_directory_entry_get_file_attribute_flags(
+		          internal_file_entry->directory_entry,
+		          file_attribute_flags,
+		          error );
+
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve file attribute flags from directory entry.",
 			 function );
 
 			result = -1;
@@ -4592,6 +5145,37 @@ int libfsntfs_file_entry_get_attribute_by_index(
 		return( -1 );
 	}
 #endif
+	return( result );
+}
+
+/* Determines if the file entry has a $I30 entry
+ * Returns 1 if the file entry has a $I30 entry, 0 if not or -1 on error
+ */
+int libfsntfs_file_entry_has_i30_entry(
+     libfsntfs_file_entry_t *file_entry,
+     libcerror_error_t **error )
+{
+	libfsntfs_internal_file_entry_t *internal_file_entry = NULL;
+	static char *function                                = "libfsntfs_file_entry_has_i30_entry";
+	int result                                           = 0;
+
+	if( file_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file_entry = (libfsntfs_internal_file_entry_t *) file_entry;
+
+	if( internal_file_entry->directory_entry != NULL )
+	{
+		result = 1;
+	}
 	return( result );
 }
 

@@ -160,6 +160,13 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Determines if the file entry has a default data stream." },
 
+	{ "has_i30_entry",
+	  (PyCFunction) pyfsntfs_file_entry_has_i30_entry,
+	  METH_NOARGS,
+	  "i30_entry() -> Boolean\n"
+	  "\n"
+	  "Determines if the file entry has a $I30 entry." },
+
 	{ "get_file_reference",
 	  (PyCFunction) pyfsntfs_file_entry_get_file_reference,
 	  METH_NOARGS,
@@ -251,6 +258,83 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "\n"
 	  "Returns the entry modification date and time as a 64-bit integer containing a FILETIME value." },
 
+	{ "get_file_attribute_flags",
+	  (PyCFunction) pyfsntfs_file_entry_get_file_attribute_flags,
+	  METH_NOARGS,
+	  "get_file_attribute_flags() -> Integer or None\n"
+	  "\n"
+	  "Returns the file attribute flags." },
+
+	{ "get_i30_file_reference",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_file_reference,
+	  METH_NOARGS,
+	  "get_i30_file_reference() -> Integer\n"
+	  "\n"
+	  "Returns the $I30 entry file reference, a combination of MFT entry index and sequence number." },
+
+	{ "get_i30_creation_time",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_creation_time,
+	  METH_NOARGS,
+	  "get_i30_creation_time() -> Datetime or None\n"
+	  "\n"
+	  "Returns the $I30 entry creation date and time." },
+
+	{ "get_i30_creation_time_as_integer",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_creation_time_as_integer,
+	  METH_NOARGS,
+	  "get_i30_creation_time_as_integer() -> Integer or None\n"
+	  "\n"
+	  "Returns the $I30 entry creation date and time as a 64-bit integer containing a FILETIME value." },
+
+	{ "get_i30_modification_time",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_modification_time,
+	  METH_NOARGS,
+	  "get_i30_modification_time() -> Datetime or None\n"
+	  "\n"
+	  "Returns the $I30 entry modification date and time." },
+
+	{ "get_i30_modification_time_as_integer",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_modification_time_as_integer,
+	  METH_NOARGS,
+	  "get_i30_modification_time_as_integer() -> Integer or None\n"
+	  "\n"
+	  "Returns the $I30 entry modification date and time as a 64-bit integer containing a FILETIME value." },
+
+	{ "get_i30_access_time",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_access_time,
+	  METH_NOARGS,
+	  "get_i30_access_time() -> Datetime or None\n"
+	  "\n"
+	  "Returns the $I30 entry access date and time." },
+
+	{ "get_i30_access_time_as_integer",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_access_time_as_integer,
+	  METH_NOARGS,
+	  "get_i30_access_time_as_integer() -> Integer or None\n"
+	  "\n"
+	  "Returns the $I30 entry access date and time as a 64-bit integer containing a FILETIME value." },
+
+	{ "get_i30_entry_modification_time",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_entry_modification_time,
+	  METH_NOARGS,
+	  "get_i30_entry_modification_time() -> Datetime or None\n"
+	  "\n"
+	  "Returns the $I30 entry entry modification date and time." },
+
+	{ "get_i30_entry_modification_time_as_integer",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_entry_modification_time_as_integer,
+	  METH_NOARGS,
+	  "get_i30_entry_modification_time_as_integer() -> Integer or None\n"
+	  "\n"
+	  "Returns the $I30 entry entry modification date and time as a 64-bit integer containing a FILETIME value." },
+
+	{ "get_i30_file_attribute_flags",
+	  (PyCFunction) pyfsntfs_file_entry_get_i30_file_attribute_flags,
+	  METH_NOARGS,
+	  "get_i30_file_attribute_flags() -> Integer or None\n"
+	  "\n"
+	  "Returns the $I30 entry file attribute flags." },
+
 	{ "get_name",
 	  (PyCFunction) pyfsntfs_file_entry_get_name,
 	  METH_NOARGS,
@@ -271,13 +355,6 @@ PyMethodDef pyfsntfs_file_entry_object_methods[] = {
 	  "get_name_by_attribute_index(attribute_index) -> Unicode string or None\n"
 	  "\n"
 	  "Returns the name." },
-
-	{ "get_file_attribute_flags",
-	  (PyCFunction) pyfsntfs_file_entry_get_file_attribute_flags,
-	  METH_NOARGS,
-	  "get_file_attribute_flags() -> Integer or None\n"
-	  "\n"
-	  "Returns the file attribute flags." },
 
 	{ "get_path_hint",
 	  (PyCFunction) pyfsntfs_file_entry_get_path_hint,
@@ -428,6 +505,12 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  "The entry modification date and time.",
 	  NULL },
 
+	{ "file_attribute_flags",
+	  (getter) pyfsntfs_file_entry_get_file_attribute_flags,
+	  (setter) 0,
+	  "The file attribute flags.",
+	  NULL },
+
 	{ "name",
 	  (getter) pyfsntfs_file_entry_get_name,
 	  (setter) 0,
@@ -438,12 +521,6 @@ PyGetSetDef pyfsntfs_file_entry_object_get_set_definitions[] = {
 	  (getter) pyfsntfs_file_entry_get_name_attribute_index,
 	  (setter) 0,
 	  "The name.",
-	  NULL },
-
-	{ "file_attribute_flags",
-	  (getter) pyfsntfs_file_entry_get_file_attribute_flags,
-	  (setter) 0,
-	  "The file attribute flags.",
 	  NULL },
 
 	{ "symbolic_link_target",
@@ -1903,6 +1980,62 @@ PyObject *pyfsntfs_file_entry_has_default_data_stream(
 	return( Py_False );
 }
 
+/* Determines if the file entry has a $I30 entry
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_has_i30_entry(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyfsntfs_file_entry_has_i30_entry";
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_has_i30_entry(
+	          pyfsntfs_file_entry->file_entry,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if file entry has a $I30 entry.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
+}
+
 /* Retrieves the file reference
  * Returns a Python object if successful or NULL on error
  */
@@ -2656,6 +2789,648 @@ PyObject *pyfsntfs_file_entry_get_entry_modification_time_as_integer(
 	return( integer_object );
 }
 
+/* Retrieves the file attribute flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error      = NULL;
+	PyObject *integer_object      = NULL;
+	static char *function         = "pyfsntfs_file_entry_get_file_entry_flags";
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_file_attribute_flags(
+	          pyfsntfs_file_entry->file_entry,
+	          &file_attribute_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) file_attribute_flags );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry file reference
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_file_reference(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_i30_file_reference";
+	uint64_t file_reference  = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_file_reference(
+	          pyfsntfs_file_entry->file_entry,
+	          &file_reference,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file reference.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  file_reference );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry creation date and time
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_creation_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *date_time_object = NULL;
+	static char *function      = "pyfsntfs_file_entry_get_i30_creation_time";
+	uint64_t filetime          = 0;
+	int result                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_creation_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	date_time_object = pyfsntfs_datetime_new_from_filetime(
+	                    filetime );
+
+	return( date_time_object );
+}
+
+/* Retrieves the $I30 entry creation date and time as an integer
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_creation_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_i30_creation_time_as_integer";
+	uint64_t filetime        = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_creation_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve creation time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry modification date and time
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_modification_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *date_time_object = NULL;
+	static char *function      = "pyfsntfs_file_entry_get_i30_modification_time";
+	uint64_t filetime          = 0;
+	int result                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_modification_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	date_time_object = pyfsntfs_datetime_new_from_filetime(
+	                    filetime );
+
+	return( date_time_object );
+}
+
+/* Retrieves the $I30 entry modification date and time as an integer
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_modification_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_i30_modification_time_as_integer";
+	uint64_t filetime        = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_modification_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve modification time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry access date and time
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_access_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *date_time_object = NULL;
+	static char *function      = "pyfsntfs_file_entry_get_i30_access_time";
+	uint64_t filetime          = 0;
+	int result                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_access_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	date_time_object = pyfsntfs_datetime_new_from_filetime(
+	                    filetime );
+
+	return( date_time_object );
+}
+
+/* Retrieves the $I30 entry access date and time as an integer
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_access_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_i30_access_time_as_integer";
+	uint64_t filetime        = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_access_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve access time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry entry modification date and time
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_entry_modification_time(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error   = NULL;
+	PyObject *date_time_object = NULL;
+	static char *function      = "pyfsntfs_file_entry_get_i30_entry_modification_time";
+	uint64_t filetime          = 0;
+	int result                 = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_entry_modification_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	date_time_object = pyfsntfs_datetime_new_from_filetime(
+	                    filetime );
+
+	return( date_time_object );
+}
+
+/* Retrieves the $I30 entry modification date and time as an integer
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_entry_modification_time_as_integer(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyfsntfs_file_entry_get_i30_entry_modification_time_as_integer";
+	uint64_t filetime        = 0;
+	int result               = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_entry_modification_time(
+	          pyfsntfs_file_entry->file_entry,
+	          &filetime,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve entry modification time.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_signed_new_from_64bit(
+	                  filetime );
+
+	return( integer_object );
+}
+
+/* Retrieves the $I30 entry file attribute flags
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyfsntfs_file_entry_get_i30_file_attribute_flags(
+           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
+           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error      = NULL;
+	PyObject *integer_object      = NULL;
+	static char *function         = "pyfsntfs_file_entry_get_i30_file_entry_flags";
+	uint32_t file_attribute_flags = 0;
+	int result                    = 0;
+
+	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyfsntfs_file_entry == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file entry.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libfsntfs_file_entry_get_i30_file_attribute_flags(
+	          pyfsntfs_file_entry->file_entry,
+	          &file_attribute_flags,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyfsntfs_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve file attribute flags.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	else if( result == 0 )
+	{
+		Py_IncRef(
+		 Py_None );
+
+		return( Py_None );
+	}
+	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
+	                  (uint64_t) file_attribute_flags );
+
+	return( integer_object );
+}
+
 /* Retrieves the name
  * Returns a Python object if successful or NULL on error
  */
@@ -2988,65 +3763,6 @@ on_error:
 		 utf8_string );
 	}
 	return( NULL );
-}
-
-/* Retrieves the file attribute flags
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyfsntfs_file_entry_get_file_attribute_flags(
-           pyfsntfs_file_entry_t *pyfsntfs_file_entry,
-           PyObject *arguments PYFSNTFS_ATTRIBUTE_UNUSED )
-{
-	libcerror_error_t *error      = NULL;
-	PyObject *integer_object      = NULL;
-	static char *function         = "pyfsntfs_file_entry_get_file_entry_flags";
-	uint32_t file_attribute_flags = 0;
-	int result                    = 0;
-
-	PYFSNTFS_UNREFERENCED_PARAMETER( arguments )
-
-	if( pyfsntfs_file_entry == NULL )
-	{
-		PyErr_Format(
-		 PyExc_ValueError,
-		 "%s: invalid file entry.",
-		 function );
-
-		return( NULL );
-	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libfsntfs_file_entry_get_file_attribute_flags(
-	          pyfsntfs_file_entry->file_entry,
-	          &file_attribute_flags,
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result == -1 )
-	{
-		pyfsntfs_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to retrieve file attribute flags.",
-		 function );
-
-		libcerror_error_free(
-		 &error );
-
-		return( NULL );
-	}
-	else if( result == 0 )
-	{
-		Py_IncRef(
-		 Py_None );
-
-		return( Py_None );
-	}
-	integer_object = pyfsntfs_integer_unsigned_new_from_64bit(
-	                  (uint64_t) file_attribute_flags );
-
-	return( integer_object );
 }
 
 /* Retrieves the path hint for a specific $FILE_NAME attribute

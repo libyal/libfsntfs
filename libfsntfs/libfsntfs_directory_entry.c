@@ -449,6 +449,234 @@ int libfsntfs_directory_entry_get_parent_file_reference(
 	return( 1 );
 }
 
+/* Retrieves the creation date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_creation_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_creation_time";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_creation_time(
+	     directory_entry->file_name_values,
+	     filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve creation time from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_modification_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_modification_time";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_modification_time(
+	     directory_entry->file_name_values,
+	     filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve modification time from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the access date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_access_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_access_time";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_access_time(
+	     directory_entry->file_name_values,
+	     filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve access time from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the entry modification date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_entry_modification_time(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_entry_modification_time";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_entry_modification_time(
+	     directory_entry->file_name_values,
+	     filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve entry modification time from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the size
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_size(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint64_t *size,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_entry_size";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_size(
+	     directory_entry->file_name_values,
+	     size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve size from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the file attribute flags
+ * Returns 1 if successful or -1 on error
+ */
+int libfsntfs_directory_entry_get_file_attribute_flags(
+     libfsntfs_directory_entry_t *directory_entry,
+     uint32_t *file_attribute_flags,
+     libcerror_error_t **error )
+{
+	static char *function = "libfsntfs_directory_entry_get_entry_file_attribute_flags";
+
+	if( directory_entry == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid directory entry.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfsntfs_file_name_values_get_file_attribute_flags(
+	     directory_entry->file_name_values,
+	     file_attribute_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file attribute flags from file name values.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Retrieves the size of the UTF-8 encoded name
  * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character

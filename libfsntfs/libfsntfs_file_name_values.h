@@ -56,6 +56,10 @@ struct libfsntfs_file_name_values
 	 */
 	uint64_t entry_modification_time;
 
+	/* The size
+	 */
+	uint64_t size;
+
 	/* The file attribute flags
 	 */
 	uint32_t file_attribute_flags;
@@ -126,6 +130,11 @@ int libfsntfs_file_name_values_get_access_time(
 int libfsntfs_file_name_values_get_entry_modification_time(
      libfsntfs_file_name_values_t *file_name_values,
      uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libfsntfs_file_name_values_get_size(
+     libfsntfs_file_name_values_t *file_name_values,
+     uint64_t *size,
      libcerror_error_t **error );
 
 int libfsntfs_file_name_values_get_file_attribute_flags(
