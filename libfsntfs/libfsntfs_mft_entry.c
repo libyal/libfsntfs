@@ -1497,6 +1497,22 @@ int libfsntfs_mft_entry_read_attribute_list_data_mft_entry_by_index(
 	{
 		return( 0 );
 	}
+	if( (data_mft_entry->header->flags & LIBFSNTFS_MFT_ENTRY_FLAG_IN_USE) == 0 )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: Unexpected reading data unused file reference: %" PRIu64 "-%" PRIu16 "\n",
+			 function,
+			 attribute_list_data_mft_entry,
+			 (uint16_t) ( file_reference >> 48 ) );
+			libcnotify_printf(
+			 "\n" );
+	}
+#endif
+		return( 0 );
+	}
 	if( libfsntfs_mft_entry_header_get_base_record_file_reference(
 	     data_mft_entry->header,
 	     &base_record_file_reference,
