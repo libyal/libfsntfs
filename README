@@ -3,7 +3,7 @@ libfsntfs is a library to access the New Technology File System (NTFS) format.
 Project information:
 
 * Status: experimental
-* Licence: LGPLv3+
+* Licence: LGPL-3.0-or-later
 
 Read-only supported NTFS formats:
 
