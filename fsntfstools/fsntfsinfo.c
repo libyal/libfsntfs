@@ -29,6 +29,10 @@
 
 #include <stdio.h>
 
+#if defined( HAVE_FCNTL_H ) || defined( WINAPI )
+#include <fcntl.h>
+#endif
+
 #if defined( HAVE_IO_H ) || defined( WINAPI )
 #include <io.h>
 #endif
@@ -296,6 +300,9 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( __clang_analyzer__ )
+	__builtin_assume( fsntfsinfo_info_handle != NULL );
+#endif
 	if( option_bodyfile != NULL )
 	{
 		if( info_handle_set_bodyfile(

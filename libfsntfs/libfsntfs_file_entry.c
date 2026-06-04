@@ -172,7 +172,7 @@ int libfsntfs_file_entry_initialize(
 		 function,
 		 mft_entry_index );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( ( flags & LIBFSNTFS_FILE_ENTRY_FLAGS_MFT_ONLY ) == 0 )
 	{
@@ -3612,7 +3612,7 @@ int libfsntfs_internal_file_entry_get_path_hint(
 			 "%s: unable to retrieve parent reference from $FILE_NAME attribute.",
 			 function );
 
-			result = -1;
+			goto on_error;
 		}
 		parent_mft_entry_index = parent_file_reference & 0xffffffffffffUL;
 
@@ -4221,7 +4221,7 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target_size(
 
 			result = -1;
 		}
-		if( reparse_point_tag == 0xa000000c )
+		else if( reparse_point_tag == 0xa000000c )
 		{
 			result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name_size(
 			          reparse_point_attribute,
@@ -4343,7 +4343,7 @@ int libfsntfs_file_entry_get_utf8_symbolic_link_target(
 
 			result = -1;
 		}
-		if( reparse_point_tag == 0xa000000c )
+		else if( reparse_point_tag == 0xa000000c )
 		{
 			result = libfsntfs_reparse_point_attribute_get_utf8_substitute_name(
 				  reparse_point_attribute,
@@ -4465,7 +4465,7 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target_size(
 
 			result = -1;
 		}
-		if( reparse_point_tag == 0xa000000c )
+		else if( reparse_point_tag == 0xa000000c )
 		{
 			result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name_size(
 				  reparse_point_attribute,
@@ -4587,7 +4587,7 @@ int libfsntfs_file_entry_get_utf16_symbolic_link_target(
 
 			result = -1;
 		}
-		if( reparse_point_tag == 0xa000000c )
+		else if( reparse_point_tag == 0xa000000c )
 		{
 			result = libfsntfs_reparse_point_attribute_get_utf16_substitute_name(
 				  reparse_point_attribute,
@@ -5397,7 +5397,7 @@ int libfsntfs_file_entry_is_symbolic_link(
 
 			result = -1;
 		}
-		if( reparse_point_tag == 0xa000000cUL )
+		else if( reparse_point_tag == 0xa000000cUL )
 		{
 			result = 1;
 		}

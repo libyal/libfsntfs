@@ -287,9 +287,9 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 		 function,
 		 attribute_list_entry->identifier );
 	}
-#endif /* defined( HAVE_DEBUG_OUTPUT ) */
-
 	data_offset = sizeof( fsntfs_mft_attribute_list_entry_header_t );
+
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 	if( ( attribute_list_entry->size < sizeof( fsntfs_mft_attribute_list_entry_header_t ) )
 	 || ( attribute_list_entry->size > data_size ) )
@@ -387,9 +387,9 @@ int libfsntfs_mft_attribute_list_entry_read_data(
 
 			goto on_error;
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
 		data_offset += (size_t) attribute_list_entry->name_size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			if( libfsntfs_debug_print_utf16_string_value(

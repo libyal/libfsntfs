@@ -468,6 +468,18 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -576,6 +588,17 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 			break;
 		}
 	}
+	if( index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing index value.",
+		 function );
+
+		goto on_error;
+	}
 	if( compare_result == LIBCDATA_COMPARE_EQUAL )
 	{
 		if( security_descriptor_index_value->data_size < (size64_t) ( sizeof( fsntfs_secure_index_value_t ) + 20 ) )
@@ -588,7 +611,7 @@ int libfsntfs_security_descriptor_index_get_entry_from_index_node_by_identifier(
 			 function,
 			 security_descriptor_index_value->data_size );
 
-			return( -1 );
+			goto on_error;
 		}
 		read_count = libfsntfs_data_stream_read_buffer_at_offset(
 		              security_descriptor_index->data_stream,

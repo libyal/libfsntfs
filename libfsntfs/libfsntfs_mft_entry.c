@@ -596,9 +596,9 @@ int libfsntfs_mft_entry_read_data(
 	}
 	if( data_offset < fixup_values_offset )
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
 		unknown_data_size = (size_t) fixup_values_offset - data_offset;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
@@ -609,8 +609,8 @@ int libfsntfs_mft_entry_read_data(
 			 unknown_data_size,
 			 0 );
 		}
-#endif
 		data_offset += unknown_data_size;
+#endif
 	}
 	if( libfsntfs_mft_entry_header_get_number_of_fixup_values(
 	     mft_entry->header,
@@ -644,7 +644,9 @@ int libfsntfs_mft_entry_read_data(
 
 			goto on_error;
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
 		data_offset += 2 + ( (size_t) number_of_fixup_values * 2 );
+#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -1019,9 +1021,9 @@ int libfsntfs_mft_entry_read_attributes_data(
 	}
 	while( attribute_type != LIBFSNTFS_ATTRIBUTE_TYPE_END_OF_ATTRIBUTES );
 
+#if defined( HAVE_DEBUG_OUTPUT )
 	data_offset += 4;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( libfsntfs_mft_entry_header_get_used_entry_size(

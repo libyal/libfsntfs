@@ -1868,9 +1868,18 @@ int fsntfs_test_internal_file_entry_get_attribute_by_index(
 	          &attribute,
 	          &error );
 
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "attribute",
 	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -6092,9 +6101,18 @@ int fsntfs_test_file_entry_get_attribute_by_index(
 	          &attribute,
 	          &error );
 
+	FSNTFS_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "attribute",
 	 attribute );
+
+	FSNTFS_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */

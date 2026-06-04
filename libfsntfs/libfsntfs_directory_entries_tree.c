@@ -590,6 +590,18 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -1295,6 +1307,18 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -1423,6 +1447,17 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 		{
 			break;
 		}
+	}
+	if( index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing index value.",
+		 function );
+
+		goto on_error;
 	}
 	if( compare_result == LIBUNA_COMPARE_EQUAL )
 	{
@@ -1746,6 +1781,18 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 index_value_entry );
+
+			goto on_error;
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
@@ -1874,6 +1921,17 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 		{
 			break;
 		}
+	}
+	if( index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing index value.",
+		 function );
+
+		goto on_error;
 	}
 	if( compare_result == LIBUNA_COMPARE_EQUAL )
 	{
@@ -2190,6 +2248,18 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 element_file_index );
+
+			goto on_error;
+		}
 	}
 	else
 	{
@@ -2262,6 +2332,29 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 			goto on_error;
 		}
+		if( index_value == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid index node - missing index value: %d.",
+			 function,
+			 element_file_index );
+
+			goto on_error;
+		}
+	}
+	if( index_value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing index value.",
+		 function );
+
+		goto on_error;
 	}
 	if( libfsntfs_directory_entry_initialize(
 	     &directory_entry,

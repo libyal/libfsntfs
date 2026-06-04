@@ -435,13 +435,14 @@ int libfsntfs_index_entry_read_file_io_handle(
 		goto on_error;
 	}
 /* TODO refactor */
+#if defined( HAVE_DEBUG_OUTPUT )
 	index_node_size = (size_t) index_entry->node->header->size - sizeof( fsntfs_index_node_header_t );
-
+#endif
 	if( data_offset < (size_t) index_values_offset )
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
 		unknown_data_size = (size_t) index_values_offset - data_offset;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
@@ -452,9 +453,9 @@ int libfsntfs_index_entry_read_file_io_handle(
 			 unknown_data_size,
 			 0 );
 		}
-#endif
 		data_offset     += unknown_data_size;
 		index_node_size -= unknown_data_size;
+#endif
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )

@@ -31,14 +31,17 @@
  */
 #if defined( LIBFSNTFS_DLL_EXPORT )
 #define LIBFSNTFS_EXTERN __declspec(dllexport)
+#define LIBFSNTFS_EXTERN_VARIABLE extern __declspec(dllexport)
 
 #elif defined( LIBFSNTFS_DLL_IMPORT )
-#define LIBFSNTFS_EXTERN extern __declspec(dllimport)
+#define LIBFSNTFS_EXTERN __declspec(dllimport)
+#define LIBFSNTFS_EXTERN_VARIABLE extern __declspec(dllimport)
 
 #else
 #define LIBFSNTFS_EXTERN extern
+#define LIBFSNTFS_EXTERN_VARIABLE extern
 
-#endif
+#endif /* defined( LIBFSNTFS_DLL_EXPORT ) */
 
 #endif /* !defined( _LIBFSNTFS_EXTERN_H ) */
 

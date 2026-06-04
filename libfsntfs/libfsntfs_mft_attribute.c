@@ -329,10 +329,10 @@ on_error:
 			memory_free(
 			 ( *destination_mft_attribute )->data );
 		}
-		if( ( *destination_mft_attribute )->data != NULL )
+		if( ( *destination_mft_attribute )->name != NULL )
 		{
 			memory_free(
-			 ( *destination_mft_attribute )->data );
+			 ( *destination_mft_attribute )->name );
 		}
 		memory_free(
 		 *destination_mft_attribute );
@@ -1028,7 +1028,9 @@ int libfsntfs_mft_attribute_read_data(
 
 				goto on_error;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
 			data_offset = (size_t) mft_attribute->data_offset + (size_t) mft_attribute->data_size;
+#endif
 		}
 	}
 	else

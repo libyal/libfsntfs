@@ -872,9 +872,9 @@ int libfsntfs_index_read_root_node(
 
 		goto on_error;
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
 	data_offset += index->root_node->header->size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( data_offset < data_size )

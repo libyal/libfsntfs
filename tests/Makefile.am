@@ -24,6 +24,10 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
+AM_TESTS_ENVIRONMENT = \
+	export PYTHON="@PYTHON@"; \
+	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
+
 if HAVE_PYTHON_TESTS
 TESTS_PYFSNTFS = \
 	test_python_module.sh
@@ -231,6 +235,7 @@ fsntfs_test_cluster_block_stream_SOURCES = \
 
 fsntfs_test_cluster_block_stream_LDADD = \
 	@LIBFDATA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -331,6 +336,7 @@ fsntfs_test_compressed_data_handle_SOURCES = \
 
 fsntfs_test_compressed_data_handle_LDADD = \
 	@LIBFDATA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
@@ -1058,7 +1064,8 @@ fsntfs_test_tools_output_SOURCES = \
 
 fsntfs_test_tools_output_LDADD = \
 	../libfsntfs/libfsntfs.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
 
 fsntfs_test_tools_path_string_SOURCES = \
 	../fsntfstools/path_string.c ../fsntfstools/path_string.h \

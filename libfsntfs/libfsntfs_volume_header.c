@@ -592,9 +592,6 @@ int libfsntfs_volume_header_read_data(
 
 		return( -1 );
 	}
-	volume_size *= volume_header->bytes_per_sector;
-	volume_size += volume_header->bytes_per_sector;
-
 	volume_header->mft_offset = mft_cluster_block_number
 	                          * volume_header->cluster_block_size;
 
@@ -618,6 +615,9 @@ int libfsntfs_volume_header_read_data(
 		 "%s: calculated index entry size\t\t: %" PRIu32 "\n",
 		 function,
 		 volume_header->index_entry_size );
+
+		volume_size *= volume_header->bytes_per_sector;
+		volume_size += volume_header->bytes_per_sector;
 
 		libcnotify_printf(
 		 "%s: calculated volume size\t\t: %" PRIu64 "\n",
