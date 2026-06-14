@@ -1294,7 +1294,7 @@ int fsntfs_test_data_stream_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1350,7 +1350,7 @@ int fsntfs_test_data_stream_get_utf8_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1465,7 +1465,7 @@ int fsntfs_test_data_stream_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1523,7 +1523,7 @@ int fsntfs_test_data_stream_get_utf8_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1603,7 +1603,7 @@ int fsntfs_test_data_stream_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_utf16_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1659,7 +1659,7 @@ int fsntfs_test_data_stream_get_utf16_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1774,7 +1774,7 @@ int fsntfs_test_data_stream_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_utf16_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1832,7 +1832,7 @@ int fsntfs_test_data_stream_get_utf16_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2158,7 +2158,7 @@ int fsntfs_test_data_stream_read_buffer(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_read_buffer with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2216,7 +2216,7 @@ int fsntfs_test_data_stream_read_buffer(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2482,7 +2482,7 @@ int fsntfs_test_data_stream_read_buffer_at_offset(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_read_buffer_at_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2542,7 +2542,7 @@ int fsntfs_test_data_stream_read_buffer_at_offset(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2717,7 +2717,7 @@ int fsntfs_test_data_stream_seek_offset(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_seek_offset with pthread_rwlock_wrlock failing in libcthreads_read_write_lock_grab_for_write
 	 */
@@ -2775,7 +2775,7 @@ int fsntfs_test_data_stream_seek_offset(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2850,7 +2850,7 @@ int fsntfs_test_data_stream_get_offset(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_offset with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -2906,7 +2906,7 @@ int fsntfs_test_data_stream_get_offset(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2981,7 +2981,7 @@ int fsntfs_test_data_stream_get_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -3037,7 +3037,7 @@ int fsntfs_test_data_stream_get_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -3117,7 +3117,7 @@ int fsntfs_test_data_stream_get_number_of_extents(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_number_of_extents with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -3173,7 +3173,7 @@ int fsntfs_test_data_stream_get_number_of_extents(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -3319,7 +3319,7 @@ int fsntfs_test_data_stream_get_extent_by_index(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_data_stream_get_extent_by_index with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -3381,7 +3381,7 @@ int fsntfs_test_data_stream_get_extent_by_index(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 

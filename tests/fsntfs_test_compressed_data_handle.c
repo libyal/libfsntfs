@@ -42,7 +42,6 @@
 /* Define to make fsntfs_test_file generate verbose output
 #define FSNTFS_TEST_COMPRESSED_DATA_HANDLE_VERBOSE
  */
-#define FSNTFS_TEST_COMPRESSED_DATA_HANDLE_VERBOSE
 
 uint8_t fsntfs_test_compressed_data_handle_lzxpress_huffman_compressed_data1[ 3414 ] = {
 	0x00, 0x00, 0x00, 0x00, 0xa0, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

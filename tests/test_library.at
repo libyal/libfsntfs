@@ -1,0 +1,41 @@
+m4_include([package.m4])
+m4_include([test_macros.at])
+
+include_test_inputs([libfsntfs])
+
+dnl Wrap m4_define to overwrite AT_TESTSUITE_NAME
+m4_define([_M4_DEFINE_HOOK], m4_defn([m4_define]))
+m4_define([m4_define],
+  [m4_if(
+    [$1],
+    [AT_TESTSUITE_NAME],
+    [_M4_DEFINE_HOOK([$1], [Running library tests])],
+    [_M4_DEFINE_HOOK([$1], [$2])])])
+
+dnl Redefine AS_BOX to remove the "box"
+m4_undefine([AS_BOX])
+m4_define([AS_BOX], [echo "$1"])
+
+AT_INIT([library])
+AT_COLOR_TESTS
+
+dnl Rewrite AT_SETUP to change the minimum line length
+m4_define([AT_SETUP],
+  m4_unquote(
+    [m4_bpatsubst(
+      m4_dquote(m4_defn([AT_SETUP])),
+      [47],
+      [72])
+    ])
+  )
+
+SETUP_HELPER_FUNCTIONS
+
+RUN_TEST_BINARIES(
+  [SKIP_LIBRARY_TESTS],
+  [attribute attribute_list_entry bitmap_values buffer_data_handle cluster_block cluster_block_data cluster_block_stream cluster_block_vector compressed_block compressed_block_data_handle compressed_block_vector compressed_data_handle compression compression_unit_data_handle compression_unit_descriptor data_run data_stream directory_entries_tree directory_entry error extent file_entry file_name_attribute file_name_values file_system fixup_values index index_entry index_entry_header index_entry_vector index_node index_node_header index_root_header index_value io_handle logged_utility_stream_values mft mft_attribute mft_attribute_list mft_attribute_list_entry mft_entry mft_entry_header name notify object_identifier_values path_hint profiler reparse_point_attribute reparse_point_values sds_index_value security_descriptor_index security_descriptor_index_value security_descriptor_values standard_information_values txf_data_values usn_change_journal volume_header volume_information_attribute volume_information_values volume_name_attribute volume_name_values])
+
+RUN_TEST_BINARIES_WITH_INPUT(
+  [SKIP_LIBRARY_TESTS],
+  [mft_metadata_file support volume],
+  test_inputs_libfsntfs)

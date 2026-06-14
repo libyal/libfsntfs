@@ -63,11 +63,11 @@ struct libfsntfs_mft_entry_header
 	 */
 	uint16_t flags;
 
-	/* The used entry size 
+	/* The used entry size
 	 */
 	uint32_t used_entry_size;
 
-	/* The total entry size 
+	/* The total entry size
 	 */
 	uint32_t total_entry_size;
 

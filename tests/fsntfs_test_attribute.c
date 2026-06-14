@@ -815,7 +815,7 @@ int fsntfs_test_attribute_get_type(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_type with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -871,7 +871,7 @@ int fsntfs_test_attribute_get_type(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -946,7 +946,7 @@ int fsntfs_test_attribute_get_data_flags(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_data_flags with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1002,7 +1002,7 @@ int fsntfs_test_attribute_get_data_flags(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1150,7 +1150,7 @@ int fsntfs_test_attribute_get_utf8_name_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_utf8_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1206,7 +1206,7 @@ int fsntfs_test_attribute_get_utf8_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1321,7 +1321,7 @@ int fsntfs_test_attribute_get_utf8_name(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_utf8_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1379,7 +1379,7 @@ int fsntfs_test_attribute_get_utf8_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1454,7 +1454,7 @@ int fsntfs_test_attribute_get_utf16_name_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_utf16_name_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1510,7 +1510,7 @@ int fsntfs_test_attribute_get_utf16_name_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1625,7 +1625,7 @@ int fsntfs_test_attribute_get_utf16_name(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_utf16_name with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1683,7 +1683,7 @@ int fsntfs_test_attribute_get_utf16_name(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1780,7 +1780,7 @@ int fsntfs_test_attribute_get_data_vcn_range(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_data_vcn_range with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -1838,7 +1838,7 @@ int fsntfs_test_attribute_get_data_vcn_range(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -1986,7 +1986,7 @@ int fsntfs_test_attribute_get_data_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_data_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -2042,7 +2042,7 @@ int fsntfs_test_attribute_get_data_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 
@@ -2117,7 +2117,7 @@ int fsntfs_test_attribute_get_valid_data_size(
 	libcerror_error_free(
 	 &error );
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 
 	/* Test libfsntfs_attribute_get_valid_data_size with pthread_rwlock_rdlock failing in libcthreads_read_write_lock_grab_for_read
 	 */
@@ -2173,7 +2173,7 @@ int fsntfs_test_attribute_get_valid_data_size(
 		libcerror_error_free(
 		 &error );
 	}
-#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK ) */
+#endif /* defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK ) */
 
 	return( 1 );
 

@@ -207,7 +207,7 @@ int fsntfs_test_volume_initialize(
 	int test_number                 = 0;
 #endif
 
-#if defined( HAVE_FSNTFS_TEST_RWLOCK )
+#if defined( HAVE_FSNTFS_TEST_RWLOCK_HOOK )
 	number_of_malloc_fail_tests += 1;
 #endif
 

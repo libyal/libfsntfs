@@ -24,37 +24,24 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBFSNTFS_DLL_IMPORT@
 
-AM_TESTS_ENVIRONMENT = \
-	export PYTHON="@PYTHON@"; \
-	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
+check_PYTHONdir = $(abs_top_builddir)
+
+BUILT_SOURCES = package.m4
+
+check_AUTOTESTS = \
+	test_library \
+	test_manpages \
+	test_tools
 
 if HAVE_PYTHON_TESTS
-TESTS_PYFSNTFS = \
-	test_python_module.sh
+check_AUTOTESTS += test_python_module
 endif
 
-TESTS = \
-	test_library.sh \
-	test_tools.sh \
-	test_fsntfsinfo.sh \
-	test_fsntfsinfo_bodyfile.sh \
-	$(TESTS_PYFSNTFS)
-
-check_SCRIPTS = \
+check_PYTHON_SCRIPTS = \
 	pyfsntfs_test_attribute.py \
 	pyfsntfs_test_file_entry.py \
 	pyfsntfs_test_support.py \
-	pyfsntfs_test_volume.py \
-	test_fsntfsinfo.sh \
-	test_fsntfsinfo_bodyfile.sh \
-	test_library.sh \
-	test_manpage.sh \
-	test_python_module.sh \
-	test_runner.sh \
-	test_tools.sh
-
-EXTRA_DIST = \
-	$(check_SCRIPTS)
+	pyfsntfs_test_volume.py
 
 check_PROGRAMS = \
 	fsntfs_test_attribute \
@@ -131,6 +118,7 @@ check_PROGRAMS = \
 
 fsntfs_test_attribute_SOURCES = \
 	fsntfs_test_attribute.c \
+	fsntfs_test_extern.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -390,6 +378,7 @@ fsntfs_test_data_run_LDADD = \
 
 fsntfs_test_data_stream_SOURCES = \
 	fsntfs_test_data_stream.c \
+	fsntfs_test_extern.h \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
@@ -469,6 +458,7 @@ fsntfs_test_extent_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_file_entry_SOURCES = \
+	fsntfs_test_extern.h \
 	fsntfs_test_file_entry.c \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libbfio.h \
@@ -517,6 +507,7 @@ fsntfs_test_file_name_values_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_file_system_SOURCES = \
+	fsntfs_test_extern.h \
 	fsntfs_test_file_system.c \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_libbfio.h \
@@ -784,6 +775,7 @@ fsntfs_test_mft_entry_header_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_mft_metadata_file_SOURCES = \
+	fsntfs_test_extern.h \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
 	fsntfs_test_getopt.c fsntfs_test_getopt.h \
 	fsntfs_test_libbfio.h \
@@ -1104,6 +1096,7 @@ fsntfs_test_txf_data_values_LDADD = \
 	@LIBCERROR_LIBADD@
 
 fsntfs_test_usn_change_journal_SOURCES = \
+	fsntfs_test_extern.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libfsntfs.h \
 	fsntfs_test_macros.h \
@@ -1118,8 +1111,9 @@ fsntfs_test_usn_change_journal_LDADD = \
 	@PTHREAD_LIBADD@
 
 fsntfs_test_volume_SOURCES = \
-	fsntfs_test_getopt.c fsntfs_test_getopt.h \
+	fsntfs_test_extern.h \
 	fsntfs_test_functions.c fsntfs_test_functions.h \
+	fsntfs_test_getopt.c fsntfs_test_getopt.h \
 	fsntfs_test_libbfio.h \
 	fsntfs_test_libcerror.h \
 	fsntfs_test_libclocale.h \
@@ -1215,8 +1209,93 @@ fsntfs_test_volume_name_values_LDADD = \
 	../libfsntfs/libfsntfs.la \
 	@LIBCERROR_LIBADD@
 
+AUTOM4TE = autom4te
+AUTOTEST = $(AUTOM4TE) --language=autotest
+
+SUFFIXES = .at
+
+.at:
+	$(AM_V_GEN)rm -f $@ $@.tmp; \
+	$(AUTOTEST) -I '$(srcdir)' -o $@.tmp $< && \
+	mv $@.tmp $@
+
+atconfig: $(top_builddir)/config.status
+	cd $(top_builddir) && $(SHELL) ./config.status tests/$@
+
+check-build: $(check_PROGRAMS)
+
+check-local: $(check_AUTOTESTS)
+	@fail=0; \
+	for test_suite in $(check_AUTOTESTS); do \
+		$(AM_TESTS_ENVIRONMENT) $(SHELL) "./$$test_suite" $(TESTSUITEFLAGS) || fail=1; \
+		echo ""; \
+	done; \
+	exit $$fail
+
+clean-local:
+	for test_suite in $(check_AUTOTESTS); do \
+		test ! -f "$$test_suite" || $(SHELL) "./$$test_suite" --clean; \
+	done
+
+package.m4: $(top_srcdir)/configure.ac
+	$(AM_V_GEN):; \
+	{ \
+	  echo 'm4_define([AT_PACKAGE_NAME], [$(PACKAGE_NAME)])' ; \
+	  echo 'm4_define([AT_PACKAGE_TARNAME], [$(PACKAGE_TARNAME)])' ; \
+	  echo 'm4_define([AT_PACKAGE_VERSION], [$(PACKAGE_VERSION)])' ; \
+	  echo 'm4_define([AT_PACKAGE_STRING], [$(PACKAGE_STRING)])' ; \
+	  echo 'm4_define([AT_PACKAGE_BUGREPORT], [$(PACKAGE_BUGREPORT)])' ; \
+	} > $@
+
+test_inputs_libfsntfs.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) libfsntfs
+
+test_inputs_pyfsntfs.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) pyfsntfs
+
+test_inputs_fsntfsinfo.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo
+
+test_inputs_fsntfsinfo_fs.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_fs
+
+test_inputs_fsntfsinfo_mft.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_mft
+
+test_inputs_fsntfsinfo_usn.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_usn
+
+test_inputs_fsntfsinfo_bodyfile_fs.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_bodyfile_fs
+
+test_inputs_fsntfsinfo_bodyfile_mft.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_bodyfile_mft
+
+test_library: package.m4 test_inputs_libfsntfs.at test_library.at test_macros.at
+
+test_manpages: package.m4 test_manpages.at
+
+test_python_module: package.m4 test_inputs_pyfsntfs.at test_python_module.at
+
+test_tools: package.m4 test_inputs_fsntfsinfo.at test_inputs_fsntfsinfo_bodyfile_fs.at test_inputs_fsntfsinfo_bodyfile_mft.at test_inputs_fsntfsinfo_fs.at test_inputs_fsntfsinfo_mft.at test_inputs_fsntfsinfo_usn.at test_macros.at test_tools.at
+
+EXTRA_DIST = \
+	$(check_AUTOTESTS:=.at) \
+	$(check_PYTHON_SCRIPTS) \
+	generate_test_inputs.sh \
+	package.m4 \
+	test_macros.at
+
+CLEANFILES = \
+	$(check_AUTOTESTS) \
+	*.exe \
+	*.tmp \
+	notify_stream.log \
+	test_inputs_*.at
+
 DISTCLEANFILES = \
+	*.log \
+	atconfig \
 	Makefile \
-	Makefile.in \
-	notify_stream.log
+	Makefile.in
 

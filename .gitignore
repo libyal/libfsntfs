@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20251129
+# Version: 20260604
 
 # Generic auto-generated build files
 *~
@@ -131,7 +131,12 @@ stamp-h[1-9]
 /fsntfstools/*.exe
 /fsntfstools/fsntfsinfo
 /fsntfstools/fsntfsmount
+/tests/*.dir
 /tests/*.exe
+/tests/*.log
+/tests/*.tmp
+/tests/atconfig
+/tests/atlocal
 /tests/fsntfs_test_attribute
 /tests/fsntfs_test_attribute_list_entry
 /tests/fsntfs_test_bitmap_values
@@ -205,6 +210,12 @@ stamp-h[1-9]
 /tests/fsntfs_test_volume_name_values
 /tests/input
 /tests/notify_stream.log
+/tests/package.m4
+/tests/test_inputs_*.at
+/tests/test_library
+/tests/test_manpages
+/tests/test_python_module
+/tests/test_tools
 /tests/tmp*
 
 # Local library dependencies specific files
