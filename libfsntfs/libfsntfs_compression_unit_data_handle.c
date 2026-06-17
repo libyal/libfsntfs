@@ -57,7 +57,6 @@ int libfsntfs_compression_unit_data_handle_initialize(
 	off64_t calculated_attribute_data_vcn_offset        = 0;
 	off64_t data_offset                                 = 0;
 	off64_t data_run_offset                             = 0;
-	off64_t data_segment_offset                         = 0;
 	uint16_t data_flags                                 = 0;
 	int attribute_index                                 = 0;
 	int data_run_index                                  = 0;
@@ -69,6 +68,7 @@ int libfsntfs_compression_unit_data_handle_initialize(
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	char *data_segment_type                             = NULL;
+	off64_t data_segment_offset                         = 0;
 #endif
 
 	if( data_handle == NULL )
@@ -434,8 +434,9 @@ int libfsntfs_compression_unit_data_handle_initialize(
 					descriptor->data_run_offset = data_run_offset;
 					descriptor->data_offset     = data_offset;
 
+#if defined( HAVE_DEBUG_OUTPUT )
 					data_segment_offset = 0;
-
+#endif
 					if( data_run_size <= compression_unit_size )
 					{
 						descriptor->compression_unit_size = compression_unit_size;
@@ -530,7 +531,9 @@ int libfsntfs_compression_unit_data_handle_initialize(
 				{
 					data_run_offset += data_segment_size;
 				}
+#if defined( HAVE_DEBUG_OUTPUT )
 				data_segment_offset             += data_segment_size;
+#endif
 				data_run_size                   -= data_segment_size;
 				remaining_compression_unit_size -= data_segment_size;
 

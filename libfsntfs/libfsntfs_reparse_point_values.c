@@ -155,7 +155,6 @@ int libfsntfs_reparse_point_values_read_data(
      libcerror_error_t **error )
 {
 	static char *function            = "libfsntfs_reparse_point_values_read_data";
-	uint32_t flags                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	system_character_t *value_string = NULL;
@@ -375,17 +374,16 @@ int libfsntfs_reparse_point_values_read_data(
 	}
 	else if( reparse_point_values->tag == 0xa000000c )
 	{
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (fsntfs_symbolic_link_reparse_data_t *) reparse_point_values->reparse_data )->flags,
-		 flags );
-
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
+			byte_stream_copy_to_uint32_little_endian(
+			 ( (fsntfs_symbolic_link_reparse_data_t *) reparse_point_values->reparse_data )->flags,
+			 value_32bit );
 			libcnotify_printf(
 			 "%s: flags\t\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
-			 flags );
+			 value_32bit );
 		}
 #endif
 		reparse_point_values->substitute_name_offset += sizeof( fsntfs_symbolic_link_reparse_data_t );

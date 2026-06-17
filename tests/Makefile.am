@@ -1256,28 +1256,45 @@ test_inputs_pyfsntfs.at: generate_test_inputs.sh
 test_inputs_fsntfsinfo.at: generate_test_inputs.sh
 	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo
 
-test_inputs_fsntfsinfo_fs.at: generate_test_inputs.sh
-	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_fs
-
-test_inputs_fsntfsinfo_mft.at: generate_test_inputs.sh
-	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_mft
-
-test_inputs_fsntfsinfo_usn.at: generate_test_inputs.sh
-	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_usn
+test_inputs_fsntfsinfo_bodyfile_mft.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_bodyfile_mft
 
 test_inputs_fsntfsinfo_bodyfile_fs.at: generate_test_inputs.sh
 	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_bodyfile_fs
 
-test_inputs_fsntfsinfo_bodyfile_mft.at: generate_test_inputs.sh
-	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_bodyfile_mft
+test_inputs_fsntfsinfo_mft.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_mft
 
-test_library: package.m4 test_inputs_libfsntfs.at test_library.at test_macros.at
+test_inputs_fsntfsinfo_fs.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_fs
 
-test_manpages: package.m4 test_manpages.at
+test_inputs_fsntfsinfo_usn.at: generate_test_inputs.sh
+	$(SHELL) $(srcdir)/generate_test_inputs.sh $(PACKAGE_NAME) fsntfsinfo_usn
 
-test_python_module: package.m4 test_inputs_pyfsntfs.at test_python_module.at
+test_library: \
+	package.m4 \
+	test_inputs_libfsntfs.at \
+	test_library.at \
+	test_macros.at
 
-test_tools: package.m4 test_inputs_fsntfsinfo.at test_inputs_fsntfsinfo_bodyfile_fs.at test_inputs_fsntfsinfo_bodyfile_mft.at test_inputs_fsntfsinfo_fs.at test_inputs_fsntfsinfo_mft.at test_inputs_fsntfsinfo_usn.at test_macros.at test_tools.at
+test_manpages: \
+	package.m4 \
+	test_manpages.at
+
+test_python_module: \
+	package.m4 \
+	test_inputs_pyfsntfs.at \
+	test_python_module.at
+
+test_tools: \
+	package.m4 \
+	test_inputs_fsntfsinfo.at \
+	test_inputs_fsntfsinfo_bodyfile_fs.at \
+	test_inputs_fsntfsinfo_bodyfile_mft.at \
+	test_inputs_fsntfsinfo_fs.at \
+	test_inputs_fsntfsinfo_mft.at \
+	test_inputs_fsntfsinfo_usn.at \
+	test_macros.at test_tools.at
 
 EXTRA_DIST = \
 	$(check_AUTOTESTS:=.at) \

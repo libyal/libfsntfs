@@ -383,13 +383,13 @@ int libfsntfs_mft_entry_read_data(
 {
 	static char *function           = "libfsntfs_mft_entry_read_data";
 	size_t data_offset              = 0;
-	size_t unknown_data_size        = 0;
 	uint16_t attributes_offset      = 0;
 	uint16_t fixup_values_offset    = 0;
 	uint16_t number_of_fixup_values = 0;
 	int result                      = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	size_t unknown_data_size        = 0;
 	uint32_t total_entry_size       = 0;
 #endif
 

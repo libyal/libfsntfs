@@ -173,13 +173,16 @@ int libfsntfs_index_entry_read_file_io_handle(
 	uint8_t *index_entry_data                          = NULL;
 	static char *function                              = "libfsntfs_index_entry_read_file_io_handle";
 	size_t data_offset                                 = 0;
-	size_t index_node_size                             = 0;
 	size_t index_values_offset                         = 0;
 	size_t unknown_data_size                           = 0;
 	ssize_t read_count                                 = 0;
 	off64_t index_value_vcn_offset                     = 0;
 	uint16_t fixup_values_offset                       = 0;
 	uint16_t number_of_fixup_values                    = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	size_t index_node_size                             = 0;
+#endif
 
 	if( index_entry == NULL )
 	{
