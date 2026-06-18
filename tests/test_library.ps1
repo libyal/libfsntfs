@@ -1,71 +1,10 @@
 # Tests library functions and types.
-#
-# Version: 20260615
 
 $LibraryTests = "attribute attribute_list_entry bitmap_values buffer_data_handle cluster_block cluster_block_data cluster_block_stream cluster_block_vector compressed_block compressed_block_data_handle compressed_block_vector compressed_data_handle compression compression_unit_data_handle compression_unit_descriptor data_run data_stream directory_entries_tree directory_entry error extent file_entry file_name_attribute file_name_values file_system fixup_values index index_entry index_entry_header index_entry_vector index_node index_node_header index_root_header index_value io_handle logged_utility_stream_values mft mft_attribute mft_attribute_list mft_attribute_list_entry mft_entry mft_entry_header name notify object_identifier_values path_hint profiler reparse_point_attribute reparse_point_values sds_index_value security_descriptor_index security_descriptor_index_value security_descriptor_values standard_information_values txf_data_values usn_change_journal volume_header volume_information_attribute volume_information_values volume_name_attribute volume_name_values"
 $LibraryTestsWithInput = "mft_metadata_file support volume"
 $OptionSets = "offset" -split " "
 
 . .\test_functions.ps1
-
-Function RunTest
-{
-	param( [string]$TestName )
-
-	$TestBinary = "fsntfs_test_${TestName}"
-
-	$TestDescription = "${TestBinary}"
-	$TestExecutable = "${TestExecutablesDirectory}\${TestBinary}.exe"
-
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
-	{
-		WriteTestResult ${TestDescription} ${ExitIgnore}
-
-		Return ${ExitIgnore}
-	}
-	$Output = Invoke-Expression ${TestExecutable}
-	$Result = $global:LastExitCode
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	WriteTestResult ${TestDescription} ${Result}
-
-	Return ${Result}
-}
-
-Function RunTestWithInput
-{
-	param( [string]$TestName, [string[]]$TestInput )
-
-	$OptionSet = $TestInput[0]
-	$Options = $TestInput[1]
-	$TestFile = $TestInput[2]
-
-	$TestBinary = "fsntfs_test_${TestName}"
-	$TestFileName = (${TestFile} -split '\\')[-2..-1] -join '\'
-
-	$TestDescription = "${TestBinary} with input: '${TestFileName}"
-	$TestExecutable = "${TestExecutablesDirectory}\${TestBinary}.exe"
-
-	If (-Not (Test-Path -Path ${TestExecutable} -PathType Leaf))
-	{
-		WriteTestResult ${TestDescription} ${ExitIgnore}
-
-		Return ${ExitIgnore}
-	}
-	$Output = Invoke-Expression "${TestExecutable} ${Options} ${TestFile}"
-	$Result = $global:LastExitCode
-
-	If (${Result} -ne ${ExitSuccess})
-	{
-		Write-Host ${Output} -foreground Red
-	}
-	WriteTestResult ${TestDescription} ${Result}
-
-	Return ${Result}
-}
 
 $TestExecutablesDirectory = GetTestExecutablesDirectory
 
@@ -85,7 +24,7 @@ Foreach (${TestName} in ${LibraryTests} -split " ")
 	{
 		Continue
 	}
-	$Result = RunTest ${TestName}
+	$Result = RunTestBinary ${TestExecutablesDirectory} "fsntfs_test_${TestName}"
 
 	If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 	{
@@ -104,7 +43,7 @@ Foreach (${TestName} in ${LibraryTestsWithInput} -split " ")
 	}
 	ForEach ($TestInput in ${TestInputs})
 	{
-		$Result = RunTestWithInput ${TestName} ${TestInput}
+		$Result = RunTestBinaryWithInput ${TestExecutablesDirectory} "fsntfs_test_${TestName}" ${TestInput}
 
 		If ((${Result} -ne ${ExitSuccess}) -And (${Result} -ne ${ExitIgnore}))
 		{
