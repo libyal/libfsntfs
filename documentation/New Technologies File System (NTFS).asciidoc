@@ -3077,7 +3077,7 @@ What file system metadata is missing:
 | Title | Common Log File System – Analysis of the Windows ARIES log system
 | Date | November 2010
 | Author(s) | Joachim Metz
-| URL | https://github.com/libyal/libfsclfs/blob/main/documenation/Common%20Log%20File%20System%20(CLFS).asciidoc
+| URL | https://github.com/libyal/libfsclfs/blob/main/documentation/Common%20Log%20File%20System%20(CLFS).asciidoc
 |===
 
 `[LIBVSHADOW]`
