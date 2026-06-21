@@ -849,6 +849,7 @@ int libfsntfs_mft_attribute_list_insert_file_reference(
 	static char *function         = "libfsntfs_mft_attribute_list_insert_file_reference";
 	int entry_index               = 0;
 	int result                    = 0;
+	intptr_t* entry_find          = NULL;
 
 	if( attribute_list == NULL )
 	{
@@ -877,12 +878,35 @@ int libfsntfs_mft_attribute_list_insert_file_reference(
 	}
 	*safe_file_reference = file_reference;
 
-	result = libcdata_array_insert_entry(
+	result = libcdata_array_get_entry_by_value(
+				attribute_list->file_references_array,
+				(intptr_t *) safe_file_reference,
+				(int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_mft_attribute_list_compare_file_reference,
+				&entry_find,
+				error
+				);
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to find file reference in array.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 1 )
+	{
+		memory_free(
+		 safe_file_reference );
+		return( 1 );
+	}
+
+	result = libcdata_array_append_entry(
 	          attribute_list->file_references_array,
 	          &entry_index,
 	          (intptr_t *) safe_file_reference,
-	          (int (*)(intptr_t *, intptr_t *, libcerror_error_t **)) &libfsntfs_mft_attribute_list_compare_file_reference,
-	          LIBCDATA_INSERT_FLAG_UNIQUE_ENTRIES,
 	          error );
 
 	if( result == -1 )
@@ -891,7 +915,7 @@ int libfsntfs_mft_attribute_list_insert_file_reference(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to insert file reference in array.",
+		 "%s: unable to append file reference in array.",
 		 function );
 
 		goto on_error;
