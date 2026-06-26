@@ -2,7 +2,7 @@ AC_PREREQ([2.71])
 
 AC_INIT(
   [libfsntfs],
-  [20260621],
+  [20260626],
   [https://github.com/libyal/libfsntfs/issues])
 
 AC_CONFIG_SRCDIR(

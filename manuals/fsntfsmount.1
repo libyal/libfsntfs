@@ -1,23 +1,21 @@
 .Dd June 26, 2026
-.Dt FSNTFSINFO 1
+.Dt FSNTFSMOUNT 1
 .Os
 .Sh NAME
-.Nm fsntfsinfo
-.Nd determines information about a New Technology File System (NTFS) volume
+.Nm fsntfsmount
+.Nd mounts a New Technology File System (NTFS) volume
 .Sh SYNOPSIS
-.Nm fsntfsinfo
-.Op Fl B Ar bodyfile
-.Op Fl E Ar mft_entry_index
-.Op Fl F Ar path
+.Nm fsntfsmount
 .Op Fl o Ar offset
-.Op Fl dhHUvV
+.Op Fl X Ar extended_options
+.Op Fl hvV
 .Ar source
+.Ar mount_point
 .Sh DESCRIPTION
-.Nm fsntfsinfo
-is a utility to determine information about a New Technology File System \
-(NTFS) volume
+.Nm fsntfsmount
+is a utility to mount a New Technology File System (NTFS) volume
 .Pp
-.Nm fsntfsinfo
+.Nm fsntfsmount
 is part of the
 .Nm libfsntfs
 package.
@@ -25,30 +23,23 @@ package.
 is a library to access the New Technology File System (NTFS) format
 .Pp
 .Ar source
-is the source volume.
+a New Technology File System (NTFS) volume
+.Ar mount_point
+the directory to serve as mount point
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl B Ar bodyfile
-output file system information as a bodyfile
-.It Fl d
-calculate a MD5 hash of a file entry to include in the bodyfile
-.It Fl E Ar mft_entry_index
-show information about a specific MFT entry index or "all"
-.It Fl F Ar path
-show information about a specific file entry path
 .It Fl h
 shows this help
-.It Fl H
-shows the file system hierarchy
 .It Fl o Ar offset
 specify the volume offset in bytes
-.It Fl U
-shows information from the USN change journal ($UsnJrnl)
 .It Fl v
-verbose output to stderr
+verbose output to stderr, while fsntfsmount will remain running in the \
+foreground
 .It Fl V
 print version
+.It Fl X Ar extended_options
+extended options to pass to sub system
 .El
 .Sh ENVIRONMENT
 None
@@ -56,18 +47,8 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# fsntfsinfo ntfs-img-kw-1.dd
-fsntfsinfo 20240521
-.sp
-New Technology File System information:
-.sp
-Volume information:
-	Name				: KW-SRCH-1
-	Version				: 3.1
-	Serial number			: ba50ed9250ed5623
-	Cluster block size		: 512
-	MFT entry size			: 1024
-	Index entry size		: 4096
+# fshfsmount /dev/sda1
+fshfsmount 20210729
 .sp
 .Ed
 .Sh DIAGNOSTICS
@@ -75,7 +56,7 @@ Errors, verbose and debug output are printed to stderr when verbose output \
 \-v is enabled.
 Verbose and debug output are only printed when enabled at compilation.
 .Sh SEE ALSO
-.Xr fsntfsmount 1
+.Xr fsntfsinfo 1
 .Sh AUTHORS
 .An Joachim Metz <joachim.metz@gmail.com>
 .Sh BUGS
