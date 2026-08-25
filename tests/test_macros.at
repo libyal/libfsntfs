@@ -136,7 +136,7 @@ m4_define([RUN_TEST_BINARIES],
     AT_SKIP_IF(
       [test -n "${]$1[}"])
 
-    AT_CHECK([ath_fn_run_test_binary test_binary])
+    AT_CHECK([$abs_builddir/test_binary])
     AT_CLEANUP])
   ])
 
@@ -181,7 +181,7 @@ m4_define([RUN_TEST_BINARIES_WITH_INPUT],
       TEST_FILE=`ath_fn_resolve_test_file "$abs_srcdir/input/test_file"`
 
       AT_CHECK(
-        [ath_fn_run_test_binary test_binary test_options "${TEST_FILE}"])
+        [$abs_builddir/test_binary test_options "${TEST_FILE}"])
 
       AT_CLEANUP])
     ])
