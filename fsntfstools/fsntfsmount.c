@@ -486,8 +486,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
+#if defined( __OpenBSD__ )
+	fuse_unmount(
+	 mount_point, NULL );
+#else
 	fuse_unmount(
 	 fsntfsmount_fuse_handle );
+#endif
 
 	fuse_destroy(
 	 fsntfsmount_fuse_handle );
