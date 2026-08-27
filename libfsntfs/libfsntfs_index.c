@@ -946,7 +946,7 @@ int libfsntfs_index_read_bitmap(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve index entry size from root header.",
+		 "%s: unable to retrieve index entry size.",
 		 function );
 
 		goto on_error;
@@ -1118,6 +1118,7 @@ int libfsntfs_index_sub_node_is_allocated(
 {
 	static char *function       = "libfsntfs_index_sub_node_is_allocated";
 	off64_t sub_node_vcn_offset = 0;
+	uint32_t index_entry_size   = 0;
 	int result                  = 0;
 
 	if( index == NULL )
@@ -1142,23 +1143,26 @@ int libfsntfs_index_sub_node_is_allocated(
 
 		return( -1 );
 	}
-	if( index->io_handle == NULL )
+	if( libfsntfs_index_root_header_get_index_entry_size(
+	     index->root_header,
+	     &index_entry_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid index - missing IO handle.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve index entry size.",
 		 function );
 
 		return( -1 );
 	}
-	sub_node_vcn_offset = (off64_t) sub_node_vcn * index->io_handle->cluster_block_size;
+	sub_node_vcn_offset = (off64_t) sub_node_vcn * (off64_t) index->io_handle->cluster_block_size;
 
 	result = libcdata_range_list_range_is_present(
 	          index->bitmap_values->allocated_block_list,
 	          sub_node_vcn_offset,
-	          index->io_handle->cluster_block_size,
+	          index_entry_size,
 	          error );
 
 	if( result == -1 )

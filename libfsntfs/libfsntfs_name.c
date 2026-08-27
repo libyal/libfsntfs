@@ -608,7 +608,7 @@ int libfsntfs_name_compare_short(
 	return( LIBUNA_COMPARE_EQUAL );
 }
 
-/* Compares an UTF-8 string with an UTF-16 encoded name
+/* Compares an UTF-16 encoded name with an UTF-8 string
  * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
  */
 int libfsntfs_name_compare_with_utf8_string(
@@ -736,27 +736,27 @@ int libfsntfs_name_compare_with_utf8_string(
 			name_character   = (libuna_unicode_character_t) towupper( (wint_t) name_character );
 			string_character = (libuna_unicode_character_t) towupper( (wint_t) string_character );
 		}
-		if( string_character < name_character )
+		if( name_character < string_character )
 		{
 			return( LIBUNA_COMPARE_LESS );
 		}
-		else if( string_character > name_character )
+		else if( name_character > string_character )
 		{
 			return( LIBUNA_COMPARE_GREATER );
 		}
 	}
-	if( utf8_string_index < utf8_string_length )
+	if( name_index < name_size )
 	{
 		return( LIBUNA_COMPARE_GREATER );
 	}
-	else if( name_index < name_size )
+	else if( utf8_string_index < utf8_string_length )
 	{
 		return( LIBUNA_COMPARE_LESS );
 	}
 	return( LIBUNA_COMPARE_EQUAL );
 }
 
-/* Compares an UTF-16 string with an UTF-16 encoded name
+/* Compares an UTF-16 encoded name with an UTF-16 string
  * Returns LIBUNA_COMPARE_LESS, LIBUNA_COMPARE_EQUAL, LIBUNA_COMPARE_GREATER if successful or -1 on error
  */
 int libfsntfs_name_compare_with_utf16_string(
@@ -884,20 +884,20 @@ int libfsntfs_name_compare_with_utf16_string(
 			name_character   = (libuna_unicode_character_t) towupper( (wint_t) name_character );
 			string_character = (libuna_unicode_character_t) towupper( (wint_t) string_character );
 		}
-		if( string_character < name_character )
+		if( name_character < string_character )
 		{
 			return( LIBUNA_COMPARE_LESS );
 		}
-		else if( string_character > name_character )
+		else if( name_character > string_character )
 		{
 			return( LIBUNA_COMPARE_GREATER );
 		}
 	}
-	if( utf16_string_index < utf16_string_length )
+	if( name_index < name_size )
 	{
 		return( LIBUNA_COMPARE_GREATER );
 	}
-	else if( name_index < name_size )
+	else if( utf16_string_index < utf16_string_length )
 	{
 		return( LIBUNA_COMPARE_LESS );
 	}

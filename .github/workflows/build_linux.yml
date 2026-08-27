@@ -36,7 +36,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -64,7 +64,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -92,7 +92,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config libfuse-dev
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config libfuse-dev
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -120,7 +120,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config libfuse3-dev
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config libfuse3-dev
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -149,7 +149,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config python3-dev
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config python3-dev
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi
@@ -179,7 +179,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config python3 python3-build python3-dev
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config python3 python3-build python3-dev
     - name: Build from source
       env:
         CC: ${{ matrix.compiler }}
@@ -207,7 +207,7 @@ jobs:
     - name: Install build dependencies
       run: |
         sudo apt -y update
-        sudo apt -y install autoconf automake autopoint build-essential git libfuse3-dev libssl-dev libtool pkg-config
+        sudo apt -y install autoconf automake autopoint build-essential git libssl-dev libtool pkg-config
     - name: Download test data
       run: |
         if test -x "synctestdata.sh"; then ./synctestdata.sh; fi

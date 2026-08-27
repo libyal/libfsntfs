@@ -706,7 +706,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_GREATER );
+	 LIBUNA_COMPARE_LESS );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -723,7 +723,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_GREATER );
+	 LIBUNA_COMPARE_LESS );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -740,7 +740,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_LESS );
+	 LIBUNA_COMPARE_GREATER );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -757,7 +757,7 @@ int fsntfs_test_name_compare_with_utf8_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_LESS );
+	 LIBUNA_COMPARE_GREATER );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -939,7 +939,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_GREATER );
+	 LIBUNA_COMPARE_LESS );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -956,7 +956,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_GREATER );
+	 LIBUNA_COMPARE_LESS );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -973,7 +973,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_LESS );
+	 LIBUNA_COMPARE_GREATER );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -990,7 +990,7 @@ int fsntfs_test_name_compare_with_utf16_string(
 	FSNTFS_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 LIBUNA_COMPARE_LESS );
+	 LIBUNA_COMPARE_GREATER );
 
 	FSNTFS_TEST_ASSERT_IS_NULL(
 	 "error",

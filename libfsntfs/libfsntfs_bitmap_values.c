@@ -293,7 +293,7 @@ int libfsntfs_bitmap_values_read_data(
 						 allocated_element_index - 1 );
 					}
 					libcnotify_printf(
-					 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
+					 "%s: allocated block range\t\t: %" PRIu64 " - %" PRIu64 "\n",
 					 function,
 					 allocated_range_offset,
 					 allocated_range_offset + allocated_range_size );
@@ -351,7 +351,7 @@ int libfsntfs_bitmap_values_read_data(
 				 allocated_element_index - 1 );
 			}
 			libcnotify_printf(
-			 "%s: allocated block range\t\t: 0x%" PRIx64 " - 0x%" PRIx64 "\n",
+			 "%s: allocated block range\t\t: %" PRIu64 " - %" PRIu64 "\n",
 			 function,
 			 allocated_range_offset,
 			 allocated_range_offset + allocated_range_size );

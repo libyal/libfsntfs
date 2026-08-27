@@ -616,6 +616,36 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 			 "\n" );
 		}
 #endif
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) == 0 )
+		{
+			index_value_flags = 0;
+
+			if( index_node == directory_entries_tree->i30_index->root_node )
+			{
+				index_value_flags = LIBFSNTFS_INDEX_VALUE_LIST_FLAG_STORED_IN_ROOT;
+			}
+			/* Add the index values containing data in a depth first manner since
+			 * this will preserve the sorted by file name order of the directory entries
+			 */
+			result = libfsntfs_directory_entries_tree_insert_index_value(
+			          directory_entries_tree,
+			          index_value_entry,
+			          index_value,
+			          index_value_flags,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to insert index value into directory entries tree.",
+				 function );
+
+				goto on_error;
+			}
+		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
 			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
@@ -661,83 +691,55 @@ int libfsntfs_directory_entries_tree_read_from_index_node(
 				 "\n" );
 			}
 #endif
-			if( is_allocated == 0 )
+			if( is_allocated != 0 )
 			{
-				continue;
-			}
-			index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+				index_entry_offset = (off64_t) index_value->sub_node_vcn * (off64_t) directory_entries_tree->i30_index->io_handle->cluster_block_size;
 
-			if( libfsntfs_index_get_sub_node(
-			     directory_entries_tree->i30_index,
-			     file_io_handle,
-			     sub_node_cache,
-			     index_entry_offset,
-			     (int) index_value->sub_node_vcn,
-			     &sub_node,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-				 function,
-				 (int) index_value->sub_node_vcn,
-				 index_entry_offset,
-				 index_entry_offset );
+				if( libfsntfs_index_get_sub_node(
+				     directory_entries_tree->i30_index,
+				     file_io_handle,
+				     sub_node_cache,
+				     index_entry_offset,
+				     (int) index_value->sub_node_vcn,
+				     &sub_node,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+					 function,
+					 (int) index_value->sub_node_vcn,
+					 index_entry_offset,
+					 index_entry_offset );
 
-				goto on_error;
-			}
-			if( libfsntfs_directory_entries_tree_read_from_index_node(
-			     directory_entries_tree,
-			     file_io_handle,
-			     sub_node,
-			     recursion_depth + 1,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read directory entries tree from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-				 function,
-				 (int) index_value->sub_node_vcn,
-				 index_entry_offset,
-				 index_entry_offset );
+					goto on_error;
+				}
+				if( libfsntfs_directory_entries_tree_read_from_index_node(
+				     directory_entries_tree,
+				     file_io_handle,
+				     sub_node,
+				     recursion_depth + 1,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read directory entries tree from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+					 function,
+					 (int) index_value->sub_node_vcn,
+					 index_entry_offset,
+					 index_entry_offset );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
 		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
 		{
 			break;
-		}
-		index_value_flags = 0;
-
-		if( index_node == directory_entries_tree->i30_index->root_node )
-		{
-			index_value_flags = LIBFSNTFS_INDEX_VALUE_LIST_FLAG_STORED_IN_ROOT;
-		}
-		/* Add the index values containing data in a depth first manner since
-		 * this will preserve the sorted by file name order of the directory entries
-		 */
-		result = libfsntfs_directory_entries_tree_insert_index_value(
-		          directory_entries_tree,
-		          index_value_entry,
-		          index_value,
-		          index_value_flags,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to insert index value into directory entries tree.",
-			 function );
-
-			goto on_error;
 		}
 	}
 	if( libfcache_cache_free(
@@ -1333,42 +1335,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
-		{
-			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: node index value: %d sub node VCN value out of bounds.",
-				 function,
-				 index_value_entry );
-
-				goto on_error;
-			}
-			is_allocated = libfsntfs_index_sub_node_is_allocated(
-			                directory_entries_tree->i30_index,
-			                (int) index_value->sub_node_vcn,
-			                error );
-
-			if( is_allocated == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if sub node with VCN: %d is allocated.",
-				 function,
-				 (int) index_value->sub_node_vcn );
-
-				goto on_error;
-			}
-			else if( is_allocated == 0 )
-			{
-				continue;
-			}
-		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
 		{
 			break;
@@ -1436,14 +1402,14 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 				goto on_error;
 			}
 		}
-		if( compare_result == LIBUNA_COMPARE_LESS )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
-			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
+			if( compare_result == LIBUNA_COMPARE_GREATER )
 			{
 				break;
 			}
 		}
-		else if( compare_result == LIBUNA_COMPARE_EQUAL )
+		if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}
@@ -1536,52 +1502,84 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
 	}
 	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
-		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: node index value: %d sub node VCN value out of bounds.",
+			 function,
+			 index_value_entry );
 
-		if( libfsntfs_index_get_sub_node(
-		     directory_entries_tree->i30_index,
-		     file_io_handle,
-		     directory_entries_tree->i30_index->index_node_cache,
-		     index_entry_offset,
-		     (int) index_value->sub_node_vcn,
-		     &sub_node,
-		     error ) != 1 )
+			goto on_error;
+		}
+		is_allocated = libfsntfs_index_sub_node_is_allocated(
+		                directory_entries_tree->i30_index,
+		                (int) index_value->sub_node_vcn,
+		                error );
+
+		if( is_allocated == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: unable to determine if sub node with VCN: %d is allocated.",
 			 function,
-			 (int) index_value->sub_node_vcn,
-			 index_entry_offset,
-			 index_entry_offset );
+			 (int) index_value->sub_node_vcn );
 
 			goto on_error;
 		}
-		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
-		          directory_entries_tree,
-		          file_io_handle,
-		          sub_node,
-		          utf8_string,
-		          utf8_string_length,
-		          directory_entry,
-		          recursion_depth + 1,
-		          error );
-
-		if( result == -1 )
+		else if( is_allocated != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to retrieve directory entry by UTF-8 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-			 function,
-			 (int) index_value->sub_node_vcn,
-			 index_entry_offset,
-			 index_entry_offset );
+			index_entry_offset = (off64_t) index_value->sub_node_vcn * (off64_t) directory_entries_tree->i30_index->io_handle->cluster_block_size;
 
-			goto on_error;
+			if( libfsntfs_index_get_sub_node(
+			     directory_entries_tree->i30_index,
+			     file_io_handle,
+			     directory_entries_tree->i30_index->index_node_cache,
+			     index_entry_offset,
+			     (int) index_value->sub_node_vcn,
+			     &sub_node,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
+				 index_entry_offset );
+
+				goto on_error;
+			}
+			result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf8_name(
+			          directory_entries_tree,
+			          file_io_handle,
+			          sub_node,
+			          utf8_string,
+			          utf8_string_length,
+			          directory_entry,
+			          recursion_depth + 1,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to retrieve directory entry by UTF-8 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
+				 index_entry_offset );
+
+				goto on_error;
+			}
 		}
 	}
 	return( result );
@@ -1807,42 +1805,6 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 			 "\n" );
 		}
 #endif
-		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
-		{
-			if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: node index value: %d sub node VCN value out of bounds.",
-				 function,
-				 index_value_entry );
-
-				goto on_error;
-			}
-			is_allocated = libfsntfs_index_sub_node_is_allocated(
-			                directory_entries_tree->i30_index,
-			                (int) index_value->sub_node_vcn,
-			                error );
-
-			if( is_allocated == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if sub node with VCN: %d is allocated.",
-				 function,
-				 (int) index_value->sub_node_vcn );
-
-				goto on_error;
-			}
-			else if( is_allocated == 0 )
-			{
-				continue;
-			}
-		}
 		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_LAST ) != 0 )
 		{
 			break;
@@ -1894,7 +1856,8 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 
 			goto on_error;
 		}
-		if( compare_result != LIBUNA_COMPARE_EQUAL )
+		if( ( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
+		 || ( compare_result != LIBUNA_COMPARE_EQUAL ) )
 		{
 			if( libfsntfs_file_name_values_free(
 			     &file_name_values,
@@ -1910,14 +1873,14 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 				goto on_error;
 			}
 		}
-		if( compare_result == LIBUNA_COMPARE_LESS )
+		if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 		{
-			if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
+			if( compare_result == LIBUNA_COMPARE_GREATER )
 			{
 				break;
 			}
 		}
-		else if( compare_result == LIBUNA_COMPARE_EQUAL )
+		if( compare_result == LIBUNA_COMPARE_EQUAL )
 		{
 			break;
 		}
@@ -2010,52 +1973,84 @@ int libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
 	}
 	else if( ( index_value->flags & LIBFSNTFS_INDEX_VALUE_FLAG_IS_BRANCH_NODE ) != 0 )
 	{
-		index_entry_offset = (off64_t) ( index_value->sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+		if( index_value->sub_node_vcn > (uint64_t) INT_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: node index value: %d sub node VCN value out of bounds.",
+			 function,
+			 index_value_entry );
 
-		if( libfsntfs_index_get_sub_node(
-		     directory_entries_tree->i30_index,
-		     file_io_handle,
-		     directory_entries_tree->i30_index->index_node_cache,
-		     index_entry_offset,
-		     (int) index_value->sub_node_vcn,
-		     &sub_node,
-		     error ) != 1 )
+			goto on_error;
+		}
+		is_allocated = libfsntfs_index_sub_node_is_allocated(
+		                directory_entries_tree->i30_index,
+		                (int) index_value->sub_node_vcn,
+		                error );
+
+		if( is_allocated == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: unable to determine if sub node with VCN: %d is allocated.",
 			 function,
-			 (int) index_value->sub_node_vcn,
-			 index_entry_offset,
-			 index_entry_offset );
+			 (int) index_value->sub_node_vcn );
 
 			goto on_error;
 		}
-		result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
-		          directory_entries_tree,
-		          file_io_handle,
-		          sub_node,
-		          utf16_string,
-		          utf16_string_length,
-		          directory_entry,
-		          recursion_depth + 1,
-		          error );
-
-		if( result == -1 )
+		else if( is_allocated != 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to retrieve directory entry by UTF-16 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-			 function,
-			 (int) index_value->sub_node_vcn,
-			 index_entry_offset,
-			 index_entry_offset );
+			index_entry_offset = (off64_t) index_value->sub_node_vcn * (off64_t) directory_entries_tree->i30_index->io_handle->cluster_block_size;
 
-			goto on_error;
+			if( libfsntfs_index_get_sub_node(
+			     directory_entries_tree->i30_index,
+			     file_io_handle,
+			     directory_entries_tree->i30_index->index_node_cache,
+			     index_entry_offset,
+			     (int) index_value->sub_node_vcn,
+			     &sub_node,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to retrieve sub node with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
+				 index_entry_offset );
+
+				goto on_error;
+			}
+			result = libfsntfs_directory_entries_tree_get_entry_from_index_node_by_utf16_name(
+			          directory_entries_tree,
+			          file_io_handle,
+			          sub_node,
+			          utf16_string,
+			          utf16_string_length,
+			          directory_entry,
+			          recursion_depth + 1,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_IO,
+				 LIBCERROR_IO_ERROR_READ_FAILED,
+				 "%s: unable to retrieve directory entry by UTF-16 string from index entry with VCN: %d at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+				 function,
+				 (int) index_value->sub_node_vcn,
+				 index_entry_offset,
+				 index_entry_offset );
+
+				goto on_error;
+			}
 		}
 	}
 	return( result );
@@ -2161,6 +2156,7 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	static char *function                                 = "libfsntfs_directory_entries_tree_read_element_data";
 	off64_t index_entry_offset                            = 0;
 	off64_t sub_node_vcn                                  = 0;
+	uint32_t index_entry_size                             = 0;
 	int index_value_entry                                 = 0;
 	int is_allocated                                      = 0;
 	int result                                            = 0;
@@ -2263,9 +2259,26 @@ int libfsntfs_directory_entries_tree_read_element_data(
 	}
 	else
 	{
-		sub_node_vcn       = index_value_offset / directory_entries_tree->i30_index->io_handle->cluster_block_size;
-		index_entry_offset = (off64_t) ( sub_node_vcn * directory_entries_tree->i30_index->io_handle->cluster_block_size );
+		if( libfsntfs_index_get_index_entry_size(
+		     directory_entries_tree->i30_index,
+		     &index_entry_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve index entry size.",
+			 function );
 
+			goto on_error;
+		}
+		sub_node_vcn = index_value_offset / index_entry_size;
+
+		if( index_entry_size > directory_entries_tree->i30_index->io_handle->cluster_block_size )
+		{
+			sub_node_vcn *= index_entry_size / directory_entries_tree->i30_index->io_handle->cluster_block_size;
+		}
 		is_allocated = libfsntfs_index_sub_node_is_allocated(
 		                directory_entries_tree->i30_index,
 		                (int) sub_node_vcn,
@@ -2295,6 +2308,8 @@ int libfsntfs_directory_entries_tree_read_element_data(
 
 			goto on_error;
 		}
+		index_entry_offset = (off64_t) sub_node_vcn * (off64_t) directory_entries_tree->i30_index->io_handle->cluster_block_size;
+
 		if( libfsntfs_index_get_sub_node(
 		     directory_entries_tree->i30_index,
 		     file_io_handle,
