@@ -28,24 +28,29 @@ import pyfsntfs
 
 
 class SupportFunctionsTests(unittest.TestCase):
-  """Tests the support functions."""
+    """Tests the support functions."""
 
-  def test_get_version(self):
-    """Tests the get_version function."""
-    version = pyfsntfs.get_version()
-    self.assertIsNotNone(version)
+    def test_get_version(self):
+        """Tests the get_version function."""
+        version = pyfsntfs.get_version()
+        self.assertIsNotNone(version)
 
 
 if __name__ == "__main__":
-  argument_parser = argparse.ArgumentParser()
+    argument_parser = argparse.ArgumentParser()
 
-  argument_parser.add_argument(
-      "source", nargs="?", action="store", metavar="PATH",
-      default=None, help="path of the source file.")
+    argument_parser.add_argument(
+        "source",
+        nargs="?",
+        action="store",
+        metavar="PATH",
+        default=None,
+        help="path of the source file.",
+    )
 
-  options, unknown_options = argument_parser.parse_known_args()
-  unknown_options.insert(0, sys.argv[0])
+    options, unknown_options = argument_parser.parse_known_args()
+    unknown_options.insert(0, sys.argv[0])
 
-  setattr(unittest, "source", options.source)
+    setattr(unittest, "source", options.source)
 
-  unittest.main(argv=unknown_options, verbosity=2)
+    unittest.main(argv=unknown_options, verbosity=2)
