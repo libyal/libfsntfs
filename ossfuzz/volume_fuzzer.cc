@@ -36,19 +36,33 @@ extern "C" {
  */
 LIBFSNTFS_EXTERN \
 int libfsntfs_volume_open_file_io_handle(
-     libfsntfs_volume_t *volume,
-     libbfio_handle_t *file_io_handle,
-     int access_flags,
-     libfsntfs_error_t **error );
+      libfsntfs_volume_t *volume,
+      libbfio_handle_t *file_io_handle,
+      int access_flags,
+      libfsntfs_error_t **error );
 
 #endif /* !defined( LIBFSNTFS_HAVE_BFIO ) */
 
 int LLVMFuzzerTestOneInput(
-     const uint8_t *data,
-     size_t size )
+      const uint8_t *data,
+      size_t size )
 {
+	uint8_t utf8_string[ 64 ];
+	uint16_t utf16_string[ 32 ];
+
 	libbfio_handle_t *file_io_handle = NULL;
 	libfsntfs_volume_t *volume       = NULL;
+	uint64_t number_of_file_entries  = 0;
+	uint64_t serial_number           = 0;
+	size_t utf8_string_size          = 0;
+	size_t utf16_string_size         = 0;
+	uint32_t cluster_block_size      = 0;
+	uint32_t index_entry_size        = 0;
+	uint32_t mft_entry_size          = 0;
+	uint16_t bytes_per_sector        = 0;
+	uint16_t flags                   = 0;
+	uint8_t major_version            = 0;
+	uint8_t minor_version            = 0;
 
 	if( libbfio_memory_range_initialize(
 	     &file_io_handle,
@@ -78,6 +92,105 @@ int LLVMFuzzerTestOneInput(
 	{
 		goto on_error_libfsntfs;
 	}
+	if( libfsntfs_volume_has_bitlocker_drive_encryption(
+	     volume,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_has_volume_shadow_snapshots(
+	     volume,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_bytes_per_sector(
+	     volume,
+	     &bytes_per_sector,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_cluster_block_size(
+	     volume,
+	     &cluster_block_size,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_mft_entry_size(
+	     volume,
+	     &mft_entry_size,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_index_entry_size(
+	     volume,
+	     &index_entry_size,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_serial_number(
+	     volume,
+	     &serial_number,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_utf8_name_size(
+	     volume,
+	     &utf8_string_size,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_utf8_name(
+	     volume,
+	     utf8_string,
+	     64,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_utf16_name_size(
+	     volume,
+	     &utf16_string_size,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_utf16_name(
+	     volume,
+	     utf16_string,
+	     32,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_version(
+	     volume,
+	     &major_version,
+	     &minor_version,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_flags(
+	     volume,
+	     &flags,
+	     NULL ) == -1 )
+	{
+		goto on_error_libfsntfs;
+	}
+	if( libfsntfs_volume_get_number_of_file_entries(
+	     volume,
+	     &number_of_file_entries,
+	     NULL ) != 1 )
+	{
+		goto on_error_libfsntfs;
+	}
 	libfsntfs_volume_close(
 	 volume,
 	 NULL );
@@ -96,4 +209,3 @@ on_error_libbfio:
 }
 
 } /* extern "C" */
-

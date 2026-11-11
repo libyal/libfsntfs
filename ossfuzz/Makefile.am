@@ -12,14 +12,72 @@ AM_CPPFLAGS = \
 	@LIBBFIO_CPPFLAGS@
 
 bin_PROGRAMS = \
+	attribute_fuzzer \
+	attribute_list_entry_fuzzer \
+	data_stream_fuzzer \
 	file_entry_fuzzer \
 	mft_metadata_file_fuzzer \
+	usn_change_journal_fuzzer \
 	volume_fuzzer
 
-file_entry_fuzzer_SOURCES = \
+attribute_fuzzer_SOURCES = \
+	attribute_fuzzer.cc \
 	ossfuzz_libbfio.h \
-	ossfuzz_libfsntfs.h \
-	file_entry_fuzzer.cc
+	ossfuzz_libfsntfs.h
+
+attribute_fuzzer_LDADD = \
+	@LIB_FUZZING_ENGINE@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+attribute_list_entry_fuzzer_SOURCES = \
+	attribute_list_entry_fuzzer.cc \
+	ossfuzz_libbfio.h \
+	ossfuzz_libfsntfs.h
+
+attribute_list_entry_fuzzer_LDADD = \
+	@LIB_FUZZING_ENGINE@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+data_stream_fuzzer_SOURCES = \
+	data_stream_fuzzer.cc \
+	ossfuzz_libbfio.h \
+	ossfuzz_libfsntfs.h
+
+data_stream_fuzzer_LDADD = \
+	@LIB_FUZZING_ENGINE@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+file_entry_fuzzer_SOURCES = \
+	file_entry_fuzzer.cc \
+	ossfuzz_libbfio.h \
+	ossfuzz_libfsntfs.h
 
 file_entry_fuzzer_LDADD = \
 	@LIB_FUZZING_ENGINE@ \
@@ -52,10 +110,28 @@ mft_metadata_file_fuzzer_LDADD = \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 
-volume_fuzzer_SOURCES = \
+usn_change_journal_fuzzer_SOURCES = \
+	usn_change_journal_fuzzer.cc \
 	ossfuzz_libbfio.h \
-	ossfuzz_libfsntfs.h \
-	volume_fuzzer.cc
+	ossfuzz_libfsntfs.h
+
+usn_change_journal_fuzzer_LDADD = \
+	@LIB_FUZZING_ENGINE@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libfsntfs/libfsntfs.la \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
+
+volume_fuzzer_SOURCES = \
+	volume_fuzzer.cc \
+	ossfuzz_libbfio.h \
+	ossfuzz_libfsntfs.h
 
 volume_fuzzer_LDADD = \
 	@LIB_FUZZING_ENGINE@ \
@@ -76,10 +152,17 @@ DISTCLEANFILES = \
 	Makefile.in
 
 splint-local:
+	@echo "Running splint on attribute_fuzzer ..."
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(attribute_fuzzer_SOURCES)
+	@echo "Running splint on attribute_list_entry_fuzzer ..."
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(attribute_list_entry_fuzzer_SOURCES)
+	@echo "Running splint on data_stream_fuzzer ..."
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(data_stream_fuzzer_SOURCES)
 	@echo "Running splint on file_entry_fuzzer ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(file_entry_fuzzer_SOURCES)
 	@echo "Running splint on mft_metadata_file_fuzzer ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(mft_metadata_file_fuzzer_SOURCES)
+	@echo "Running splint on usn_change_journal_fuzzer ..."
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(usn_change_journal_fuzzer_SOURCES)
 	@echo "Running splint on volume_fuzzer ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(volume_fuzzer_SOURCES)
-
